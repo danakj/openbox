@@ -184,14 +184,11 @@ void frame_adjust_focus(gpointer self, gboolean hilite);
 void frame_adjust_title(gpointer self);
 void frame_adjust_icon(gpointer self);
 
-static gulong frame_animate_iconify_time_left(gpointer _self,
+gulong frame_animate_iconify_time_left(gpointer _self,
         const GTimeVal *now);
 
 ObFrameContext frame_context(gpointer, Window win, gint x, gint y);
-//void frame_client_gravity(gpointer self, gint *x, gint *y);
-//void frame_frame_gravity(gpointer self, gint *x, gint *y);
-//void frame_rect_to_frame(gpointer self, Rect *r);
-//void frame_rect_to_client(gpointer self, Rect *r);
+
 void frame_flash_start(gpointer self);
 void frame_flash_stop(gpointer self);
 void frame_begin_iconify_animation(gpointer self, gboolean iconifying);
@@ -225,7 +222,11 @@ void frame_adjust_cursors(gpointer self);
 void frame_trigger(gpointer, ObFrameTrigger);
 
 /* Global for renderframe.c only */
+extern Display * obp_display;
+extern gint obp_screen;
 extern ObFramePlugin plugin;
 #define OBDEFAULTFRAME(x) ((ObDefaultFrame *)(x))
+
+ObFramePlugin * get_info();
 
 #endif /*FRAME_DEFAULT_PLUGIN_H_*/

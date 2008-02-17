@@ -382,7 +382,7 @@ gint main(gint argc, gchar **argv)
     if (render_plugin)
     {
     //RrThemeFree(render_plugin->ob_rr_theme);
-    RrInstanceFree(render_plugin->ob_rr_inst);
+    //RrInstanceFree(render_plugin->ob_rr_inst);
     }
     session_shutdown(being_replaced);
 

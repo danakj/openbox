@@ -20,14 +20,11 @@
 #define FRAME_DEFAULT_CONFIG_H_
 
 #include <X11/Xresource.h>
-#include "render/render.h"
 
-G_BEGIN_DECLS
+#include "render/render.h"
 
 struct _ObFrameThemeConfig
 {
-    const RrInstance *inst;
-
     /* style settings - fonts */
     RrFont *win_font_focused;
     RrFont *win_font_unfocused;
@@ -238,6 +235,7 @@ struct _ObFrameThemeConfig
 
 typedef struct _ObFrameThemeConfig ObFrameThemeConfig;
 
+G_BEGIN_DECLS
 /*! The font values are all optional. If a NULL is used for any of them, then
  the default font will be used. */
 gint load_theme_config(const RrInstance *inst, const gchar *name,

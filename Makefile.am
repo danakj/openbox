@@ -27,8 +27,8 @@ check_PROGRAMS = \
 lib_LTLIBRARIES = \
 	render/libobrender.la \
 	obt/libobt.la \
-	engines/libconcept.la \
 	engines/libdefault.la
+#	engines/libconcept.la \
 #	engines/libconcept2.la \
 #	engines/libminimal.la
 
@@ -70,6 +70,7 @@ render_libobrender_la_CPPFLAGS = \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
+	-no-undefined \
 	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 render_libobrender_la_LIBADD = \
 	obt/libobt.la \
@@ -105,12 +106,14 @@ engines_libdefault_la_CPPFLAGS = \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(XFT_CFLAGS) \
-	-DG_LOG_DOMAIN=\"ObRender\" \
+	-DG_LOG_DOMAIN=\"ObDefault\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 engines_libdefault_la_LDFLAGS = \
+	-no-undefined \
 	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 engines_libdefault_la_LIBADD = \
 	render/libobrender.la \
+	obt/libobt.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
 	$(XFT_LIBS) \
@@ -118,24 +121,6 @@ engines_libdefault_la_LIBADD = \
 	$(XML_LIBS)
 engines_libdefault_la_SOURCES = \
 	gettext.h \
-	render/color.h \
-	render/color.c \
-	render/font.h \
-	render/font.c \
-	render/geom.h \
-	render/gradient.h \
-	render/gradient.c \
-	render/icon.h \
-	render/image.h \
-	render/image.c \
-	render/instance.h \
-	render/instance.c \
-	render/mask.h \
-	render/mask.c \
-	render/render.h \
-	render/render.c \
-	openbox/engine_interface.h \
-	openbox/engine_interface.c \
 	engines/default/config.h \
 	engines/default/config.c \
 	engines/default/render.h \
@@ -189,53 +174,53 @@ engines_libdefault_la_SOURCES = \
 #    engines/minimal/frame_minimal_plugin.c
 
 ## frame_concept ##
-engines_libconcept_la_CPPFLAGS = \
-	$(X_CFLAGS) \
-	$(GLIB_CFLAGS) \
-	$(XML_CFLAGS) \
-	$(PANGO_CFLAGS) \
-	$(XFT_CFLAGS) \
-	$(IMLIB2_CFLAGS) \
-	$(GDK_PIXBUF_CFLAGS) \
-	$(GDK_PIXBUF_XLIB_CFLAGS) \
-	-DG_LOG_DOMAIN=\"ObRender\" \
-	-DDEFAULT_THEME=\"$(theme)\"
-engines_libconcept_la_LDFLAGS = \
-	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
-engines_libconcept_la_LIBADD = \
-	render/libobrender.la \
-	$(X_LIBS) \
-	$(PANGO_LIBS) \
-	$(XFT_LIBS) \
-	$(GLIB_LIBS) \
-	$(IMLIB2_LIBS) \
-	$(GDK_PIXBUF_LIBS) \
-	$(GDK_PIXBUF_XLIB_LIBS) \
-	$(XML_LIBS)
-engines_libconcept_la_SOURCES = \
-	gettext.h \
-	render/color.h \
-	render/color.c \
-	render/font.h \
-	render/font.c \
-	render/geom.h \
-	render/gradient.h \
-	render/gradient.c \
-	render/icon.h \
-	render/image.h \
-	render/image.c \
-	render/instance.h \
-	render/instance.c \
-	render/mask.h \
-	render/mask.c \
-	render/render.h \
-	render/render.c \
-	openbox/engine_interface.h \
-	openbox/engine_interface.c \
-	engines/concept/config.h \
-	engines/concept/config.c \
-	engines/concept/plugin.h \
-	engines/concept/plugin.c
+#engines_libconcept_la_CPPFLAGS = \
+#	$(X_CFLAGS) \
+#	$(GLIB_CFLAGS) \
+#	$(XML_CFLAGS) \
+#	$(PANGO_CFLAGS) \
+#	$(XFT_CFLAGS) \
+#	$(IMLIB2_CFLAGS) \
+#	$(GDK_PIXBUF_CFLAGS) \
+#	$(GDK_PIXBUF_XLIB_CFLAGS) \
+#	-DG_LOG_DOMAIN=\"ObRender\" \
+#	-DDEFAULT_THEME=\"$(theme)\"
+#engines_libconcept_la_LDFLAGS = \
+#	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
+#engines_libconcept_la_LIBADD = \
+#	render/libobrender.la \
+#	$(X_LIBS) \
+#	$(PANGO_LIBS) \
+#	$(XFT_LIBS) \
+#	$(GLIB_LIBS) \
+#	$(IMLIB2_LIBS) \
+#	$(GDK_PIXBUF_LIBS) \
+#	$(GDK_PIXBUF_XLIB_LIBS) \
+#	$(XML_LIBS)
+#engines_libconcept_la_SOURCES = \
+#	gettext.h \
+#	render/color.h \
+#	render/color.c \
+#	render/font.h \
+#	render/font.c \
+#	render/geom.h \
+#	render/gradient.h \
+#	render/gradient.c \
+#	render/icon.h \
+#	render/image.h \
+#	render/image.c \
+#	render/instance.h \
+#	render/instance.c \
+#	render/mask.h \
+#	render/mask.c \
+#	render/render.h \
+#	render/render.c \
+#	openbox/engine_interface.h \
+#	openbox/engine_interface.c \
+#	engines/concept/config.h \
+#	engines/concept/config.c \
+#	engines/concept/plugin.h \
+#	engines/concept/plugin.c
 
 ## obt ##
 
@@ -252,6 +237,7 @@ obt_libobt_la_CPPFLAGS = \
 	-DDATADIR=\"$(datadir)\" \
 	-DCONFIGDIR=\"$(configdir)\"
 obt_libobt_la_LDFLAGS = \
+	-no-undefined \
 	-version-info $(OBT_CURRENT):$(OBT_REVISION):$(OBT_AGE)
 obt_libobt_la_LIBADD = \
 	$(XINERAMA_LIBS) \

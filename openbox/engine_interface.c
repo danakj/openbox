@@ -87,9 +87,10 @@ ObFramePlugin * init_frame_plugin(const gchar *name, gboolean allow_fallback,
 
 void update_frame_plugin(ObFramePlugin * self)
 {
-    self->ob_display = obt_display;
-    self->ob_screen = ob_screen;
-    self->ob_rr_inst = ob_rr_inst;
+    self->init (obt_display, ob_screen);
+    //self->ob_display = obt_display;
+    //self->ob_screen = ob_screen;
+    //self->ob_rr_inst = ob_rr_inst;
     self->config_theme_keepborder = config_theme_keepborder;
     self->config_title_layout = config_title_layout;
     self->ob_main_loop = ob_main_loop;
@@ -101,7 +102,7 @@ ObFramePlugin * load_frame_plugin(const gchar * filename)
     gpointer func;
 
     if (!(module = g_module_open(filename, G_MODULE_BIND_LOCAL))) {
-        ob_debug_type(OB_DEBUG_SM, "Failed to load plugin (%s): %s\n",
+        ob_debug ("Failed to load plugin (%s): %s\n",
                 filename, g_module_error());
         exit(1);
     }

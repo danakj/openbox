@@ -17,20 +17,19 @@
  See the COPYING file for a copy of the GNU General Public License.
  */
 
-#include "openbox/client.h"
-#include "openbox/openbox.h"
-#include "obt/prop.h"
-#include "openbox/grab.h"
-#include "openbox/config.h"
-#include "obt/mainloop.h"
-#include "openbox/focus_cycle.h"
-#include "openbox/focus_cycle_indicator.h"
-#include "openbox/moveresize.h"
-#include "openbox/screen.h"
-#include "render/theme.h"
-
 #include "plugin.h"
 #include "render.h"
+
+/* Needed for the _() function */
+#include <gettext.h>
+
+#include "obt/prop.h"
+#include "openbox/screen.h"
+
+/* Needed for the grab_server */
+#include "openbox/grab.h"
+
+#include <X11/extensions/shape.h>
 
 typedef enum
 {
@@ -53,12 +52,16 @@ typedef enum
 
 #define FRAME_HANDLE_Y(f) (f->size.top + f->client_area.height + f->cbwidth_b)
 
+Display * obp_display;
+gint obp_screen;
+RrInstance *ob_rr_inst;
+
 Window createWindow(Window parent, Visual *visual, gulong mask,
         XSetWindowAttributes *attrib)
 {
-    return XCreateWindow(plugin.ob_display, parent, 0, 0, 1, 1, 0, (visual ? 32
-            : RrDepth(plugin.ob_rr_inst)), InputOutput, (visual ? visual
-            : RrVisual(plugin.ob_rr_inst)), mask, attrib);
+    return XCreateWindow(obp_display, parent, 0, 0, 1, 1, 0, (visual ? 32
+            : RrDepth(ob_rr_inst)), InputOutput, (visual ? visual
+            : RrVisual(ob_rr_inst)), mask, attrib);
 
 }
 
@@ -69,10 +72,10 @@ Visual *check_32bit_client(ObClient *c)
 
     /* we're already running at 32 bit depth, yay. we don't need to use their
      visual */
-    if (RrDepth(plugin.ob_rr_inst) == 32)
+    if (RrDepth(ob_rr_inst) == 32)
         return NULL;
 
-    ret = XGetWindowAttributes(plugin.ob_display, c->window, &wattrib);
+    ret = XGetWindowAttributes(obp_display, c->window, &wattrib);
     g_assert(ret != BadDrawable);
     g_assert(ret != BadWindow);
 
@@ -84,8 +87,11 @@ Visual *check_32bit_client(ObClient *c)
 /* Not used */
 gint init(Display * display, gint screen)
 {
-    plugin.ob_display = display;
-    plugin.ob_screen = screen;
+    ob_rr_inst = RrInstanceNew(display, screen);
+    if (ob_rr_inst == NULL)
+        ob_exit_with_error(_("Failed to initialize the obrender library."));
+    obp_display = display;
+    obp_screen = screen;
 }
 
 gpointer frame_new(struct _ObClient * client)
@@ -108,14 +114,14 @@ gpointer frame_new(struct _ObClient * client)
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
         /* create a colormap with the visual */
         OBDEFAULTFRAME(self)->colormap = attrib.colormap = XCreateColormap(
-                plugin.ob_display, RootWindow(plugin.ob_display,
-                        plugin.ob_screen), visual, AllocNone);
-        attrib.background_pixel = BlackPixel(plugin.ob_display,
-                plugin.ob_screen);
-        attrib.border_pixel = BlackPixel(plugin.ob_display, plugin.ob_screen);
+                obp_display, RootWindow(obp_display,
+                        obp_screen), visual, AllocNone);
+        attrib.background_pixel = BlackPixel(obp_display,
+                obp_screen);
+        attrib.border_pixel = BlackPixel(obp_display, obp_screen);
     }
     self->window = createWindow(
-            RootWindow(plugin.ob_display, plugin.ob_screen), visual, mask,
+            RootWindow(obp_display, obp_screen), visual, mask,
             &attrib);
 
     /* create the visible decor windows */
@@ -124,7 +130,7 @@ gpointer frame_new(struct _ObClient * client)
     if (visual) {
         /* client has a 32-bit visual */
         mask |= CWColormap | CWBackPixel | CWBorderPixel;
-        attrib.colormap = RrColormap(plugin.ob_rr_inst);
+        attrib.colormap = RrColormap(ob_rr_inst);
     }
 
     self->backback = createWindow(self->window, NULL, mask, &attrib);
@@ -187,9 +193,9 @@ gpointer frame_new(struct _ObClient * client)
     self->focused = FALSE;
 
     /* the other stuff is shown based on decor settings */
-    XMapWindow(plugin.ob_display, self->label);
-    XMapWindow(plugin.ob_display, self->backback);
-    XMapWindow(plugin.ob_display, self->backfront);
+    XMapWindow(obp_display, self->label);
+    XMapWindow(obp_display, self->backback);
+    XMapWindow(obp_display, self->backfront);
 
     self->hover_flag = OB_BUTTON_NONE;
     self->press_flag = OB_BUTTON_NONE;
@@ -203,25 +209,25 @@ void set_theme_statics(gpointer _self)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
     /* set colors/appearance/sizes for stuff that doesn't change */
-    XResizeWindow(plugin.ob_display, self->max, theme_config.button_size,
+    XResizeWindow(obp_display, self->max, theme_config.button_size,
             theme_config.button_size);
-    XResizeWindow(plugin.ob_display, self->iconify, theme_config.button_size,
+    XResizeWindow(obp_display, self->iconify, theme_config.button_size,
             theme_config.button_size);
-    XResizeWindow(plugin.ob_display, self->icon, theme_config.button_size + 2,
+    XResizeWindow(obp_display, self->icon, theme_config.button_size + 2,
             theme_config.button_size + 2);
-    XResizeWindow(plugin.ob_display, self->close, theme_config.button_size,
+    XResizeWindow(obp_display, self->close, theme_config.button_size,
             theme_config.button_size);
-    XResizeWindow(plugin.ob_display, self->desk, theme_config.button_size,
+    XResizeWindow(obp_display, self->desk, theme_config.button_size,
             theme_config.button_size);
-    XResizeWindow(plugin.ob_display, self->shade, theme_config.button_size,
+    XResizeWindow(obp_display, self->shade, theme_config.button_size,
             theme_config.button_size);
-    XResizeWindow(plugin.ob_display, self->tltresize, theme_config.grip_width,
+    XResizeWindow(obp_display, self->tltresize, theme_config.grip_width,
             theme_config.paddingy + 1);
-    XResizeWindow(plugin.ob_display, self->trtresize, theme_config.grip_width,
+    XResizeWindow(obp_display, self->trtresize, theme_config.grip_width,
             theme_config.paddingy + 1);
-    XResizeWindow(plugin.ob_display, self->tllresize,
+    XResizeWindow(obp_display, self->tllresize,
             theme_config.paddingx + 1, theme_config.title_height);
-    XResizeWindow(plugin.ob_display, self->trrresize,
+    XResizeWindow(obp_display, self->trrresize,
             theme_config.paddingx + 1, theme_config.title_height);
 
     /* set up the dynamic appearances */
@@ -250,9 +256,9 @@ void free_theme_statics(gpointer _self)
 void frame_free(gpointer self)
 {
     free_theme_statics(OBDEFAULTFRAME(self));
-    XDestroyWindow(plugin.ob_display, OBDEFAULTFRAME(self)->window);
+    XDestroyWindow(obp_display, OBDEFAULTFRAME(self)->window);
     if (OBDEFAULTFRAME(self)->colormap)
-        XFreeColormap(plugin.ob_display, OBDEFAULTFRAME(self)->colormap);
+        XFreeColormap(obp_display, OBDEFAULTFRAME(self)->colormap);
     
     g_free(OBDEFAULTFRAME(self)->stitle);
     g_free(self);
@@ -268,8 +274,8 @@ void frame_show(gpointer _self)
          the client gets its MapNotify, i.e. to make sure the client is
          _visible_ when it gets MapNotify. */
         grab_server(TRUE);
-        XMapWindow(plugin.ob_display, self->client->window);
-        XMapWindow(plugin.ob_display, self->window);
+        XMapWindow(obp_display, self->client->window);
+        XMapWindow(obp_display, self->window);
         grab_server(FALSE);
     }
 }
@@ -279,10 +285,10 @@ gint frame_hide(gpointer self)
     if (OBDEFAULTFRAME(self)->visible) {
         OBDEFAULTFRAME(self)->visible = FALSE;
         if (!frame_iconify_animating(self))
-            XUnmapWindow(plugin.ob_display, OBDEFAULTFRAME(self)->window);
+            XUnmapWindow(obp_display, OBDEFAULTFRAME(self)->window);
         /* we unmap the client itself so that we can get MapRequest
          events, and because the ICCCM tells us to! */
-        XUnmapWindow(plugin.ob_display, OBDEFAULTFRAME(self)->client->window);
+        XUnmapWindow(obp_display, OBDEFAULTFRAME(self)->client->window);
         return 1;
     }
     else {
@@ -306,7 +312,7 @@ void frame_adjust_shape(gpointer _self)
     if (!self->client->shaped)
     {
         /* clear the shape on the frame window */
-        XShapeCombineMask(plugin.ob_display, self->window, ShapeBounding,
+        XShapeCombineMask(obp_display, self->window, ShapeBounding,
                 self->size.left,
                 self->size.top,
                 None, ShapeSet);
@@ -314,7 +320,7 @@ void frame_adjust_shape(gpointer _self)
     else
     {
         /* make the frame's shape match the clients */
-        XShapeCombineShape(plugin.ob_display, self->window, ShapeBounding,
+        XShapeCombineShape(obp_display, self->window, ShapeBounding,
                 self->size.left,
                 self->size.top,
                 self->client->window,
@@ -341,7 +347,7 @@ void frame_adjust_shape(gpointer _self)
             ++num;
         }
 
-        XShapeCombineRectangles(plugin.ob_display, self->window,
+        XShapeCombineRectangles(obp_display, self->window,
                 ShapeBounding, 0, 0, xrect, num,
                 ShapeUnion, Unsorted);
     }
@@ -357,7 +363,7 @@ void frame_grab(gpointer _self, GHashTable * window_map)
      */
 
     /* reparent the client to the frame */
-    XReparentWindow(plugin.ob_display, self->client->window, self->window, 0, 0);
+    XReparentWindow(obp_display, self->client->window, self->window, 0, 0);
 
     /*
      When reparenting the client window, it is usually not mapped yet, since
@@ -370,7 +376,7 @@ void frame_grab(gpointer _self, GHashTable * window_map)
 
     /* select the event mask on the client's parent (to receive config/map
      req's) the ButtonPress is to catch clicks on the client border */
-    XSelectInput(plugin.ob_display, self->window, FRAME_EVENTMASK);
+    XSelectInput(obp_display, self->window, FRAME_EVENTMASK);
 
     /* set all the windows for the frame in the window_map */
     g_hash_table_insert(window_map, &self->window, self->client);
@@ -427,7 +433,7 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
             frame_animate_iconify, self, FALSE);
 
     /* check if the app has already reparented its window away */
-    while (XCheckTypedWindowEvent(plugin.ob_display, self->client->window,
+    while (XCheckTypedWindowEvent(obp_display, self->client->window,
             ReparentNotify, &ev)) {
         /* This check makes sure we don't catch our own reparent action to
          our frame window. This doesn't count as the app reparenting itself
@@ -438,7 +444,7 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
          */
         if (ev.xreparent.parent != self->window) {
             reparent = FALSE;
-            XPutBackEvent(plugin.ob_display, &ev);
+            XPutBackEvent(obp_display, &ev);
             break;
         }
     }
@@ -446,8 +452,8 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
     if (reparent) {
         /* according to the ICCCM - if the client doesn't reparent itself,
          then we will reparent the window to root for them */
-        XReparentWindow(plugin.ob_display, self->client->window, RootWindow(
-                plugin.ob_display, plugin.ob_screen), self->client_area.x,
+        XReparentWindow(obp_display, self->client->window, RootWindow(
+                obp_display, obp_screen), self->client_area.x,
                 self->client_area.y);
     }
 
@@ -741,7 +747,7 @@ void frame_begin_iconify_animation(gpointer _self, gboolean iconifying)
 
         /* show it during the animation even if it is not "visible" */
         if (!self->visible)
-            XMapWindow(plugin.ob_display, self->window);
+            XMapWindow(obp_display, self->window);
     }
 }
 
@@ -753,7 +759,7 @@ void frame_end_iconify_animation(gpointer _self)
         return;
 
     if (!self->visible)
-        XUnmapWindow(plugin.ob_display, self->window);
+        XUnmapWindow(obp_display, self->window);
     else {
         /* Send a ConfigureNotify when the animation is done, this fixes
          KDE's pager showing the window in the wrong place.  since the
@@ -766,11 +772,11 @@ void frame_end_iconify_animation(gpointer _self)
     /* we're not animating any more ! */
     self->iconify_animation_going = 0;
 
-    XMoveResizeWindow(plugin.ob_display, self->window, self->area.x,
+    XMoveResizeWindow(obp_display, self->window, self->area.x,
             self->area.y, self->area.width, self->area.height);
     /* we delay re-rendering until after we're done animating */
     frame_update_skin(self);
-    XFlush(plugin.ob_display);
+    XFlush(obp_display);
 }
 
 gboolean frame_iconify_animating(gpointer _self)
@@ -860,81 +866,81 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
         gint innercornerheight = theme_config.grip_width - self->size.bottom;
 
         if (self->cbwidth_l) {
-            XMoveResizeWindow(plugin.ob_display, self->innerleft,
+            XMoveResizeWindow(obp_display, self->innerleft,
                     self->size.left - self->cbwidth_l, self->size.top,
                     self->cbwidth_l, self->client_area.height);
 
-            XMapWindow(plugin.ob_display, self->innerleft);
+            XMapWindow(obp_display, self->innerleft);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->innerleft);
+            XUnmapWindow(obp_display, self->innerleft);
 
         if (self->cbwidth_l && innercornerheight > 0) {
-            XMoveResizeWindow(plugin.ob_display, self->innerbll, 0,
+            XMoveResizeWindow(obp_display, self->innerbll, 0,
                     self->client_area.height - (theme_config.grip_width
                             - self->size.bottom), self->cbwidth_l,
                     theme_config.grip_width - self->size.bottom);
 
-            XMapWindow(plugin.ob_display, self->innerbll);
+            XMapWindow(obp_display, self->innerbll);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->innerbll);
+            XUnmapWindow(obp_display, self->innerbll);
 
         if (self->cbwidth_r) {
-            XMoveResizeWindow(plugin.ob_display, self->innerright,
+            XMoveResizeWindow(obp_display, self->innerright,
                     self->size.left + self->client_area.width, self->size.top,
                     self->cbwidth_r, self->client_area.height);
 
-            XMapWindow(plugin.ob_display, self->innerright);
+            XMapWindow(obp_display, self->innerright);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->innerright);
+            XUnmapWindow(obp_display, self->innerright);
 
         if (self->cbwidth_r && innercornerheight > 0) {
-            XMoveResizeWindow(plugin.ob_display, self->innerbrr, 0,
+            XMoveResizeWindow(obp_display, self->innerbrr, 0,
                     self->client_area.height - (theme_config.grip_width
                             - self->size.bottom), self->cbwidth_r,
                     theme_config.grip_width - self->size.bottom);
 
-            XMapWindow(plugin.ob_display, self->innerbrr);
+            XMapWindow(obp_display, self->innerbrr);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->innerbrr);
+            XUnmapWindow(obp_display, self->innerbrr);
 
         if (self->cbwidth_t) {
-            XMoveResizeWindow(plugin.ob_display, self->innertop,
+            XMoveResizeWindow(obp_display, self->innertop,
                     self->size.left - self->cbwidth_l, self->size.top
                             - self->cbwidth_t, self->client_area.width
                             + self->cbwidth_l + self->cbwidth_r,
                     self->cbwidth_t);
 
-            XMapWindow(plugin.ob_display, self->innertop);
+            XMapWindow(obp_display, self->innertop);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->innertop);
+            XUnmapWindow(obp_display, self->innertop);
 
         if (self->cbwidth_b) {
-            XMoveResizeWindow(plugin.ob_display, self->innerbottom,
+            XMoveResizeWindow(obp_display, self->innerbottom,
                     self->size.left - self->cbwidth_l, self->size.top
                             + self->client_area.height, self->client_area.width
                             + self->cbwidth_l + self->cbwidth_r,
                     self->cbwidth_b);
 
-            XMoveResizeWindow(plugin.ob_display, self->innerblb, 0, 0,
+            XMoveResizeWindow(obp_display, self->innerblb, 0, 0,
                     theme_config.grip_width + self->bwidth, self->cbwidth_b);
-            XMoveResizeWindow(plugin.ob_display, self->innerbrb,
+            XMoveResizeWindow(obp_display, self->innerbrb,
                     self->client_area.width + self->cbwidth_l + self->cbwidth_r
                             - (theme_config.grip_width + self->bwidth), 0,
                     theme_config.grip_width + self->bwidth, self->cbwidth_b);
 
-            XMapWindow(plugin.ob_display, self->innerbottom);
-            XMapWindow(plugin.ob_display, self->innerblb);
-            XMapWindow(plugin.ob_display, self->innerbrb);
+            XMapWindow(obp_display, self->innerbottom);
+            XMapWindow(obp_display, self->innerblb);
+            XMapWindow(obp_display, self->innerbrb);
         }
         else {
-            XUnmapWindow(plugin.ob_display, self->innerbottom);
-            XUnmapWindow(plugin.ob_display, self->innerblb);
-            XUnmapWindow(plugin.ob_display, self->innerbrb);
+            XUnmapWindow(obp_display, self->innerbottom);
+            XUnmapWindow(obp_display, self->innerblb);
+            XUnmapWindow(obp_display, self->innerbrb);
         }
 
         if (self->bwidth) {
@@ -943,95 +949,95 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
             /* height of titleleft and titleright */
             titlesides = (!self->max_horz ? theme_config.grip_width : 0);
 
-            XMoveResizeWindow(plugin.ob_display, self->titletop,
+            XMoveResizeWindow(obp_display, self->titletop,
                     theme_config.grip_width + self->bwidth, 0,
                     /* width + bwidth*2 - bwidth*2 - grips*2 */
                     self->width - theme_config.grip_width * 2, self->bwidth);
-            XMoveResizeWindow(plugin.ob_display, self->titletopleft, 0, 0,
+            XMoveResizeWindow(obp_display, self->titletopleft, 0, 0,
                     theme_config.grip_width + self->bwidth, self->bwidth);
-            XMoveResizeWindow(plugin.ob_display, self->titletopright,
+            XMoveResizeWindow(obp_display, self->titletopright,
                     self->client_area.width + self->size.left
                             + self->size.right - theme_config.grip_width
                             - self->bwidth, 0, theme_config.grip_width
                             + self->bwidth, self->bwidth);
 
             if (titlesides > 0) {
-                XMoveResizeWindow(plugin.ob_display, self->titleleft, 0,
+                XMoveResizeWindow(obp_display, self->titleleft, 0,
                         self->bwidth, self->bwidth, titlesides);
-                XMoveResizeWindow(plugin.ob_display, self->titleright,
+                XMoveResizeWindow(obp_display, self->titleright,
                         self->client_area.width + self->size.left
                                 + self->size.right - self->bwidth,
                         self->bwidth, self->bwidth, titlesides);
 
-                XMapWindow(plugin.ob_display, self->titleleft);
-                XMapWindow(plugin.ob_display, self->titleright);
+                XMapWindow(obp_display, self->titleleft);
+                XMapWindow(obp_display, self->titleright);
             }
             else {
-                XUnmapWindow(plugin.ob_display, self->titleleft);
-                XUnmapWindow(plugin.ob_display, self->titleright);
+                XUnmapWindow(obp_display, self->titleleft);
+                XUnmapWindow(obp_display, self->titleright);
             }
 
-            XMapWindow(plugin.ob_display, self->titletop);
-            XMapWindow(plugin.ob_display, self->titletopleft);
-            XMapWindow(plugin.ob_display, self->titletopright);
+            XMapWindow(obp_display, self->titletop);
+            XMapWindow(obp_display, self->titletopleft);
+            XMapWindow(obp_display, self->titletopright);
 
             if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-                XMoveResizeWindow(plugin.ob_display, self->titlebottom,
+                XMoveResizeWindow(obp_display, self->titlebottom,
                         (self->max_horz ? 0 : self->bwidth),
                         theme_config.title_height + self->bwidth, self->width,
                         self->bwidth);
 
-                XMapWindow(plugin.ob_display, self->titlebottom);
+                XMapWindow(obp_display, self->titlebottom);
             }
             else
-                XUnmapWindow(plugin.ob_display, self->titlebottom);
+                XUnmapWindow(obp_display, self->titlebottom);
         }
         else {
-            XUnmapWindow(plugin.ob_display, self->titlebottom);
+            XUnmapWindow(obp_display, self->titlebottom);
 
-            XUnmapWindow(plugin.ob_display, self->titletop);
-            XUnmapWindow(plugin.ob_display, self->titletopleft);
-            XUnmapWindow(plugin.ob_display, self->titletopright);
-            XUnmapWindow(plugin.ob_display, self->titleleft);
-            XUnmapWindow(plugin.ob_display, self->titleright);
+            XUnmapWindow(obp_display, self->titletop);
+            XUnmapWindow(obp_display, self->titletopleft);
+            XUnmapWindow(obp_display, self->titletopright);
+            XUnmapWindow(obp_display, self->titleleft);
+            XUnmapWindow(obp_display, self->titleright);
         }
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-            XMoveResizeWindow(plugin.ob_display, self->title,
+            XMoveResizeWindow(obp_display, self->title,
                     (self->max_horz ? 0 : self->bwidth), self->bwidth,
                     self->width, theme_config.title_height);
 
-            XMapWindow(plugin.ob_display, self->title);
+            XMapWindow(obp_display, self->title);
 
             if (self->decorations & OB_FRAME_DECOR_GRIPS) {
-                XMoveResizeWindow(plugin.ob_display, self->topresize,
+                XMoveResizeWindow(obp_display, self->topresize,
                         theme_config.grip_width, 0, self->width
                                 - theme_config.grip_width *2,
                         theme_config.paddingy + 1);
 
-                XMoveWindow(plugin.ob_display, self->tltresize, 0, 0);
-                XMoveWindow(plugin.ob_display, self->tllresize, 0, 0);
-                XMoveWindow(plugin.ob_display, self->trtresize, self->width
+                XMoveWindow(obp_display, self->tltresize, 0, 0);
+                XMoveWindow(obp_display, self->tllresize, 0, 0);
+                XMoveWindow(obp_display, self->trtresize, self->width
                         - theme_config.grip_width, 0);
-                XMoveWindow(plugin.ob_display, self->trrresize, self->width
+                XMoveWindow(obp_display, self->trrresize, self->width
                         - theme_config.paddingx - 1, 0);
 
-                XMapWindow(plugin.ob_display, self->topresize);
-                XMapWindow(plugin.ob_display, self->tltresize);
-                XMapWindow(plugin.ob_display, self->tllresize);
-                XMapWindow(plugin.ob_display, self->trtresize);
-                XMapWindow(plugin.ob_display, self->trrresize);
+                XMapWindow(obp_display, self->topresize);
+                XMapWindow(obp_display, self->tltresize);
+                XMapWindow(obp_display, self->tllresize);
+                XMapWindow(obp_display, self->trtresize);
+                XMapWindow(obp_display, self->trrresize);
             }
             else {
-                XUnmapWindow(plugin.ob_display, self->topresize);
-                XUnmapWindow(plugin.ob_display, self->tltresize);
-                XUnmapWindow(plugin.ob_display, self->tllresize);
-                XUnmapWindow(plugin.ob_display, self->trtresize);
-                XUnmapWindow(plugin.ob_display, self->trrresize);
+                XUnmapWindow(obp_display, self->topresize);
+                XUnmapWindow(obp_display, self->tltresize);
+                XUnmapWindow(obp_display, self->tllresize);
+                XUnmapWindow(obp_display, self->trtresize);
+                XUnmapWindow(obp_display, self->trrresize);
             }
         }
         else
-            XUnmapWindow(plugin.ob_display, self->title);
+            XUnmapWindow(obp_display, self->title);
     }
 
     if ((self->decorations & OB_FRAME_DECOR_TITLEBAR))
@@ -1042,7 +1048,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
         gint sidebwidth = self->max_horz ? 0 : self->bwidth;
 
         if (self->bwidth && self->size.bottom) {
-            XMoveResizeWindow(plugin.ob_display, self->handlebottom,
+            XMoveResizeWindow(obp_display, self->handlebottom,
                     theme_config.grip_width + self->bwidth + sidebwidth,
                     self->size.top + self->client_area.height
                             + self->size.bottom - self->bwidth, self->width
@@ -1050,7 +1056,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
                     self->bwidth);
 
             if (sidebwidth) {
-                XMoveResizeWindow(plugin.ob_display, self->lgripleft, 0,
+                XMoveResizeWindow(obp_display, self->lgripleft, 0,
                         self->size.top + self->client_area.height
                                 + self->size.bottom
                                 - (!self->max_horz ? theme_config.grip_width
@@ -1058,7 +1064,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
                         self->bwidth,
                         (!self->max_horz ? theme_config.grip_width
                                 : self->size.bottom - self->cbwidth_b));
-                XMoveResizeWindow(plugin.ob_display, self->rgripright,
+                XMoveResizeWindow(obp_display, self->rgripright,
                         self->size.left + self->client_area.width
                                 + self->size.right - self->bwidth,
                         self->size.top + self->client_area.height
@@ -1069,19 +1075,19 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
                         (!self->max_horz ? theme_config.grip_width
                                 : self->size.bottom - self->cbwidth_b));
 
-                XMapWindow(plugin.ob_display, self->lgripleft);
-                XMapWindow(plugin.ob_display, self->rgripright);
+                XMapWindow(obp_display, self->lgripleft);
+                XMapWindow(obp_display, self->rgripright);
             }
             else {
-                XUnmapWindow(plugin.ob_display, self->lgripleft);
-                XUnmapWindow(plugin.ob_display, self->rgripright);
+                XUnmapWindow(obp_display, self->lgripleft);
+                XUnmapWindow(obp_display, self->rgripright);
             }
 
-            XMoveResizeWindow(plugin.ob_display, self->lgripbottom, sidebwidth,
+            XMoveResizeWindow(obp_display, self->lgripbottom, sidebwidth,
                     self->size.top + self->client_area.height
                             + self->size.bottom - self->bwidth,
                     theme_config.grip_width + self->bwidth, self->bwidth);
-            XMoveResizeWindow(plugin.ob_display, self->rgripbottom,
+            XMoveResizeWindow(obp_display, self->rgripbottom,
                     self->size.left + self->client_area.width
                             + self->size.right - self->bwidth - sidebwidth
                             - theme_config.grip_width, self->size.top
@@ -1089,132 +1095,132 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
                             - self->bwidth, theme_config.grip_width
                             + self->bwidth, self->bwidth);
 
-            XMapWindow(plugin.ob_display, self->handlebottom);
-            XMapWindow(plugin.ob_display, self->lgripbottom);
-            XMapWindow(plugin.ob_display, self->rgripbottom);
+            XMapWindow(obp_display, self->handlebottom);
+            XMapWindow(obp_display, self->lgripbottom);
+            XMapWindow(obp_display, self->rgripbottom);
 
             if (self->decorations & OB_FRAME_DECOR_HANDLE
                     && theme_config.handle_height > 0) {
-                XMoveResizeWindow(plugin.ob_display, self->handletop,
+                XMoveResizeWindow(obp_display, self->handletop,
                         theme_config.grip_width + self->bwidth + sidebwidth, 
                         FRAME_HANDLE_Y(self), self->width - (theme_config.grip_width
                                 + sidebwidth) * 2, self->bwidth);
-                XMapWindow(plugin.ob_display, self->handletop);
+                XMapWindow(obp_display, self->handletop);
 
                 if (self->decorations & OB_FRAME_DECOR_GRIPS) {
-                    XMoveResizeWindow(plugin.ob_display, self->handleleft,
+                    XMoveResizeWindow(obp_display, self->handleleft,
                             theme_config.grip_width, 0, self->bwidth,
                             theme_config.handle_height);
-                    XMoveResizeWindow(plugin.ob_display, self->handleright,
+                    XMoveResizeWindow(obp_display, self->handleright,
                             self->width - theme_config.grip_width
                                     - self->bwidth, 0, self->bwidth,
                             theme_config.handle_height);
 
-                    XMoveResizeWindow(plugin.ob_display, self->lgriptop,
+                    XMoveResizeWindow(obp_display, self->lgriptop,
                             sidebwidth, 
                             FRAME_HANDLE_Y(self), theme_config.grip_width
                                     + self->bwidth, self->bwidth);
-                    XMoveResizeWindow(plugin.ob_display, self->rgriptop,
+                    XMoveResizeWindow(obp_display, self->rgriptop,
                             self->size.left + self->client_area.width
                                     + self->size.right - self->bwidth
                                     - sidebwidth - theme_config.grip_width, 
                             FRAME_HANDLE_Y(self), theme_config.grip_width
                                     + self->bwidth, self->bwidth);
 
-                    XMapWindow(plugin.ob_display, self->handleleft);
-                    XMapWindow(plugin.ob_display, self->handleright);
-                    XMapWindow(plugin.ob_display, self->lgriptop);
-                    XMapWindow(plugin.ob_display, self->rgriptop);
+                    XMapWindow(obp_display, self->handleleft);
+                    XMapWindow(obp_display, self->handleright);
+                    XMapWindow(obp_display, self->lgriptop);
+                    XMapWindow(obp_display, self->rgriptop);
                 }
                 else {
-                    XUnmapWindow(plugin.ob_display, self->handleleft);
-                    XUnmapWindow(plugin.ob_display, self->handleright);
-                    XUnmapWindow(plugin.ob_display, self->lgriptop);
-                    XUnmapWindow(plugin.ob_display, self->rgriptop);
+                    XUnmapWindow(obp_display, self->handleleft);
+                    XUnmapWindow(obp_display, self->handleright);
+                    XUnmapWindow(obp_display, self->lgriptop);
+                    XUnmapWindow(obp_display, self->rgriptop);
                 }
             }
             else {
-                XUnmapWindow(plugin.ob_display, self->handleleft);
-                XUnmapWindow(plugin.ob_display, self->handleright);
-                XUnmapWindow(plugin.ob_display, self->lgriptop);
-                XUnmapWindow(plugin.ob_display, self->rgriptop);
+                XUnmapWindow(obp_display, self->handleleft);
+                XUnmapWindow(obp_display, self->handleright);
+                XUnmapWindow(obp_display, self->lgriptop);
+                XUnmapWindow(obp_display, self->rgriptop);
 
-                XUnmapWindow(plugin.ob_display, self->handletop);
+                XUnmapWindow(obp_display, self->handletop);
             }
         }
         else {
-            XUnmapWindow(plugin.ob_display, self->handleleft);
-            XUnmapWindow(plugin.ob_display, self->handleright);
-            XUnmapWindow(plugin.ob_display, self->lgriptop);
-            XUnmapWindow(plugin.ob_display, self->rgriptop);
+            XUnmapWindow(obp_display, self->handleleft);
+            XUnmapWindow(obp_display, self->handleright);
+            XUnmapWindow(obp_display, self->lgriptop);
+            XUnmapWindow(obp_display, self->rgriptop);
 
-            XUnmapWindow(plugin.ob_display, self->handletop);
+            XUnmapWindow(obp_display, self->handletop);
 
-            XUnmapWindow(plugin.ob_display, self->handlebottom);
-            XUnmapWindow(plugin.ob_display, self->lgripleft);
-            XUnmapWindow(plugin.ob_display, self->rgripright);
-            XUnmapWindow(plugin.ob_display, self->lgripbottom);
-            XUnmapWindow(plugin.ob_display, self->rgripbottom);
+            XUnmapWindow(obp_display, self->handlebottom);
+            XUnmapWindow(obp_display, self->lgripleft);
+            XUnmapWindow(obp_display, self->rgripright);
+            XUnmapWindow(obp_display, self->lgripbottom);
+            XUnmapWindow(obp_display, self->rgripbottom);
         }
 
         if (self->decorations & OB_FRAME_DECOR_HANDLE
                 && theme_config.handle_height > 0) {
-            XMoveResizeWindow(plugin.ob_display, self->handle, sidebwidth, 
+            XMoveResizeWindow(obp_display, self->handle, sidebwidth, 
             FRAME_HANDLE_Y(self) + self->bwidth, self->width,
                     theme_config.handle_height);
-            XMapWindow(plugin.ob_display, self->handle);
+            XMapWindow(obp_display, self->handle);
 
             if (self->decorations & OB_FRAME_DECOR_GRIPS) {
-                XMoveResizeWindow(plugin.ob_display, self->lgrip, 0, 0,
+                XMoveResizeWindow(obp_display, self->lgrip, 0, 0,
                         theme_config.grip_width, theme_config.handle_height);
-                XMoveResizeWindow(plugin.ob_display, self->rgrip, self->width
+                XMoveResizeWindow(obp_display, self->rgrip, self->width
                         - theme_config.grip_width, 0, theme_config.grip_width,
                         theme_config.handle_height);
 
-                XMapWindow(plugin.ob_display, self->lgrip);
-                XMapWindow(plugin.ob_display, self->rgrip);
+                XMapWindow(obp_display, self->lgrip);
+                XMapWindow(obp_display, self->rgrip);
             }
             else {
-                XUnmapWindow(plugin.ob_display, self->lgrip);
-                XUnmapWindow(plugin.ob_display, self->rgrip);
+                XUnmapWindow(obp_display, self->lgrip);
+                XUnmapWindow(obp_display, self->rgrip);
             }
         }
         else {
-            XUnmapWindow(plugin.ob_display, self->lgrip);
-            XUnmapWindow(plugin.ob_display, self->rgrip);
+            XUnmapWindow(obp_display, self->lgrip);
+            XUnmapWindow(obp_display, self->rgrip);
 
-            XUnmapWindow(plugin.ob_display, self->handle);
+            XUnmapWindow(obp_display, self->handle);
         }
 
         if (self->bwidth && !self->max_horz && (self->client_area.height
                 + self->size.top + self->size.bottom) > theme_config.grip_width
                 * 2) {
-            XMoveResizeWindow(plugin.ob_display, self->left, 0, self->bwidth
+            XMoveResizeWindow(obp_display, self->left, 0, self->bwidth
                     + theme_config.grip_width, self->bwidth,
                     self->client_area.height + self->size.top
                             + self->size.bottom - theme_config.grip_width * 2);
 
-            XMapWindow(plugin.ob_display, self->left);
+            XMapWindow(obp_display, self->left);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->left);
+            XUnmapWindow(obp_display, self->left);
 
         if (self->bwidth && !self->max_horz && (self->client_area.height
                 + self->size.top + self->size.bottom) > theme_config.grip_width
                 * 2) {
-            XMoveResizeWindow(plugin.ob_display, self->right,
+            XMoveResizeWindow(obp_display, self->right,
                     self->client_area.width + self->cbwidth_l + self->cbwidth_r
                             + self->bwidth, self->bwidth
                             + theme_config.grip_width, self->bwidth,
                     self->client_area.height + self->size.top
                             + self->size.bottom - theme_config.grip_width * 2);
 
-            XMapWindow(plugin.ob_display, self->right);
+            XMapWindow(obp_display, self->right);
         }
         else
-            XUnmapWindow(plugin.ob_display, self->right);
+            XUnmapWindow(obp_display, self->right);
 
-        XMoveResizeWindow(plugin.ob_display, self->backback, self->size.left,
+        XMoveResizeWindow(obp_display, self->backback, self->size.left,
                 self->size.top, self->client_area.width,
                 self->client_area.height);
     }
@@ -1241,7 +1247,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
              but don't do this during an iconify animation. it will be
              reflected afterwards.
              */
-            XMoveResizeWindow(plugin.ob_display, self->window, self->area.x,
+            XMoveResizeWindow(obp_display, self->window, self->area.x,
                     self->area.y, self->area.width, self->area.height);
 
         /* when the client has StaticGravity, it likes to move around.
@@ -1249,7 +1255,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
          this also needs to be run when the frame's decorations sizes change!
          */
         if (!is_resize)
-            XMoveResizeWindow(plugin.ob_display, self->client->window,
+            XMoveResizeWindow(obp_display, self->client->window,
                     self->size.left, self->size.top, self->client_area.width,
                     self->client_area.height);
 
@@ -1277,7 +1283,7 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
             focus_cycle_draw_indicator(self->client);
     }
     if (is_resize && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
-        XResizeWindow(plugin.ob_display, self->label, self->label_width,
+        XResizeWindow(obp_display, self->label, self->label_width,
                 theme_config.label_height);
 }
 
@@ -1416,8 +1422,8 @@ gboolean frame_animate_iconify(gpointer p)
     if (time == 0)
         frame_end_iconify_animation(self);
     else {
-        XMoveResizeWindow(plugin.ob_display, self->window, x, y, w, h);
-        XFlush(plugin.ob_display);
+        XMoveResizeWindow(obp_display, self->window, x, y, w, h);
+        XFlush(obp_display);
     }
 
     return time > 0; /* repeat until we're out of time */
@@ -1438,71 +1444,71 @@ void frame_adjust_cursors(gpointer _self)
         /* these ones turn off when max vert, and some when shaded */
         a.cursor = ob_cursor(r && topbot && !sh ? OB_CURSOR_NORTH
                 : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->topresize, CWCursor,
+        XChangeWindowAttributes(obp_display, self->topresize, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->titletop, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->titletop, CWCursor, &a);
         a.cursor = ob_cursor(r && topbot ? OB_CURSOR_SOUTH : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->handle, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->handletop, CWCursor,
+        XChangeWindowAttributes(obp_display, self->handle, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->handletop, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->handlebottom,
+        XChangeWindowAttributes(obp_display, self->handlebottom,
                 CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerbottom, CWCursor,
+        XChangeWindowAttributes(obp_display, self->innerbottom, CWCursor,
                 &a);
 
         /* these ones change when shaded */
         a.cursor = ob_cursor(r ? (sh ? OB_CURSOR_WEST : OB_CURSOR_NORTHWEST)
                 : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->titleleft, CWCursor,
+        XChangeWindowAttributes(obp_display, self->titleleft, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->tltresize, CWCursor,
+        XChangeWindowAttributes(obp_display, self->tltresize, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->tllresize, CWCursor,
+        XChangeWindowAttributes(obp_display, self->tllresize, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->titletopleft,
+        XChangeWindowAttributes(obp_display, self->titletopleft,
                 CWCursor, &a);
         a.cursor = ob_cursor(r ? (sh ? OB_CURSOR_EAST : OB_CURSOR_NORTHEAST)
                 : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->titleright, CWCursor,
+        XChangeWindowAttributes(obp_display, self->titleright, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->trtresize, CWCursor,
+        XChangeWindowAttributes(obp_display, self->trtresize, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->trrresize, CWCursor,
+        XChangeWindowAttributes(obp_display, self->trrresize, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->titletopright,
+        XChangeWindowAttributes(obp_display, self->titletopright,
                 CWCursor, &a);
 
         /* these ones are pretty static */
         a.cursor = ob_cursor(r ? OB_CURSOR_WEST : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->left, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerleft, CWCursor,
+        XChangeWindowAttributes(obp_display, self->left, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerleft, CWCursor,
                 &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_EAST : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->right, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerright, CWCursor,
+        XChangeWindowAttributes(obp_display, self->right, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerright, CWCursor,
                 &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHWEST : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->lgrip, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->handleleft, CWCursor,
+        XChangeWindowAttributes(obp_display, self->lgrip, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->handleleft, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->lgripleft, CWCursor,
+        XChangeWindowAttributes(obp_display, self->lgripleft, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->lgriptop, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->lgripbottom, CWCursor,
+        XChangeWindowAttributes(obp_display, self->lgriptop, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->lgripbottom, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerbll, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerblb, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerbll, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerblb, CWCursor, &a);
         a.cursor = ob_cursor(r ? OB_CURSOR_SOUTHEAST : OB_CURSOR_NONE);
-        XChangeWindowAttributes(plugin.ob_display, self->rgrip, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->handleright, CWCursor,
+        XChangeWindowAttributes(obp_display, self->rgrip, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->handleright, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->rgripright, CWCursor,
+        XChangeWindowAttributes(obp_display, self->rgripright, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->rgriptop, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->rgripbottom, CWCursor,
+        XChangeWindowAttributes(obp_display, self->rgriptop, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->rgripbottom, CWCursor,
                 &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerbrr, CWCursor, &a);
-        XChangeWindowAttributes(plugin.ob_display, self->innerbrb, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerbrr, CWCursor, &a);
+        XChangeWindowAttributes(obp_display, self->innerbrb, CWCursor, &a);
     }
 }
 
@@ -1510,7 +1516,7 @@ void frame_adjust_client_area(gpointer _self)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
     /* adjust the window which is there to prevent flashing on unmap */
-    XMoveResizeWindow(plugin.ob_display, self->backfront, 0, 0,
+    XMoveResizeWindow(obp_display, self->backfront, 0, 0,
             self->client_area.width, self->client_area.height);
 }
 
@@ -1527,7 +1533,7 @@ void frame_adjust_focus(gpointer _self, gboolean hilite)
     self->focused = hilite;
     self->need_render = TRUE;
     frame_update_skin(self);
-    XFlush(plugin.ob_display);
+    XFlush(obp_display);
 }
 
 void frame_adjust_title(gpointer _self)
@@ -1730,61 +1736,61 @@ void layout_title(ObDefaultFrame * self)
 
     /* position and map the elements */
     if (self->icon_on) {
-        XMapWindow(plugin.ob_display, self->icon);
-        XMoveWindow(plugin.ob_display, self->icon, self->icon_x,
+        XMapWindow(obp_display, self->icon);
+        XMoveWindow(obp_display, self->icon, self->icon_x,
                 theme_config.paddingy);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->icon);
+        XUnmapWindow(obp_display, self->icon);
 
     if (self->desk_on) {
-        XMapWindow(plugin.ob_display, self->desk);
-        XMoveWindow(plugin.ob_display, self->desk, self->desk_x,
+        XMapWindow(obp_display, self->desk);
+        XMoveWindow(obp_display, self->desk, self->desk_x,
                 theme_config.paddingy + 1);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->desk);
+        XUnmapWindow(obp_display, self->desk);
 
     if (self->shade_on) {
-        XMapWindow(plugin.ob_display, self->shade);
-        XMoveWindow(plugin.ob_display, self->shade, self->shade_x,
+        XMapWindow(obp_display, self->shade);
+        XMoveWindow(obp_display, self->shade, self->shade_x,
                 theme_config.paddingy + 1);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->shade);
+        XUnmapWindow(obp_display, self->shade);
 
     if (self->iconify_on) {
-        XMapWindow(plugin.ob_display, self->iconify);
-        XMoveWindow(plugin.ob_display, self->iconify, self->iconify_x,
+        XMapWindow(obp_display, self->iconify);
+        XMoveWindow(obp_display, self->iconify, self->iconify_x,
                 theme_config.paddingy + 1);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->iconify);
+        XUnmapWindow(obp_display, self->iconify);
 
     if (self->max_on) {
-        XMapWindow(plugin.ob_display, self->max);
-        XMoveWindow(plugin.ob_display, self->max, self->max_x,
+        XMapWindow(obp_display, self->max);
+        XMoveWindow(obp_display, self->max, self->max_x,
                 theme_config.paddingy + 1);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->max);
+        XUnmapWindow(obp_display, self->max);
 
     if (self->close_on) {
-        XMapWindow(plugin.ob_display, self->close);
-        XMoveWindow(plugin.ob_display, self->close, self->close_x,
+        XMapWindow(obp_display, self->close);
+        XMoveWindow(obp_display, self->close, self->close_x,
                 theme_config.paddingy + 1);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->close);
+        XUnmapWindow(obp_display, self->close);
 
     if (self->label_on) {
         self->label_width = MAX(1, self->label_width); /* no lower than 1 */
-        XMapWindow(plugin.ob_display, self->label);
-        XMoveWindow(plugin.ob_display, self->label, self->label_x,
+        XMapWindow(obp_display, self->label);
+        XMoveWindow(obp_display, self->label, self->label_x,
                 theme_config.paddingy);
     }
     else
-        XUnmapWindow(plugin.ob_display, self->label);
+        XUnmapWindow(obp_display, self->label);
 }
 
 void trigger_none (gpointer self) {}
@@ -1852,9 +1858,10 @@ void frame_trigger(gpointer self, ObFrameTrigger trigger_name)
     }
 }
 
-ObFramePlugin plugin = { 0, //gpointer handler;
-        "libdefault.la", //gchar * filename;
-        "Default", //gchar * name;
+ObFramePlugin plugin = {
+        0, /* gpointer handler */
+        "libdefault.la", /* gchar * filename */
+        "Default", /* gchar * name */
         init, //gint (*init) (Display * display, gint screen);
         0, /* */
         frame_new, //gpointer (*frame_new) (struct _ObClient *c);
@@ -1904,9 +1911,9 @@ ObFramePlugin plugin = { 0, //gpointer handler;
         load_theme_config, /* */
 
         /* This fields are fill by openbox. */
-        0, //Display * ob_display;
-        0, //gint ob_screen;
-        0, //RrInstance *ob_rr_inst;
+        //0, //Display * ob_display;
+        //0, //gint ob_screen;
+        //0, //RrInstance *ob_rr_inst;
         0, //gboolean config_theme_keepborder;
         0, //struct _ObClient *focus_cycle_target;
         0, //gchar *config_title_layout;

@@ -196,9 +196,9 @@ struct _ObFramePlugin
             RrFont *menu_item_font, RrFont *osd_font);
 
     /* Filled by openbox-core */
-    Display * ob_display;
-    gint ob_screen;
-    RrInstance *ob_rr_inst;
+    //Display * ob_display;
+    //gint ob_screen;
+    //RrInstance *ob_rr_inst;
     // Not more needed
     //struct _RrTheme * ob_rr_theme;
     gboolean config_theme_keepborder;

@@ -18,20 +18,12 @@
  */
 
 #include "config.h"
+
 #include "plugin.h"
 
 #include "render/render.h"
-#include "render/color.h"
-#include "render/font.h"
 #include "render/mask.h"
 #include "render/icon.h"
-#include "obt/parse.h"
-
-#include <X11/Xlib.h>
-
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
 
 static XrmDatabase loaddb(const gchar *name, gchar **path);
 static gboolean read_int(XrmDatabase db, const gchar *rname, gint *value);
@@ -56,9 +48,6 @@ gint load_theme_config(const RrInstance *inst, const gchar *name,
     ObFrameThemeConfig * theme = &theme_config;
     gboolean userdef;
 
-    //theme = g_new0(ObFrameTheme, 1);
-
-    theme->inst = inst;
     theme->name = g_strdup(name ? name : DEFAULT_THEME);
 
     theme->a_disabled_focused_max = RrAppearanceNew(inst, 1);

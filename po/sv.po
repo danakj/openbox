@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:24+0100\n"
+"POT-Creation-Date: 2008-02-17 16:45+0100\n"
 "PO-Revision-Date: 2008-02-17 16:37+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -340,7 +340,11 @@ msgstr "Kunde inte erhålla fönsterhanterarmarkeringen på skärm %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Fönsterhanteraren på skärm %d avslutar inte"
 
-#: openbox/screen.c:408
+#. TRANSLATORS: If you need to specify a different order of the
+#. arguments, you can use %1$d for the first one and %2$d for the
+#. second one. For example,
+#. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
+#: openbox/screen.c:412
 #, c-format
 msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
@@ -349,7 +353,7 @@ msgstr ""
 "Openbox är inställt på %d skrivbord, men nuvarande session har %d.  Använder "
 "sessionens inställning."
 
-#: openbox/screen.c:1174
+#: openbox/screen.c:1178
 #, c-format
 msgid "desktop %i"
 msgstr "skrivbord %i"

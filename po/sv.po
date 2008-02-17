@@ -291,7 +291,7 @@ msgstr ""
 
 #: openbox/openbox.c:582
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file kräver ett argument\n"
 
 #: openbox/openbox.c:625
 #, c-format

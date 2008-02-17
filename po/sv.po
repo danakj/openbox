@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-09 09:34+0100\n"
-"PO-Revision-Date: 2008-02-09 09:41+0100\n"
+"POT-Creation-Date: 2008-02-17 16:24+0100\n"
+"PO-Revision-Date: 2008-02-17 16:37+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions.c:151
+#: openbox/actions.c:150
 #, c-format
 msgid "Invalid action '%s' requested. No such action exists."
 msgstr "Ogiltig action '%s' efterfrågades, men den finns inte."
@@ -30,35 +30,61 @@ msgstr "Lyckades inte konvertera sökvägen '%s' från utf8"
 msgid "Failed to execute '%s': %s"
 msgstr "Kunde inte exekvera '%s': %s"
 
-#: openbox/client.c:1988 openbox/client.c:2020
+#: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "Dödar..."
 
-#: openbox/client.c:1990 openbox/client.c:2022
+#: openbox/client.c:2012 openbox/client.c:2044
 msgid "Not Responding"
 msgstr "Svarar Inte"
 
-#: openbox/client_list_combined_menu.c:91 openbox/client_list_menu.c:94
+#: openbox/client.c:3416
+msgid "No"
+msgstr "Nej"
+
+#: openbox/client.c:3417
+msgid "Yes"
+msgstr "Ja"
+
+#: openbox/client.c:3430
+#, c-format
+msgid ""
+"The window \"%s\" does not seem to be responding.  Do you want to force it "
+"to exit by sending the %s signal?"
+msgstr ""
+"Fönstret \"%s\" verkar inte svara.  Vill du tvinga det att avslutas genom "
+"att skicka signalen %s?"
+
+#: openbox/client.c:3434
+#, c-format
+msgid ""
+"The window \"%s\" does not seem to be responding.  Do you want to disconnect "
+"it from the X server?"
+msgstr ""
+"Fönstret \"%s\" verkar inte svara.  Vill du stänga dess anslutning till X-"
+"servern?"
+
+#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
 msgstr "Gå dit..."
 
-#: openbox/client_list_combined_menu.c:98
+#: openbox/client_list_combined_menu.c:94
 msgid "Manage desktops"
 msgstr "Hantera skrivbord"
 
-#: openbox/client_list_combined_menu.c:99 openbox/client_list_menu.c:158
+#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
 msgstr "_Lägg till nytt skrivbord"
 
-#: openbox/client_list_combined_menu.c:100 openbox/client_list_menu.c:159
+#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
 msgid "_Remove last desktop"
 msgstr "_Ta bort sista skrivbordet"
 
-#: openbox/client_list_combined_menu.c:153
+#: openbox/client_list_combined_menu.c:149
 msgid "Windows"
 msgstr "Fönster"
 
-#: openbox/client_list_menu.c:206
+#: openbox/client_list_menu.c:203
 msgid "Desktops"
 msgstr "Skrivbord"
 
@@ -122,7 +148,7 @@ msgstr "_Dekorationer"
 msgid "_Close"
 msgstr "Stän_g"
 
-#: openbox/config.c:754
+#: openbox/config.c:781
 #, c-format
 msgid "Invalid button '%s' specified in config file"
 msgstr "Ogiltig knapp '%s' angiven i konfigurationsfilen"
@@ -155,60 +181,60 @@ msgstr "Försökte öppna menyn '%s', men den finns inte"
 msgid "More..."
 msgstr "Mer..."
 
-#: openbox/mouse.c:363
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid button '%s' in mouse binding"
 msgstr "Ogiltig knapp '%s' i musbindning"
 
-#: openbox/mouse.c:369
+#: openbox/mouse.c:385
 #, c-format
 msgid "Invalid context '%s' in mouse binding"
 msgstr "Ogiltig kontext '%s' i musbindning"
 
-#: openbox/openbox.c:132
+#: openbox/openbox.c:134
 #, c-format
 msgid "Unable to change to home directory '%s': %s"
 msgstr "Kunde inte gå till hemkatalogen '%s': %s"
 
-#: openbox/openbox.c:152
+#: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Kunde inte öppna en display från miljövariabeln DISPLAY."
 
-#: openbox/openbox.c:183
+#: openbox/openbox.c:185
 msgid "Failed to initialize the obrender library."
 msgstr "Kunde inte initialisera obrender-biblioteket."
 
-#: openbox/openbox.c:189
+#: openbox/openbox.c:196
 msgid "X server does not support locale."
 msgstr "X-servern stödjer inte lokalisering."
 
-#: openbox/openbox.c:191
+#: openbox/openbox.c:198
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Kan inte sätta lokaliseringsmodifierare för X-servern."
 
-#: openbox/openbox.c:255
+#: openbox/openbox.c:264
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Kunde inte hitta en giltig konfigurationsfil, använder enkla standardvärden"
 
-#: openbox/openbox.c:289
+#: openbox/openbox.c:298
 msgid "Unable to load a theme."
 msgstr "Kunde inte ladda ett tema."
 
-#: openbox/openbox.c:416
+#: openbox/openbox.c:428
 #, c-format
 msgid "Restart failed to execute new executable '%s': %s"
 msgstr "Restart misslyckades att starta nytt program '%s': %s"
 
-#: openbox/openbox.c:486 openbox/openbox.c:488
+#: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:497
+#: openbox/openbox.c:509
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [alternativ]\n"
 
-#: openbox/openbox.c:498
+#: openbox/openbox.c:510
 msgid ""
 "\n"
 "Options:\n"
@@ -216,27 +242,28 @@ msgstr ""
 "\n"
 "Alternativ:\n"
 
-#: openbox/openbox.c:499
+#: openbox/openbox.c:511
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Visa den här hjälpen och avsluta\n"
 
-#: openbox/openbox.c:500
+#: openbox/openbox.c:512
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Visa versionen och avsluta\n"
 
-#: openbox/openbox.c:501
+#: openbox/openbox.c:513
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Ersätt den befintliga fönsterhanteraren\n"
 
-#: openbox/openbox.c:502
+#: openbox/openbox.c:514
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr "  --config-file FIL   Ange sökvägen till konfigurationsfil att använda\n"
+msgstr ""
+"  --config-file FIL   Ange sökvägen till konfigurationsfil att använda\n"
 
-#: openbox/openbox.c:503
+#: openbox/openbox.c:515
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Avaktivera anslutning till sessionshanteraren\n"
 
-#: openbox/openbox.c:504
+#: openbox/openbox.c:516
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -244,19 +271,19 @@ msgstr ""
 "\n"
 "Skicka meddelanden till en exekverande instans av Openbox:\n"
 
-#: openbox/openbox.c:505
+#: openbox/openbox.c:517
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ladda om Openbox konfiguration\n"
 
-#: openbox/openbox.c:506
+#: openbox/openbox.c:518
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Starta om Openbox\n"
 
-#: openbox/openbox.c:507
+#: openbox/openbox.c:519
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Avsluta Openbox\n"
 
-#: openbox/openbox.c:508
+#: openbox/openbox.c:520
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -264,23 +291,23 @@ msgstr ""
 "\n"
 "Debug-alternativ:\n"
 
-#: openbox/openbox.c:509
+#: openbox/openbox.c:521
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Kör i synkroniserat läge\n"
 
-#: openbox/openbox.c:510
+#: openbox/openbox.c:522
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Visa debuginformation\n"
 
-#: openbox/openbox.c:511
+#: openbox/openbox.c:523
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Visa debuginformation för fokushantering\n"
 
-#: openbox/openbox.c:512
+#: openbox/openbox.c:524
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Dela skärmen i simulerade xinerama-skärmar\n"
 
-#: openbox/openbox.c:513
+#: openbox/openbox.c:525
 #, c-format
 msgid ""
 "\n"
@@ -289,11 +316,11 @@ msgstr ""
 "\n"
 "Rapportera buggar till %s\n"
 
-#: openbox/openbox.c:582
+#: openbox/openbox.c:594
 msgid "--config-file requires an argument\n"
 msgstr "--config-file kräver ett argument\n"
 
-#: openbox/openbox.c:625
+#: openbox/openbox.c:637
 #, c-format
 msgid "Invalid command line argument '%s'\n"
 msgstr "Ogiltigt kommandoradsargument '%s'\n"
@@ -322,7 +349,7 @@ msgstr ""
 "Openbox är inställt på %d skrivbord, men nuvarande session har %d.  Använder "
 "sessionens inställning."
 
-#: openbox/screen.c:1169
+#: openbox/screen.c:1174
 #, c-format
 msgid "desktop %i"
 msgstr "skrivbord %i"
@@ -371,6 +398,10 @@ msgstr "Efterfrågad tangent '%s' finns inte på displayen"
 #, c-format
 msgid "X Error: %s"
 msgstr "X-fel: %s"
+
+#: openbox/prompt.c:181
+msgid "OK"
+msgstr "OK"
 
 #~ msgid "Invalid use of action '%s'. Action will be ignored."
 #~ msgstr "Ogiltigt användande av action '%s', den kommer ignoreras."

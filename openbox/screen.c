@@ -405,6 +405,10 @@ void screen_startup(gboolean reconfig)
                    net_number_of_desktops, cardinal, &d))
     {
         if (d != config_desktops_num) {
+            /* TRANSLATORS: If you need to specify a different order of the
+               arguments, you can use %1$d for the first one and %2$d for the
+               second one. For example,
+               "The current session has %2$d desktops, but Openbox is configured for %1$d ..." */
             g_warning(_("Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration."),
                       config_desktops_num, d);
         }

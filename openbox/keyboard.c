@@ -51,13 +51,13 @@ static void grab_keys(gboolean grab)
         while (p) {
             if (p->key)
                 grab_key(p->key, p->state, obt_root(ob_screen),
-                         GrabModeAsync);
+                         GrabModeSync);
             p = p->next_sibling;
         }
         if (curpos)
             grab_key(config_keyboard_reset_keycode,
                      config_keyboard_reset_state,
-                     obt_root(ob_screen), GrabModeAsync);
+                     obt_root(ob_screen), GrabModeSync);
     }
 }
 
@@ -261,6 +261,8 @@ void keyboard_event(ObClient *client, const XEvent *e)
         }
         p = p->next_sibling;
     }
+
+    XAllowEvents(obt_display, AsyncKeyboard, event_curtime);
 }
 
 static void node_rebind(KeyBindingTree *node)

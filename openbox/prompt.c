@@ -349,14 +349,10 @@ static void prompt_resize(ObPrompt *self, gint w, gint h)
 static void setup_button_focus_tex(ObPromptElement *e, RrAppearance *a,
                                    gboolean on)
 {
-    gint l, r, t, b;
+    gint i, l, r, t, b;
 
-    if (!on) {
-        gint i;
-
-        for (i = 1; i < 5; ++i)
-            a->texture[i].type = on ? RR_TEXTURE_LINE_ART : RR_TEXTURE_NONE;
-    }
+    for (i = 1; i < 5; ++i)
+        a->texture[i].type = on ? RR_TEXTURE_LINE_ART : RR_TEXTURE_NONE;
 
     if (!on) return;
 

@@ -848,6 +848,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     ObFrameContext con;
     static gint px = -1, py = -1;
     static guint pb = 0;
+    static ObFrameContext pcon = OB_FRAME_CONTEXT_NONE;
 
     switch (e->type) {
     case ButtonPress:
@@ -856,11 +857,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             pb = e->xbutton.button;
             px = e->xbutton.x;
             py = e->xbutton.y;
+
+            pcon = frame_context(client, e->xbutton.window, px, py);
+            pcon = mouse_button_frame_context(pcon, e->xbutton.button,
+                                              e->xbutton.state);
         }
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
-           if the user is doing an intereactive thing, or has a menu open then
+           if the user is doing an interactive thing, or has a menu open then
            the mouse is grabbed (possibly) and if we get these events we don't
            want to deal with them
         */
@@ -873,7 +878,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                                              e->xbutton.state);
 
             if (e->type == ButtonRelease && e->xbutton.button == pb)
-                pb = 0, px = py = -1;
+                pb = 0, px = py = -1, pcon = OB_FRAME_CONTEXT_NONE;
 
             switch (con) {
             case OB_FRAME_CONTEXT_MAXIMIZE:
@@ -927,31 +932,31 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
-            if (!client->frame->max_hover) {
+            if (!client->frame->max_hover && !pb) {
                 client->frame->max_hover = TRUE;
                 frame_adjust_state(client->frame);
             }
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            if (!client->frame->desk_hover) {
+            if (!client->frame->desk_hover && !pb) {
                 client->frame->desk_hover = TRUE;
                 frame_adjust_state(client->frame);
             }
             break;
         case OB_FRAME_CONTEXT_SHADE:
-            if (!client->frame->shade_hover) {
+            if (!client->frame->shade_hover && !pb) {
                 client->frame->shade_hover = TRUE;
                 frame_adjust_state(client->frame);
             }
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
-            if (!client->frame->iconify_hover) {
+            if (!client->frame->iconify_hover && !pb) {
                 client->frame->iconify_hover = TRUE;
                 frame_adjust_state(client->frame);
             }
             break;
         case OB_FRAME_CONTEXT_CLOSE:
-            if (!client->frame->close_hover) {
+            if (!client->frame->close_hover && !pb) {
                 client->frame->close_hover = TRUE;
                 frame_adjust_state(client->frame);
             }
@@ -982,22 +987,27 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = FALSE;
+            client->frame->max_press = FALSE;
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
             client->frame->desk_hover = FALSE;
+            client->frame->desk_press = FALSE;
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_SHADE:
             client->frame->shade_hover = FALSE;
+            client->frame->shade_press = FALSE;
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
             client->frame->iconify_hover = FALSE;
+            client->frame->iconify_press = FALSE;
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_CLOSE:
             client->frame->close_hover = FALSE;
+            client->frame->close_press = FALSE;
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
@@ -1036,22 +1046,27 @@ static void event_handle_client(ObClient *client, XEvent *e)
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
             client->frame->max_hover = TRUE;
+            client->frame->max_press = (con == pcon);
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
             client->frame->desk_hover = TRUE;
+            client->frame->desk_press = (con == pcon);
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_SHADE:
             client->frame->shade_hover = TRUE;
+            client->frame->shade_press = (con == pcon);
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
             client->frame->iconify_hover = TRUE;
+            client->frame->iconify_press = (con == pcon);
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_CLOSE:
             client->frame->close_hover = TRUE;
+            client->frame->close_press = (con == pcon);
             frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:

@@ -274,7 +274,7 @@ ObFrameContext plugin_frame_context(ObClient *client, Window win, gint x, gint y
         return OB_FRAME_CONTEXT_ROOT;
     if (client == NULL)
         return OB_FRAME_CONTEXT_NONE;
-    if (win == client->window) {
+    if (win == client->w_client) {
         /* conceptually, this is the desktop, as far as users are
          concerned */
         if (client->type == OB_CLIENT_TYPE_DESKTOP)

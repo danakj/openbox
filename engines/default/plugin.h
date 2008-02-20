@@ -34,7 +34,7 @@ struct _ObDefaultFrame
     Window window;
 
     gchar * stitle; /* The current title we draw */
-    
+
     gboolean visible;
 
     gboolean max_horz; /* when maxed some decorations are hidden */
@@ -159,7 +159,7 @@ typedef struct _ObDefaultFrame ObDefaultFrame;
 
 /* Function use for interface */
 gint init(Display *, gint);
-gpointer frame_new(struct _ObClient *c);
+gpointer frame_new(struct _ObClient *, Window, Window);
 void frame_free(gpointer self);
 void frame_show(gpointer self);
 gint frame_hide(gpointer self);
@@ -184,8 +184,7 @@ void frame_adjust_focus(gpointer self, gboolean hilite);
 void frame_adjust_title(gpointer self);
 void frame_adjust_icon(gpointer self);
 
-gulong frame_animate_iconify_time_left(gpointer _self,
-        const GTimeVal *now);
+gulong frame_animate_iconify_time_left(gpointer _self, const GTimeVal *now);
 
 ObFrameContext frame_context(gpointer, Window win, gint x, gint y);
 
@@ -204,7 +203,7 @@ Strut frame_get_size(gpointer self);
 Rect frame_get_area(gpointer self);
 gint frame_get_decorations(gpointer self);
 
-void frame_update_title (gpointer, const gchar *);
+void frame_update_title(gpointer, const gchar *);
 
 gboolean frame_is_visible(gpointer self);
 gboolean frame_is_max_horz(gpointer self);

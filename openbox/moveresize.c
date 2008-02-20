@@ -391,14 +391,14 @@ static void do_resize(void)
         ce.xclient.type = ClientMessage;
         ce.xclient.message_type = OBT_PROP_ATOM(WM_PROTOCOLS);
         ce.xclient.display = obt_display;
-        ce.xclient.window = moveresize_client->window;
+        ce.xclient.window = moveresize_client->w_client;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST);
         ce.xclient.data.l[1] = event_curtime;
         ce.xclient.data.l[2] = XSyncValueLow32(val);
         ce.xclient.data.l[3] = XSyncValueHigh32(val);
         ce.xclient.data.l[4] = 0l;
-        XSendEvent(obt_display, moveresize_client->window, FALSE,
+        XSendEvent(obt_display, moveresize_client->w_client, FALSE,
                    NoEventMask, &ce);
 
         waiting_for_sync = TRUE;

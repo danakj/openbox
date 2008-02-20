@@ -131,7 +131,7 @@ struct _ObFramePlugin
     gint (*release)(void);
 
     /* create a new frame, return the ID of frame */
-    gpointer (*frame_new)(struct _ObClient *c);
+    gpointer (*frame_new)(struct _ObClient *c, Window w_client, Window w_frame);
     /* Free the frame */
     void (*frame_free)(gpointer self);
 

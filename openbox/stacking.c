@@ -51,7 +51,7 @@ void stacking_set_list(void)
         windows = g_new(Window, g_list_length(stacking_list));
         for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data))
-                windows[i++] = WINDOW_AS_CLIENT(it->data)->window;
+                windows[i++] = WINDOW_AS_CLIENT(it->data)->w_client;
         }
     }
 

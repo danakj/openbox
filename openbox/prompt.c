@@ -356,7 +356,7 @@ void prompt_show(ObPrompt *self, ObClient *parent)
     XSetWMNormalHints(obt_display, self->super.window, &hints);
 
     XSetTransientForHint(obt_display, self->super.window,
-                         (parent ? parent->window : 0));
+                         (parent ? parent->w_client : 0));
 
     /* set up the dialog and render it */
     prompt_layout(self);

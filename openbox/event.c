@@ -819,7 +819,7 @@ void event_enter_client(ObClient *client)
 
     if (is_enter_focus_event_ignored(event_curserial)) {
         ob_debug_type(OB_DEBUG_FOCUS, "Ignoring enter event with serial %lu\n"
-                      "on client 0x%x", event_curserial, client->window);
+                      "on client 0x%x", event_curserial, client->w_client);
         return;
     }
 
@@ -978,7 +978,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                           "%sNotify mode %d detail %d on %lx",
                           (e->type == EnterNotify ? "Enter" : "Leave"),
                           e->xcrossing.mode,
-                          e->xcrossing.detail, (client?client->window:0));
+                          e->xcrossing.detail, (client?client->w_client:0));
             if (grab_on_keyboard())
                 break;
             if (config_focus_follow && config_focus_delay &&
@@ -1031,7 +1031,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                               e->xcrossing.mode,
                               e->xcrossing.detail,
                               e->xcrossing.serial,
-                              client?client->window:0);
+                              client?client->w_client:0);
             }
             else {
                 ob_debug_type(OB_DEBUG_FOCUS,
@@ -1041,7 +1041,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                               e->xcrossing.mode,
                               e->xcrossing.detail,
                               e->xcrossing.serial,
-                              (client?client->window:0));
+                              (client?client->w_client:0));
                 if (config_focus_follow)
                     event_enter_client(client);
             }
@@ -1214,7 +1214,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     case UnmapNotify:
         ob_debug("UnmapNotify for window 0x%x eventwin 0x%x sendevent %d "
                  "ignores left %d",
-                 client->window, e->xunmap.event, e->xunmap.from_configure,
+                 client->w_client, e->xunmap.event, e->xunmap.from_configure,
                  client->ignore_unmaps);
         if (client->ignore_unmaps) {
             client->ignore_unmaps--;
@@ -1223,7 +1223,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         client_unmanage(client);
         break;
     case DestroyNotify:
-        ob_debug("DestroyNotify for window 0x%x", client->window);
+        ob_debug("DestroyNotify for window 0x%x", client->w_client);
         client_unmanage(client);
         break;
     case ReparentNotify:
@@ -1241,11 +1241,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
            X server to deal with after we unmanage the window */
         XPutBackEvent(obt_display, e);
 
-        ob_debug("ReparentNotify for window 0x%x", client->window);
+        ob_debug("ReparentNotify for window 0x%x", client->w_client);
         client_unmanage(client);
         break;
     case MapRequest:
-        ob_debug("MapRequest for 0x%lx", client->window);
+        ob_debug("MapRequest for 0x%lx", client->w_client);
         if (!client->iconic) break; /* this normally doesn't happen, but if it
                                        does, we don't want it!
                                        it can happen now when the window is on
@@ -1262,7 +1262,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         msgtype = e->xclient.message_type;
         if (msgtype == OBT_PROP_ATOM(WM_CHANGE_STATE)) {
             /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(obt_display, client->window,
+            while (XCheckTypedWindowEvent(obt_display, client->w_client,
                                           e->type, &ce)) {
                 /* XXX: it would be nice to compress ALL messages of a
                    type, not just messages in a row without other
@@ -1276,7 +1276,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_set_wm_state(client, e->xclient.data.l[0]);
         } else if (msgtype == OBT_PROP_ATOM(NET_WM_DESKTOP)) {
             /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(obt_display, client->window,
+            while (XCheckTypedWindowEvent(obt_display, client->w_client,
                                           e->type, &ce)) {
                 /* XXX: it would be nice to compress ALL messages of a
                    type, not just messages in a row without other
@@ -1300,7 +1300,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                       e->xclient.data.l[0] == 1 ? "Add" :
                       e->xclient.data.l[0] == 2 ? "Toggle" : "INVALID"),
                      e->xclient.data.l[1], e->xclient.data.l[2],
-                     client->window);
+                     client->w_client);
 
             /* ignore enter events caused by these like ob actions do */
             if (!config_focus_under_mouse)
@@ -1310,11 +1310,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (!config_focus_under_mouse)
                 event_end_ignore_all_enters(ignore_start);
         } else if (msgtype == OBT_PROP_ATOM(NET_CLOSE_WINDOW)) {
-            ob_debug("net_close_window for 0x%lx", client->window);
+            ob_debug("net_close_window for 0x%lx", client->w_client);
             client_close(client);
         } else if (msgtype == OBT_PROP_ATOM(NET_ACTIVE_WINDOW)) {
             ob_debug("net_active_window for 0x%lx source=%s",
-                     client->window,
+                     client->w_client,
                      (e->xclient.data.l[0] == 0 ? "unknown" :
                       (e->xclient.data.l[0] == 1 ? "application" :
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
@@ -1337,7 +1337,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                              e->xclient.data.l[0] == 2));
         } else if (msgtype == OBT_PROP_ATOM(NET_WM_MOVERESIZE)) {
             ob_debug("net_wm_moveresize for 0x%lx direction %d",
-                     client->window, e->xclient.data.l[2]);
+                     client->w_client, e->xclient.data.l[2]);
             if ((Atom)e->xclient.data.l[2] ==
                 OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_TOPLEFT) ||
                 (Atom)e->xclient.data.l[2] ==
@@ -1472,7 +1472,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         if (!client_validate(client)) break;
 
         /* compress changes to a single property into a single change */
-        while (XCheckTypedWindowEvent(obt_display, client->window,
+        while (XCheckTypedWindowEvent(obt_display, client->w_client,
                                       e->type, &ce)) {
             Atom a, b;
 
@@ -1546,7 +1546,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         else if (msgtype == OBT_PROP_ATOM(NET_WM_USER_TIME)) {
             guint32 t;
             if (client == focus_client &&
-                OBT_PROP_GET32(client->window, NET_WM_USER_TIME, CARDINAL, &t)
+                OBT_PROP_GET32(client->w_client, NET_WM_USER_TIME, CARDINAL, &t)
                 && t && !event_time_after(t, e->xproperty.time) &&
                 (!event_last_user_time ||
                  event_time_after(t, event_last_user_time)))

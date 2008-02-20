@@ -81,7 +81,8 @@ typedef enum
 struct _ObClient
 {
     ObWindow obwin;
-    Window  window;
+    Window w_client;
+    Window w_frame;
 
     /*! If this client is managing an ObPrompt window, then this is set to the
       prompt */

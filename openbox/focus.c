@@ -74,7 +74,7 @@ void focus_set_client(ObClient *client)
     Window active;
 
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "focus_set_client 0x%lx", client ? client->window : 0);
+                  "focus_set_client 0x%lx", client ? client->w_client : 0);
 
     if (focus_client == client)
         return;
@@ -98,7 +98,7 @@ void focus_set_client(ObClient *client)
 
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
     if (ob_state() != OB_STATE_EXITING) {
-        active = client ? client->window : None;
+        active = client ? client->w_client : None;
         OBT_PROP_SET32(obt_root(ob_screen), NET_ACTIVE_WINDOW, WINDOW, active);
     }
 }

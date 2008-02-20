@@ -132,8 +132,8 @@ static void ping_send(ObPingTarget *t)
     }
 
     /*ob_debug("+PING: '%s' (id %u)", t->client->title, t->id);*/
-    OBT_PROP_MSG_TO(t->client->window, t->client->window, WM_PROTOCOLS,
-                    OBT_PROP_ATOM(NET_WM_PING), t->id, t->client->window, 0, 0,
+    OBT_PROP_MSG_TO(t->client->w_client, t->client->w_client, WM_PROTOCOLS,
+                    OBT_PROP_ATOM(NET_WM_PING), t->id, t->client->w_client, 0, 0,
                     NoEventMask);
 }
 

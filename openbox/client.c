@@ -164,7 +164,7 @@ void client_set_list(void)
         windows = g_new(Window, size);
         win_it = windows;
         for (it = client_list; it; it = g_list_next(it), ++win_it)
-            *win_it = ((ObClient*)it->data)->window;
+            *win_it = ((ObClient*)it->data)->w_client;
     } else
         windows = NULL;
 
@@ -203,7 +203,7 @@ void client_manage(Window window, ObPrompt *prompt)
        window */
     self = g_new0(ObClient, 1);
     self->obwin.type = OB_WINDOW_CLASS_CLIENT;
-    self->window = window;
+    self->w_client = window;
     self->prompt = prompt;
 
     /* non-zero defaults */
@@ -229,7 +229,7 @@ void client_manage(Window window, ObPrompt *prompt)
         XChangeSaveSet(obt_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
-    self->frame = render_plugin->frame_new(self);
+    self->frame = render_plugin->frame_new(self, self->w_client, self->w_frame);
     render_plugin->frame_grab(self->frame, window_map);
 
     /* we've grabbed everything and set everything that we need to at mapping
@@ -270,7 +270,7 @@ void client_manage(Window window, ObPrompt *prompt)
     }
 
     /* remove the client's border */
-    XSetWindowBorderWidth(obt_display, self->window, 0);
+    XSetWindowBorderWidth(obt_display, self->w_client, 0);
 
     /* adjust the frame to the client's size before showing or placing
        the window */
@@ -381,7 +381,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
              "some restrictions may apply",
-             self->window, place.x, place.y, place.width, place.height);
+             self->w_client, place.x, place.y, place.width, place.height);
     if (self->session)
         ob_debug("  but session requested %d, %d  %d x %d instead, "
                  "overriding",
@@ -408,7 +408,7 @@ void client_manage(Window window, ObPrompt *prompt)
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Want to focus new window 0x%x at time %u "
                       "launched at %u (last user interaction time %u)",
-                      self->window, map_time, launch_time,
+                      self->w_client, map_time, launch_time,
                       event_last_user_time);
 
         if (menu_frame_visible || render_plugin->moveresize_in_progress) {
@@ -536,7 +536,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);
-    window_add(&self->window, CLIENT_AS_WINDOW(self));
+    window_add(&self->w_client, CLIENT_AS_WINDOW(self));
 
     /* this has to happen after we're in the client_list */
     if (STRUT_EXISTS(self->strut))
@@ -572,7 +572,7 @@ ObClient *client_fake_manage(Window window)
     /* do this minimal stuff to figure out the client's decorations */
 
     self = g_new0(ObClient, 1);
-    self->window = window;
+    self->w_client = window;
 
     client_get_all(self, FALSE);
     /* per-app settings override stuff, and return the settings for other
@@ -582,7 +582,7 @@ ObClient *client_fake_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* create the decoration frame for the client window and adjust its size */
-    self->frame = render_plugin->frame_new(self);
+    self->frame = render_plugin->frame_new(self, self->w_client, self->w_frame);
     render_plugin->frame_set_decorations (self->frame, self->decorations);
     render_plugin->frame_update_title (self->frame, self->title);
     render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
@@ -611,14 +611,14 @@ void client_unmanage(ObClient *self)
     gulong ignore_start;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
-             self->window, render_plugin->frame_get_window(self->frame),
+             self->w_client, render_plugin->frame_get_window(self->frame),
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
 
     /* we dont want events no more. do this before hiding the frame so we
        don't generate more events */
-    XSelectInput(obt_display, self->window, NoEventMask);
+    XSelectInput(obt_display, self->w_client, NoEventMask);
 
     /* ignore enter events from the unmap so it doesnt mess with the focus */
     if (!config_focus_under_mouse)
@@ -636,7 +636,7 @@ void client_unmanage(ObClient *self)
     /* remove the window from our save set, unless we are managing an internal
        ObPrompt window */
     if (!self->prompt)
-        XChangeSaveSet(obt_display, self->window, SetModeDelete);
+        XChangeSaveSet(obt_display, self->w_client, SetModeDelete);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -651,7 +651,7 @@ void client_unmanage(ObClient *self)
 
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
-    window_remove(self->window);
+    window_remove(self->w_client);
 
     /* once the client is out of the list, update the struts to remove its
        influence */
@@ -706,7 +706,7 @@ void client_unmanage(ObClient *self)
         self->decorations = 0; /* unmanaged windows have no decor */
 
         /* give the client its border back */
-        XSetWindowBorderWidth(obt_display, self->window, self->border_width);
+        XSetWindowBorderWidth(obt_display, self->w_client, self->border_width);
 
         client_move_resize(self, a.x, a.y, a.width, a.height);
     }
@@ -719,25 +719,25 @@ void client_unmanage(ObClient *self)
     if (ob_state() != OB_STATE_EXITING) {
         /* these values should not be persisted across a window
            unmapping/mapping */
-        OBT_PROP_ERASE(self->window, NET_WM_DESKTOP);
-        OBT_PROP_ERASE(self->window, NET_WM_STATE);
-        OBT_PROP_ERASE(self->window, WM_STATE);
+        OBT_PROP_ERASE(self->w_client, NET_WM_DESKTOP);
+        OBT_PROP_ERASE(self->w_client, NET_WM_STATE);
+        OBT_PROP_ERASE(self->w_client, WM_STATE);
     } else {
         /* if we're left in an unmapped state, the client wont be mapped.
            this is bad, since we will no longer be managing the window on
            restart */
-        XMapWindow(obt_display, self->window);
+        XMapWindow(obt_display, self->w_client);
     }
 
     /* these should not be left on the window ever.  other window managers
        don't necessarily use them and it will mess them up (like compiz) */
-    OBT_PROP_ERASE(self->window, NET_WM_VISIBLE_NAME);
-    OBT_PROP_ERASE(self->window, NET_WM_VISIBLE_ICON_NAME);
+    OBT_PROP_ERASE(self->w_client, NET_WM_VISIBLE_NAME);
+    OBT_PROP_ERASE(self->w_client, NET_WM_VISIBLE_ICON_NAME);
 
     /* update the list hints */
     client_set_list();
 
-    ob_debug("Unmanaged window 0x%lx", self->window);
+    ob_debug("Unmanaged window 0x%lx", self->w_client);
 
     /* free all data allocated in the client struct */
     g_slist_free(self->transients);
@@ -871,13 +871,13 @@ static void client_restore_session_state(ObClient *self)
         self->area.width = self->session->w;
     if (self->session->h > 0)
         self->area.height = self->session->h;
-    XResizeWindow(obt_display, self->window,
+    XResizeWindow(obt_display, self->w_client,
                   self->area.width, self->area.height);
 
     self->desktop = (self->session->desktop == DESKTOP_ALL ?
                      self->session->desktop :
                      MIN(screen_num_desktops - 1, self->session->desktop));
-    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
+    OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     self->shaded = self->session->shaded;
     self->iconic = self->session->iconic;
@@ -1121,7 +1121,7 @@ static void client_get_all(ObClient *self, gboolean real)
 
 static void client_get_startup_id(ObClient *self)
 {
-    if (!(OBT_PROP_GETS(self->window, NET_STARTUP_ID, utf8,
+    if (!(OBT_PROP_GETS(self->w_client, NET_STARTUP_ID, utf8,
                         &self->startup_id)))
         if (self->group)
             OBT_PROP_GETS(self->group->leader,
@@ -1133,7 +1133,7 @@ static void client_get_area(ObClient *self)
     XWindowAttributes wattrib;
     Status ret;
 
-    ret = XGetWindowAttributes(obt_display, self->window, &wattrib);
+    ret = XGetWindowAttributes(obt_display, self->w_client, &wattrib);
     g_assert(ret != BadWindow);
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
@@ -1148,7 +1148,7 @@ static void client_get_desktop(ObClient *self)
 {
     guint32 d = screen_num_desktops; /* an always-invalid value */
 
-    if (OBT_PROP_GET32(self->window, NET_WM_DESKTOP, CARDINAL, &d)) {
+    if (OBT_PROP_GET32(self->w_client, NET_WM_DESKTOP, CARDINAL, &d)) {
         if (d >= screen_num_desktops && d != DESKTOP_ALL)
             self->desktop = screen_num_desktops - 1;
         else
@@ -1201,7 +1201,7 @@ static void client_get_state(ObClient *self)
     guint32 *state;
     guint num;
 
-    if (OBT_PROP_GETA32(self->window, NET_WM_STATE, ATOM, &state, &num)) {
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_STATE, ATOM, &state, &num)) {
         gulong i;
         for (i = 0; i < num; ++i) {
             if (state[i] == OBT_PROP_ATOM(NET_WM_STATE_MODAL))
@@ -1247,9 +1247,9 @@ static void client_get_shaped(ObClient *self)
         guint ufoo;
         gint s;
 
-        XShapeSelectInput(obt_display, self->window, ShapeNotifyMask);
+        XShapeSelectInput(obt_display, self->w_client, ShapeNotifyMask);
 
-        XShapeQueryExtents(obt_display, self->window, &s, &foo,
+        XShapeQueryExtents(obt_display, self->w_client, &s, &foo,
                            &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
                            &ufoo);
         self->shaped = (s != 0);
@@ -1263,8 +1263,8 @@ void client_update_transient_for(ObClient *self)
     ObClient *target = NULL;
     gboolean trangroup = FALSE;
 
-    if (XGetTransientForHint(obt_display, self->window, &t)) {
-        if (t != self->window) { /* cant be transient to itself! */
+    if (XGetTransientForHint(obt_display, self->w_client, &t)) {
+        if (t != self->w_client) { /* cant be transient to itself! */
             ObWindow *tw = window_find(t);
             /* if this happens then we need to check for it*/
             g_assert(tw != CLIENT_AS_WINDOW(self));
@@ -1414,7 +1414,7 @@ static void client_get_mwm_hints(ObClient *self)
 
     self->mwmhints.flags = 0; /* default to none */
 
-    if (OBT_PROP_GETA32(self->window, MOTIF_WM_HINTS, MOTIF_WM_HINTS,
+    if (OBT_PROP_GETA32(self->w_client, MOTIF_WM_HINTS, MOTIF_WM_HINTS,
                         &hints, &num)) {
         if (num >= OB_MWM_ELEMENTS) {
             self->mwmhints.flags = hints[0];
@@ -1434,7 +1434,7 @@ void client_get_type_and_transientness(ObClient *self)
     self->type = -1;
     self->transient = FALSE;
 
-    if (OBT_PROP_GETA32(self->window, NET_WM_WINDOW_TYPE, ATOM, &val, &num)) {
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_WINDOW_TYPE, ATOM, &val, &num)) {
         /* use the first value that we know about in the array */
         for (i = 0; i < num; ++i) {
             if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DESKTOP))
@@ -1468,7 +1468,7 @@ void client_get_type_and_transientness(ObClient *self)
         g_free(val);
     }
 
-    if (XGetTransientForHint(obt_display, self->window, &t))
+    if (XGetTransientForHint(obt_display, self->w_client, &t))
         self->transient = TRUE;
 
     if (self->type == (ObClientType) -1) {
@@ -1499,7 +1499,7 @@ void client_update_protocols(ObClient *self)
     self->focus_notify = FALSE;
     self->delete_window = FALSE;
 
-    if (OBT_PROP_GETA32(self->window, WM_PROTOCOLS, ATOM, &proto, &num_ret)) {
+    if (OBT_PROP_GETA32(self->w_client, WM_PROTOCOLS, ATOM, &proto, &num_ret)) {
         for (i = 0; i < num_ret; ++i) {
             if (proto[i] == OBT_PROP_ATOM(WM_DELETE_WINDOW))
                 /* this means we can request the window to close */
@@ -1529,7 +1529,7 @@ void client_update_sync_request_counter(ObClient *self)
 {
     guint32 i;
 
-    if (OBT_PROP_GET32(self->window, NET_WM_SYNC_REQUEST_COUNTER, CARDINAL,&i))
+    if (OBT_PROP_GET32(self->w_client, NET_WM_SYNC_REQUEST_COUNTER, CARDINAL,&i))
     {
         self->sync_counter = i;
     } else
@@ -1541,7 +1541,7 @@ static void client_get_colormap(ObClient *self)
 {
     XWindowAttributes wa;
 
-    if (XGetWindowAttributes(obt_display, self->window, &wa))
+    if (XGetWindowAttributes(obt_display, self->w_client, &wa))
         client_update_colormap(self, wa.colormap);
 }
 
@@ -1573,7 +1573,7 @@ void client_update_normal_hints(ObClient *self)
     SIZE_SET(self->max_size, G_MAXINT, G_MAXINT);
 
     /* get the hints from the window */
-    if (XGetWMNormalHints(obt_display, self->window, &size, &ret)) {
+    if (XGetWMNormalHints(obt_display, self->w_client, &size, &ret)) {
         /* normal windows can't request placement! har har
         if (!client_normal(self))
         */
@@ -1810,7 +1810,7 @@ static void client_change_allowed_actions(ObClient *self)
     if (self->functions & OB_CLIENT_FUNC_UNDECORATE)
         actions[num++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
 
-    OBT_PROP_SETA32(self->window, NET_WM_ALLOWED_ACTIONS, ATOM, actions, num);
+    OBT_PROP_SETA32(self->w_client, NET_WM_ALLOWED_ACTIONS, ATOM, actions, num);
 
     /* make sure the window isn't breaking any rules now
 
@@ -1845,7 +1845,7 @@ void client_update_wmhints(ObClient *self)
     /* assume a window takes input if it doesnt specify */
     self->can_focus = TRUE;
 
-    if ((hints = XGetWMHints(obt_display, self->window)) != NULL) {
+    if ((hints = XGetWMHints(obt_display, self->w_client)) != NULL) {
         gboolean ur;
 
         if (hints->flags & InputHint)
@@ -1934,10 +1934,10 @@ void client_update_title(ObClient *self)
     g_free(self->original_title);
 
     /* try netwm */
-    if (!OBT_PROP_GETS(self->window, NET_WM_NAME, utf8, &data)) {
+    if (!OBT_PROP_GETS(self->w_client, NET_WM_NAME, utf8, &data)) {
         /* try old x stuff */
-        if (!(OBT_PROP_GETS(self->window, WM_NAME, locale, &data)
-              || OBT_PROP_GETS(self->window, WM_NAME, utf8, &data))) {
+        if (!(OBT_PROP_GETS(self->w_client, WM_NAME, locale, &data)
+              || OBT_PROP_GETS(self->w_client, WM_NAME, utf8, &data))) {
             if (self->transient) {
     /*
     GNOME alert windows are not given titles:
@@ -1965,7 +1965,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, utf8, visible);
+    OBT_PROP_SETS(self->w_client, NET_WM_VISIBLE_NAME, utf8, visible);
     self->title = visible;
 
     if (self->frame) {
@@ -1979,10 +1979,10 @@ void client_update_title(ObClient *self)
     g_free(self->icon_title);
 
     /* try netwm */
-    if (!OBT_PROP_GETS(self->window, NET_WM_ICON_NAME, utf8, &data))
+    if (!OBT_PROP_GETS(self->w_client, NET_WM_ICON_NAME, utf8, &data))
         /* try old x stuff */
-        if (!(OBT_PROP_GETS(self->window, WM_ICON_NAME, locale, &data) ||
-              OBT_PROP_GETS(self->window, WM_ICON_NAME, utf8, &data)))
+        if (!(OBT_PROP_GETS(self->w_client, WM_ICON_NAME, locale, &data) ||
+              OBT_PROP_GETS(self->w_client, WM_ICON_NAME, utf8, &data)))
             data = g_strdup(self->title);
 
     if (self->client_machine) {
@@ -2000,7 +2000,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, utf8, visible);
+    OBT_PROP_SETS(self->w_client, NET_WM_VISIBLE_ICON_NAME, utf8, visible);
     self->icon_title = visible;
 }
 
@@ -2011,7 +2011,7 @@ void client_update_strut(ObClient *self)
     gboolean got = FALSE;
     StrutPartial strut;
 
-    if (OBT_PROP_GETA32(self->window, NET_WM_STRUT_PARTIAL, CARDINAL,
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_STRUT_PARTIAL, CARDINAL,
                         &data, &num))
     {
         if (num == 12) {
@@ -2025,7 +2025,7 @@ void client_update_strut(ObClient *self)
     }
 
     if (!got &&
-        OBT_PROP_GETA32(self->window, NET_WM_STRUT, CARDINAL, &data, &num)) {
+        OBT_PROP_GETA32(self->w_client, NET_WM_STRUT, CARDINAL, &data, &num)) {
         if (num == 4) {
             Rect *a;
 
@@ -2077,7 +2077,7 @@ void client_update_icons(ObClient *self)
         g_free(self->icons);
     self->nicons = 0;
 
-    if (OBT_PROP_GETA32(self->window, NET_WM_ICON, CARDINAL, &data, &num)) {
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_ICON, CARDINAL, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
         num_seen = num_small_seen = 0;
@@ -2150,7 +2150,7 @@ void client_update_icons(ObClient *self)
     } else {
         XWMHints *hints;
 
-        if ((hints = XGetWMHints(obt_display, self->window))) {
+        if ((hints = XGetWMHints(obt_display, self->w_client))) {
             if (hints->flags & IconPixmapHint) {
                 self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
@@ -2190,7 +2190,7 @@ void client_update_icons(ObClient *self)
                 (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
                 (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
                 (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
-        OBT_PROP_SETA32(self->window, NET_WM_ICON, CARDINAL, data, 48*48+2);
+        OBT_PROP_SETA32(self->w_client, NET_WM_ICON, CARDINAL, data, 48*48+2);
         g_free(data);
     } else if (self->frame)
         render_plugin->frame_update_skin (self->frame);
@@ -2206,7 +2206,7 @@ void client_update_icon_geometry(ObClient *self)
 
     RECT_SET(self->icon_geometry, 0, 0, 0, 0);
 
-    if (OBT_PROP_GETA32(self->window, NET_WM_ICON_GEOMETRY, CARDINAL,
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_ICON_GEOMETRY, CARDINAL,
                         &data, &num))
     {
         if (num == 4)
@@ -2224,7 +2224,7 @@ static void client_get_session_ids(ObClient *self)
     gchar *s;
     gchar **ss;
 
-    if (!OBT_PROP_GET32(self->window, WM_CLIENT_LEADER, WINDOW, &leader))
+    if (!OBT_PROP_GET32(self->w_client, WM_CLIENT_LEADER, WINDOW, &leader))
         leader = None;
 
     /* get the SM_CLIENT_ID */
@@ -2232,7 +2232,7 @@ static void client_get_session_ids(ObClient *self)
     if (leader)
         got = OBT_PROP_GETS(leader, SM_CLIENT_ID, locale, &self->sm_client_id);
     if (!got)
-        OBT_PROP_GETS(self->window, SM_CLIENT_ID, locale, &self->sm_client_id);
+        OBT_PROP_GETS(self->w_client, SM_CLIENT_ID, locale, &self->sm_client_id);
 
     /* get the WM_CLASS (name and class). make them "" if they are not
        provided */
@@ -2240,7 +2240,7 @@ static void client_get_session_ids(ObClient *self)
     if (leader)
         got = OBT_PROP_GETSS(leader, WM_CLASS, locale, &ss);
     if (!got)
-        got = OBT_PROP_GETSS(self->window, WM_CLASS, locale, &ss);
+        got = OBT_PROP_GETSS(self->w_client, WM_CLASS, locale, &ss);
 
     if (got) {
         if (ss[0]) {
@@ -2259,7 +2259,7 @@ static void client_get_session_ids(ObClient *self)
     if (leader)
         got = OBT_PROP_GETS(leader, WM_WINDOW_ROLE, locale, &s);
     if (!got)
-        got = OBT_PROP_GETS(self->window, WM_WINDOW_ROLE, locale, &s);
+        got = OBT_PROP_GETS(self->w_client, WM_WINDOW_ROLE, locale, &s);
 
     if (got)
         self->role = s;
@@ -2272,7 +2272,7 @@ static void client_get_session_ids(ObClient *self)
     if (leader)
         got = OBT_PROP_GETSS(leader, WM_COMMAND, locale, &ss);
     if (!got)
-        got = OBT_PROP_GETSS(self->window, WM_COMMAND, locale, &ss);
+        got = OBT_PROP_GETSS(self->w_client, WM_COMMAND, locale, &ss);
 
     if (got) {
         /* merge/mash them all together */
@@ -2297,7 +2297,7 @@ static void client_get_session_ids(ObClient *self)
     if (leader)
         got = OBT_PROP_GETS(leader, WM_CLIENT_MACHINE, locale, &s);
     if (!got)
-        got = OBT_PROP_GETS(self->window, WM_CLIENT_MACHINE, locale, &s);
+        got = OBT_PROP_GETS(self->w_client, WM_CLIENT_MACHINE, locale, &s);
 
     if (got) {
         gchar localhost[128];
@@ -2312,7 +2312,7 @@ static void client_get_session_ids(ObClient *self)
 
         /* see if it has the PID set too (the PID requires that the
            WM_CLIENT_MACHINE be set) */
-        if (OBT_PROP_GET32(self->window, NET_WM_PID, CARDINAL, &pid))
+        if (OBT_PROP_GET32(self->w_client, NET_WM_PID, CARDINAL, &pid))
             self->pid = pid;
     }
 }
@@ -2332,12 +2332,12 @@ static void client_change_wm_state(ObClient *self)
         self->wmstate = NormalState;
 
     if (old != self->wmstate) {
-        OBT_PROP_MSG(ob_screen, self->window, KDE_WM_CHANGE_STATE,
+        OBT_PROP_MSG(ob_screen, self->w_client, KDE_WM_CHANGE_STATE,
                      self->wmstate, 1, 0, 0, 0);
 
         state[0] = self->wmstate;
         state[1] = None;
-        OBT_PROP_SETA32(self->window, WM_STATE, WM_STATE, state, 2);
+        OBT_PROP_SETA32(self->w_client, WM_STATE, WM_STATE, state, 2);
     }
 }
 
@@ -2371,7 +2371,7 @@ static void client_change_state(ObClient *self)
         netstate[num++] = OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION);
     if (self->undecorated)
         netstate[num++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
-    OBT_PROP_SETA32(self->window, NET_WM_STATE, ATOM, netstate, num);
+    OBT_PROP_SETA32(self->w_client, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
         render_plugin->frame_update_layout (self->frame, FALSE, FALSE);
@@ -2678,7 +2678,7 @@ static void client_apply_startup_state(ObClient *self,
     */
     client_try_configure(self, &x, &y, &w, &h, &l, &l, FALSE);
     ob_debug("placed window 0x%x at %d, %d with size %d x %d",
-             self->window, x, y, w, h);
+             self->w_client, x, y, w, h);
     /* save the area, and make it where it should be for the premax stuff */
     oldarea = self->area;
     RECT_SET(self->area, x, y, w, h);
@@ -2721,7 +2721,7 @@ static void client_apply_startup_state(ObClient *self,
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
-    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
+    OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     /* nothing to do for the other states:
        skip_taskbar
@@ -3070,8 +3070,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
         event.type = ConfigureNotify;
         event.xconfigure.display = obt_display;
-        event.xconfigure.event = self->window;
-        event.xconfigure.window = self->window;
+        event.xconfigure.event = self->w_client;
+        event.xconfigure.window = self->w_client;
 
         ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d",
                  self->title, self->root_pos.x, self->root_pos.y, w, h);
@@ -3177,7 +3177,7 @@ static void client_iconify_recursive(ObClient *self,
 
     if (self->iconic != iconic) {
         ob_debug("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
-                 self->window);
+                 self->w_client);
 
         if (iconic) {
             /* don't let non-normal windows iconify along with their parents
@@ -3351,10 +3351,10 @@ void client_close(ObClient *self)
     if (!self->delete_window)
         /* don't use client_kill(), we should only kill based on PID in
            response to a lack of PING replies */
-        XKillClient(obt_display, self->window);
+        XKillClient(obt_display, self->w_client);
     else {
         /* request the client to close with WM_DELETE_WINDOW */
-        OBT_PROP_MSG_TO(self->window, self->window, WM_PROTOCOLS,
+        OBT_PROP_MSG_TO(self->w_client, self->w_client, WM_PROTOCOLS,
                         OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime,
                         0, 0, 0, NoEventMask);
 
@@ -3416,7 +3416,7 @@ void client_kill(ObClient *self)
         /* running on the local host */
         if (self->kill_level == 0) {
             ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
-                     self->window, self->pid);
+                     self->w_client, self->pid);
             kill(self->pid, SIGTERM);
             ++self->kill_level;
 
@@ -3425,13 +3425,13 @@ void client_kill(ObClient *self)
         }
         else {
             ob_debug("killing window 0x%x with pid %lu, with SIGKILL",
-                     self->window, self->pid);
+                     self->w_client, self->pid);
             kill(self->pid, SIGKILL); /* kill -9 */
         }
     }
     else {
         /* running on a remote host */
-        XKillClient(obt_display, self->window);
+        XKillClient(obt_display, self->w_client);
     }
 }
 
@@ -3467,7 +3467,7 @@ static void client_set_desktop_recursive(ObClient *self,
 
         old = self->desktop;
         self->desktop = target;
-        OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, target);
+        OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, target);
         /* the frame can display the current desktop state */
         render_plugin->frame_set_decorations (self->frame, self->decorations);
         render_plugin->frame_update_layout(self->frame, FALSE, FALSE);
@@ -3526,8 +3526,8 @@ gboolean client_validate(ObClient *self)
 
     XSync(obt_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(obt_display, self->window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(obt_display, self->window, UnmapNotify, &e))
+    if (XCheckTypedWindowEvent(obt_display, self->w_client, DestroyNotify, &e) ||
+        XCheckTypedWindowEvent(obt_display, self->w_client, UnmapNotify, &e))
     {
         XPutBackEvent(obt_display, &e);
         return FALSE;
@@ -3770,7 +3770,7 @@ gboolean client_focus(ObClient *self)
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Focusing client \"%s\" (0x%x) at time %u",
-                  self->title, self->window, event_curtime);
+                  self->title, self->w_client, event_curtime);
 
     /* if using focus_delay, stop the timer now so that focus doesn't
        go moving on us */
@@ -3790,7 +3790,7 @@ gboolean client_focus(ObClient *self)
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
-        XSetInputFocus(obt_display, self->window, RevertToPointerRoot,
+        XSetInputFocus(obt_display, self->w_client, RevertToPointerRoot,
                        event_curtime);
     }
 
@@ -3799,14 +3799,14 @@ gboolean client_focus(ObClient *self)
         ce.xclient.type = ClientMessage;
         ce.xclient.message_type = OBT_PROP_ATOM(WM_PROTOCOLS);
         ce.xclient.display = obt_display;
-        ce.xclient.window = self->window;
+        ce.xclient.window = self->w_client;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = OBT_PROP_ATOM(WM_TAKE_FOCUS);
         ce.xclient.data.l[1] = event_curtime;
         ce.xclient.data.l[2] = 0l;
         ce.xclient.data.l[3] = 0l;
         ce.xclient.data.l[4] = 0l;
-        XSendEvent(obt_display, self->window, FALSE, NoEventMask, &ce);
+        XSendEvent(obt_display, self->w_client, FALSE, NoEventMask, &ce);
     }
 
     obt_display_ignore_errors(FALSE);

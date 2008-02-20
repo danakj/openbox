@@ -121,7 +121,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
             } else if (CLIENT_CONTEXT(i, client)) {
-                win = client->window;
+                win = client->w_client;
                 mode = GrabModeSync; /* this is handled in event */
                 mask = ButtonPressMask; /* can't catch more than this with Sync
                                            mode the release event is

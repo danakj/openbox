@@ -107,6 +107,33 @@ static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
 
+Window createWindow(Window parent, Visual *visual, gulong mask,
+        XSetWindowAttributes *attrib)
+{
+    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0, (visual ? 32
+            : RrDepth(ob_rr_inst)), InputOutput, (visual ? visual
+            : RrVisual(ob_rr_inst)), mask, attrib);
+
+}
+
+Visual *check_32bit_client(ObClient *c)
+{
+    XWindowAttributes wattrib;
+    Status ret;
+
+    /* we're already running at 32 bit depth, yay. we don't need to use their
+     visual */
+    if (RrDepth(ob_rr_inst) == 32)
+        return NULL;
+
+    ret = XGetWindowAttributes(obt_display, c->w_client, &wattrib);
+    g_assert(ret != BadDrawable);
+    g_assert(ret != BadWindow);
+
+    if (wattrib.depth == 32)
+        return wattrib.visual;
+    return NULL;
+}
 
 void client_startup(gboolean reconfig)
 {
@@ -229,6 +256,21 @@ void client_manage(Window window, ObPrompt *prompt)
         XChangeSaveSet(obt_display, window, SetModeInsert);
 
     /* create the decoration frame for the client window */
+    Visual *visual = check_32bit_client(self);
+    gulong mask = 0;
+    XSetWindowAttributes attrib;
+    if (visual) {
+        /* client has a 32-bit visual */
+        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        /* create a colormap with the visual */
+        attrib.colormap = XCreateColormap(
+                obt_display, RootWindow(obt_display, ob_screen), visual,
+                AllocNone);
+        attrib.background_pixel = BlackPixel(obt_display, ob_screen);
+        attrib.border_pixel = BlackPixel(obt_display, ob_screen);
+    }
+    self->w_frame = createWindow(RootWindow(obt_display, ob_screen), visual,
+            mask, &attrib);
     self->frame = render_plugin->frame_new(self, self->w_client, self->w_frame);
     render_plugin->frame_grab(self->frame, window_map);
 
@@ -582,6 +624,21 @@ ObClient *client_fake_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* create the decoration frame for the client window and adjust its size */
+    Visual *visual = check_32bit_client(self);
+    gulong mask = 0;
+    XSetWindowAttributes attrib;
+    if (visual) {
+        /* client has a 32-bit visual */
+        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        /* create a colormap with the visual */
+        attrib.colormap = XCreateColormap(
+                obt_display, RootWindow(obt_display, ob_screen), visual,
+                AllocNone);
+        attrib.background_pixel = BlackPixel(obt_display, ob_screen);
+        attrib.border_pixel = BlackPixel(obt_display, ob_screen);
+    }
+    self->w_frame = createWindow(RootWindow(obt_display, ob_screen), visual,
+            mask, &attrib);
     self->frame = render_plugin->frame_new(self, self->w_client, self->w_frame);
     render_plugin->frame_set_decorations (self->frame, self->decorations);
     render_plugin->frame_update_title (self->frame, self->title);

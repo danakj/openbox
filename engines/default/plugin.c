@@ -119,8 +119,7 @@ gpointer frame_new(struct _ObClient * client, Window w_client, Window w_frame)
         attrib.background_pixel = BlackPixel(obp_display, obp_screen);
         attrib.border_pixel = BlackPixel(obp_display, obp_screen);
     }
-    self->window = createWindow(RootWindow(obp_display, obp_screen), visual,
-            mask, &attrib);
+    self->window = w_frame;
 
     /* create the visible decor windows */
 

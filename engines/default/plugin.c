@@ -261,38 +261,6 @@ void frame_free(gpointer self)
     g_free(self);
 }
 
-void frame_show(gpointer _self)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    if (!self->visible) {
-        self->visible = TRUE;
-        frame_update_skin(self);
-        /* Grab the server to make sure that the frame window is mapped before
-         the client gets its MapNotify, i.e. to make sure the client is
-         _visible_ when it gets MapNotify. */
-        grab_server(TRUE);
-        XMapWindow(obp_display, self->client->w_client);
-        XMapWindow(obp_display, self->window);
-        grab_server(FALSE);
-    }
-}
-
-gint frame_hide(gpointer self)
-{
-    if (OBDEFAULTFRAME(self)->visible) {
-        OBDEFAULTFRAME(self)->visible = FALSE;
-        if (!frame_iconify_animating(self))
-            XUnmapWindow(obp_display, OBDEFAULTFRAME(self)->window);
-        /* we unmap the client itself so that we can get MapRequest
-         events, and because the ICCCM tells us to! */
-        XUnmapWindow(obp_display, OBDEFAULTFRAME(self)->client->w_client);
-        return 1;
-    }
-    else {
-        return 0;
-    }
-}
-
 void frame_adjust_theme(gpointer self)
 {
     free_theme_statics(self);
@@ -1877,8 +1845,7 @@ init, //gint (*init) (Display * display, gint screen);
         0, /* */
         frame_new, //gpointer (*frame_new) (struct _ObClient *c);
         frame_free, //void (*frame_free) (gpointer self);
-        frame_show, //void (*frame_show) (gpointer self);
-        frame_hide, //void (*frame_hide) (gpointer self);
+
         frame_adjust_theme, //void (*frame_adjust_theme) (gpointer self);
         frame_adjust_shape, //void (*frame_adjust_shape) (gpointer self);
         frame_grab, //void (*frame_adjust_area) (gpointer self, gboolean moved, gboolean resized, gboolean fake);

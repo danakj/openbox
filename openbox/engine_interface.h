@@ -135,9 +135,6 @@ struct _ObFramePlugin
     /* Free the frame */
     void (*frame_free)(gpointer self);
 
-    void (*frame_show)(gpointer self);
-    gint (*frame_hide)(gpointer self);
-
     void (*frame_adjust_theme)(gpointer self);
     void (*frame_adjust_shape)(gpointer self);
 

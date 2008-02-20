@@ -728,4 +728,6 @@ ObClient* client_under_pointer();
 
 gboolean client_has_group_siblings(ObClient *self);
 
+void client_show_frame(ObClient *);
+void client_hide_frame(ObClient *);
 #endif

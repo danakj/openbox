@@ -681,7 +681,7 @@ void client_unmanage(ObClient *self)
     if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
 
-    self->ignore_unmaps += render_plugin->frame_hide(self->frame);
+    client_hide_frame(self);
     /* flush to send the hide to the server quickly */
     XFlush(obt_display);
 
@@ -2613,7 +2613,7 @@ gboolean client_show(ObClient *self)
            should be going to something under the window */
         mouse_replay_pointer();
 
-        render_plugin->frame_show(self->frame);
+        client_show_frame(self);
         show = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
@@ -2658,7 +2658,7 @@ gboolean client_hide(ObClient *self)
            should be going to the window */
         mouse_replay_pointer();
 
-        self->ignore_unmaps += render_plugin->frame_hide(self->frame);
+        client_hide_frame(self);
         hide = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
@@ -4470,4 +4470,29 @@ ObClient* client_under_pointer(void)
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
+}
+
+void client_show_frame(ObClient * self)
+{
+    render_plugin->frame_set_is_visible(self->frame, TRUE);
+    render_plugin->frame_update_layout(self->frame, FALSE, FALSE);
+    render_plugin->frame_update_skin(self->frame);
+    /* Grab the server to make sure that the frame window is mapped before
+     the client gets its MapNotify, i.e. to make sure the client is
+     _visible_ when it gets MapNotify. */
+    grab_server(TRUE);
+    XMapWindow(obt_display, self->w_client);
+    XMapWindow(obt_display, self->w_frame);
+    grab_server(FALSE);
+}
+
+void client_hide_frame(ObClient * self)
+{
+    render_plugin->frame_set_is_visible(self->frame, FALSE);
+    if (!render_plugin->frame_iconify_animating(self))
+        XUnmapWindow(obt_display, self->w_frame);
+    /* we unmap the client itself so that we can get MapRequest
+     events, and because the ICCCM tells us to! */
+    XUnmapWindow(obt_display, self->w_client);
+    self->ignore_unmaps++;
 }

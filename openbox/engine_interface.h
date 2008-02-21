@@ -118,7 +118,7 @@ typedef enum
     OB_TRIGGER_PLUGIN9, /* ... */
 } ObFrameTrigger;
 
-struct _ObFramePlugin
+struct _ObFrameEngine
 {
     gpointer handler; // Currently not used.
 
@@ -217,22 +217,22 @@ enum _ObStyle
 };
 
 typedef enum _ObStyle ObStyle;
-typedef struct _ObFramePlugin ObFramePlugin;
-typedef ObFramePlugin * (*ObFramePluginFunc)(void);
+typedef struct _ObFrameEngine ObFrameEngine;
+typedef ObFrameEngine * (*ObFrameEngineFunc)(void);
 
 #define OBFRAME(x) (ObFrame *) (x);
 
 /* initialize theme plugin, it read themerc and load
  * the plugin needed */
-ObFramePlugin * init_frame_plugin(const gchar *name, gboolean allow_fallback,
+ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font);
 
 /* Update plugin data */
-void update_frame_plugin(ObFramePlugin *);
+void update_frame_plugin(ObFrameEngine *);
 
 /* Load modules specified in filename */
-ObFramePlugin * load_frame_plugin(const gchar * filename);
+ObFrameEngine * load_frame_plugin(const gchar * filename);
 
 /* Give context from string, it's used to parse config file */
 ObFrameContext frame_context_from_string(const gchar *name);

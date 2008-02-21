@@ -1838,10 +1838,11 @@ if(!call_trigger_func)
 }
 }
 
-ObFramePlugin plugin = { 0, /* gpointer handler */
-"libdefault.la", /* gchar * filename */
-"Default", /* gchar * name */
-init, //gint (*init) (Display * display, gint screen);
+ObFrameEngine plugin = {
+        0, /* gpointer handler */
+        "libdefault.la", /* gchar * filename */
+        "Default", /* gchar * name */
+        init, //gint (*init) (Display * display, gint screen);
         0, /* */
         frame_new, //gpointer (*frame_new) (struct _ObClient *c);
         frame_free, //void (*frame_free) (gpointer self);
@@ -1897,9 +1898,9 @@ init, //gint (*init) (Display * display, gint screen);
         0, //gchar *config_title_layout;
         FALSE, //gboolean moveresize_in_progress;
         0, //struct _ObMainLoop *ob_main_loop;
-};
+        };
 
-ObFramePlugin * get_info()
+ObFrameEngine * get_info()
 {
     return &plugin;
 }

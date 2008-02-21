@@ -223,9 +223,9 @@ void frame_trigger(gpointer, ObFrameTrigger);
 /* Global for renderframe.c only */
 extern Display * obp_display;
 extern gint obp_screen;
-extern ObFramePlugin plugin;
+extern ObFrameEngine plugin;
 #define OBDEFAULTFRAME(x) ((ObDefaultFrame *)(x))
 
-ObFramePlugin * get_info();
+ObFrameEngine * get_info();
 
 #endif /*FRAME_DEFAULT_PLUGIN_H_*/

@@ -92,7 +92,7 @@ gchar       *ob_sm_id = NULL;
 gchar       *ob_sm_save_file = NULL;
 gboolean     ob_sm_restore = TRUE;
 gboolean     ob_debug_xinerama = FALSE;
-ObFramePlugin *render_plugin = NULL;
+ObFrameEngine * render_plugin = NULL;
 
 static ObState   state;
 static gboolean  xsync = FALSE;

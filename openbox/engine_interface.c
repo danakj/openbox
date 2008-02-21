@@ -34,7 +34,7 @@ XrmDatabase loaddb(const gchar *name, gchar **path);
 /* Read string in XrmDatabase */
 gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value);
 
-ObFramePlugin * init_frame_plugin(const gchar *name, gboolean allow_fallback,
+ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font)
 {
@@ -71,7 +71,7 @@ ObFramePlugin * init_frame_plugin(const gchar *name, gboolean allow_fallback,
     ob_debug("Try to init : %s", plugin_filename);
     gchar * absolute_plugin_filename = g_build_filename(g_get_home_dir(),
             ".config", "openbox", "engines", plugin_filename, NULL);
-    ObFramePlugin * p = load_frame_plugin(absolute_plugin_filename);
+    ObFrameEngine * p = load_frame_plugin(absolute_plugin_filename);
     g_free(absolute_plugin_filename);
 
     update_frame_plugin(p);
@@ -85,7 +85,7 @@ ObFramePlugin * init_frame_plugin(const gchar *name, gboolean allow_fallback,
     return p;
 }
 
-void update_frame_plugin(ObFramePlugin * self)
+void update_frame_plugin(ObFrameEngine * self)
 {
     self->init (obt_display, ob_screen);
     //self->ob_display = obt_display;
@@ -96,7 +96,7 @@ void update_frame_plugin(ObFramePlugin * self)
     self->ob_main_loop = ob_main_loop;
 }
 
-ObFramePlugin * load_frame_plugin(const gchar * filename)
+ObFrameEngine * load_frame_plugin(const gchar * filename)
 {
     GModule *module;
     gpointer func;
@@ -108,7 +108,7 @@ ObFramePlugin * load_frame_plugin(const gchar * filename)
     }
 
     if (g_module_symbol(module, "get_info", &func)) {
-        ObFramePlugin *plugin = (ObFramePlugin *) ((ObFramePluginFunc) func)();
+        ObFrameEngine *plugin = (ObFrameEngine *) ((ObFrameEngineFunc) func)();
         return plugin;
     }
     else {

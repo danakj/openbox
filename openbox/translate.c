@@ -56,7 +56,7 @@ static guint translate_modifier(gchar *str)
              !g_ascii_strcasecmp("H", str))
         mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_HYPER);
     else
-        g_message(_("Invalid modifier key '%s' in key/mouse binding"), str);
+        g_message(_("Invalid modifier key \"%s\" in key/mouse binding"), str);
 
     return mask;
 }
@@ -135,20 +135,20 @@ gboolean translate_key(const gchar *str, guint *state, guint *keycode)
         /* take it directly */
         *keycode = strtol(l, &end, 16);
         if (*l == '\0' || *end != '\0') {
-            g_message(_("Invalid key code '%s' in key binding"), l);
+            g_message(_("Invalid key code \"%s\" in key binding"), l);
             goto translation_fail;
         }
     } else {
         /* figure out the keycode */
         sym = XStringToKeysym(l);
         if (sym == NoSymbol) {
-            g_message(_("Invalid key name '%s' in key binding"), l);
+            g_message(_("Invalid key name \"%s\" in key binding"), l);
             goto translation_fail;
         }
         *keycode = XKeysymToKeycode(obt_display, sym);
     }
     if (!*keycode) {
-        g_message(_("Requested key '%s' does not exist on the display"), l);
+        g_message(_("Requested key \"%s\" does not exist on the display"), l);
         goto translation_fail;
     }
 

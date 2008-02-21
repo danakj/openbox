@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2007-06-07 14:49+0200\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -19,19 +19,19 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
+msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr ""
-"不正なアクション'%s'が要求されました。そのようなアクションは存在しません。"
+"不正なアクション\"%s\"が要求されました。そのようなアクションは存在しません。"
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "パス'%s'を utf8 から変換するのに失敗しました。"
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "パス\"%s\"を utf8 から変換するのに失敗しました。"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "'%s'の実行に失敗しました: %s"
+msgid "Failed to execute \"%s\": %s"
+msgstr "\"%s\"の実行に失敗しました: %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
@@ -150,8 +150,8 @@ msgstr "閉じる(_C)"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr "不正なボタン'%s'が設定ファイルで指定されています。"
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "不正なボタン\"%s\"が設定ファイルで指定されています。"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -159,23 +159,23 @@ msgstr "設定ファイルにキー割り当ての衝突があります。"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr "正当なメニューファイル'%s'を見つけることができません。"
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "正当なメニューファイル\"%s\"を見つけることができません。"
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "パイプメニューの為のコマンド'%s'の実行に失敗しました: %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "パイプメニューの為のコマンド\"%s\"の実行に失敗しました: %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr "パイプメニュー'%s'からの不正な出力です。"
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "パイプメニュー\"%s\"からの不正な出力です。"
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "メニュー'%s'へのアクセスを試みましたが、それは存在しません。"
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "メニュー\"%s\"へのアクセスを試みましたが、それは存在しません。"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -183,18 +183,18 @@ msgstr "もっと..."
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr "マウス割り当てに於いて不正なボタン '%s'"
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "マウス割り当てに於いて不正なボタン \"%s\""
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr "マウス割り当てに於いて不正なコンテクスト '%s'"
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "マウス割り当てに於いて不正なコンテクスト \"%s\""
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
-msgstr "ホームディレクトリ'%s'に移動できません: %s"
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "ホームディレクトリ\"%s\"に移動できません: %s"
 
 #: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -222,8 +222,8 @@ msgstr "テーマを読み込めません。"
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
-msgstr "再起動の際新しい実行ファイル'%s'の実行に失敗しました: %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "再起動の際新しい実行ファイル\"%s\"の実行に失敗しました: %s"
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
@@ -312,8 +312,8 @@ msgstr ""
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
-msgstr "不正なコマンドライン引数 '%s'\n"
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "不正なコマンドライン引数 \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
@@ -348,18 +348,18 @@ msgstr "デスクトップ%i"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "ディレクトリ'%s'を作れません: %s"
+msgid "Unable to make directory \"%s\": %s"
+msgstr "ディレクトリ\"%s\"を作れません: %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
-msgstr "セッションを'%s'に保存できません: %s"
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "セッションを\"%s\"に保存できません: %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
-msgstr "セッションを'%s'に保存中にエラーが起きました: %s"
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "セッションを\"%s\"に保存中にエラーが起きました: %s"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -368,23 +368,23 @@ msgstr "起動中 %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "キー/マウス割り当ての中の不正な修飾キー '%s'"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr "キー/マウス割り当ての中の不正な修飾キー \"%s\""
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr "キー割り当ての中の不正なキーコード '%s'"
+msgid "Invalid key code \"%s\" in key binding"
+msgstr "キー割り当ての中の不正なキーコード \"%s\""
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr "キー割り当ての中の不正なキー名称 '%s'"
+msgid "Invalid key name \"%s\" in key binding"
+msgstr "キー割り当ての中の不正なキー名称 \"%s\""
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr "要求されたキー'%s'はそのディスプレイに存在しません。"
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "要求されたキー\"%s\"はそのディスプレイに存在しません。"
 
 #: openbox/xerror.c:40
 #, c-format
@@ -395,5 +395,5 @@ msgstr "Xエラー: %s"
 msgid "OK"
 msgstr ""
 
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "アクション'%s'の不正な使用です。このアクションは無視されます。"
+#~ msgid "Invalid use of action \"%s\". Action will be ignored."
+#~ msgstr "アクション\"%s\"の不正な使用です。このアクションは無視されます。"

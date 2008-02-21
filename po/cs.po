@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2008-02-09 09:33+0100\n"
 "Last-Translator: tezlo <tezlo@gmx.net>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -17,18 +17,18 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Požadována neplatná akce '%s'. Žádná taková akce neexistuje."
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Požadována neplatná akce \"%s\". Žádná taková akce neexistuje."
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "Nepodařilo se převést cestu '%s' z utf8"
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "Nepodařilo se převést cestu \"%s\" z utf8"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "Nepodařilo se spustit '%s': %s"
+msgid "Failed to execute \"%s\": %s"
+msgstr "Nepodařilo se spustit \"%s\": %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
@@ -146,8 +146,8 @@ msgstr "_Zavřít"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr "Neplatné tlačítko '%s' v konfiguračním souboru"
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Neplatné tlačítko \"%s\" v konfiguračním souboru"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -155,23 +155,23 @@ msgstr "Konflikt klávesových zkratek v konfiguračním souboru"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr "Nepodařilo se najít platný menu soubor '%s'"
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Nepodařilo se najít platný menu soubor \"%s\""
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Nepodařilo se spustit příkaz pro pipe-menu '%s': %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Nepodařilo se spustit příkaz pro pipe-menu \"%s\": %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr "Neplatný výstup z pipe-menu '%s'"
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Neplatný výstup z pipe-menu \"%s\""
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Pokus o přístup k menu '%s', ale ono neexistuje"
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Pokus o přístup k menu \"%s\", ale ono neexistuje"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -179,18 +179,18 @@ msgstr "Víc..."
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr "Neplatné tlačítko '%s' v nastavení myši"
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Neplatné tlačítko \"%s\" v nastavení myši"
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr "Neplatný kontext '%s' v nastavení myši"
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "Neplatný kontext \"%s\" v nastavení myši"
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
-msgstr "Nepodařilo se přejít do domácího adresáře '%s': %s"
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "Nepodařilo se přejít do domácího adresáře \"%s\": %s"
 
 #: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -220,8 +220,8 @@ msgstr "Nepodařilo se načíst motiv."
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Při restartu se nepodařilo spustit nový program '%s': %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "Při restartu se nepodařilo spustit nový program \"%s\": %s"
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
@@ -318,8 +318,8 @@ msgstr "--config-file vyžaduje argument\n"
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
-msgstr "Neplatný argument příkazové řádky '%s'\n"
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "Neplatný argument příkazové řádky \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
@@ -356,18 +356,18 @@ msgstr "plochu %i"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "Nepodařilo se vytvořit adresář '%s': %s"
+msgid "Unable to make directory \"%s\": %s"
+msgstr "Nepodařilo se vytvořit adresář \"%s\": %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
-msgstr "Nepodařilo se uložit session do '%s': %s"
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "Nepodařilo se uložit session do \"%s\": %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
-msgstr "Chyba během ukládání session do '%s': %s"
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "Chyba během ukládání session do \"%s\": %s"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -376,23 +376,23 @@ msgstr "Spouštím %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Neplatný modifikátor '%s' v nastavení klávesnice/myši"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr "Neplatný modifikátor \"%s\" v nastavení klávesnice/myši"
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr "Neplatný kód klávesy '%s' v nastevení"
+msgid "Invalid key code \"%s\" in key binding"
+msgstr "Neplatný kód klávesy \"%s\" v nastevení"
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr "Neplatné jméno klávesy '%s' v nastavení"
+msgid "Invalid key name \"%s\" in key binding"
+msgstr "Neplatné jméno klávesy \"%s\" v nastavení"
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr "Požadovaná klávesa '%s' na displeji neexistuje"
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "Požadovaná klávesa \"%s\" na displeji neexistuje"
 
 #: openbox/xerror.c:40
 #, c-format
@@ -403,5 +403,5 @@ msgstr "X Chyba: %s"
 msgid "OK"
 msgstr ""
 
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "Neplatné užití akce '%s'. Akce bude ignorována."
+#~ msgid "Invalid use of action \"%s\". Action will be ignored."
+#~ msgstr "Neplatné užití akce \"%s\". Akce bude ignorována."

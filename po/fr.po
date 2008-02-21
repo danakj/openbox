@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2008-01-17 22:53+0100\n"
 "Last-Translator: Cyrille Bagard <nocbos@gmail.com>\n"
 "Language-Team: français <fr@li.org>\n"
@@ -21,17 +21,17 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Action demandée invalide '%s'. Une telle action n'existe pas."
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Action demandée invalide \"%s\". Une telle action n'existe pas."
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
+msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Échec de la conversion du chemin « %s » depuis l'UTF-8"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
+msgid "Failed to execute \"%s\": %s"
 msgstr "Échec de l'exécution de « %s » : %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
@@ -150,7 +150,7 @@ msgstr "_Fermer"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
+msgid "Invalid button \"%s\" specified in config file"
 msgstr "Bouton « %s » indiqué dans le fichier de configuration invalide"
 
 #: openbox/keyboard.c:157
@@ -159,22 +159,22 @@ msgstr "Conflit entre les raccourcis clavier dans le fichier de configuration"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
+msgid "Unable to find a valid menu file \"%s\""
 msgstr "Impossible de trouver un fichier de menus valide  « %s »"
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
 msgstr "Échec lors de l'exécution de la commande pour un pipe-menu « %s » : %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
+msgid "Invalid output from pipe-menu \"%s\""
 msgstr "Sortie du pipe-menu invalide « %s »"
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
+msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "Tentative d'accès au menu « %s » qui n'existe pas"
 
 #: openbox/menu.c:368 openbox/menu.c:369
@@ -183,17 +183,17 @@ msgstr "Plus..."
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
+msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Bouton « %s » invalide dans le paramétrage de la souris"
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
+msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Contexte « %s » invalide dans le paramétrage de la souris"
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
+msgid "Unable to change to home directory \"%s\": %s"
 msgstr "Impossible de changer vers le répertoire de l'utilisateur « %s » : %s"
 
 #: openbox/openbox.c:154
@@ -227,7 +227,7 @@ msgstr "Impossible de charger un thème."
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "Le redémarrage n'a pas réussi à exécuter le nouvel exécutable « %s » : %s"
 
@@ -332,7 +332,7 @@ msgstr ""
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
+msgid "Invalid command line argument \"%s\"\n"
 msgstr "Argument de la ligne de commande invalide « %s »\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
@@ -371,17 +371,17 @@ msgstr "bureau %i"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
+msgid "Unable to make directory \"%s\": %s"
 msgstr "Impossible de créer le répertoire « %s » : %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
+msgid "Unable to save the session to \"%s\": %s"
 msgstr "Impossible de sauvegarder la session dans « %s » : %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
+msgid "Error while saving the session to \"%s\": %s"
 msgstr "Erreur lors de la sauvegarde de la session depuis « %s » : %s"
 
 #: openbox/startupnotify.c:243
@@ -391,24 +391,24 @@ msgstr "Exécution de %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
 msgstr ""
 "Touche de modification « %s » invalide dans le paramétrage du clavier / de la "
 "souris"
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
+msgid "Invalid key code \"%s\" in key binding"
 msgstr "Code de touche « %s » invalide dans le raccourci clavier"
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
+msgid "Invalid key name \"%s\" in key binding"
 msgstr "Nom de touche « %s » invalide dans le raccourci clavier"
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
+msgid "Requested key \"%s\" does not exist on the display"
 msgstr "La touche demandée « %s » n'existe pas pour l'affichage"
 
 #: openbox/xerror.c:40

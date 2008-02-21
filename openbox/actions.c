@@ -147,7 +147,7 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name)
         actions_definition_ref(act->def);
         act->options = NULL;
     } else
-        g_message(_("Invalid action '%s' requested. No such action exists."),
+        g_message(_("Invalid action \"%s\" requested. No such action exists."),
                   name);
 
     return act;

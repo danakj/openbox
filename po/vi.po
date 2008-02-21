@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2008-01-17 23:08+0100\n"
 "Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
 "Language-Team: None\n"
@@ -17,18 +17,18 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Hành động '%s' làm không được. Hành động đó không có."
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Hành động \"%s\" làm không được. Hành động đó không có."
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "Không thể chuyển chỗ '%s' từ utf8"
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "Không thể chuyển chỗ \"%s\" từ utf8"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "Làm không được '%s': %s"
+msgid "Failed to execute \"%s\": %s"
+msgstr "Làm không được \"%s\": %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
@@ -146,8 +146,8 @@ msgstr "Đón_g"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr "Sai nút '%s' ở trong hình thể"
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Sai nút \"%s\" ở trong hình thể"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -155,23 +155,23 @@ msgstr "Xung đột với chữ trói ở trong hình thể"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr "Không có thể tìm vững chắc thực đơn '%s'"
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Không có thể tìm vững chắc thực đơn \"%s\""
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Không có thể chạy lệnh cho ống-thực đơn '%s': %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Không có thể chạy lệnh cho ống-thực đơn \"%s\": %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr "Vô hiệu sản xuất của ống-thực đơn '%s'"
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Vô hiệu sản xuất của ống-thực đơn \"%s\""
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Thử mở thực đơn '%s' nhưng mà cái đó không có"
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Thử mở thực đơn \"%s\" nhưng mà cái đó không có"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -179,18 +179,18 @@ msgstr "Thêm nữa"
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr "Vô hiệu nút '%s' ở trong máy chuột đặt"
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Vô hiệu nút \"%s\" ở trong máy chuột đặt"
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr "Vô hiệu văn cảnh '%s' ở trong chuột đặt"
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "Vô hiệu văn cảnh \"%s\" ở trong chuột đặt"
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
-msgstr "Không thể đổi đến chỗ nhà '%s': %s"
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "Không thể đổi đến chỗ nhà \"%s\": %s"
 
 #: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -218,8 +218,8 @@ msgstr "Không thể đọc theme."
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Bắt đầu lại hỏng mở được executable mới '%s': %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "Bắt đầu lại hỏng mở được executable mới \"%s\": %s"
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
@@ -318,8 +318,8 @@ msgstr ""
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
-msgstr "Mệnh lệnh viết sai '%s'\n"
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "Mệnh lệnh viết sai \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
@@ -354,18 +354,18 @@ msgstr "chỗ làm việc %i"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "Không thể chế directory '%s': %s"
+msgid "Unable to make directory \"%s\": %s"
+msgstr "Không thể chế directory \"%s\": %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
-msgstr "Không thể tiết kiệm thời kỳ cho '%s': %s"
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "Không thể tiết kiệm thời kỳ cho \"%s\": %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
-msgstr "Bĩ trục chật lúc tiết kiệm thời kỳ cho '%s': %s"
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "Bĩ trục chật lúc tiết kiệm thời kỳ cho \"%s\": %s"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -374,23 +374,23 @@ msgstr "Đan Chạy %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Vô hiệu Modifier key '%s' ở chỗ máy keyboard/chuột đặt"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr "Vô hiệu Modifier key \"%s\" ở chỗ máy keyboard/chuột đặt"
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr "Vô hiệu key mã '%s' ở chỗ key đặt"
+msgid "Invalid key code \"%s\" in key binding"
+msgstr "Vô hiệu key mã \"%s\" ở chỗ key đặt"
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr "Vô hiệu key tên '%s' ở chỗ key đặt"
+msgid "Invalid key name \"%s\" in key binding"
+msgstr "Vô hiệu key tên \"%s\" ở chỗ key đặt"
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr "Yêu cầu key '%s' không có ở chỗ màn hình"
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "Yêu cầu key \"%s\" không có ở chỗ màn hình"
 
 #: openbox/xerror.c:40
 #, c-format
@@ -401,5 +401,5 @@ msgstr "X trục chật: %s"
 msgid "OK"
 msgstr ""
 
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "Sự dùng hành động '%s' sai rồi. Không làm hành động đó."
+#~ msgid "Invalid use of action \"%s\". Action will be ignored."
+#~ msgstr "Sự dùng hành động \"%s\" sai rồi. Không làm hành động đó."

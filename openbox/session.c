@@ -100,7 +100,7 @@ void session_startup(gint argc, gchar **argv)
     dir = g_build_filename(parse_xdg_data_home_path(),
                            "openbox", "sessions", NULL);
     if (!parse_mkdir_path(dir, 0700)) {
-        g_message(_("Unable to make directory '%s': %s"),
+        g_message(_("Unable to make directory \"%s\": %s"),
                   dir, g_strerror(errno));
     }
 
@@ -448,7 +448,7 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
     f = fopen(ob_sm_save_file, "w");
     if (!f) {
         success = FALSE;
-        g_message(_("Unable to save the session to '%s': %s"),
+        g_message(_("Unable to save the session to \"%s\": %s"),
                   ob_sm_save_file, g_strerror(errno));
     } else {
         fprintf(f, "<?xml version=\"1.0\"?>\n\n");
@@ -580,7 +580,7 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
 
         if (fflush(f)) {
             success = FALSE;
-            g_message(_("Error while saving the session to '%s': %s"),
+            g_message(_("Error while saving the session to \"%s\": %s"),
                       ob_sm_save_file, g_strerror(errno));
         }
         fclose(f);

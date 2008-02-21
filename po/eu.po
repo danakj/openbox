@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2008-01-19 14:34+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
@@ -17,18 +17,18 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Eskatutako '%s' ekintza baliogabea. Ez da ekintza hori existitzen."
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Eskatutako \"%s\" ekintza baliogabea. Ez da ekintza hori existitzen."
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "Hutsegitea '%s' helbidea utf8-tik bihurtzean"
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "Hutsegitea \"%s\" helbidea utf8-tik bihurtzean"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "Hutsegitea '%s' exekutatzean: %s"
+msgid "Failed to execute \"%s\": %s"
+msgstr "Hutsegitea \"%s\" exekutatzean: %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
@@ -146,8 +146,8 @@ msgstr "_Itxi"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr "Konfigurazio fitxategian zehaztutako '%s' botoia baliogabea"
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Konfigurazio fitxategian zehaztutako \"%s\" botoia baliogabea"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -155,23 +155,23 @@ msgstr "Gatazka konfigurazio fitxategiko tekla elkarketarekin"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr "Ezin da '%s' baliozko menu fitxategi bat aurkitu"
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Ezin da \"%s\" baliozko menu fitxategi bat aurkitu"
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Hutsegitea '%s' pipe-menuarentzat komandoa exekutatzean: %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Hutsegitea \"%s\" pipe-menuarentzat komandoa exekutatzean: %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr "Baliogabeko irteera '%s' pipe-menutik"
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Baliogabeko irteera \"%s\" pipe-menutik"
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "'%s' menua atzitzen saiatu da baina ez da existitzen"
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "\"%s\" menua atzitzen saiatu da baina ez da existitzen"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -179,18 +179,18 @@ msgstr "Gehiago..."
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr "Baliogabeko '%s' botoia sagu elkarketan"
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Baliogabeko \"%s\" botoia sagu elkarketan"
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr "Baliogabeko '%s' testuingurua sagu elkarketan"
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "Baliogabeko \"%s\" testuingurua sagu elkarketan"
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
-msgstr "Ezin da '%s' hasiera direktoriora aldatu: %s"
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "Ezin da \"%s\" hasiera direktoriora aldatu: %s"
 
 #: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -220,8 +220,8 @@ msgstr "Ezin da gai bat kargatu."
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Berrabiarazteak hutsegitea '%s' exekutagarri berria exekutatzean: %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "Berrabiarazteak hutsegitea \"%s\" exekutagarri berria exekutatzean: %s"
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
@@ -319,8 +319,8 @@ msgstr ""
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
-msgstr "'%s' komando lerro argumentu baliogabea\n"
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "\"%s\" komando lerro argumentu baliogabea\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
@@ -358,18 +358,18 @@ msgstr "%i Idazmahaia"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "Ezin da '%s' direktorioa sortu: %s"
+msgid "Unable to make directory \"%s\": %s"
+msgstr "Ezin da \"%s\" direktorioa sortu: %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
-msgstr "Ezin da saioa '%s'-n gorde: %s"
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "Ezin da saioa \"%s\"-n gorde: %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
-msgstr "Errorea saioa '%s'-n gordetzean: %s"
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "Errorea saioa \"%s\"-n gordetzean: %s"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -378,23 +378,23 @@ msgstr "Egikaritzen %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr " tekla/sagu elkarketan '%s' modifikatzaile tekla baliogabea"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr " tekla/sagu elkarketan \"%s\" modifikatzaile tekla baliogabea"
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr " tekla elkarketan '%s' tekla kode baliogabea"
+msgid "Invalid key code \"%s\" in key binding"
+msgstr " tekla elkarketan \"%s\" tekla kode baliogabea"
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr " tekla elkarketan '%s' tekla izen baliogabea"
+msgid "Invalid key name \"%s\" in key binding"
+msgstr " tekla elkarketan \"%s\" tekla izen baliogabea"
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr "Eskatutako '%s' tekla ez da pantaila existitzen"
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "Eskatutako \"%s\" tekla ez da pantaila existitzen"
 
 #: openbox/xerror.c:40
 #, c-format

@@ -600,7 +600,7 @@ void client_manage(Window window, ObPrompt *prompt)
     g_free(settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
-             window, frame_engine->frame_get_window(self->frame), self->class);
+             window, self->w_frame, self->class);
 }
 
 
@@ -670,7 +670,7 @@ void client_unmanage(ObClient *self)
     gulong ignore_start;
 
     ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
-             self->w_client, frame_engine->frame_get_window(self->frame),
+             self->w_client, self->w_frame,
              self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);

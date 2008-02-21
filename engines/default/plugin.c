@@ -1683,7 +1683,6 @@ ObFrameEngine plugin = {
         frame_update_skin, /* */
         frame_set_hover_flag, /* */
         frame_set_press_flag, /* */
-        frame_get_window,/* */
         frame_get_size, /* */
         frame_get_decorations, /* */
         frame_is_visible, /* */

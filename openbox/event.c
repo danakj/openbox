@@ -1226,7 +1226,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case ReparentNotify:
         /* this is when the client is first taken captive in the frame */
-        if (e->xreparent.parent == frame_engine->frame_get_window(client->frame)) break;
+        if (e->xreparent.parent == client->w_frame) break;
 
         /*
           This event is quite rare and is usually handled in unmapHandler.

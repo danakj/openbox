@@ -172,8 +172,6 @@ struct _ObFrameEngine
     void (*frame_set_hover_flag)(gpointer, ObFrameButton);
     void (*frame_set_press_flag)(gpointer, ObFrameButton);
 
-    Window (*frame_get_window)(gpointer);
-
     void (*frame_get_size)(gpointer, Strut *);
     gint (*frame_get_decorations)(gpointer);
 

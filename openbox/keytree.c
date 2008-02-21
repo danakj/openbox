@@ -81,7 +81,8 @@ void tree_assimilate(KeyBindingTree *node)
         b = node;
         while (a) {
             last = a;
-            if (!(a->state == b->state && a->key == b->key)) {
+            /* check b->key != 0 for key bindings that didn't get translated */
+            if (!(a->state == b->state && a->key == b->key && b->key != 0)) {
                 a = a->next_sibling;
             } else {
                 tmp = b;
@@ -90,7 +91,9 @@ void tree_assimilate(KeyBindingTree *node)
                 a = a->first_child;
             }
         }
-        if (!(last->state == b->state && last->key == b->key)) {
+        /* check b->key != 0, and save key bindings that didn't get translated
+           as siblings here */
+        if (!(last->state == b->state && last->key == b->key && b->key != 0)) {
             last->next_sibling = b;
             b->parent = last->parent;
         } else {
@@ -110,7 +113,10 @@ KeyBindingTree *tree_find(KeyBindingTree *search, gboolean *conflict)
     a = keyboard_firstnode;
     b = search;
     while (a && b) {
-        if (!(a->state == b->state && a->key == b->key)) {
+        /* check b->key != 0 for key bindings that didn't get translated, and
+           don't make them conflict with anything else so that they can all
+           live together in peace and harmony */
+        if (!(a->state == b->state && a->key == b->key && b->key != 0)) {
             a = a->next_sibling;
         } else {
             if ((a->first_child == NULL) == (b->first_child == NULL)) {

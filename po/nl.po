@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-17 16:45+0100\n"
+"POT-Creation-Date: 2008-02-21 11:58+0100\n"
 "PO-Revision-Date: 2007-07-12 13:01+0200\n"
 "Last-Translator: Marvin Vek\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -19,18 +19,18 @@ msgstr ""
 
 #: openbox/actions.c:150
 #, c-format
-msgid "Invalid action '%s' requested. No such action exists."
-msgstr "Ongeldige actie '%s' gevraagd. Deze actie bestaat niet"
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Ongeldige actie \"%s\" gevraagd. Deze actie bestaat niet"
 
 #: openbox/actions/execute.c:92
 #, c-format
-msgid "Failed to convert the path '%s' from utf8"
-msgstr "Converteren van het pad '%s' vanuit utf8 mislukt"
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "Converteren van het pad \"%s\" vanuit utf8 mislukt"
 
 #: openbox/actions/execute.c:101 openbox/actions/execute.c:120
 #, c-format
-msgid "Failed to execute '%s': %s"
-msgstr "Uitvoeren van '%s' mislukt: %s"
+msgid "Failed to execute \"%s\": %s"
+msgstr "Uitvoeren van \"%s\" mislukt: %s"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
@@ -148,8 +148,8 @@ msgstr "_Sluiten"
 
 #: openbox/config.c:781
 #, c-format
-msgid "Invalid button '%s' specified in config file"
-msgstr "Ongeldige knop '%s' gespecificeerd in het configuratiebestand"
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Ongeldige knop \"%s\" gespecificeerd in het configuratiebestand"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
@@ -157,23 +157,23 @@ msgstr "Conflict met toetsenbinding in het configuratiebestand"
 
 #: openbox/menu.c:103 openbox/menu.c:111
 #, c-format
-msgid "Unable to find a valid menu file '%s'"
-msgstr "Het vinden van een geldig menubestand '%s' is mislukt"
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Het vinden van een geldig menubestand \"%s\" is mislukt"
 
 #: openbox/menu.c:171
 #, c-format
-msgid "Failed to execute command for pipe-menu '%s': %s"
-msgstr "Uitvoeren mislukt van het commando '%s' voor pipe-menu: %s"
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Uitvoeren mislukt van het commando \"%s\" voor pipe-menu: %s"
 
 #: openbox/menu.c:185
 #, c-format
-msgid "Invalid output from pipe-menu '%s'"
-msgstr "Ongeldige uitvoer van pipe-menu '%s'"
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Ongeldige uitvoer van pipe-menu \"%s\""
 
 #: openbox/menu.c:198
 #, c-format
-msgid "Attempted to access menu '%s' but it does not exist"
-msgstr "Toegang gevraagd tot menu '%s' maar het bestaat niet"
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Toegang gevraagd tot menu \"%s\" maar het bestaat niet"
 
 #: openbox/menu.c:368 openbox/menu.c:369
 msgid "More..."
@@ -181,18 +181,18 @@ msgstr "Meer..."
 
 #: openbox/mouse.c:379
 #, c-format
-msgid "Invalid button '%s' in mouse binding"
-msgstr "Ongeldige knop '%s' in muis binding"
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Ongeldige knop \"%s\" in muis binding"
 
 #: openbox/mouse.c:385
 #, c-format
-msgid "Invalid context '%s' in mouse binding"
-msgstr "Ongeldige context '%s' in muis binding"
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "Ongeldige context \"%s\" in muis binding"
 
 #: openbox/openbox.c:134
 #, c-format
-msgid "Unable to change to home directory '%s': %s"
-msgstr "Pad instellen mislukt naar de thuismap '%s': %s"
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "Pad instellen mislukt naar de thuismap \"%s\": %s"
 
 #: openbox/openbox.c:154
 msgid "Failed to open the display from the DISPLAY environment variable."
@@ -222,8 +222,8 @@ msgstr "Thema laden mislukt."
 
 #: openbox/openbox.c:428
 #, c-format
-msgid "Restart failed to execute new executable '%s': %s"
-msgstr "Uitvoeren van nieuw programma '%s' tijdens herstart miskukt: %s"
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "Uitvoeren van nieuw programma \"%s\" tijdens herstart miskukt: %s"
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
@@ -322,8 +322,8 @@ msgstr "--config-file vereist een argument\n"
 
 #: openbox/openbox.c:637
 #, c-format
-msgid "Invalid command line argument '%s'\n"
-msgstr "Onbekende optie '%s'\n"
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "Onbekende optie \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
@@ -360,18 +360,18 @@ msgstr "bureaublad %i"
 
 #: openbox/session.c:103
 #, c-format
-msgid "Unable to make directory '%s': %s"
-msgstr "Kan map '%s' niet aanmaken: %s"
+msgid "Unable to make directory \"%s\": %s"
+msgstr "Kan map \"%s\" niet aanmaken: %s"
 
 #: openbox/session.c:451
 #, c-format
-msgid "Unable to save the session to '%s': %s"
-msgstr "Kan de sessie niet opslaan naar '%s': %s"
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "Kan de sessie niet opslaan naar \"%s\": %s"
 
 #: openbox/session.c:583
 #, c-format
-msgid "Error while saving the session to '%s': %s"
-msgstr "Fout tijdens het opslaan van de sessie naar '%s': %s"
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "Fout tijdens het opslaan van de sessie naar \"%s\": %s"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -380,23 +380,23 @@ msgstr "Starten %s\n"
 
 #: openbox/translate.c:59
 #, c-format
-msgid "Invalid modifier key '%s' in key/mouse binding"
-msgstr "Ongeldige modificatietoets '%s' in toetsen-/muisbinding"
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr "Ongeldige modificatietoets \"%s\" in toetsen-/muisbinding"
 
 #: openbox/translate.c:138
 #, c-format
-msgid "Invalid key code '%s' in key binding"
-msgstr "Ongeldige toetscode '%s' in toetsenbinding"
+msgid "Invalid key code \"%s\" in key binding"
+msgstr "Ongeldige toetscode \"%s\" in toetsenbinding"
 
 #: openbox/translate.c:145
 #, c-format
-msgid "Invalid key name '%s' in key binding"
-msgstr "Ongeldige toetsnaam '%s' in toetsenbinding"
+msgid "Invalid key name \"%s\" in key binding"
+msgstr "Ongeldige toetsnaam \"%s\" in toetsenbinding"
 
 #: openbox/translate.c:151
 #, c-format
-msgid "Requested key '%s' does not exist on the display"
-msgstr "Aangevraagde toets '%s' bestaat niet op het scherm"
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "Aangevraagde toets \"%s\" bestaat niet op het scherm"
 
 #: openbox/xerror.c:40
 #, c-format
@@ -407,5 +407,5 @@ msgstr "X Fout: %s"
 msgid "OK"
 msgstr ""
 
-#~ msgid "Invalid use of action '%s'. Action will be ignored."
-#~ msgstr "Ongeldig gebruik van actie '%s'. Actie wordt genegeerd."
+#~ msgid "Invalid use of action \"%s\". Action will be ignored."
+#~ msgstr "Ongeldig gebruik van actie \"%s\". Actie wordt genegeerd."

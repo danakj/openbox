@@ -166,13 +166,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         x = o->x;
         if (o->xcenter) x = (area->width - w) / 2;
         else if (x == G_MININT) x = c->frame->area.x - carea->x;
-        else if (o->xopposite) x = area->width - w;
+        else if (o->xopposite) x = area->width - w - x;
         x += area->x;
 
         y = o->y;
         if (o->ycenter) y = (area->height - h) / 2;
         else if (y == G_MININT) y = c->frame->area.y - carea->y;
-        else if (o->yopposite) y = area->height - h;
+        else if (o->yopposite) y = area->height - h - y;
         y += area->y;
 
         /* get the client's size back */

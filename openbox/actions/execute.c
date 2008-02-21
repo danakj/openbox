@@ -89,7 +89,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (!o->cmd) return FALSE;
     cmd = g_filename_from_utf8(o->cmd, -1, NULL, NULL, NULL);
     if (!cmd) {
-        g_message(_("Failed to convert the path '%s' from utf8"), o->cmd);
+        g_message(_("Failed to convert the path \"%s\" from utf8"), o->cmd);
         return FALSE;
     }
 
@@ -98,7 +98,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     event_cancel_all_key_grabs();
 
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
-        g_message(_("Failed to execute '%s': %s"), o->cmd, e->message);
+        g_message(_("Failed to execute \"%s\": %s"), o->cmd, e->message);
         g_error_free(e);
     }
     else {
@@ -117,7 +117,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                            G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e))
         {
-            g_message(_("Failed to execute '%s': %s"), o->cmd, e->message);
+            g_message(_("Failed to execute \"%s\": %s"), o->cmd, e->message);
             g_error_free(e);
 
             if (o->sn)

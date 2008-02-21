@@ -778,7 +778,7 @@ static void parse_dock(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
             config_dock_app_move_button = b;
             config_dock_app_move_modifiers = s;
         } else {
-            g_message(_("Invalid button '%s' specified in config file"), str);
+            g_message(_("Invalid button \"%s\" specified in config file"), str);
         }
         g_free(str);
     }

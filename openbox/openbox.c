@@ -131,7 +131,7 @@ gint main(gint argc, gchar **argv)
     textdomain(PACKAGE_NAME);
 
     if (chdir(g_get_home_dir()) == -1)
-        g_message(_("Unable to change to home directory '%s': %s"),
+        g_message(_("Unable to change to home directory \"%s\": %s"),
                   g_get_home_dir(), g_strerror(errno));
 
     /* parse the command line args, which can change the argv[0] */
@@ -425,7 +425,7 @@ gint main(gint argc, gchar **argv)
                 g_strfreev(argvp);
             } else {
                 g_message(
-                    _("Restart failed to execute new executable '%s': %s"),
+                    _("Restart failed to execute new executable \"%s\": %s"),
                     restart_path, err->message);
                 g_error_free(err);
             }
@@ -634,7 +634,7 @@ static void parse_args(gint *argc, gchar **argv)
         else {
             /* this is a memleak.. oh well.. heh */
             gchar *err = g_strdup_printf
-                (_("Invalid command line argument '%s'\n"), argv[i]);
+                (_("Invalid command line argument \"%s\"\n"), argv[i]);
             ob_exit_with_error(err);
         }
     }

@@ -47,9 +47,6 @@ typedef enum
                            ButtonMotionMask | PointerMotionMask | \
                            EnterWindowMask | LeaveWindowMask)
 
-#define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
-#define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 60) /* 60 Hz */
-
 #define FRAME_HANDLE_Y(f) (f->size.top + f->client_area.height + f->cbwidth_b)
 
 Display * obp_display;
@@ -393,10 +390,6 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
     XEvent ev;
     gboolean reparent = TRUE;
 
-    /* if there was any animation going on, kill it */
-    obt_main_loop_timeout_remove_data(plugin.ob_main_loop,
-            frame_animate_iconify, self, FALSE);
-
     /* check if the app has already reparented its window away */
     while (XCheckTypedWindowEvent(obp_display, self->client->w_client,
             ReparentNotify, &ev)) {
@@ -660,94 +653,6 @@ void frame_flash_stop(gpointer _self)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
     self->flashing = FALSE;
-}
-
-void frame_begin_iconify_animation(gpointer _self, gboolean iconifying)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    gulong time;
-    gboolean new_anim = FALSE;
-    gboolean set_end = TRUE;
-    GTimeVal now;
-
-    /* if there is no titlebar, just don't animate for now
-     XXX it would be nice tho.. */
-    if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
-        return;
-
-    /* get the current time */
-    g_get_current_time(&now);
-
-    /* get how long until the end */
-    time = FRAME_ANIMATE_ICONIFY_TIME;
-    if (self->iconify_animation_going) {
-        if (!!iconifying != (self->iconify_animation_going > 0)) {
-            /* animation was already going on in the opposite direction */
-            time = time - frame_animate_iconify_time_left(_self, &now);
-        }
-        else
-            /* animation was already going in the same direction */
-            set_end = FALSE;
-    }
-    else
-        new_anim = TRUE;
-    self->iconify_animation_going = iconifying ? 1 : -1;
-
-    /* set the ending time */
-    if (set_end) {
-        self->iconify_animation_end.tv_sec = now.tv_sec;
-        self->iconify_animation_end.tv_usec = now.tv_usec;
-        g_time_val_add(&self->iconify_animation_end, time);
-    }
-
-    if (new_anim) {
-        obt_main_loop_timeout_remove_data(plugin.ob_main_loop,
-                frame_animate_iconify, self, FALSE);
-        obt_main_loop_timeout_add(plugin.ob_main_loop, 
-        FRAME_ANIMATE_ICONIFY_STEP_TIME, frame_animate_iconify, self,
-                g_direct_equal, NULL);
-
-        /* do the first step */
-        frame_animate_iconify(self);
-
-        /* show it during the animation even if it is not "visible" */
-        if (!self->visible)
-            XMapWindow(obp_display, self->window);
-    }
-}
-
-void frame_end_iconify_animation(gpointer _self)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    /* see if there is an animation going */
-    if (self->iconify_animation_going == 0)
-        return;
-
-    if (!self->visible)
-        XUnmapWindow(obp_display, self->window);
-    else {
-        /* Send a ConfigureNotify when the animation is done, this fixes
-         KDE's pager showing the window in the wrong place.  since the
-         window is mapped at a different location and is then moved, we
-         need to send the synthetic configurenotify, since apps may have
-         read the position when the client mapped, apparently. */
-        client_reconfigure(self->client, TRUE);
-    }
-
-    /* we're not animating any more ! */
-    self->iconify_animation_going = 0;
-
-    XMoveResizeWindow(obp_display, self->window, self->area.x, self->area.y,
-            self->area.width, self->area.height);
-    /* we delay re-rendering until after we're done animating */
-    frame_update_skin(self);
-    XFlush(obp_display);
-}
-
-gboolean frame_iconify_animating(gpointer _self)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    return self->iconify_animation_going != 0;
 }
 
 void frame_set_decorations(gpointer self, ObFrameDecorations d)
@@ -1203,15 +1108,13 @@ void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
     }
 
     if (!is_fake) {
-        if (!frame_iconify_animating(self))
-            /* move and resize the top level frame.
-             shading can change without being moved or resized.
-
-             but don't do this during an iconify animation. it will be
-             reflected afterwards.
-             */
-            XMoveResizeWindow(obp_display, self->window, self->area.x,
-                    self->area.y, self->area.width, self->area.height);
+        /* move and resize the top level frame.
+         shading can change without being moved or resized.
+         but don't do this during an iconify animation. it will be
+         reflected afterwards.
+         */
+        XMoveResizeWindow(obp_display, self->window, self->area.x,
+                self->area.y, self->area.width, self->area.height);
 
         /* when the client has StaticGravity, it likes to move around.
          also this correctly positions the client when it maps.
@@ -1300,96 +1203,6 @@ gboolean frame_is_max_horz(gpointer self)
 gboolean frame_is_max_vert(gpointer self)
 {
     return OBDEFAULTFRAME(self)->max_vert;
-}
-
-gulong frame_animate_iconify_time_left(gpointer _self, const GTimeVal *now)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    glong sec, usec;
-    sec = self->iconify_animation_end.tv_sec - now->tv_sec;
-    usec = self->iconify_animation_end.tv_usec - now->tv_usec;
-    if (usec < 0) {
-        usec += G_USEC_PER_SEC;
-        sec--;
-    }
-    /* no negative values */
-    return MAX(sec * G_USEC_PER_SEC + usec, 0);
-}
-
-gboolean frame_animate_iconify(gpointer p)
-{
-    ObDefaultFrame *self = p;
-    gint x, y, w, h;
-    gint iconx, icony, iconw;
-    GTimeVal now;
-    gulong time;
-    gboolean iconifying;
-
-    if (self->client->icon_geometry.width == 0) {
-        /* there is no icon geometry set so just go straight down */
-        Rect *a =
-                screen_physical_area_monitor(screen_find_monitor(&self->area));
-        iconx = self->area.x + self->area.width / 2 + 32;
-        icony = a->y + a->width;
-        iconw = 64;
-        g_free(a);
-    }
-    else {
-        iconx = self->client->icon_geometry.x;
-        icony = self->client->icon_geometry.y;
-        iconw = self->client->icon_geometry.width;
-    }
-
-    iconifying = self->iconify_animation_going > 0;
-
-    /* how far do we have left to go ? */
-    g_get_current_time(&now);
-    time = frame_animate_iconify_time_left(self, &now);
-
-    if (time == 0 || iconifying) {
-        /* start where the frame is supposed to be */
-        x = self->area.x;
-        y = self->area.y;
-        w = self->area.width;
-        h = self->area.height;
-    }
-    else {
-        /* start at the icon */
-        x = iconx;
-        y = icony;
-        w = iconw;
-        h = self->size.top; /* just the titlebar */
-    }
-
-    if (time > 0) {
-        glong dx, dy, dw;
-        glong elapsed;
-
-        dx = self->area.x - iconx;
-        dy = self->area.y - icony;
-        dw = self->area.width - self->bwidth * 2 - iconw;
-        /* if restoring, we move in the opposite direction */
-        if (!iconifying) {
-            dx = -dx;
-            dy = -dy;
-            dw = -dw;
-        }
-
-        elapsed = FRAME_ANIMATE_ICONIFY_TIME - time;
-        x = x - (dx * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
-        y = y - (dy * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
-        w = w - (dw * elapsed) / FRAME_ANIMATE_ICONIFY_TIME;
-        h = self->size.top; /* just the titlebar */
-    }
-
-    if (time == 0)
-        frame_end_iconify_animation(self);
-    else {
-        XMoveResizeWindow(obp_display, self->window, x, y, w, h);
-        XFlush(obp_display);
-    }
-
-    return time > 0; /* repeat until we're out of time */
 }
 
 void frame_adjust_cursors(gpointer _self)
@@ -1846,25 +1659,19 @@ ObFrameEngine plugin = {
         0, /* */
         frame_new, //gpointer (*frame_new) (struct _ObClient *c);
         frame_free, //void (*frame_free) (gpointer self);
-
         frame_adjust_theme, //void (*frame_adjust_theme) (gpointer self);
         frame_adjust_shape, //void (*frame_adjust_shape) (gpointer self);
         frame_grab, //void (*frame_adjust_area) (gpointer self, gboolean moved, gboolean resized, gboolean fake);
-        frame_ungrab, frame_context, //void (*frame_adjust_state) (gpointer self);
+        frame_ungrab, /* */
+        frame_context, //void (*frame_adjust_state) (gpointer self);
         frame_set_is_visible, /* */
         frame_set_is_focus, /* */
         frame_set_is_max_vert, /* */
         frame_set_is_max_horz, /* */
         frame_set_is_shaded, /* */
-
         frame_flash_start, /* */
         frame_flash_stop, /* */
-        frame_begin_iconify_animation, /* */
-        frame_end_iconify_animation, /* */
-        frame_iconify_animating, /* */
-
         frame_set_decorations, /* */
-
         frame_update_title, /* */
         /* This give the window area */
         frame_get_window_area, /* */
@@ -1872,33 +1679,23 @@ ObFrameEngine plugin = {
         /* Draw the frame */
         frame_update_layout, /* */
         frame_update_skin, /* */
-
         frame_set_hover_flag, /* */
         frame_set_press_flag, /* */
-
         frame_get_window,/* */
-
         frame_get_size, /* */
         frame_get_decorations, /* */
-
         frame_is_visible, /* */
         frame_is_max_horz, /* */
         frame_is_max_vert, /* */
-
         frame_trigger, /* */
-
         load_theme_config, /* */
-
         /* This fields are fill by openbox. */
-        //0, //Display * ob_display;
-                //0, //gint ob_screen;
-                //0, //RrInstance *ob_rr_inst;
-                0, //gboolean config_theme_keepborder;
-        0, //struct _ObClient *focus_cycle_target;
-        0, //gchar *config_title_layout;
-        FALSE, //gboolean moveresize_in_progress;
-        0, //struct _ObMainLoop *ob_main_loop;
-        };
+        0, /*gboolean config_theme_keepborder; */
+        0, /*struct _ObClient *focus_cycle_target; */
+        0, /*gchar *config_title_layout; */
+        FALSE, /*gboolean moveresize_in_progress;*/
+        0, /*struct _ObMainLoop *ob_main_loop;*/
+};
 
 ObFrameEngine * get_info()
 {

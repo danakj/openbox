@@ -184,15 +184,10 @@ void frame_adjust_focus(gpointer self, gboolean hilite);
 void frame_adjust_title(gpointer self);
 void frame_adjust_icon(gpointer self);
 
-gulong frame_animate_iconify_time_left(gpointer _self, const GTimeVal *now);
-
 ObFrameContext frame_context(gpointer, Window win, gint x, gint y);
 
 void frame_flash_start(gpointer self);
 void frame_flash_stop(gpointer self);
-void frame_begin_iconify_animation(gpointer self, gboolean iconifying);
-void frame_end_iconify_animation(gpointer self);
-gboolean frame_iconify_animating(gpointer _self);
 
 void frame_set_hover_flag(gpointer, ObFrameButton);
 void frame_set_press_flag(gpointer, ObFrameButton);
@@ -215,7 +210,6 @@ gboolean flash_timeout(gpointer data);
 void layout_title(ObDefaultFrame *);
 void set_theme_statics(gpointer self);
 void free_theme_statics(gpointer self);
-gboolean frame_animate_iconify(gpointer self);
 void frame_adjust_cursors(gpointer self);
 
 void frame_trigger(gpointer, ObFrameTrigger);

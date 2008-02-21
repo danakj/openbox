@@ -968,11 +968,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_FRAME:
-            /* When the mouse leaves an animating window, don't use the
-               corresponding enter events. Pretend like the animating window
-               doesn't even exist..! */
-            if (frame_engine->frame_iconify_animating(client->frame))
-                event_end_ignore_all_enters(event_start_ignore_all_enters());
 
             ob_debug_type(OB_DEBUG_FOCUS,
                           "%sNotify mode %d detail %d on %lx",
@@ -1880,8 +1875,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
         {
             /* the frame may not be "visible" but they can still click on it
                in the case where it is animating before disappearing */
-            if (!client || !frame_engine->frame_iconify_animating(client->frame))
-                mouse_event(client, e);
+            mouse_event(client, e);
         } else
             keyboard_event((frame_engine->focus_cycle_target ? frame_engine->focus_cycle_target :
                             (client ? client : focus_client)), e);

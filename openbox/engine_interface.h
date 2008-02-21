@@ -153,9 +153,6 @@ struct _ObFrameEngine
 
     void (*frame_flash_start)(gpointer self);
     void (*frame_flash_stop)(gpointer self);
-    void (*frame_begin_iconify_animation)(gpointer self, gboolean iconifying);
-    void (*frame_end_iconify_animation)(gpointer self);
-    gboolean (*frame_iconify_animating)(gpointer p);
 
     /* Set the layout wanted by client */
     void (*frame_set_decorations)(gpointer, ObFrameDecorations);

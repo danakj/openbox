@@ -33,8 +33,7 @@ static void framerender_close(ObDefaultFrame *self, RrAppearance *a);
 void frame_update_skin(gpointer _self)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    if (plugin.frame_iconify_animating(self))
-        return; /* delay redrawing until the animation is done */
+    
     if (!self->visible)
         return;
 

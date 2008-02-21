@@ -3265,8 +3265,6 @@ static void client_iconify_recursive(ObClient *self,
 
     if (changed) {
         client_change_state(self);
-        if (config_animate_iconify && !hide_animation)
-        frame_engine->frame_begin_iconify_animation(self->frame, iconic);
         /* do this after starting the animation so it doesn't flash */
         client_showhide(self);
     }
@@ -4453,9 +4451,7 @@ ObClient* client_under_pointer(void)
                        switching and windows are shown/hidden status is not
                        reliable */
                     (c->desktop == screen_desktop ||
-                     c->desktop == DESKTOP_ALL) &&
-                    /* ignore all animating windows */
-                    !(frame_engine->frame_iconify_animating(c->frame)) &&
+                     c->desktop == DESKTOP_ALL) &&   
                     RECT_CONTAINS(frame_engine->frame_get_window_area(c->frame), x, y))
                 {
                     ret = c;
@@ -4489,8 +4485,7 @@ void client_show_frame(ObClient * self)
 void client_hide_frame(ObClient * self)
 {
     frame_engine->frame_set_is_visible(self->frame, FALSE);
-    if (!frame_engine->frame_iconify_animating(self))
-        XUnmapWindow(obt_display, self->w_frame);
+    XUnmapWindow(obt_display, self->w_frame);
     /* we unmap the client itself so that we can get MapRequest
      events, and because the ICCCM tells us to! */
     XUnmapWindow(obt_display, self->w_client);

@@ -184,38 +184,6 @@ void frame_free(gpointer self)
     g_free(self);
 }
 
-void frame_show(gpointer _self)
-{
-    ObConceptFrame * self = (ObConceptFrame *) _self;
-    if (!self->visible) {
-        self->visible = TRUE;
-        frame_update_skin(self);
-        /* Grab the server to make sure that the frame window is mapped before
-         the client gets its MapNotify, i.e. to make sure the client is
-         _visible_ when it gets MapNotify. */
-        grab_server(TRUE);
-        XMapWindow(plugin.ob_display, self->client->window);
-        XMapWindow(plugin.ob_display, self->window);
-        grab_server(FALSE);
-    }
-}
-
-gint frame_hide(gpointer self)
-{
-    if (OBCONCEPTFRAME(self)->visible) {
-        OBCONCEPTFRAME(self)->visible = FALSE;
-        if (!frame_iconify_animating(self))
-            XUnmapWindow(plugin.ob_display, OBCONCEPTFRAME(self)->window);
-        /* we unmap the client itself so that we can get MapRequest
-         events, and because the ICCCM tells us to! */
-        XUnmapWindow(plugin.ob_display, OBCONCEPTFRAME(self)->client->window);
-        /* We ignore 1 unmap */
-        return 1;
-    }
-    else
-        return 0;
-}
-
 void frame_adjust_theme(gpointer self)
 {
     free_theme_statics(self);
@@ -475,95 +443,6 @@ void frame_flash_stop(gpointer _self)
 {
     ObConceptFrame * self = (ObConceptFrame *) _self;
     self->flashing = FALSE;
-}
-
-void frame_begin_iconify_animation(gpointer _self, gboolean iconifying)
-{
-    ObConceptFrame * self = (ObConceptFrame *) _self;
-    gulong time;
-    gboolean new_anim = FALSE;
-    gboolean set_end = TRUE;
-    GTimeVal now;
-
-    /* if there is no titlebar, just don't animate for now
-     XXX it would be nice tho.. */
-    if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
-        return;
-
-    /* get the current time */
-    g_get_current_time(&now);
-
-    /* get how long until the end */
-    time = FRAME_ANIMATE_ICONIFY_TIME;
-    if (self->iconify_animation_going) {
-        if (!!iconifying != (self->iconify_animation_going > 0)) {
-            /* animation was already going on in the opposite direction */
-            time = time - frame_animate_iconify_time_left(self, &now);
-        }
-        else
-            /* animation was already going in the same direction */
-            set_end = FALSE;
-    }
-    else
-        new_anim = TRUE;
-    self->iconify_animation_going = iconifying ? 1 : -1;
-
-    /* set the ending time */
-    if (set_end) {
-        self->iconify_animation_end.tv_sec = now.tv_sec;
-        self->iconify_animation_end.tv_usec = now.tv_usec;
-        g_time_val_add(&self->iconify_animation_end, time);
-    }
-
-    if (new_anim) {
-        obt_main_loop_timeout_remove_data(plugin.ob_main_loop,
-                frame_animate_iconify, self, FALSE);
-        obt_main_loop_timeout_add(plugin.ob_main_loop,
-        FRAME_ANIMATE_ICONIFY_STEP_TIME, frame_animate_iconify, self,
-                g_direct_equal, NULL);
-
-        /* do the first step */
-        frame_animate_iconify(self);
-
-        /* show it during the animation even if it is not "visible" */
-        if (!self->visible)
-            XMapWindow(plugin.ob_display, self->window);
-    }
-}
-
-void frame_end_iconify_animation(gpointer _self)
-{
-    ObConceptFrame * self = (ObConceptFrame *) _self;
-    /* see if there is an animation going */
-    if (self->iconify_animation_going == 0)
-        return;
-
-    if (!self->visible)
-        XUnmapWindow(plugin.ob_display, self->window);
-    else {
-        /* Send a ConfigureNotify when the animation is done, this fixes
-         KDE's pager showing the window in the wrong place.  since the
-         window is mapped at a different location and is then moved, we
-         need to send the synthetic configurenotify, since apps may have
-         read the position when the client mapped, apparently. */
-        client_reconfigure(self->client, TRUE);
-    }
-
-    /* we're not animating any more ! */
-    self->iconify_animation_going = 0;
-
-    XMoveResizeWindow(plugin.ob_display, self->window, self->window_area.x,
-            self->window_area.y, self->window_area.width,
-            self->window_area.height);
-    /* we delay re-rendering until after we're done animating */
-    frame_update_skin(self);
-    XFlush(plugin.ob_display);
-}
-
-gboolean frame_iconify_animating(gpointer _self)
-{
-    ObConceptFrame * self = (ObConceptFrame *) _self;
-    return self->iconify_animation_going != 0;
 }
 
 void frame_set_decorations(gpointer self, ObFrameDecorations d)

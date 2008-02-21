@@ -222,8 +222,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
         return;
     }
 
-    frame_engine->frame_end_iconify_animation(c->frame);
-
     moving = mv;
     moveresize_client = c;
     start_cx = c->area.x;

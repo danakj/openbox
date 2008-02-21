@@ -337,7 +337,7 @@ gint main(gint argc, gchar **argv)
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
-                    frame_engine->frame_update_layout (c->frame, FALSE, FALSE);
+                    frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
                     /* the decor sizes may have changed, so the windows may
                        end up in new positions */
                     client_reconfigure(c, FALSE);

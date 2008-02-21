@@ -528,7 +528,7 @@ static void event_process(const XEvent *ec, gpointer data)
                from our Inferior up to us. This happens when iconifying a
                window with RevertToParent focus */
             frame_engine->frame_set_is_focus(client->frame, FALSE);
-            frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+            frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
             frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called */
         }
@@ -593,7 +593,7 @@ static void event_process(const XEvent *ec, gpointer data)
         else if (client != focus_client) {
             focus_left_screen = FALSE;
             frame_engine->frame_set_is_focus(client->frame, TRUE);
-            frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+            frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
             frame_engine->frame_update_skin (client->frame);
             focus_set_client(client);
             client_calc_layer(client);
@@ -640,7 +640,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (client && client != focus_client) {
           frame_engine->frame_set_is_focus(client->frame, FALSE);
-          frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+          frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
           frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */
@@ -677,7 +677,8 @@ static void event_process(const XEvent *ec, gpointer data)
             gulong vals[4];
 
             /* set the frame extents on the window */
-            Strut size = frame_engine->frame_get_size(c->frame);
+            Strut size;
+            frame_engine->frame_get_size(c->frame, &size);
             vals[0] = size.left;
             vals[1] = size.right;
             vals[2] = size.top;
@@ -1158,8 +1159,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
            desktop. eg. open amarok window on desktop 1, switch to desktop
            2, click amarok tray icon. it will move by its decoration size.
         */
-        Strut size = frame_engine->frame_get_size(client->frame);
-        Rect area = frame_engine->frame_get_window_area(client->frame);
+        Strut size;
+        frame_engine->frame_get_size(client->frame, &size);
+        Rect area;
+        frame_engine->frame_get_window_area(client->frame, &area);
         if (x != client->area.x &&
             x == (area.x + size.left -
                   (gint)client->border_width) &&

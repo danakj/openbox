@@ -177,7 +177,7 @@ void frame_set_is_max_vert(gpointer, gboolean);
 void frame_set_is_max_horz(gpointer, gboolean);
 void frame_set_is_shaded(gpointer, gboolean);
 
-void frame_update_layout(gpointer, gboolean, gboolean);
+void frame_update_layout(gpointer, Rect, gboolean, gboolean);
 void frame_adjust_client_area(gpointer self);
 void frame_adjust_state(gpointer self);
 void frame_adjust_focus(gpointer self, gboolean hilite);
@@ -194,8 +194,9 @@ void frame_set_press_flag(gpointer, ObFrameButton);
 
 Window frame_get_window(gpointer);
 
-Strut frame_get_size(gpointer self);
-Rect frame_get_area(gpointer self);
+void frame_get_size(gpointer self, Strut *);
+void frame_get_area(gpointer self, Rect *);
+
 gint frame_get_decorations(gpointer self);
 
 void frame_update_title(gpointer, const gchar *);

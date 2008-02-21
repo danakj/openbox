@@ -572,7 +572,7 @@ static void screen_fallback_focus(void)
             /* reduce flicker by hiliting now rather than waiting for the
                server FocusIn event */
         frame_engine->frame_set_is_focus (c->frame, TRUE);
-        frame_engine->frame_update_layout (c->frame, FALSE, FALSE);
+        frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
         frame_engine->frame_update_skin (c->frame);
             /* do this here so that if you switch desktops to a window with
                helper windows then the helper windows won't flash */
@@ -1229,7 +1229,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
                 /* reduce flicker by hiliting now rather than waiting for the
                    server FocusIn event */
         frame_engine->frame_set_is_focus(c->frame, TRUE);
-        frame_engine->frame_update_layout (c->frame, FALSE, FALSE);
+        frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
         frame_engine->frame_update_skin (c->frame);
             }
         }

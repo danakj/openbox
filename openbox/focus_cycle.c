@@ -177,7 +177,8 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     if (!client_list)
         return NULL;
 
-    Rect area = frame_engine->frame_get_window_area(c->frame);
+    Rect area;
+    frame_engine->frame_get_window_area(c->frame, &area);
     /* first, find the centre coords of the currently focused window */
     my_cx = area.x + area.width / 2;
     my_cy = area.y + area.height / 2;
@@ -195,7 +196,8 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
                                 desktop_windows))
             continue;
 
-        Rect cur_area = frame_engine->frame_get_window_area(cur->frame);
+        Rect cur_area;
+        frame_engine->frame_get_window_area(cur->frame, &cur_area);
         /* find the centre coords of this window, from the
          * currently focused window's point of view */
         his_cx = (cur_area.x - my_cx)

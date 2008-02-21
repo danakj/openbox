@@ -660,21 +660,23 @@ void frame_set_decorations(gpointer self, ObFrameDecorations d)
     OBDEFAULTFRAME(self)->decorations = d;
 }
 
-Rect frame_get_window_area(gpointer self)
+void frame_get_window_area(gpointer self, Rect * r)
 {
-    return OBDEFAULTFRAME(self)->area;
+    /* *r = (OBDEFAULTFRAME(self)->area) ??? */ 
+    memcpy(r, &(OBDEFAULTFRAME(self)->area), sizeof(Rect));
 }
 void frame_set_client_area(gpointer self, Rect r)
 {
     OBDEFAULTFRAME(self)->client_area = r;
 }
 
-void frame_update_layout(gpointer _self, gboolean is_resize, gboolean is_fake)
+void frame_update_layout(gpointer _self, Rect area, gboolean is_resize, gboolean is_fake)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
     Strut oldsize;
 
     oldsize = self->size;
+    self->client_area = area;
     self->area = self->client_area;
 
     /* do this before changing the frame's status like max_horz max_vert */
@@ -1174,9 +1176,9 @@ Window frame_get_window(gpointer self)
     return OBDEFAULTFRAME(self)->window;
 }
 
-Strut frame_get_size(gpointer self)
+void frame_get_size(gpointer self, Strut * s)
 {
-    return OBDEFAULTFRAME(self)->size;
+    memcpy(s, &(OBDEFAULTFRAME(self)->size), sizeof(Strut));
 }
 
 gint frame_get_decorations(gpointer self)

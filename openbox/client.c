@@ -316,13 +316,12 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* adjust the frame to the client's size before showing or placing
        the window */
-    frame_engine->frame_set_client_area (self->frame, self->area);
     frame_engine->frame_set_hover_flag (self->frame, OB_BUTTON_NONE);
     frame_engine->frame_set_press_flag (self->frame, OB_BUTTON_NONE);
     frame_engine->frame_set_is_focus (self->frame, FALSE);
     frame_engine->frame_set_decorations (self->frame, self->decorations);
     frame_engine->frame_update_title (self->frame, self->title);
-    frame_engine->frame_update_layout (self->frame, FALSE, TRUE);
+    frame_engine->frame_update_layout (self->frame, self->area, FALSE, TRUE);
     frame_engine->frame_update_skin (self->frame);
 
     /* where the frame was placed is where the window was originally */
@@ -403,7 +402,8 @@ void client_manage(Window window, ObPrompt *prompt)
     {
         Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
-        Strut size = frame_engine->frame_get_size(self->frame);
+        Strut size;
+        frame_engine->frame_get_size(self->frame, &size);
         /* get the size of the frame */
         place.width += size.left + size.right;
         place.height += size.top + size.bottom;
@@ -642,12 +642,14 @@ ObClient *client_fake_manage(Window window)
     self->frame = frame_engine->frame_new(self, self->w_client, self->w_frame);
     frame_engine->frame_set_decorations (self->frame, self->decorations);
     frame_engine->frame_update_title (self->frame, self->title);
-    frame_engine->frame_update_layout (self->frame, FALSE, FALSE);
+    frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
     frame_engine->frame_update_skin (self->frame);
 
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);    
     ob_debug("gave extents left %d right %d top %d bottom %d",
-             frame_engine->frame_get_size(self->frame).left, frame_engine->frame_get_size(self->frame).right,
-             frame_engine->frame_get_size(self->frame).top, frame_engine->frame_get_size(self->frame).bottom);
+             size.left, size.right,
+             size.top, size.bottom);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -1015,7 +1017,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     /* get where the frame would be */
     frame_client_gravity(self, x, y);
 
-    Strut size = frame_engine->frame_get_size(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
 
     /* get the requested size of the window with decorations */
     fw = size.left + w + size.right;
@@ -1028,7 +1031,8 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         Point newtl, newtr, newbl, newbr;
         gboolean stationary_l, stationary_r, stationary_t, stationary_b;
 
-        Rect area = frame_engine->frame_get_window_area(self->frame);
+        Rect area;
+        frame_engine->frame_get_window_area(self->frame, &area);
         POINT_SET(oldtl, area.x, area.y);
         POINT_SET(oldbr, area.x + area.width - 1,
                   area.y + area.height - 1);
@@ -2431,7 +2435,7 @@ static void client_change_state(ObClient *self)
     OBT_PROP_SETA32(self->w_client, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
-        frame_engine->frame_update_layout (self->frame, FALSE, FALSE);
+        frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
 }
 
 ObClient *client_search_focus_tree(ObClient *self)
@@ -2772,9 +2776,8 @@ static void client_apply_startup_state(ObClient *self,
        not, so this needs to be called even if we have fullscreened/maxed
     */
     self->area = oldarea;
-    frame_engine->frame_set_client_area (self->frame, self->area);
     frame_engine->frame_set_decorations (self->frame, self->decorations);
-    frame_engine->frame_update_layout (self->frame, FALSE, FALSE);
+    frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
@@ -2858,7 +2861,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
     frame_engine->frame_set_decorations (self->frame, self->decorations);
-    frame_engine->frame_update_layout (self->frame, FALSE, TRUE);
+    frame_engine->frame_update_layout (self->frame, self->area, FALSE, TRUE);
 
     /* gets the frame's position */
     frame_client_gravity(self, x, y);
@@ -2891,7 +2894,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         a = screen_area(self->desktop, i,
                         (self->max_horz && self->max_vert ? NULL : &desired));
 
-        Strut size = frame_engine->frame_get_size(self->frame);
+        Strut size;
+        frame_engine->frame_get_size(self->frame, &size);
         /* set the size and position if maximized */
         if (self->max_horz) {
             *x = a->x;
@@ -3031,8 +3035,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     gboolean fvert = frame_engine->frame_is_max_vert(self->frame);
     gint logicalw, logicalh;
 
-    Strut size = frame_engine->frame_get_size(self->frame);
-    Rect area = frame_engine->frame_get_window_area(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
+    Rect area;
+    frame_engine->frame_get_window_area(self->frame, &area);
 
     /* find the new x, y, width, and height (and logical size) */
     client_try_configure(self, &x, &y, &w, &h, &logicalw, &logicalh, user);
@@ -3047,7 +3053,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
     oldw = self->area.width;
     oldh = self->area.height;
-    oldframe = frame_engine->frame_get_window_area(self->frame);
+    frame_engine->frame_get_window_area(self->frame, &oldframe);
     RECT_SET(self->area, x, y, w, h);
 
     frame_engine->frame_set_client_area (self->frame, self->area);
@@ -3062,7 +3068,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
         frame_engine->frame_set_decorations (self->frame, self->decorations);
-        frame_engine->frame_update_layout (self->frame, FALSE, FALSE);
+        frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
     }
 
     /* find the frame's dimensions and move/resize it */
@@ -3087,7 +3093,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         mouse_replay_pointer();
 
         frame_engine->frame_set_decorations (self->frame, self->decorations);
-        frame_engine->frame_update_layout (self->frame, TRUE, FALSE);
+        frame_engine->frame_update_layout (self->frame, self->area, TRUE, FALSE);
 
         if (!user)
             event_end_ignore_all_enters(ignore_start);
@@ -3152,14 +3158,15 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
       frame_engine->frame_set_decorations (self->frame, self->decorations);
-      frame_engine->frame_update_layout (self->frame, FALSE, FALSE);
+      frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
     }
 
     XFlush(obt_display);
 
     /* if it moved between monitors, then this can affect the stacking
        layer of this window or others - for fullscreen windows */
-    Rect current_frame = frame_engine->frame_get_window_area(self->frame);
+    Rect current_frame;
+    frame_engine->frame_get_window_area(self->frame, &current_frame);
     if (screen_find_monitor(&current_frame) !=
         screen_find_monitor(&oldframe))
     {
@@ -3372,7 +3379,7 @@ void client_shade(ObClient *self, gboolean shade)
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
     frame_engine->frame_set_is_shaded (self->frame, self->shaded);
-    frame_engine->frame_update_layout(self->frame, FALSE, FALSE);
+    frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
 }
 
 static void client_ping_event(ObClient *self, gboolean dead)
@@ -3525,7 +3532,7 @@ static void client_set_desktop_recursive(ObClient *self,
         OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, target);
         /* the frame can display the current desktop state */
         frame_engine->frame_set_decorations (self->frame, self->decorations);
-        frame_engine->frame_update_layout(self->frame, FALSE, FALSE);
+        frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
         /* 'move' the window to the new desktop */
         if (!donthide)
             client_hide(self);
@@ -4022,7 +4029,8 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 
 guint client_monitor(ObClient *self)
 {
-    Rect area = frame_engine->frame_get_window_area(self->frame);
+    Rect area;
+    frame_engine->frame_get_window_area(self->frame, &area);
     return screen_find_monitor(&area);
 }
 
@@ -4218,8 +4226,10 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     Rect dock_area;
     gint edge;
 
-    Strut size = frame_engine->frame_get_size(self->frame);
-    Rect area = frame_engine->frame_get_window_area(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
+    Rect area;
+    frame_engine->frame_get_window_area(self->frame, &area);
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
                     &area);
@@ -4272,7 +4282,9 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
         ob_debug("trying window %s", cur->title);
 
-        detect_edge(frame_engine->frame_get_window_area(cur->frame), dir, my_head, my_size, my_edge_start,
+        Rect area;
+        frame_engine->frame_get_window_area(self->frame, &area); 
+        detect_edge(area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
     }
     dock_get_area(&dock_area);
@@ -4290,7 +4302,8 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
     gboolean near;
 
 
-    Rect area = frame_engine->frame_get_window_area(self->frame);
+    Rect area;
+    frame_engine->frame_get_window_area(self->frame, &area);
 
     switch (dir) {
     case OB_DIRECTION_EAST:
@@ -4361,8 +4374,10 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     gboolean near;
     ObDirection dir;
 
-    Rect area = frame_engine->frame_get_window_area(self->frame);
-    Strut size = frame_engine->frame_get_size(self->frame);
+    Rect area;
+    frame_engine->frame_get_window_area(self->frame, &area);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
 
     switch (side) {
     case OB_DIRECTION_EAST:
@@ -4446,13 +4461,15 @@ ObClient* client_under_pointer(void)
         for (it = stacking_list; it; it = g_list_next(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
+                Rect area;
+                frame_engine->frame_get_window_area(c->frame, &area);
                 if (frame_engine->frame_is_visible(c->frame) &&
                     /* check the desktop, this is done during desktop
                        switching and windows are shown/hidden status is not
                        reliable */
                     (c->desktop == screen_desktop ||
                      c->desktop == DESKTOP_ALL) &&   
-                    RECT_CONTAINS(frame_engine->frame_get_window_area(c->frame), x, y))
+                    RECT_CONTAINS(area, x, y))
                 {
                     ret = c;
                     break;
@@ -4471,7 +4488,7 @@ gboolean client_has_group_siblings(ObClient *self)
 void client_show_frame(ObClient * self)
 {
     frame_engine->frame_set_is_visible(self->frame, TRUE);
-    frame_engine->frame_update_layout(self->frame, FALSE, FALSE);
+    frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
     frame_engine->frame_update_skin(self->frame);
     /* Grab the server to make sure that the frame window is mapped before
      the client gets its MapNotify, i.e. to make sure the client is

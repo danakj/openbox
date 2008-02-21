@@ -160,11 +160,11 @@ struct _ObFrameEngine
     void (*frame_update_title)(gpointer, const gchar *);
 
     /* get the current window area */
-    Rect (*frame_get_window_area)(gpointer);
+    void (*frame_get_window_area)(gpointer, Rect *);
     /* set the requested client area */
     void (*frame_set_client_area)(gpointer, Rect);
     /* Update size, move/resize windows */
-    void (*frame_update_layout)(gpointer self, gboolean is_resize,
+    void (*frame_update_layout)(gpointer self, Rect, gboolean is_resize,
             gboolean is_fake);
     /* Update skin, color/texture windows */ 
     void (*frame_update_skin)(gpointer);
@@ -174,7 +174,7 @@ struct _ObFrameEngine
 
     Window (*frame_get_window)(gpointer);
 
-    Strut (*frame_get_size)(gpointer);
+    void (*frame_get_size)(gpointer, Strut *);
     gint (*frame_get_decorations)(gpointer);
 
     gboolean (*frame_is_visible)(gpointer);

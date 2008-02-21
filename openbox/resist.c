@@ -105,7 +105,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
     GList *it;
     Rect dock_area;
 
-    Rect c_area = frame_engine->frame_get_window_area(c->frame);
+    Rect c_area;
+    frame_engine->frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 
@@ -125,7 +126,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
-        Rect target_area = frame_engine->frame_get_window_area(target->frame);
+        Rect target_area;
+        frame_engine->frame_get_window_area(target->frame, &target_area);
         if (resist_move_window(c_area, target_area,
                                resist, x, y))
             break;
@@ -147,7 +149,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     gint w, h; /* current size */
     Rect desired_area;
 
-    Rect c_area = frame_engine->frame_get_window_area(c->frame);
+    Rect c_area;
+    frame_engine->frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 
@@ -302,7 +305,8 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
     ObClient *target; /* target */
     Rect dock_area;
 
-    Rect c_area = frame_engine->frame_get_window_area(c->frame);
+    Rect c_area;
+    frame_engine->frame_get_window_area(c->frame, &c_area);
     if (!resist) return;
 
     for (it = stacking_list; it; it = g_list_next(it)) {
@@ -317,7 +321,8 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
-        Rect target_area = frame_engine->frame_get_window_area(target->frame);
+        Rect target_area;
+        frame_engine->frame_get_window_area(target->frame, &target_area);
         if (resist_size_window(c_area, target_area,
                                resist, w, h, dir))
             break;
@@ -339,7 +344,8 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     guint i;
     Rect desired_area;
 
-    Rect c_area = frame_engine->frame_get_window_area(c->frame);
+    Rect c_area;
+    frame_engine->frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 

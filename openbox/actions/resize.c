@@ -67,8 +67,10 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         ObClient *c = data->client;
         guint32 corner;
 
-        Strut c_size = frame_engine->frame_get_size(c->frame);
-        Rect c_area = frame_engine->frame_get_window_area(c->frame);
+        Strut c_size;
+        frame_engine->frame_get_size(c->frame, &c_size);
+        Rect c_area;
+        frame_engine->frame_get_window_area(c->frame, &c_area);
         if (!data->button)
             corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
         else if (o->corner_specified)

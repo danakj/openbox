@@ -288,7 +288,8 @@ ObFrameContext plugin_frame_context(ObClient *client, Window win, gint x, gint y
 
 void frame_client_gravity(ObClient *self, gint *x, gint *y)
 {
-    Strut size = frame_engine->frame_get_size(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -350,7 +351,8 @@ void frame_client_gravity(ObClient *self, gint *x, gint *y)
 
 void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 {
-    Strut size = frame_engine->frame_get_size(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -406,7 +408,8 @@ void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 
 void frame_rect_to_frame(ObClient * self, Rect *r)
 {
-    Strut size = frame_engine->frame_get_size(self->frame);
+    Strut size;
+    frame_engine->frame_get_size(self->frame, &size);
     r->width += size.left + size.right;
     r->height += size.top + size.bottom;
     frame_client_gravity(self, &r->x, &r->y);
@@ -414,7 +417,8 @@ void frame_rect_to_frame(ObClient * self, Rect *r)
 
 void frame_rect_to_client(ObClient * self, Rect *r)
 {
-    Strut size = frame_engine->frame_get_size(self);
+    Strut size;
+    frame_engine->frame_get_size(self, &size);
     r->width -= size.left + size.right;
     r->height -= size.top + size.bottom;
     frame_frame_gravity(self, &r->x, &r->y);

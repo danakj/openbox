@@ -98,8 +98,10 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 {
     gchar *text;
 
-    Strut size = frame_engine->frame_get_size(c->frame);
-    Rect area = frame_engine->frame_get_window_area(c->frame);
+    Strut size;
+    frame_engine->frame_get_size(c->frame, &size);
+    Rect area;
+    frame_engine->frame_get_window_area(c->frame, &area);
     text = g_strdup_printf(format, a, b);
     if (config_resize_popup_pos == OB_RESIZE_POS_TOP)
         popup_position(popup, SouthGravity,
@@ -346,9 +348,13 @@ static void do_move(gboolean keyboard, gint keydist)
     client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
                      TRUE, FALSE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
+    {
+        Rect area;
+        frame_engine->frame_get_window_area(moveresize_client->frame, &area);
         popup_coords(moveresize_client, "%d x %d",
-                     frame_engine->frame_get_window_area(moveresize_client->frame).x,
-                     frame_engine->frame_get_window_area(moveresize_client->frame).y);
+                     area.x,
+                     area.y);
+    }
 }
 
 
@@ -480,7 +486,8 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     }
 
 
-    Strut size = frame_engine->frame_get_size(moveresize_client->frame);
+    Strut size;
+    frame_engine->frame_get_size(moveresize_client->frame, &size);
     /* resist_size_* needs the frame size */
     nw += size.left +
         size.right;

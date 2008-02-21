@@ -55,7 +55,7 @@ Window window_top(ObWindow *self)
     case OB_WINDOW_CLASS_DOCK:
         return WINDOW_AS_DOCK(self)->frame;
     case OB_WINDOW_CLASS_CLIENT:
-        return render_plugin->frame_get_window(WINDOW_AS_CLIENT(self)->frame);
+        return frame_engine->frame_get_window(WINDOW_AS_CLIENT(self)->frame);
     case OB_WINDOW_CLASS_INTERNAL:
         return WINDOW_AS_INTERNAL(self)->window;
     case OB_WINDOW_CLASS_PROMPT:

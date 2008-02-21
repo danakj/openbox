@@ -268,7 +268,7 @@ ObFrameContext frame_context_from_string(const gchar *name)
 ObFrameContext plugin_frame_context(ObClient *client, Window win, gint x, gint y)
 {
     /* this part is commun to all plugin */
-    if (render_plugin->moveresize_in_progress)
+    if (frame_engine->moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
     if (win == obt_root(ob_screen))
         return OB_FRAME_CONTEXT_ROOT;
@@ -282,13 +282,13 @@ ObFrameContext plugin_frame_context(ObClient *client, Window win, gint x, gint y
         return OB_FRAME_CONTEXT_CLIENT;
     }
     /* this part is specific to the plugin */
-    return render_plugin->frame_context(client->frame, win, x, y);
+    return frame_engine->frame_context(client->frame, win, x, y);
 
 }
 
 void frame_client_gravity(ObClient *self, gint *x, gint *y)
 {
-    Strut size = render_plugin->frame_get_size(self->frame);
+    Strut size = frame_engine->frame_get_size(self->frame);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -350,7 +350,7 @@ void frame_client_gravity(ObClient *self, gint *x, gint *y)
 
 void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 {
-    Strut size = render_plugin->frame_get_size(self->frame);
+    Strut size = frame_engine->frame_get_size(self->frame);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -406,7 +406,7 @@ void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 
 void frame_rect_to_frame(ObClient * self, Rect *r)
 {
-    Strut size = render_plugin->frame_get_size(self->frame);
+    Strut size = frame_engine->frame_get_size(self->frame);
     r->width += size.left + size.right;
     r->height += size.top + size.bottom;
     frame_client_gravity(self, &r->x, &r->y);
@@ -414,7 +414,7 @@ void frame_rect_to_frame(ObClient * self, Rect *r)
 
 void frame_rect_to_client(ObClient * self, Rect *r)
 {
-    Strut size = render_plugin->frame_get_size(self);
+    Strut size = frame_engine->frame_get_size(self);
     r->width -= size.left + size.right;
     r->height -= size.top + size.bottom;
     frame_frame_gravity(self, &r->x, &r->y);

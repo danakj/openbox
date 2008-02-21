@@ -527,9 +527,9 @@ static void event_process(const XEvent *ec, gpointer data)
             /* We don't get a FocusOut for this case, because it's just moving
                from our Inferior up to us. This happens when iconifying a
                window with RevertToParent focus */
-            render_plugin->frame_set_is_focus(client->frame, FALSE);
-            render_plugin->frame_update_layout (client->frame, FALSE, FALSE);
-            render_plugin->frame_update_skin(client->frame);
+            frame_engine->frame_set_is_focus(client->frame, FALSE);
+            frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+            frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called */
         }
         else if (e->xfocus.detail == NotifyPointerRoot ||
@@ -592,9 +592,9 @@ static void event_process(const XEvent *ec, gpointer data)
         }
         else if (client != focus_client) {
             focus_left_screen = FALSE;
-            render_plugin->frame_set_is_focus(client->frame, TRUE);
-            render_plugin->frame_update_layout (client->frame, FALSE, FALSE);
-            render_plugin->frame_update_skin (client->frame);
+            frame_engine->frame_set_is_focus(client->frame, TRUE);
+            frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+            frame_engine->frame_update_skin (client->frame);
             focus_set_client(client);
             client_calc_layer(client);
             client_bring_helper_windows(client);
@@ -639,9 +639,9 @@ static void event_process(const XEvent *ec, gpointer data)
         }
 
         if (client && client != focus_client) {
-          render_plugin->frame_set_is_focus(client->frame, FALSE);
-          render_plugin->frame_update_layout (client->frame, FALSE, FALSE);
-          render_plugin->frame_update_skin(client->frame);
+          frame_engine->frame_set_is_focus(client->frame, FALSE);
+          frame_engine->frame_update_layout (client->frame, FALSE, FALSE);
+          frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */
         }
@@ -677,7 +677,7 @@ static void event_process(const XEvent *ec, gpointer data)
             gulong vals[4];
 
             /* set the frame extents on the window */
-            Strut size = render_plugin->frame_get_size(c->frame);
+            Strut size = frame_engine->frame_get_size(c->frame);
             vals[0] = size.left;
             vals[1] = size.right;
             vals[2] = size.top;
@@ -714,7 +714,7 @@ static void event_process(const XEvent *ec, gpointer data)
              e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
     {
         XSyncAlarmNotifyEvent *se = (XSyncAlarmNotifyEvent*)e;
-        if (se->alarm == moveresize_alarm && render_plugin->moveresize_in_progress)
+        if (se->alarm == moveresize_alarm && frame_engine->moveresize_in_progress)
             moveresize_event(e);
     }
 #endif
@@ -906,7 +906,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
 
             if (current_button)
-        render_plugin->frame_set_hover_flag (client->frame, current_button);
+        frame_engine->frame_set_hover_flag (client->frame, current_button);
         }
         break;
     case MotionNotify:
@@ -921,22 +921,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
         case OB_FRAME_CONTEXT_TLCORNER:
         case OB_FRAME_CONTEXT_TRCORNER:
             /* we've left the button area inside the titlebar */
-            render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+            frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_MAX);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_MAX);
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_DESK);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_DESK);
             break;
         case OB_FRAME_CONTEXT_SHADE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_SHADE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_SHADE);
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_ICONIFY);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_ICONIFY);
             break;
         case OB_FRAME_CONTEXT_CLOSE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_CLOSE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_CLOSE);
             break;
         default:
             break;
@@ -950,28 +950,28 @@ static void event_handle_client(ObClient *client, XEvent *e)
         case OB_FRAME_CONTEXT_TLCORNER:
         case OB_FRAME_CONTEXT_TRCORNER:
             /* we've left the button area inside the titlebar */
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_MAXIMIZE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_SHADE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_CLOSE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_NONE);
             break;
         case OB_FRAME_CONTEXT_FRAME:
             /* When the mouse leaves an animating window, don't use the
                corresponding enter events. Pretend like the animating window
                doesn't even exist..! */
-            if (render_plugin->frame_iconify_animating(client->frame))
+            if (frame_engine->frame_iconify_animating(client->frame))
                 event_end_ignore_all_enters(event_start_ignore_all_enters());
 
             ob_debug_type(OB_DEBUG_FOCUS,
@@ -1002,19 +1002,19 @@ static void event_handle_client(ObClient *client, XEvent *e)
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_MAX);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_MAX);
             break;
         case OB_FRAME_CONTEXT_ALLDESKTOPS:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_DESK);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_DESK);
             break;
         case OB_FRAME_CONTEXT_SHADE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_SHADE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_SHADE);
             break;
         case OB_FRAME_CONTEXT_ICONIFY:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_ICONIFY);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_ICONIFY);
             break;
         case OB_FRAME_CONTEXT_CLOSE:
-        render_plugin->frame_set_hover_flag(client->frame, OB_BUTTON_CLOSE);
+        frame_engine->frame_set_hover_flag(client->frame, OB_BUTTON_CLOSE);
             break;
         case OB_FRAME_CONTEXT_FRAME:
             if (grab_on_keyboard())
@@ -1069,7 +1069,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         ob_debug("ConfigureRequest for \"%s\" desktop %d wmstate %d "
                  "visibile %d",
                  client->title,
-                 screen_desktop, client->wmstate, render_plugin->frame_is_visible(client->frame),
+                 screen_desktop, client->wmstate, frame_engine->frame_is_visible(client->frame),
                  x, y, w, h, client->border_width);
 
         if (e->xconfigurerequest.value_mask & CWBorderWidth)
@@ -1163,8 +1163,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
            desktop. eg. open amarok window on desktop 1, switch to desktop
            2, click amarok tray icon. it will move by its decoration size.
         */
-        Strut size = render_plugin->frame_get_size(client->frame);
-        Rect area = render_plugin->frame_get_window_area(client->frame);
+        Strut size = frame_engine->frame_get_size(client->frame);
+        Rect area = frame_engine->frame_get_window_area(client->frame);
         if (x != client->area.x &&
             x == (area.x + size.left -
                   (gint)client->border_width) &&
@@ -1228,7 +1228,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case ReparentNotify:
         /* this is when the client is first taken captive in the frame */
-        if (e->xreparent.parent == render_plugin->frame_get_window(client->frame)) break;
+        if (e->xreparent.parent == frame_engine->frame_get_window(client->frame)) break;
 
         /*
           This event is quite rare and is usually handled in unmapHandler.
@@ -1570,7 +1570,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             e->type == obt_display_extension_shape_basep)
         {
             client->shaped = ((XShapeEvent*)e)->shaped;
-            render_plugin->frame_adjust_shape(client->frame);
+            frame_engine->frame_adjust_shape(client->frame);
         }
 #endif
     }
@@ -1869,7 +1869,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
     if (!actions_interactive_input_event(e) && !moveresize_event(e)) {
-        if (render_plugin->moveresize_in_progress)
+        if (frame_engine->moveresize_in_progress)
             /* make further actions work on the client being
                moved/resized */
             client = moveresize_client;
@@ -1880,10 +1880,10 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
         {
             /* the frame may not be "visible" but they can still click on it
                in the case where it is animating before disappearing */
-            if (!client || !render_plugin->frame_iconify_animating(client->frame))
+            if (!client || !frame_engine->frame_iconify_animating(client->frame))
                 mouse_event(client, e);
         } else
-            keyboard_event((render_plugin->focus_cycle_target ? render_plugin->focus_cycle_target :
+            keyboard_event((frame_engine->focus_cycle_target ? frame_engine->focus_cycle_target :
                             (client ? client : focus_client)), e);
     }
 }
@@ -1905,7 +1905,7 @@ static gboolean focus_delay_func(gpointer data)
     Time old = event_curtime;
 
     /* don't move focus and kill the menu or the move/resize */
-    if (menu_frame_visible || render_plugin->moveresize_in_progress) return FALSE;
+    if (menu_frame_visible || frame_engine->moveresize_in_progress) return FALSE;
 
     event_curtime = d->time;
     event_curserial = d->serial;
@@ -1993,7 +1993,7 @@ void event_cancel_all_key_grabs(void)
         menu_frame_hide_all();
         ob_debug("KILLED open menus");
     }
-    else if (render_plugin->moveresize_in_progress) {
+    else if (frame_engine->moveresize_in_progress) {
         moveresize_end(TRUE);
         ob_debug("KILLED interactive moveresize");
     }

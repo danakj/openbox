@@ -117,7 +117,7 @@ void mouse_grab_for_client(ObClient *client, gboolean grab)
             guint mask;
 
             if (FRAME_CONTEXT(i, client)) {
-                win = render_plugin->frame_get_window(client->frame);
+                win = frame_engine->frame_get_window(client->frame);
                 mode = GrabModeAsync;
                 mask = ButtonPressMask | ButtonMotionMask | ButtonReleaseMask;
             } else if (CLIENT_CONTEXT(i, client)) {

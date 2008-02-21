@@ -544,7 +544,7 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
     gboolean occluded = FALSE;
     gboolean found = FALSE;
 
-    Rect client_area = render_plugin->frame_get_window_area(client->frame);
+    Rect client_area = frame_engine->frame_get_window_area(client->frame);
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
         return occluded;
@@ -558,7 +558,7 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
                  c->desktop == client->desktop) &&
                 !client_search_transient(client, c))
             {
-                Rect c_area = render_plugin->frame_get_window_area(c->frame);
+                Rect c_area = frame_engine->frame_get_window_area(c->frame);
                 if (RECT_INTERSECTS_RECT(c_area, client_area))
                 {
                     if (sibling != NULL) {
@@ -590,7 +590,7 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
     gboolean occludes = FALSE;
     gboolean found = FALSE;
 
-    Rect client_area = render_plugin->frame_get_window_area(client->frame);
+    Rect client_area = frame_engine->frame_get_window_area(client->frame);
 
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
@@ -604,7 +604,7 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
                  c->desktop == client->desktop) &&
                 !client_search_transient(c, client))
             {
-                Rect c_area = render_plugin->frame_get_window_area(c->frame);
+                Rect c_area = frame_engine->frame_get_window_area(c->frame);
                 if (RECT_INTERSECTS_RECT(c_area, client_area))
                 {
                     if (sibling != NULL) {

@@ -54,7 +54,7 @@ void focus_cycle_stop(ObClient *ifclient)
 {
     /* stop focus cycling if the given client is a valid focus target,
        and so the cycling is being disrupted */
-    if (render_plugin->focus_cycle_target && ifclient &&
+    if (frame_engine->focus_cycle_target && ifclient &&
         focus_valid_target(ifclient, TRUE,
                            focus_cycle_iconic_windows,
                            focus_cycle_all_desktops,
@@ -80,7 +80,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
 
     if (interactive) {
         if (cancel) {
-        render_plugin->focus_cycle_target = NULL;
+        frame_engine->focus_cycle_target = NULL;
             goto done_cycle;
         } else if (done)
             goto done_cycle;
@@ -97,14 +97,14 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     }
 
 
-    if (render_plugin->focus_cycle_target == NULL) {
+    if (frame_engine->focus_cycle_target == NULL) {
         focus_cycle_iconic_windows = TRUE;
         focus_cycle_all_desktops = all_desktops;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
         start = it = g_list_find(list, focus_client);
     } else
-        start = it = g_list_find(list, render_plugin->focus_cycle_target);
+        start = it = g_list_find(list, frame_engine->focus_cycle_target);
 
     if (!start) /* switched desktops or something? */
         start = it = forward ? g_list_last(list) : g_list_first(list);
@@ -126,8 +126,8 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                                focus_cycle_desktop_windows))
         {
             if (interactive) {
-                if (ft != render_plugin->focus_cycle_target) { /* prevents flicker */
-                    render_plugin->focus_cycle_target = ft;
+                if (ft != frame_engine->focus_cycle_target) { /* prevents flicker */
+                    frame_engine->focus_cycle_target = ft;
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 /* same arguments as focus_target_valid */
@@ -137,9 +137,9 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                                        focus_cycle_dock_windows,
                                        focus_cycle_desktop_windows,
                                        mode);
-                return render_plugin->focus_cycle_target;
-            } else if (ft != render_plugin->focus_cycle_target) {
-        render_plugin->focus_cycle_target = ft;
+                return frame_engine->focus_cycle_target;
+            } else if (ft != frame_engine->focus_cycle_target) {
+        frame_engine->focus_cycle_target = ft;
                 done = TRUE;
                 break;
             }
@@ -147,10 +147,10 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     } while (it != start);
 
 done_cycle:
-    if (done && !cancel) ret = render_plugin->focus_cycle_target;
+    if (done && !cancel) ret = frame_engine->focus_cycle_target;
 
     t = NULL;
-    render_plugin->focus_cycle_target = NULL;
+    frame_engine->focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;
 
@@ -177,7 +177,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     if (!client_list)
         return NULL;
 
-    Rect area = render_plugin->frame_get_window_area(c->frame);
+    Rect area = frame_engine->frame_get_window_area(c->frame);
     /* first, find the centre coords of the currently focused window */
     my_cx = area.x + area.width / 2;
     my_cy = area.y + area.height / 2;
@@ -195,7 +195,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
                                 desktop_windows))
             continue;
 
-        Rect cur_area = render_plugin->frame_get_window_area(cur->frame);
+        Rect cur_area = frame_engine->frame_get_window_area(cur->frame);
         /* find the centre coords of this window, from the
          * currently focused window's point of view */
         his_cx = (cur_area.x - my_cx)
@@ -271,7 +271,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     ObClient *ret = NULL;
 
     if (cancel) {
-    render_plugin->focus_cycle_target = NULL;
+    frame_engine->focus_cycle_target = NULL;
         goto done_cycle;
     } else if (done && interactive)
         goto done_cycle;
@@ -279,7 +279,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!focus_order)
         goto done_cycle;
 
-    if (render_plugin->focus_cycle_target == NULL) {
+    if (frame_engine->focus_cycle_target == NULL) {
         focus_cycle_iconic_windows = FALSE;
         focus_cycle_all_desktops = FALSE;
         focus_cycle_dock_windows = dock_windows;
@@ -288,8 +288,8 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
 
     if (!first) first = focus_client;
 
-    if (render_plugin->focus_cycle_target)
-        ft = focus_find_directional(render_plugin->focus_cycle_target, dir, dock_windows,
+    if (frame_engine->focus_cycle_target)
+        ft = focus_find_directional(frame_engine->focus_cycle_target, dir, dock_windows,
                                     desktop_windows);
     else if (first)
         ft = focus_find_directional(first, dir, dock_windows, desktop_windows);
@@ -305,26 +305,26 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                 ft = it->data;
     }
 
-    if (ft && ft != render_plugin->focus_cycle_target) {/* prevents flicker */
-    render_plugin->focus_cycle_target = ft;
+    if (ft && ft != frame_engine->focus_cycle_target) {/* prevents flicker */
+    frame_engine->focus_cycle_target = ft;
         if (!interactive)
             goto done_cycle;
         focus_cycle_draw_indicator(showbar ? ft : NULL);
     }
-    if (render_plugin->focus_cycle_target && dialog)
+    if (frame_engine->focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */
-        focus_cycle_popup_single_show(render_plugin->focus_cycle_target,
+        focus_cycle_popup_single_show(frame_engine->focus_cycle_target,
                                       focus_cycle_iconic_windows,
                                       focus_cycle_all_desktops,
                                       focus_cycle_dock_windows,
                                       focus_cycle_desktop_windows);
-    return render_plugin->focus_cycle_target;
+    return frame_engine->focus_cycle_target;
 
 done_cycle:
-    if (done && !cancel) ret = render_plugin->focus_cycle_target;
+    if (done && !cancel) ret = frame_engine->focus_cycle_target;
 
     first = NULL;
-    render_plugin->focus_cycle_target = NULL;
+    frame_engine->focus_cycle_target = NULL;
 
     focus_cycle_draw_indicator(NULL);
     focus_cycle_popup_single_hide();

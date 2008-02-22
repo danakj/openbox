@@ -1505,31 +1505,31 @@ void trigger_unmax_horz(gpointer self)
 void trigger_max_horz_toggle(gpointer self)
 {
 }
-void trigger_plugin1(gpointer self)
+void trigger_engine1(gpointer self)
 {
 }
-void trigger_plugin2(gpointer self)
+void trigger_engine2(gpointer self)
 {
 }
-void trigger_plugin3(gpointer self)
+void trigger_engine3(gpointer self)
 {
 }
-void trigger_plugin4(gpointer self)
+void trigger_engine4(gpointer self)
 {
 }
-void trigger_plugin5(gpointer self)
+void trigger_engine5(gpointer self)
 {
 }
-void trigger_plugin6(gpointer self)
+void trigger_engine6(gpointer self)
 {
 }
-void trigger_plugin7(gpointer self)
+void trigger_engine7(gpointer self)
 {
 }
-void trigger_plugin8(gpointer self)
+void trigger_engine8(gpointer self)
 {
 }
-void trigger_plugin9(gpointer self)
+void trigger_engine9(gpointer self)
 {
 }
 
@@ -1542,10 +1542,10 @@ void frame_trigger(gpointer self, ObFrameTrigger trigger_name)
                     trigger_max, trigger_unmax, trigger_max_troggle,
                     trigger_max_vert, trigger_unmax_vert, trigger_max_toggle,
                     trigger_max_horz, trigger_unmax_horz,
-                    trigger_max_horz_toggle, trigger_plugin1, trigger_plugin2,
-                    trigger_plugin3, trigger_plugin4, trigger_plugin5,
-                    trigger_plugin6, trigger_plugin7, trigger_plugin8,
-                    trigger_plugin9, NULL, 
+                    trigger_max_horz_toggle, trigger_engine1, trigger_engine2,
+                    trigger_engine3, trigger_engine4, trigger_engine5,
+                    trigger_engine6, trigger_engine7, trigger_engine8,
+                    trigger_engine9, NULL, 
 };
 
 void (*call_trigger_func)(gpointer) = trigger_func[trigger_name];
@@ -1555,7 +1555,7 @@ if(!call_trigger_func)
 }
 }
 
-ObFrameEngine plugin = {
+ObFrameEngine engine = {
         0, /* gpointer handler */
         "libdefault.la", /* gchar * filename */
         "Default", /* gchar * name */
@@ -1599,7 +1599,7 @@ ObFrameEngine plugin = {
 
 ObFrameEngine * get_info()
 {
-    return &plugin;
+    return &engine;
 }
 
 gboolean flash_timeout(gpointer data)

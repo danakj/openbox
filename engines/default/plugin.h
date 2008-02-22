@@ -15,8 +15,8 @@
 
  See the COPYING file for a copy of the GNU General Public License.
  */
-#ifndef FRAME_DEFAULT_PLUGIN_H_
-#define FRAME_DEFAULT_PLUGIN_H_
+#ifndef FRAME_DEFAULT_ENGINE_H_
+#define FRAME_DEFAULT_ENGINE_H_
 
 #include "config.h"
 #include "render/render.h"
@@ -211,9 +211,9 @@ void frame_trigger(gpointer, ObFrameTrigger);
 /* Global for renderframe.c only */
 extern Display * obp_display;
 extern gint obp_screen;
-extern ObFrameEngine plugin;
+extern ObFrameEngine engine;
 #define OBDEFAULTFRAME(x) ((ObDefaultFrame *)(x))
 
 ObFrameEngine * get_info();
 
-#endif /*FRAME_DEFAULT_PLUGIN_H_*/
+#endif /*FRAME_DEFAULT_ENGINE_H_*/

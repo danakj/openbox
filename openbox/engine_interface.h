@@ -107,15 +107,15 @@ typedef enum
     OB_TRIGGER_MAX_HORZ,
     OB_TRIGGER_UNMAX_HORZ,
     OB_TRIGGER_MAX_HORZ_TOGGLE,
-    OB_TRIGGER_PLUGIN1,
-    OB_TRIGGER_PLUGIN2,
-    OB_TRIGGER_PLUGIN3,
-    OB_TRIGGER_PLUGIN4, /* ... */
-    OB_TRIGGER_PLUGIN5, /* ... */
-    OB_TRIGGER_PLUGIN6, /* ... */
-    OB_TRIGGER_PLUGIN7, /* ... */
-    OB_TRIGGER_PLUGIN8, /* ... */
-    OB_TRIGGER_PLUGIN9, /* ... */
+    OB_TRIGGER_ENGINE1,
+    OB_TRIGGER_ENGINE2,
+    OB_TRIGGER_ENGINE3,
+    OB_TRIGGER_ENGINE4, /* ... */
+    OB_TRIGGER_ENGINE5, /* ... */
+    OB_TRIGGER_ENGINE6, /* ... */
+    OB_TRIGGER_ENGINE7, /* ... */
+    OB_TRIGGER_ENGINE8, /* ... */
+    OB_TRIGGER_ENGINE9, /* ... */
 } ObFrameTrigger;
 
 struct _ObFrameEngine
@@ -212,19 +212,19 @@ typedef ObFrameEngine * (*ObFrameEngineFunc)(void);
 
 /* initialize theme plugin, it read themerc and load
  * the plugin needed */
-ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
+ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font);
 
 /* Update plugin data */
-void update_frame_plugin(ObFrameEngine *);
+void update_frame_engine(ObFrameEngine *);
 
 /* Load modules specified in filename */
-ObFrameEngine * load_frame_plugin(const gchar * filename);
+ObFrameEngine * load_frame_engine(const gchar * filename);
 
 /* Give context from string, it's used to parse config file */
 ObFrameContext frame_context_from_string(const gchar *name);
-ObFrameContext plugin_frame_context(ObClient *, Window, gint, gint);
+ObFrameContext engine_frame_context(ObClient *, Window, gint, gint);
 
 void frame_client_gravity(ObClient * self, gint *x, gint *y);
 void frame_frame_gravity(ObClient * self, gint *x, gint *y);

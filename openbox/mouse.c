@@ -224,7 +224,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     switch (e->type) {
     case ButtonPress:
-        context = plugin_frame_context(client, e->xbutton.window,
+        context = engine_frame_context(client, e->xbutton.window,
                                 e->xbutton.x, e->xbutton.y);
         context = mouse_button_frame_context(context, e->xbutton.button,
                                              e->xbutton.state);
@@ -273,7 +273,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     case ButtonRelease:
         /* use where the press occured in the window */
-        context = plugin_frame_context(client, e->xbutton.window, pwx, pwy);
+        context = engine_frame_context(client, e->xbutton.window, pwx, pwy);
         context = mouse_button_frame_context(context, e->xbutton.button,
                                              e->xbutton.state);
 
@@ -338,7 +338,7 @@ void mouse_event(ObClient *client, XEvent *e)
 
     case MotionNotify:
         if (button) {
-            context = plugin_frame_context(client, e->xmotion.window, pwx, pwy);
+            context = engine_frame_context(client, e->xmotion.window, pwx, pwy);
             context = mouse_button_frame_context(context, button, state);
 
             if (ABS(e->xmotion.x_root - px) >= config_mouse_threshold ||

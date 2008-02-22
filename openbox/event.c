@@ -888,7 +888,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             !grab_on_keyboard())
         {
             /* use where the press occured */
-            con = plugin_frame_context(client, e->xbutton.window, px, py);
+            con = engine_frame_context(client, e->xbutton.window, px, py);
             con = mouse_button_frame_context(con, e->xbutton.button,
                                              e->xbutton.state);
 
@@ -927,7 +927,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
            notifies, but we still get motion events */
         if (grab_on_pointer()) break;
 
-        con = plugin_frame_context(client, e->xmotion.window,
+        con = engine_frame_context(client, e->xmotion.window,
                             e->xmotion.x, e->xmotion.y);
         switch (con) {
         case OB_FRAME_CONTEXT_TITLEBAR:
@@ -956,7 +956,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
         break;
     case LeaveNotify:
-        con = plugin_frame_context(client, e->xcrossing.window,
+        con = engine_frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_TITLEBAR:
@@ -1006,7 +1006,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         break;
     case EnterNotify:
     {
-        con = plugin_frame_context(client, e->xcrossing.window,
+        con = engine_frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
         case OB_FRAME_CONTEXT_MAXIMIZE:

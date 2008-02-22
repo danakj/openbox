@@ -16,8 +16,8 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __plugin_keyboard_tree_h
-#define __plugin_keyboard_tree_h
+#ifndef __engine_keyboard_tree_h
+#define __engine_keyboard_tree_h
 
 #include <glib.h>
 

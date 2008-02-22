@@ -257,7 +257,7 @@ gint main(gint argc, gchar **argv)
             /* load the theme specified in the rc file */
               {
                 ob_debug("Entering LoadThemeConfig");
-                frame_engine = init_frame_plugin (
+                frame_engine = init_frame_engine (
                     config_theme, TRUE, config_font_activewindow,
                     config_font_inactivewindow, config_font_menutitle,
                     config_font_menuitem, config_font_osd);

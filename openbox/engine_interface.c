@@ -34,7 +34,7 @@ XrmDatabase loaddb(const gchar *name, gchar **path);
 /* Read string in XrmDatabase */
 gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value);
 
-ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
+ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font)
 {
@@ -64,17 +64,17 @@ ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
             return 0;
     }
 
-    gchar * plugin_filename;
-    if (!read_string(db, "frame.theme.engine", &plugin_filename)) {
-        plugin_filename = "libdefault.la";
+    gchar * engine_filename;
+    if (!read_string(db, "frame.theme.engine", &engine_filename)) {
+        engine_filename = "libdefault.la";
     }
-    ob_debug("Try to init : %s", plugin_filename);
-    gchar * absolute_plugin_filename = g_build_filename(g_get_home_dir(),
-            ".config", "openbox", "engines", plugin_filename, NULL);
-    ObFrameEngine * p = load_frame_plugin(absolute_plugin_filename);
-    g_free(absolute_plugin_filename);
+    ob_debug("Try to init : %s", engine_filename);
+    gchar * absolute_engine_filename = g_build_filename(g_get_home_dir(),
+            ".config", "openbox", "engines", engine_filename, NULL);
+    ObFrameEngine * p = load_frame_engine(absolute_engine_filename);
+    g_free(absolute_engine_filename);
 
-    update_frame_plugin(p);
+    update_frame_engine(p);
 
     (p->load_theme_config)(ob_rr_inst, name, path, db, active_window_font,
             inactive_window_font, menu_title_font, menu_item_font, osd_font);
@@ -85,7 +85,7 @@ ObFrameEngine * init_frame_plugin(const gchar *name, gboolean allow_fallback,
     return p;
 }
 
-void update_frame_plugin(ObFrameEngine * self)
+void update_frame_engine(ObFrameEngine * self)
 {
     self->init (obt_display, ob_screen);
     //self->ob_display = obt_display;
@@ -96,20 +96,20 @@ void update_frame_plugin(ObFrameEngine * self)
     //self->ob_main_loop = ob_main_loop;
 }
 
-ObFrameEngine * load_frame_plugin(const gchar * filename)
+ObFrameEngine * load_frame_engine(const gchar * filename)
 {
     GModule *module;
     gpointer func;
 
     if (!(module = g_module_open(filename, G_MODULE_BIND_LOCAL))) {
-        ob_debug ("Failed to load plugin (%s): %s\n",
+        ob_debug ("Failed to load engine (%s): %s\n",
                 filename, g_module_error());
         exit(1);
     }
 
     if (g_module_symbol(module, "get_info", &func)) {
-        ObFrameEngine *plugin = (ObFrameEngine *) ((ObFrameEngineFunc) func)();
-        return plugin;
+        ObFrameEngine *engine = (ObFrameEngine *) ((ObFrameEngineFunc) func)();
+        return engine;
     }
     else {
         ob_debug_type(OB_DEBUG_SM,
@@ -118,30 +118,11 @@ ObFrameEngine * load_frame_plugin(const gchar * filename)
         exit(1);
     }
 
-    ob_debug_type(OB_DEBUG_SM, "Invalid plugin (%s)\n", filename);
+    ob_debug_type(OB_DEBUG_SM, "Invalid engine (%s)\n", filename);
     g_module_close(module);
     exit(1);
 }
-/*
- static gboolean scan_plugin_func(const gchar * path, const gchar * basename,
- gpointer data)
- {
- if (!str_has_suffix_nocase(basename, SHARED_SUFFIX))
- return FALSE;
 
- if (!g_file_test(path, G_FILE_TEST_IS_REGULAR))
- return FALSE;
-
- add_plugin(path);
-
- return FALSE;
- }
-
- static void scan_plugins(const gchar * path)
- {
- dir_foreach(path, scan_plugin_func, NULL, NULL);
- }
- */
 gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value)
 {
     gboolean ret = FALSE;
@@ -265,9 +246,9 @@ ObFrameContext frame_context_from_string(const gchar *name)
     return OB_FRAME_CONTEXT_NONE;
 }
 
-ObFrameContext plugin_frame_context(ObClient *client, Window win, gint x, gint y)
+ObFrameContext engine_frame_context(ObClient *client, Window win, gint x, gint y)
 {
-    /* this part is commun to all plugin */
+    /* this part is commun to all engine */
     if (frame_engine->moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
     if (win == obt_root(ob_screen))

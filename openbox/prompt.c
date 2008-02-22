@@ -21,6 +21,7 @@
 #include "screen.h"
 #include "openbox.h"
 #include "client.h"
+#include "group.h"
 #include "prop.h"
 #include "modkeys.h"
 #include "event.h"
@@ -435,7 +436,7 @@ static void render_all(ObPrompt *self)
         render_button(self, &self->button[i]);
 }
 
-void prompt_show(ObPrompt *self, ObClient *parent)
+void prompt_show(ObPrompt *self, ObClient *parent, gboolean modal)
 {
     gint i;
 
@@ -457,8 +458,33 @@ void prompt_show(ObPrompt *self, ObClient *parent)
             break;
         }
 
-    XSetTransientForHint(ob_display, self->super.window,
-                         (parent ? parent->window : 0));
+    if (parent) {
+        Atom states[1];
+        gint nstates;
+        Window p;
+        XWMHints h;
+
+        if (parent->group) {
+            /* make it transient for the window's group */
+            h.flags = WindowGroupHint;
+            h.window_group = parent->group->leader;
+            p = RootWindow(ob_display, ob_screen);
+        }
+        else {
+            /* make it transient for the window directly */
+            h.flags = 0;
+            p = parent->window;
+        }
+
+        XSetWMHints(ob_display, self->super.window, &h);
+        PROP_SET32(self->super.window, wm_transient_for, window, p);
+
+        states[0] = prop_atoms.net_wm_state_modal;
+        nstates = (modal ? 1 : 0);
+        PROP_SETA32(self->super.window, net_wm_state, atom, states, nstates);
+    }
+    else
+        PROP_ERASE(self->super.window, wm_transient_for);
 
     /* set up the dialog and render it */
     prompt_layout(self);

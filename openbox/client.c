@@ -3442,7 +3442,7 @@ static void client_prompt_kill(ObClient *self)
         g_free(m);
     }
 
-    prompt_show(self->kill_prompt, self);
+    prompt_show(self->kill_prompt, self, TRUE);
 }
 
 void client_kill(ObClient *self)

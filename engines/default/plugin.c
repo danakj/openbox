@@ -417,8 +417,7 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
     g_hash_table_remove(window_map, &self->rgriptop);
     g_hash_table_remove(window_map, &self->rgripbottom);
     
-    obt_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self,
-            TRUE);
+
 }
 
 ObFrameContext frame_context(gpointer _self, Window win, gint x, gint y)
@@ -592,26 +591,6 @@ void frame_set_is_shaded(gpointer self, gboolean b)
 void frame_unfocus(gpointer self)
 {
     OBDEFAULTFRAME(self)->focused = FALSE;
-}
-
-void frame_flash_start(gpointer _self)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    self->flash_on = self->focused;
-
-    if (!self->flashing)
-        obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 0.6,
-                flash_timeout, self, g_direct_equal, flash_done);
-    g_get_current_time(&self->flash_end);
-    g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
-
-    self->flashing = TRUE;
-}
-
-void frame_flash_stop(gpointer _self)
-{
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    self->flashing = FALSE;
 }
 
 void frame_set_decorations(gpointer self, ObFrameDecorations d)
@@ -1293,37 +1272,6 @@ static gboolean is_button_present(ObDefaultFrame *_self, const gchar *lc,
     return FALSE;
 }
 
-void flash_done(gpointer data)
-{
-    ObDefaultFrame *self = data;
-
-    if (self->focused != self->flash_on)
-        frame_adjust_focus(self, self->focused);
-}
-
-gboolean flash_timeout(gpointer data)
-{
-    ObDefaultFrame *self = data;
-    GTimeVal now;
-
-    g_get_current_time(&now);
-    if (now.tv_sec > self->flash_end.tv_sec
-            || (now.tv_sec == self->flash_end.tv_sec && now.tv_usec
-                    >= self->flash_end.tv_usec))
-        self->flashing = FALSE;
-
-    if (!self->flashing)
-        return FALSE; /* we are done */
-
-    self->flash_on = !self->flash_on;
-    if (!self->focused) {
-        frame_adjust_focus(self, self->flash_on);
-        self->focused = FALSE;
-    }
-
-    return TRUE; /* go again */
-}
-
 void layout_title(ObDefaultFrame * self)
 {
     gchar *lc;
@@ -1630,8 +1578,8 @@ ObFrameEngine plugin = {
         frame_set_is_max_vert, /* */
         frame_set_is_max_horz, /* */
         frame_set_is_shaded, /* */
-        frame_flash_start, /* */
-        frame_flash_stop, /* */
+        0, //frame_flash_start, /* */
+        0, //frame_flash_stop, /* */
         frame_set_decorations, /* */
         frame_update_title, /* */
         /* This give the window area */
@@ -1658,3 +1606,9 @@ ObFrameEngine * get_info()
 {
     return &plugin;
 }
+
+gboolean flash_timeout(gpointer data)
+{
+    return TRUE;
+}
+

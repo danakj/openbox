@@ -318,6 +318,12 @@ struct _ObClient
 
     /*! A boolean used for algorithms which need to mark clients as visited */
     gboolean visited;
+    
+    /* Manage flashing */
+    gboolean focused;
+    gboolean flashing;
+    gboolean flash_on;
+    GTimeVal flash_end;
 };
 
 extern GList      *client_list;
@@ -730,4 +736,9 @@ gboolean client_has_group_siblings(ObClient *self);
 
 void client_show_frame(ObClient *);
 void client_hide_frame(ObClient *);
+
+gboolean client_flash_timeout(gpointer);
+void client_flash_start(ObClient *);
+void client_flash_stop(ObClient *);
+void client_flash_done(gpointer);
 #endif

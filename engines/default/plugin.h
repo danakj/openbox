@@ -147,10 +147,6 @@ struct _ObDefaultFrame
     gboolean focused;
     gboolean need_render;
 
-    gboolean flashing;
-    gboolean flash_on;
-    GTimeVal flash_end;
-
     GTimeVal iconify_animation_end;
 
 };
@@ -204,9 +200,6 @@ void frame_update_title(gpointer, const gchar *);
 gboolean frame_is_visible(gpointer self);
 gboolean frame_is_max_horz(gpointer self);
 gboolean frame_is_max_vert(gpointer self);
-
-void flash_done(gpointer data);
-gboolean flash_timeout(gpointer data);
 
 void layout_title(ObDefaultFrame *);
 void set_theme_statics(gpointer self);

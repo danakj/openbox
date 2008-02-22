@@ -817,7 +817,8 @@ void client_unmanage(ObClient *self)
                 obt_display, ob_screen), self->area.x,
                 self->area.y);
     }
-    frame_engine->frame_ungrab(self->frame, window_map); 
+    frame_engine->frame_ungrab(self->frame, window_map);
+    obt_main_loop_timeout_remove_data(ob_main_loop, client_flash_timeout, self, TRUE);
     frame_engine->frame_free(self->frame);
     self->frame = NULL;
 
@@ -3552,9 +3553,9 @@ void client_hilite(ObClient *self, gboolean hilite)
     self->demands_attention = hilite && !client_focused(self);
     if (self->frame != NULL) { /* if we're mapping, just set the state */
         if (self->demands_attention)
-        frame_engine->frame_flash_start(self->frame);
+        client_flash_start(self);
         else
-        frame_engine->frame_flash_stop(self->frame);
+        client_flash_stop(self);
         client_change_state(self);
     }
 }
@@ -4553,4 +4554,54 @@ void client_hide_frame(ObClient * self)
      events, and because the ICCCM tells us to! */
     XUnmapWindow(obt_display, self->w_client);
     self->ignore_unmaps++;
+}
+
+gboolean client_flash_timeout(gpointer data)
+{
+    ObClient * self = (ObClient *) data;
+    GTimeVal now;
+    g_get_current_time(&now);
+    
+    if (now.tv_sec > self->flash_end.tv_sec
+            || (now.tv_sec == self->flash_end.tv_sec && now.tv_usec
+                    >= self->flash_end.tv_usec))
+        self->flashing = FALSE;
+
+    if (!self->flashing)
+        return FALSE; /* we are done */
+
+    self->flash_on = !self->flash_on;
+    if (!self->focused) {
+        frame_engine->frame_set_is_focus(self->frame, self->flash_on);
+        frame_engine->frame_update_skin (self->frame);
+        self->focused = FALSE;
+    }
+    return TRUE; /* go again */
+}
+
+void client_flash_start(ObClient * self)
+{
+    self->flash_on = self->focused;
+    if (!self->flashing)
+        obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 0.6,
+                client_flash_timeout, self, g_direct_equal, client_flash_done);
+    g_get_current_time(&self->flash_end);
+    g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
+
+    self->flashing = TRUE;
+}
+
+void client_flash_stop(ObClient * self)
+{
+    self->flashing = FALSE;
+}
+
+void client_flash_done(gpointer data)
+{
+    ObClient * self = (ObClient *) data;
+    if (self->focused != self->flash_on)
+    {
+        frame_engine->frame_set_is_focus(self->frame, self->focused);
+        frame_engine->frame_update_skin (self->frame);
+    }
 }

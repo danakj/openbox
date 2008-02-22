@@ -1056,19 +1056,9 @@ void frame_update_layout(gpointer _self, Rect area, gboolean is_resize, gboolean
         XMoveResizeWindow(obp_display, self->window, self->area.x,
                 self->area.y, self->area.width, self->area.height);
 
-        /* when the client has StaticGravity, it likes to move around.
-         also this correctly positions the client when it maps.
-         this also needs to be run when the frame's decorations sizes change!
-         */
-        if (!is_resize)
-            XMoveResizeWindow(obp_display, self->client->w_client,
-                    self->size.left, self->size.top, self->client_area.width,
-                    self->client_area.height);
-
         if (is_resize) {
-            self->need_render = TRUE;
-            frame_update_skin(self);
-            frame_adjust_shape(self);
+            //frame_update_skin(self);
+            //frame_adjust_shape(self);
         }
 
         if (!STRUT_EQUAL(self->size, oldsize)) {

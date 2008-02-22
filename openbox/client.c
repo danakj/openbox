@@ -2836,6 +2836,15 @@ static void client_apply_startup_state(ObClient *self,
     self->area = oldarea;
     frame_engine->frame_set_decorations (self->frame, self->decorations);
     frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    /* when the client has StaticGravity, it likes to move around.
+     also this correctly positions the client when it maps.
+     this also needs to be run when the frame's decorations sizes change!
+     */
+    Strut size;
+    frame_engine->frame_get_size (self->frame, &size);
+    XMoveResizeWindow(obt_display, self->w_client,
+                size.left, size.top, self->area.width,
+                self->area.height);
     /* if this occurs while we are focus cycling, the indicator needs to
      match the changes */
     if (focus_cycle_target == self)
@@ -3160,6 +3169,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
         frame_engine->frame_set_decorations (self->frame, self->decorations);
         frame_engine->frame_update_layout (self->frame, self->area, TRUE, FALSE);
+
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
         if (focus_cycle_target == self)
@@ -3234,7 +3244,18 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
       if (focus_cycle_target == self)
           focus_cycle_draw_indicator(self);
     }
-
+    
+    if (user && final) {
+        /* when the client has StaticGravity, it likes to move around.
+         also this correctly positions the client when it maps.
+         this also needs to be run when the frame's decorations sizes change!
+         */
+        Strut size;
+        frame_engine->frame_get_size(self->frame, &size);
+        XMoveResizeWindow(obt_display, self->w_client, size.left, size.top,
+                self->area.width, self->area.height);
+    }
+    
     XFlush(obt_display);
 
     /* if it moved between monitors, then this can affect the stacking

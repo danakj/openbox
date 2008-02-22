@@ -29,7 +29,6 @@
 #include "render/theme.h"
 
 #define PADDING 2
-#define SEPARATOR_HEIGHT 3
 #define MAX_MENU_WIDTH 400
 
 #define ITEM_HEIGHT (ob_rr_theme->menu_font_height + 2*PADDING)
@@ -40,6 +39,9 @@
                          ButtonPressMask | ButtonReleaseMask)
 
 GList *menu_frame_visible;
+GHashTable *menu_frame_map;
+
+static RrAppearance *a_sep;
 
 static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
@@ -56,10 +58,18 @@ static Window createWindow(Window parent, gulong mask,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 
-GHashTable *menu_frame_map;
-
 void menu_frame_startup(gboolean reconfig)
 {
+    gint i;
+
+    a_sep = RrAppearanceCopy(ob_rr_theme->a_clear);
+    RrAppearanceAddTextures(a_sep, ob_rr_theme->menu_sep_width);
+    for (i = 0; i < ob_rr_theme->menu_sep_width; ++i) {
+        a_sep->texture[i].type = RR_TEXTURE_LINE_ART;
+        a_sep->texture[i].data.lineart.color =
+            ob_rr_theme->menu_sep_color;
+    }
+
     if (reconfig) return;
 
     menu_frame_map = g_hash_table_new(g_int_hash, g_int_equal);
@@ -67,6 +77,8 @@ void menu_frame_startup(gboolean reconfig)
 
 void menu_frame_shutdown(gboolean reconfig)
 {
+    RrAppearanceFree(a_sep);
+
     if (reconfig) return;
 
     g_hash_table_destroy(menu_frame_map);
@@ -338,7 +350,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
             th = ob_rr_theme->menu_title_height;
         } else {
             item_a = ob_rr_theme->a_menu_normal;
-            th = SEPARATOR_HEIGHT + 2*PADDING;
+            th = ob_rr_theme->menu_sep_width +
+                2*ob_rr_theme->menu_sep_paddingy;
         }
         break;
     default:
@@ -442,26 +455,31 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                     ob_rr_theme->menu_title_height -
                     2*ob_rr_theme->paddingy);
         } else {
-            RrAppearance *clear;
+            gint i;
 
-            /* unlabeled separaator */
-            XMoveResizeWindow(obt_display, self->text, PADDING, PADDING,
-                              self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
+            /* unlabeled separator */
+            XMoveResizeWindow(obt_display, self->text, 0, 0,
+                              self->area.width,
+                              ob_rr_theme->menu_sep_width +
+                              2*ob_rr_theme->menu_sep_paddingy);
 
-            clear = ob_rr_theme->a_clear_tex;
-            RrAppearanceClearTextures(clear);
-            clear->texture[0].type = RR_TEXTURE_LINE_ART;
-            clear->surface.parent = item_a;
-            clear->surface.parentx = PADDING;
-            clear->surface.parenty = PADDING;
-            clear->texture[0].data.lineart.color =
-                text_a->texture[0].data.text.color;
-            clear->texture[0].data.lineart.x1 = 2*PADDING;
-            clear->texture[0].data.lineart.y1 = SEPARATOR_HEIGHT/2;
-            clear->texture[0].data.lineart.x2 = self->area.width - 4*PADDING;
-            clear->texture[0].data.lineart.y2 = SEPARATOR_HEIGHT/2;
-            RrPaint(clear, self->text,
-                    self->area.width - 2*PADDING, SEPARATOR_HEIGHT);
+            a_sep->surface.parent = item_a;
+            a_sep->surface.parentx = 0;
+            a_sep->surface.parenty = 0;
+            for (i = 0; i < ob_rr_theme->menu_sep_width; ++i) {
+                a_sep->texture[i].data.lineart.x1 =
+                    ob_rr_theme->menu_sep_paddingx;
+                a_sep->texture[i].data.lineart.y1 =
+                    ob_rr_theme->menu_sep_paddingy + i;
+                a_sep->texture[i].data.lineart.x2 =
+                    self->area.width - ob_rr_theme->menu_sep_paddingx - 1;
+                a_sep->texture[i].data.lineart.y2 =
+                    ob_rr_theme->menu_sep_paddingy + i;
+            }
+
+            RrPaint(a_sep, self->text, self->area.width,
+                    ob_rr_theme->menu_sep_width +
+                    2*ob_rr_theme->menu_sep_paddingy);
         }
         break;
     }
@@ -597,7 +615,8 @@ static gint menu_entry_frame_get_height(ObMenuEntryFrame *self,
             if (last_entry)
                 h -= ob_rr_theme->mbwidth;
         } else {
-            h += SEPARATOR_HEIGHT;
+            h += ob_rr_theme->menu_sep_width +
+                2*ob_rr_theme->menu_sep_paddingy - PADDING * 2;
         }
         break;
     }
@@ -728,7 +747,8 @@ void menu_frame_render(ObMenuFrame *self)
                     (ob_rr_theme->mbwidth - PADDING) *2;
             } else {
                 tw = 0;
-                th = SEPARATOR_HEIGHT;
+                th = ob_rr_theme->menu_sep_width +
+                    2*ob_rr_theme->menu_sep_paddingy - 2*PADDING;
             }
             break;
         }

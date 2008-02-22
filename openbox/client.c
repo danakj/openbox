@@ -1541,7 +1541,7 @@ void client_update_normal_hints(ObClient *self)
     self->min_ratio = 0.0f;
     self->max_ratio = 0.0f;
     SIZE_SET(self->size_inc, 1, 1);
-    SIZE_SET(self->base_size, 0, 0);
+    SIZE_SET(self->base_size, -1, -1);
     SIZE_SET(self->min_size, 0, 0);
     SIZE_SET(self->max_size, G_MAXINT, G_MAXINT);
 
@@ -2817,7 +2817,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
             0 : self->max_ratio;
 
         /* base size is substituted with min size if not specified */
-        if (self->base_size.width || self->base_size.height) {
+        if (self->base_size.width >= 0 || self->base_size.height >= 0) {
             basew = self->base_size.width;
             baseh = self->base_size.height;
         } else {
@@ -3364,7 +3364,7 @@ static void client_prompt_kill(ObClient *self)
         g_free(m);
     }
 
-    prompt_show(self->kill_prompt, self);
+    prompt_show(self->kill_prompt, self, TRUE);
 }
 
 void client_kill(ObClient *self)

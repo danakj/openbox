@@ -47,6 +47,9 @@ struct _RrTheme {
     gint cbwidthy;
     gint menu_overlap_x;
     gint menu_overlap_y;
+    gint menu_sep_width;
+    gint menu_sep_paddingx;
+    gint menu_sep_paddingy;
     /* these ones are calculated, not set directly by the theme file */
     gint win_font_height;
     gint menu_title_font_height;
@@ -84,6 +87,7 @@ struct _RrTheme {
     RrColor *titlebut_focused_unpressed_color;
     RrColor *titlebut_unfocused_unpressed_color;
     RrColor *menu_title_color;
+    RrColor *menu_sep_color;
     RrColor *menu_color;
     RrColor *menu_selected_color;
     RrColor *menu_disabled_color;

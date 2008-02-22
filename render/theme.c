@@ -211,6 +211,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     if (!read_int(db, "window.client.padding.height", &theme->cbwidthy) ||
         theme->cbwidthy < 0 || theme->cbwidthy > 100)
         theme->cbwidthy = theme->cbwidthx;
+    if (!read_int(db, "menu.separator.width", &theme->menu_sep_width) ||
+        theme->menu_sep_width < 1 || theme->menu_sep_width > 100)
+        theme->menu_sep_width = 1;
+    if (!read_int(db, "menu.separator.padding.width",
+                  &theme->menu_sep_paddingx) ||
+        theme->menu_sep_paddingx < 0 || theme->menu_sep_paddingx > 100)
+        theme->menu_sep_paddingx = 6;
+    if (!read_int(db, "menu.separator.padding.height",
+                  &theme->menu_sep_paddingy) ||
+        theme->menu_sep_paddingy < 0 || theme->menu_sep_paddingy > 100)
+        theme->menu_sep_paddingy = 3;
 
     /* load colors */
     if (!read_color(db, inst,
@@ -408,6 +419,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     "menu.items.active.text.color",
                     &theme->menu_selected_color))
         theme->menu_selected_color = RrColorNew(inst, 0, 0, 0);
+    if (!read_color(db, inst,
+                    "menu.separator.color", &theme->menu_sep_color))
+        theme->menu_sep_color = RrColorNew(inst,
+                                           theme->menu_color->r,
+                                           theme->menu_color->g,
+                                           theme->menu_color->b);
 
     /* load the image masks */
 
@@ -1418,6 +1435,7 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->titlebut_focused_unpressed_color);
         RrColorFree(theme->titlebut_unfocused_unpressed_color);
         RrColorFree(theme->menu_title_color);
+        RrColorFree(theme->menu_sep_color);
         RrColorFree(theme->menu_color);
         RrColorFree(theme->menu_selected_color);
         RrColorFree(theme->menu_disabled_color);

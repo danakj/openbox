@@ -100,7 +100,7 @@ void prompt_ref(ObPrompt *self);
 void prompt_unref(ObPrompt *self);
 
 /*! Show the prompt.  It will be centered within the given area rectangle */
-void prompt_show(ObPrompt *self, struct _ObClient *parent);
+void prompt_show(ObPrompt *self, struct _ObClient *parent, gboolean modal);
 void prompt_hide(ObPrompt *self);
 
 gboolean prompt_key_event(ObPrompt *self, XEvent *e);

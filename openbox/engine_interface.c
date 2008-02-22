@@ -91,9 +91,9 @@ void update_frame_plugin(ObFrameEngine * self)
     //self->ob_display = obt_display;
     //self->ob_screen = ob_screen;
     //self->ob_rr_inst = ob_rr_inst;
-    self->config_theme_keepborder = config_theme_keepborder;
-    self->config_title_layout = config_title_layout;
-    self->ob_main_loop = ob_main_loop;
+    //self->config_theme_keepborder = config_theme_keepborder;
+    //self->config_title_layout = config_title_layout;
+    //self->ob_main_loop = ob_main_loop;
 }
 
 ObFrameEngine * load_frame_plugin(const gchar * filename)

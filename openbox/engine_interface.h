@@ -188,16 +188,9 @@ struct _ObFrameEngine
             RrFont *menu_item_font, RrFont *osd_font);
 
     /* Filled by openbox-core */
-    //Display * ob_display;
-    //gint ob_screen;
-    //RrInstance *ob_rr_inst;
-    // Not more needed
-    //struct _RrTheme * ob_rr_theme;
-    gboolean config_theme_keepborder;
     struct _ObClient *focus_cycle_target;
-    gchar *config_title_layout;
     gboolean moveresize_in_progress;
-    struct _ObtMainLoop *ob_main_loop;
+    //struct _ObtMainLoop *ob_main_loop;
 };
 /* Define how to draw the current windows */
 enum _ObStyle

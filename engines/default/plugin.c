@@ -20,6 +20,9 @@
 #include "plugin.h"
 #include "render.h"
 
+#include "openbox/config.h"
+#include "openbox/openbox.h"
+
 /* Needed for the _() function */
 #include <gettext.h>
 
@@ -458,7 +461,7 @@ void frame_ungrab(gpointer _self, GHashTable * window_map)
     g_hash_table_remove(window_map, &self->rgriptop);
     g_hash_table_remove(window_map, &self->rgripbottom);
 
-    obt_main_loop_timeout_remove_data(plugin.ob_main_loop, flash_timeout, self,
+    obt_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self,
             TRUE);
 }
 
@@ -641,7 +644,7 @@ void frame_flash_start(gpointer _self)
     self->flash_on = self->focused;
 
     if (!self->flashing)
-        obt_main_loop_timeout_add(plugin.ob_main_loop, G_USEC_PER_SEC * 0.6,
+        obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 0.6,
                 flash_timeout, self, g_direct_equal, flash_done);
     g_get_current_time(&self->flash_end);
     g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
@@ -683,7 +686,7 @@ void frame_update_layout(gpointer _self, Rect area, gboolean is_resize, gboolean
     frame_adjust_cursors(self);
 
     if (self->decorations & OB_FRAME_DECOR_BORDER
-            || (plugin.config_theme_keepborder)) {
+            || (config_theme_keepborder)) {
         self->bwidth = theme_config.fbwidth;
     }
     else {
@@ -1313,7 +1316,7 @@ static gboolean is_button_present(ObDefaultFrame *_self, const gchar *lc,
         gint dir)
 {
     ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    for (; *lc != '\0' && lc >= plugin.config_title_layout; lc += dir) {
+    for (; *lc != '\0' && lc >= config_title_layout; lc += dir) {
         if (*lc == ' ')
             continue; /* it was invalid */
         if (*lc == 'N' && self->decorations & OB_FRAME_DECOR_ICON)
@@ -1394,18 +1397,18 @@ void layout_title(ObDefaultFrame * self)
 
         if (i > 0) {
             x = left;
-            lc = plugin.config_title_layout;
+            lc = config_title_layout;
             firstcon = &self->leftmost;
         }
         else {
             x = right;
-            lc = plugin.config_title_layout
-                    + strlen(plugin.config_title_layout)-1;
+            lc = config_title_layout
+                    + strlen(config_title_layout)-1;
             firstcon = &self->rightmost;
         }
 
         /* stop at the end of the string (or the label, which calls break) */
-        for (; *lc != '\0' && lc >= plugin.config_title_layout; lc+=i) {
+        for (; *lc != '\0' && lc >= config_title_layout; lc+=i) {
             if (*lc == 'L') {
                 if (i > 0) {
                     self->label_on = TRUE;
@@ -1691,11 +1694,8 @@ ObFrameEngine plugin = {
         frame_trigger, /* */
         load_theme_config, /* */
         /* This fields are fill by openbox. */
-        0, /*gboolean config_theme_keepborder; */
         0, /*struct _ObClient *focus_cycle_target; */
-        0, /*gchar *config_title_layout; */
         FALSE, /*gboolean moveresize_in_progress;*/
-        0, /*struct _ObMainLoop *ob_main_loop;*/
 };
 
 ObFrameEngine * get_info()

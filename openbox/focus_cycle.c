@@ -29,7 +29,7 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
-//ObClient       *focus_cycle_target = NULL;
+ObClient       *focus_cycle_target = NULL;
 static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_dock_windows;

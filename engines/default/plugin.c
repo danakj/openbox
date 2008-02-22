@@ -1082,11 +1082,6 @@ void frame_update_layout(gpointer _self, Rect area, gboolean is_resize, gboolean
             OBT_PROP_SETA32(self->client->w_client, KDE_NET_WM_FRAME_STRUT,
                     CARDINAL, vals, 4);
         }
-
-        /* if this occurs while we are focus cycling, the indicator needs to
-         match the changes */
-        if (plugin.focus_cycle_target == self->client)
-            focus_cycle_draw_indicator(self->client);
     }
     if (is_resize && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(obp_display, self->label, self->label_width,

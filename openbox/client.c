@@ -31,6 +31,7 @@
 #include "grab.h"
 #include "prompt.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -663,6 +664,10 @@ ObClient *client_fake_manage(Window window)
     frame_engine->frame_set_decorations (self->frame, self->decorations);
     frame_engine->frame_update_title (self->frame, self->title);
     frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    /* if this occurs while we are focus cycling, the indicator needs to
+     match the changes */
+    if (focus_cycle_target == self)
+        focus_cycle_draw_indicator(self);
     frame_engine->frame_update_skin (self->frame);
 
     Strut size;
@@ -2482,7 +2487,13 @@ static void client_change_state(ObClient *self)
     OBT_PROP_SETA32(self->w_client, NET_WM_STATE, ATOM, netstate, num);
 
     if (self->frame)
+    {
         frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == self)
+            focus_cycle_draw_indicator(self);
+    }
 }
 
 ObClient *client_search_focus_tree(ObClient *self)
@@ -2825,6 +2836,10 @@ static void client_apply_startup_state(ObClient *self,
     self->area = oldarea;
     frame_engine->frame_set_decorations (self->frame, self->decorations);
     frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    /* if this occurs while we are focus cycling, the indicator needs to
+     match the changes */
+    if (focus_cycle_target == self)
+        focus_cycle_draw_indicator(self);
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
 
     /* set the desktop hint, to make sure that it always exists */
@@ -3116,6 +3131,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (send_resize_client && (w > oldw || h > oldh)) {
         frame_engine->frame_set_decorations (self->frame, self->decorations);
         frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == self)
+            focus_cycle_draw_indicator(self);
     }
 
     /* find the frame's dimensions and move/resize it */
@@ -3141,6 +3160,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 
         frame_engine->frame_set_decorations (self->frame, self->decorations);
         frame_engine->frame_update_layout (self->frame, self->area, TRUE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == self)
+            focus_cycle_draw_indicator(self);
 
         if (!user)
             event_end_ignore_all_enters(ignore_start);
@@ -3206,6 +3229,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (send_resize_client && (w <= oldw || h <= oldh)) {
       frame_engine->frame_set_decorations (self->frame, self->decorations);
       frame_engine->frame_update_layout (self->frame, self->area, FALSE, FALSE);
+      /* if this occurs while we are focus cycling, the indicator needs to
+       match the changes */
+      if (focus_cycle_target == self)
+          focus_cycle_draw_indicator(self);
     }
 
     XFlush(obt_display);
@@ -3427,6 +3454,10 @@ void client_shade(ObClient *self, gboolean shade)
     /* resize the frame to just the titlebar */
     frame_engine->frame_set_is_shaded (self->frame, self->shaded);
     frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
+    /* if this occurs while we are focus cycling, the indicator needs to
+     match the changes */
+    if (focus_cycle_target == self)
+        focus_cycle_draw_indicator(self);
 }
 
 static void client_ping_event(ObClient *self, gboolean dead)
@@ -3580,6 +3611,10 @@ static void client_set_desktop_recursive(ObClient *self,
         /* the frame can display the current desktop state */
         frame_engine->frame_set_decorations (self->frame, self->decorations);
         frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == self)
+            focus_cycle_draw_indicator(self);
         /* 'move' the window to the new desktop */
         if (!donthide)
             client_hide(self);
@@ -4536,6 +4571,10 @@ void client_show_frame(ObClient * self)
 {
     frame_engine->frame_set_is_visible(self->frame, TRUE);
     frame_engine->frame_update_layout(self->frame, self->area, FALSE, FALSE);
+    /* if this occurs while we are focus cycling, the indicator needs to
+     match the changes */
+    if (focus_cycle_target == self)
+        focus_cycle_draw_indicator(self);
     frame_engine->frame_update_skin(self->frame);
     /* Grab the server to make sure that the frame window is mapped before
      the client gets its MapNotify, i.e. to make sure the client is

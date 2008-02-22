@@ -529,6 +529,10 @@ static void event_process(const XEvent *ec, gpointer data)
                window with RevertToParent focus */
             frame_engine->frame_set_is_focus(client->frame, FALSE);
             frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
+            /* if this occurs while we are focus cycling, the indicator needs to
+             match the changes */
+            if (focus_cycle_target == client)
+                focus_cycle_draw_indicator(client);
             frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called */
         }
@@ -594,6 +598,10 @@ static void event_process(const XEvent *ec, gpointer data)
             focus_left_screen = FALSE;
             frame_engine->frame_set_is_focus(client->frame, TRUE);
             frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
+            /* if this occurs while we are focus cycling, the indicator needs to
+             match the changes */
+            if (focus_cycle_target == client)
+                focus_cycle_draw_indicator(client);
             frame_engine->frame_update_skin (client->frame);
             focus_set_client(client);
             client_calc_layer(client);
@@ -641,6 +649,10 @@ static void event_process(const XEvent *ec, gpointer data)
         if (client && client != focus_client) {
           frame_engine->frame_set_is_focus(client->frame, FALSE);
           frame_engine->frame_update_layout (client->frame, client->area, FALSE, FALSE);
+          /* if this occurs while we are focus cycling, the indicator needs to
+           match the changes */
+          if (focus_cycle_target == client)
+              focus_cycle_draw_indicator(client);
           frame_engine->frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */

@@ -30,6 +30,7 @@
 #include "engine_interface.h"
 #include "event.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "popup.h"
 #include "render/render.h"
 #include "gettext.h"
@@ -573,6 +574,10 @@ static void screen_fallback_focus(void)
                server FocusIn event */
         frame_engine->frame_set_is_focus (c->frame, TRUE);
         frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == c)
+            focus_cycle_draw_indicator(c);
         frame_engine->frame_update_skin (c->frame);
             /* do this here so that if you switch desktops to a window with
                helper windows then the helper windows won't flash */
@@ -1230,6 +1235,10 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
                    server FocusIn event */
         frame_engine->frame_set_is_focus(c->frame, TRUE);
         frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == c)
+            focus_cycle_draw_indicator(c);
         frame_engine->frame_update_skin (c->frame);
             }
         }

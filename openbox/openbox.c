@@ -338,6 +338,10 @@ gint main(gint argc, gchar **argv)
                     client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
                     frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
+                    /* if this occurs while we are focus cycling, the indicator needs to
+                     match the changes */
+                    if (focus_cycle_target == c)
+                        focus_cycle_draw_indicator(c);
                     /* the decor sizes may have changed, so the windows may
                        end up in new positions */
                     client_reconfigure(c, FALSE);

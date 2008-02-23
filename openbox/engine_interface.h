@@ -186,7 +186,7 @@ struct _ObFrameEngine
 
     /* Filled by openbox-core */
     struct _ObClient *focus_cycle_target;
-    gboolean moveresize_in_progress;
+    //gboolean moveresize_in_progress;
 };
 /* Define how to draw the current windows */
 enum _ObStyle

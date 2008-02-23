@@ -474,7 +474,7 @@ void client_manage(Window window, ObPrompt *prompt)
                       self->w_client, map_time, launch_time,
                       event_last_user_time);
 
-        if (menu_frame_visible || frame_engine.moveresize_in_progress) {
+        if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
             raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,

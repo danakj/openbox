@@ -40,7 +40,7 @@
 /* how far windows move and resize with the keyboard arrows */
 #define KEY_DIST 8
 
-//gboolean moveresize_in_progress = FALSE;
+gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
 #ifdef SYNC
 XSyncAlarm moveresize_alarm = None;
@@ -85,7 +85,7 @@ void moveresize_startup(gboolean reconfig)
 void moveresize_shutdown(gboolean reconfig)
 {
     if (!reconfig) {
-        if (frame_engine.moveresize_in_progress)
+        if (moveresize_in_progress)
             moveresize_end(FALSE);
         client_remove_destroy_notify(client_dest);
     }
@@ -175,7 +175,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     gint up = 1;
     gint left = 1;
 
-    if (frame_engine.moveresize_in_progress || !frame_engine.frame_is_visible(c->frame) ||
+    if (moveresize_in_progress || !frame_engine.frame_is_visible(c->frame) ||
         !(mv ?
           (c->functions & OB_CLIENT_FUNC_MOVE) :
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
@@ -253,7 +253,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     cur_w = start_cw;
     cur_h = start_ch;
 
-    frame_engine.moveresize_in_progress = TRUE;
+    moveresize_in_progress = TRUE;
 
 #ifdef SYNC
     if (config_resize_redraw && !moving && obt_display_extension_sync &&
@@ -331,7 +331,7 @@ void moveresize_end(gboolean cancel)
     /* dont edge warp after its ended */
     cancel_edge_warp();
 
-    frame_engine.moveresize_in_progress = FALSE;
+    moveresize_in_progress = FALSE;
     moveresize_client = NULL;
 }
 
@@ -835,7 +835,7 @@ gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
 
-    if (!frame_engine.moveresize_in_progress) return FALSE;
+    if (!moveresize_in_progress) return FALSE;
 
     if (e->type == ButtonPress) {
         if (!button) {

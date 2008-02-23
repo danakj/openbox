@@ -225,7 +225,7 @@ ObFrameContext frame_context_from_string(const gchar *name)
 ObFrameContext engine_frame_context(ObClient *client, Window win, gint x, gint y)
 {
     /* this part is commun to all engine */
-    if (frame_engine.moveresize_in_progress)
+    if (moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
     if (win == obt_root(ob_screen))
         return OB_FRAME_CONTEXT_ROOT;

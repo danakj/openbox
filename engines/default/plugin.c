@@ -1582,7 +1582,6 @@ ObFrameEngine engine = {
         load_theme_config, /* */
         /* This fields are fill by openbox. */
         0, /*struct _ObClient *focus_cycle_target; */
-        FALSE, /*gboolean moveresize_in_progress;*/
 };
 
 ObFrameEngine * get_info()

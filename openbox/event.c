@@ -727,7 +727,7 @@ static void event_process(const XEvent *ec, gpointer data)
              e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
     {
         XSyncAlarmNotifyEvent *se = (XSyncAlarmNotifyEvent*)e;
-        if (se->alarm == moveresize_alarm && frame_engine.moveresize_in_progress)
+        if (se->alarm == moveresize_alarm && moveresize_in_progress)
             moveresize_event(e);
     }
 #endif
@@ -1879,7 +1879,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
     if (!actions_interactive_input_event(e) && !moveresize_event(e)) {
-        if (frame_engine.moveresize_in_progress)
+        if (moveresize_in_progress)
             /* make further actions work on the client being
                moved/resized */
             client = moveresize_client;
@@ -1914,7 +1914,7 @@ static gboolean focus_delay_func(gpointer data)
     Time old = event_curtime;
 
     /* don't move focus and kill the menu or the move/resize */
-    if (menu_frame_visible || frame_engine.moveresize_in_progress) return FALSE;
+    if (menu_frame_visible || moveresize_in_progress) return FALSE;
 
     event_curtime = d->time;
     event_curserial = d->serial;
@@ -2002,7 +2002,7 @@ void event_cancel_all_key_grabs(void)
         menu_frame_hide_all();
         ob_debug("KILLED open menus");
     }
-    else if (frame_engine.moveresize_in_progress) {
+    else if (moveresize_in_progress) {
         moveresize_end(TRUE);
         ob_debug("KILLED interactive moveresize");
     }

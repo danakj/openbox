@@ -741,4 +741,7 @@ gboolean client_flash_timeout(gpointer);
 void client_flash_start(ObClient *);
 void client_flash_stop(ObClient *);
 void client_flash_done(gpointer);
+
+void client_create_window (ObClient *, Window *, Window);
+
 #endif

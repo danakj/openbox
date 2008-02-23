@@ -1,21 +1,21 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   client.c for the Openbox window manager
-   Copyright (c) 2006        Mikael Magnusson
-   Copyright (c) 2003-2007   Dana Jansens
+ client.c for the Openbox window manager
+ Copyright (c) 2006        Mikael Magnusson
+ Copyright (c) 2003-2007   Dana Jansens
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-   See the COPYING file for a copy of the GNU General Public License.
-*/
+ See the COPYING file for a copy of the GNU General Public License.
+ */
 
 #include "client.h"
 #include "debug.h"
@@ -73,7 +73,7 @@ typedef struct
     gpointer data;
 } ClientCallback;
 
-GList            *client_list          = NULL;
+GList *client_list = NULL;
 
 static GSList *client_destroy_notifies = NULL;
 
@@ -86,40 +86,31 @@ static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
 static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
-static void client_set_desktop_recursive(ObClient *self,
-                                         guint target,
-                                         gboolean donthide,
-                                         gboolean dontraise);
+static void client_set_desktop_recursive(ObClient *self, guint target,
+        gboolean donthide, gboolean dontraise);
 static void client_change_allowed_actions(ObClient *self);
 static void client_change_state(ObClient *self);
 static void client_change_wm_state(ObClient *self);
-static void client_apply_startup_state(ObClient *self,
-                                       gint x, gint y, gint w, gint h);
+static void client_apply_startup_state(ObClient *self, gint x, gint y, gint w,
+        gint h);
 static void client_restore_session_state(ObClient *self);
 static gboolean client_restore_session_stacking(ObClient *self);
 static ObAppSettings *client_get_settings_state(ObClient *self);
-static void client_update_transient_tree(ObClient *self,
-                                         ObGroup *oldgroup, ObGroup *newgroup,
-                                         gboolean oldgtran, gboolean newgtran,
-                                         ObClient* oldparent,
-                                         ObClient *newparent);
+static void client_update_transient_tree(ObClient *self, ObGroup *oldgroup,
+        ObGroup *newgroup, gboolean oldgtran, gboolean newgtran,
+        ObClient* oldparent, ObClient *newparent);
 static void client_present(ObClient *self, gboolean here, gboolean raise,
-                           gboolean unshade);
+        gboolean unshade);
 static GSList *client_search_all_top_parents_internal(ObClient *self,
-                                                      gboolean bylayer,
-                                                      ObStackingLayer layer);
+        gboolean bylayer, ObStackingLayer layer);
 static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
 
-Window createWindow(Window parent, Visual *visual, gulong mask,
-        XSetWindowAttributes *attrib)
-{
-    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0, (visual ? 32
-            : RrDepth(ob_rr_inst)), InputOutput, (visual ? visual
-            : RrVisual(ob_rr_inst)), mask, attrib);
-
-}
+#define CREATE_WINDOW(parent, visual, mask, attrib) XCreateWindow(obt_display,\
+        (parent), 0, 0, 1, 1, 0, ((visual) ? 32 : RrDepth(ob_rr_inst)), \
+        InputOutput, ((visual) ? (visual) : RrVisual(ob_rr_inst)), (mask), \
+        (attrib))
 
 Visual *check_32bit_client(ObClient *c)
 {
@@ -142,14 +133,16 @@ Visual *check_32bit_client(ObClient *c)
 
 void client_startup(gboolean reconfig)
 {
-    if (reconfig) return;
+    if (reconfig)
+        return;
 
     client_set_list();
 }
 
 void client_shutdown(gboolean reconfig)
 {
-    if (reconfig) return;
+    if (reconfig)
+        return;
 }
 
 static void client_call_notifies(ObClient *self, GSList *list)
@@ -178,8 +171,8 @@ void client_remove_destroy_notify(ObClientCallback func)
         ClientCallback *d = it->data;
         if (d->func == func) {
             g_free(d);
-            client_destroy_notifies =
-                g_slist_delete_link(client_destroy_notifies, it);
+            client_destroy_notifies = g_slist_delete_link(
+                    client_destroy_notifies, it);
             break;
         }
     }
@@ -197,11 +190,12 @@ void client_set_list(void)
         win_it = windows;
         for (it = client_list; it; it = g_list_next(it), ++win_it)
             *win_it = ((ObClient*)it->data)->w_client;
-    } else
+    }
+    else
         windows = NULL;
 
     OBT_PROP_SETA32(obt_root(ob_screen), NET_CLIENT_LIST, WINDOW,
-                    (gulong*)windows, size);
+            (gulong*)windows, size);
 
     if (windows)
         g_free(windows);
@@ -224,15 +218,15 @@ void client_manage(Window window, ObPrompt *prompt)
     map_time = event_get_server_time();
 
     /* choose the events we want to receive on the CLIENT window
-       (ObPrompt windows can request events too) */
+     (ObPrompt windows can request events too) */
     attrib_set.event_mask = CLIENT_EVENTMASK |
-        (prompt ? prompt->event_mask : 0);
+    (prompt ? prompt->event_mask : 0);
     attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
-    XChangeWindowAttributes(obt_display, window,
-                            CWEventMask|CWDontPropagate, &attrib_set);
+    XChangeWindowAttributes(obt_display, window, CWEventMask|CWDontPropagate,
+            &attrib_set);
 
     /* create the ObClient struct, and populate it from the hints on the
-       window */
+     window */
     self = g_new0(ObClient, 1);
     self->obwin.type = OB_WINDOW_CLASS_CLIENT;
     self->w_client = window;
@@ -247,35 +241,21 @@ void client_manage(Window window, ObPrompt *prompt)
     client_get_all(self, TRUE);
 
     ob_debug("Window type: %d", self->type);
-    ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
+    ob_debug("Window group: 0x%x", self->group ? self->group->leader : 0);
 
     /* now we have all of the window's information so we can set this up.
-       do this before creating the frame, so it can tell that we are still
-       mapping and doesn't go applying things right away */
+     do this before creating the frame, so it can tell that we are still
+     mapping and doesn't go applying things right away */
     client_setup_decor_and_functions(self, FALSE);
 
     /* specify that if we exit, the window should not be destroyed and
-       should be reparented back to root automatically, unless we are managing
-       an internal ObPrompt window  */
+     should be reparented back to root automatically, unless we are managing
+     an internal ObPrompt window  */
     if (!self->prompt)
         XChangeSaveSet(obt_display, window, SetModeInsert);
 
-    /* create the decoration frame for the client window */
-    Visual *visual = check_32bit_client(self);
-    gulong mask = 0;
-    XSetWindowAttributes attrib;
-    if (visual) {
-        /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
-        /* create a colormap with the visual */
-        attrib.colormap = XCreateColormap(
-                obt_display, RootWindow(obt_display, ob_screen), visual,
-                AllocNone);
-        attrib.background_pixel = BlackPixel(obt_display, ob_screen);
-        attrib.border_pixel = BlackPixel(obt_display, ob_screen);
-    }
-    self->w_frame = createWindow(RootWindow(obt_display, ob_screen), visual,
-            mask, &attrib);
+    /* create decorations */
+    client_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
     self->frame = frame_engine.frame_new(self, self->w_client, self->w_frame);
     /* reparent the client to the frame */
     XReparentWindow(obt_display, self->w_client, self->w_frame, 0, 0);
@@ -288,20 +268,20 @@ void client_manage(Window window, ObPrompt *prompt)
      */
     if (ob_state() == OB_STATE_STARTING)
         ++self->ignore_unmaps;
-    
+
     /* select the event mask on the client's parent (to receive config/map
      req's) the ButtonPress is to catch clicks on the client border */
     XSelectInput(obt_display, self->w_frame, FRAME_EVENTMASK);
-    
+
     frame_engine.frame_grab(self->frame, window_map);
 
     /* we've grabbed everything and set everything that we need to at mapping
-       time now */
+     time now */
     grab_server(FALSE);
 
     /* per-app settings override stuff from client_get_all, and return the
-       settings for other uses too. the returned settings is a shallow copy,
-       that needs to be freed with g_free(). */
+     settings for other uses too. the returned settings is a shallow copy,
+     that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
     /* the session should get the last say though */
     client_restore_session_state(self);
@@ -310,7 +290,7 @@ void client_manage(Window window, ObPrompt *prompt)
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
     /* do this after we have a frame.. it uses the frame to help determine the
-       WM_STATE to apply. */
+     WM_STATE to apply. */
     client_change_state(self);
 
     /* add ourselves to the focus order */
@@ -320,15 +300,14 @@ void client_manage(Window window, ObPrompt *prompt)
     client_calc_layer(self);
 
     /* focus the new window? */
-    if (ob_state() != OB_STATE_STARTING &&
-        (!self->session || self->session->focused) &&
-        /* this means focus=true for window is same as config_focus_new=true */
-        ((config_focus_new || (settings && settings->focus == 1)) ||
-         client_search_focus_tree_full(self)) &&
-        /* this checks for focus=false for the window */
-        (!settings || settings->focus != 0) &&
-        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE))
-    {
+    if (ob_state() != OB_STATE_STARTING && (!self->session
+            || self->session->focused) &&
+    /* this means focus=true for window is same as config_focus_new=true */
+    ((config_focus_new || (settings && settings->focus == 1))
+            || client_search_focus_tree_full(self)) &&
+    /* this checks for focus=false for the window */
+    (!settings || settings->focus != 0) && focus_valid_target(self, FALSE,
+            FALSE, TRUE, FALSE, FALSE)) {
         activate = TRUE;
     }
 
@@ -336,13 +315,13 @@ void client_manage(Window window, ObPrompt *prompt)
     XSetWindowBorderWidth(obt_display, self->w_client, 0);
 
     /* adjust the frame to the client's size before showing or placing
-       the window */
-    frame_engine.frame_set_hover_flag (self->frame, OB_BUTTON_NONE);
-    frame_engine.frame_set_press_flag (self->frame, OB_BUTTON_NONE);
-    frame_engine.frame_set_is_focus (self->frame, FALSE);
-    frame_engine.frame_set_decorations (self->frame, self->decorations);
-    frame_engine.frame_update_title (self->frame, self->title);
-    frame_engine.frame_update_layout (self->frame, self->area, FALSE, TRUE);
+     the window */
+    frame_engine.frame_set_hover_flag(self->frame, OB_BUTTON_NONE);
+    frame_engine.frame_set_press_flag(self->frame, OB_BUTTON_NONE);
+    frame_engine.frame_set_is_focus(self->frame, FALSE);
+    frame_engine.frame_set_decorations(self->frame, self->decorations);
+    frame_engine.frame_update_title(self->frame, self->title);
+    frame_engine.frame_update_layout(self->frame, self->area, FALSE, TRUE);
     //frame_engine->frame_update_skin (self->frame);
 
     /* where the frame was placed is where the window was originally */
@@ -351,76 +330,72 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
-        ob_debug("Positioned: %s @ %d %d",
-                 (!self->positioned ? "no" :
-                  (self->positioned == PPosition ? "program specified" :
-                   (self->positioned == USPosition ? "user specified" :
-                    (self->positioned == (PPosition | USPosition) ?
-                     "program + user specified" :
-                     "BADNESS !?")))), place.x, place.y);
+        ob_debug(
+                "Positioned: %s @ %d %d",
+                (!self->positioned ? "no"
+                        : (self->positioned == PPosition ? "program specified"
+                                : (self->positioned == USPosition ? "user specified"
+                                        : (self->positioned == (PPosition
+                                                | USPosition) ? "program + user specified"
+                                                : "BADNESS !?")))), place.x,
+                place.y);
 
-        ob_debug("Sized: %s @ %d %d",
-                 (!self->sized ? "no" :
-                  (self->sized == PSize ? "program specified" :
-                   (self->sized == USSize ? "user specified" :
-                    (self->sized == (PSize | USSize) ?
-                     "program + user specified" :
-                     "BADNESS !?")))), place.width, place.height);
+        ob_debug("Sized: %s @ %d %d", (!self->sized ? "no" : (self->sized
+                == PSize ? "program specified"
+                : (self->sized == USSize ? "user specified" : (self->sized
+                        == (PSize | USSize) ? "program + user specified"
+                        : "BADNESS !?")))), place.width, place.height);
 
         /* splash screens are also returned as TRUE for transient,
-           and so will be forced on screen below */
+         and so will be forced on screen below */
         transient = place_client(self, &place.x, &place.y, settings);
 
         /* make sure the window is visible. */
-        client_find_onscreen(self, &place.x, &place.y,
-                             place.width, place.height,
-                             /* non-normal clients has less rules, and
-                                windows that are being restored from a
-                                session do also. we can assume you want
-                                it back where you saved it. Clients saying
-                                they placed themselves are subjected to
-                                harder rules, ones that are placed by
-                                place.c or by the user are allowed partially
-                                off-screen and on xinerama divides (ie,
-                                it is up to the placement routines to avoid
-                                the xinerama divides)
+        client_find_onscreen(self, &place.x, &place.y, place.width,
+                place.height,
+                /* non-normal clients has less rules, and
+                 windows that are being restored from a
+                 session do also. we can assume you want
+                 it back where you saved it. Clients saying
+                 they placed themselves are subjected to
+                 harder rules, ones that are placed by
+                 place.c or by the user are allowed partially
+                 off-screen and on xinerama divides (ie,
+                 it is up to the placement routines to avoid
+                 the xinerama divides)
 
-                                splash screens get "transient" set to TRUE by
-                                the place_client call
-                             */
-                             ob_state() == OB_STATE_RUNNING &&
-                             (transient ||
-                              (!((self->positioned & USPosition) ||
-                                 (settings && settings->pos_given)) &&
-                               client_normal(self) &&
-                               !self->session &&
-                               /* don't move oldschool fullscreen windows to
-                                  fit inside the struts (fixes Acroread, which
-                                  makes its fullscreen window fit the screen
-                                  but it is not USSize'd or USPosition'd) */
-                               !(self->decorations == 0 &&
-                                 RECT_EQUAL(place, *monitor)))));
+                 splash screens get "transient" set to TRUE by
+                 the place_client call
+                 */
+                ob_state() == OB_STATE_RUNNING && (transient
+                        || (!((self->positioned & USPosition) || (settings
+                                && settings->pos_given)) && client_normal(self)
+                                && !self->session
+                                &&
+                                /* don't move oldschool fullscreen windows to
+                                 fit inside the struts (fixes Acroread, which
+                                 makes its fullscreen window fit the screen
+                                 but it is not USSize'd or USPosition'd) */
+                                !(self->decorations == 0 && RECT_EQUAL(place,
+                                        *monitor)))));
     }
 
     /* if the window isn't user-sized, then make it fit inside
-       the visible screen area on its monitor. Use basically the same rules
-       for forcing the window on screen in the client_find_onscreen call.
+     the visible screen area on its monitor. Use basically the same rules
+     for forcing the window on screen in the client_find_onscreen call.
 
-       do this after place_client, it chooses the monitor!
+     do this after place_client, it chooses the monitor!
 
-       splash screens get "transient" set to TRUE by
-       the place_client call
-    */
-    if (ob_state() == OB_STATE_RUNNING &&
-        (transient ||
-         (!(self->sized & USSize || self->positioned & USPosition) &&
-          client_normal(self) &&
-          !self->session &&
-          /* don't shrink oldschool fullscreen windows to fit inside the
-             struts (fixes Acroread, which makes its fullscreen window
-             fit the screen but it is not USSize'd or USPosition'd) */
-          !(self->decorations == 0 && RECT_EQUAL(place, *monitor)))))
-    {
+     splash screens get "transient" set to TRUE by
+     the place_client call
+     */
+    if (ob_state() == OB_STATE_RUNNING && (transient || (!(self->sized & USSize
+            || self->positioned & USPosition) && client_normal(self)
+            && !self->session &&
+    /* don't shrink oldschool fullscreen windows to fit inside the
+     struts (fixes Acroread, which makes its fullscreen window
+     fit the screen but it is not USSize'd or USPosition'd) */
+    !(self->decorations == 0 && RECT_EQUAL(place, *monitor))))) {
         Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
         Strut size;
@@ -443,121 +418,112 @@ void client_manage(Window window, ObPrompt *prompt)
     }
 
     ob_debug("placing window 0x%x at %d, %d with size %d x %d. "
-             "some restrictions may apply",
-             self->w_client, place.x, place.y, place.width, place.height);
+        "some restrictions may apply", self->w_client, place.x, place.y,
+            place.width, place.height);
     if (self->session)
         ob_debug("  but session requested %d, %d  %d x %d instead, "
-                 "overriding",
-                 self->session->x, self->session->y,
-                 self->session->w, self->session->h);
+            "overriding", self->session->x, self->session->y, self->session->w,
+                self->session->h);
 
     /* do this after the window is placed, so the premax/prefullscreen numbers
-       won't be all wacko!!
+     won't be all wacko!!
 
-       this also places the window
-    */
-    client_apply_startup_state(self, place.x, place.y,
-                               place.width, place.height);
+     this also places the window
+     */
+    client_apply_startup_state(self, place.x, place.y, place.width,
+            place.height);
 
     g_free(monitor);
     monitor = NULL;
 
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
-                  activate ? "yes" : "no");
+            activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
 
         /* This is focus stealing prevention */
         ob_debug_type(OB_DEBUG_FOCUS,
-                      "Want to focus new window 0x%x at time %u "
-                      "launched at %u (last user interaction time %u)",
-                      self->w_client, map_time, launch_time,
-                      event_last_user_time);
+                "Want to focus new window 0x%x at time %u "
+                    "launched at %u (last user interaction time %u)",
+                self->w_client, map_time, launch_time, event_last_user_time);
 
         if (menu_frame_visible || moveresize_in_progress) {
             activate = FALSE;
             raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Not focusing the window because the user is inside "
-                          "an Openbox menu or is move/resizing a window and "
-                          "we don't want to interrupt them");
+                    "Not focusing the window because the user is inside "
+                        "an Openbox menu or is move/resizing a window and "
+                        "we don't want to interrupt them");
         }
 
         /* if it's on another desktop */
-        else if (!(self->desktop == screen_desktop ||
-                   self->desktop == DESKTOP_ALL) &&
-                 /* the timestamp is from before you changed desktops */
-                 launch_time && screen_desktop_user_time &&
-                 !event_time_after(launch_time, screen_desktop_user_time))
-        {
+        else if (!(self->desktop == screen_desktop || self->desktop
+                == DESKTOP_ALL) &&
+        /* the timestamp is from before you changed desktops */
+        launch_time && screen_desktop_user_time && !event_time_after(
+                launch_time, screen_desktop_user_time)) {
             activate = FALSE;
             raise = TRUE;
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Not focusing the window because its on another "
-                          "desktop");
+                    "Not focusing the window because its on another "
+                        "desktop");
         }
         /* If something is focused, and it's not our relative... */
-        else if (focus_client && client_search_focus_tree_full(self) == NULL &&
-                 client_search_focus_group_full(self) == NULL)
-        {
+        else if (focus_client && client_search_focus_tree_full(self) == NULL
+                && client_search_focus_group_full(self) == NULL) {
             /* If the user is working in another window right now, then don't
-               steal focus */
-            if (event_last_user_time && launch_time &&
-                event_time_after(event_last_user_time, launch_time) &&
-                event_last_user_time != launch_time &&
-                event_time_after(event_last_user_time,
-                                 map_time - OB_EVENT_USER_TIME_DELAY))
-            {
+             steal focus */
+            if (event_last_user_time && launch_time && event_time_after(
+                    event_last_user_time, launch_time) && event_last_user_time
+                    != launch_time && event_time_after(event_last_user_time,
+                    map_time - OB_EVENT_USER_TIME_DELAY)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because the user is "
-                              "working in another window");
+                        "Not focusing the window because the user is "
+                            "working in another window");
             }
             /* If its a transient (and its parents aren't focused) */
             else if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because it is a "
-                              "transient, and its relatives aren't focused");
+                        "Not focusing the window because it is a "
+                            "transient, and its relatives aren't focused");
             }
             /* Don't steal focus from globally active clients.
-               I stole this idea from KWin. It seems nice.
+             I stole this idea from KWin. It seems nice.
              */
-            else if (!(focus_client->can_focus ||
-                       focus_client->focus_notify))
-            {
+            else if (!(focus_client->can_focus || focus_client->focus_notify)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because a globally "
-                              "active client has focus");
+                        "Not focusing the window because a globally "
+                            "active client has focus");
             }
             /* Don't move focus if it's not going to go to this window
-               anyway */
+             anyway */
             else if (client_focus_target(self) != self) {
                 activate = FALSE;
                 raise = TRUE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because another window "
-                              "would get the focus anyway");
+                        "Not focusing the window because another window "
+                            "would get the focus anyway");
             }
-            else if (!(self->desktop == screen_desktop ||
-                       self->desktop == DESKTOP_ALL))
-            {
+            else if (!(self->desktop == screen_desktop || self->desktop
+                    == DESKTOP_ALL)) {
                 activate = FALSE;
                 raise = TRUE;
                 ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because it is on "
-                              "another desktop and no relatives are focused ");
+                        "Not focusing the window because it is on "
+                            "another desktop and no relatives are focused ");
             }
         }
 
         if (!activate) {
             ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus stealing prevention activated for %s at "
-                          "time %u (last user interactioon time %u)",
-                          self->title, map_time, event_last_user_time);
+                    "Focus stealing prevention activated for %s at "
+                        "time %u (last user interactioon time %u)",
+                    self->title, map_time, event_last_user_time);
             /* if the client isn't focused, then hilite it so the user
-               knows it is there */
+             knows it is there */
             client_hilite(self, TRUE);
             /* we may want to raise it even tho we're not activating it */
             if (raise && !client_restore_session_stacking(self))
@@ -566,12 +532,12 @@ void client_manage(Window window, ObPrompt *prompt)
     }
     else {
         /* This may look rather odd. Well it's because new windows are added
-           to the stacking order non-intrusively. If we're not going to focus
-           the new window or hilite it, then we raise it to the top. This will
-           take affect for things that don't get focused like splash screens.
-           Also if you don't have focus_new enabled, then it's going to get
-           raised to the top. Legacy begets legacy I guess?
-        */
+         to the stacking order non-intrusively. If we're not going to focus
+         the new window or hilite it, then we raise it to the top. This will
+         take affect for things that don't get focused like splash screens.
+         Also if you don't have focus_new enabled, then it's going to get
+         raised to the top. Legacy begets legacy I guess?
+         */
         if (!client_restore_session_stacking(self))
             stacking_raise(CLIENT_AS_WINDOW(self));
     }
@@ -579,8 +545,8 @@ void client_manage(Window window, ObPrompt *prompt)
     mouse_grab_for_client(self, TRUE);
 
     /* this has to happen before we try focus the window, but we want it to
-       happen after the client's stacking has been determined or it looks bad
-    */
+     happen after the client's stacking has been determined or it looks bad
+     */
     {
         gulong ignore_start;
         if (!config_focus_under_mouse)
@@ -609,21 +575,20 @@ void client_manage(Window window, ObPrompt *prompt)
     client_set_list();
 
     /* watch for when the application stops responding.  only do this for
-       normal windows, i.e. windows which have titlebars and close buttons 
-       and things like that.
-       we don't need to stop pinging on unmanage, because it will be handled
-       automatically by the destroy callback!
-    */
+     normal windows, i.e. windows which have titlebars and close buttons 
+     and things like that.
+     we don't need to stop pinging on unmanage, because it will be handled
+     automatically by the destroy callback!
+     */
     if (self->ping && client_normal(self))
         ping_start(self, client_ping_event);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
 
-    ob_debug("Managed window 0x%lx plate 0x%x (%s)",
-             window, self->w_frame, self->class);
+    ob_debug("Managed window 0x%lx plate 0x%x (%s)", window, self->w_frame,
+            self->class);
 }
-
 
 ObClient *client_fake_manage(Window window)
 {
@@ -639,42 +604,27 @@ ObClient *client_fake_manage(Window window)
 
     client_get_all(self, FALSE);
     /* per-app settings override stuff, and return the settings for other
-       uses too. this returns a shallow copy that needs to be freed */
+     uses too. this returns a shallow copy that needs to be freed */
     settings = client_get_settings_state(self);
 
     client_setup_decor_and_functions(self, FALSE);
 
-    /* create the decoration frame for the client window and adjust its size */
-    Visual *visual = check_32bit_client(self);
-    gulong mask = 0;
-    XSetWindowAttributes attrib;
-    if (visual) {
-        /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
-        /* create a colormap with the visual */
-        attrib.colormap = XCreateColormap(
-                obt_display, RootWindow(obt_display, ob_screen), visual,
-                AllocNone);
-        attrib.background_pixel = BlackPixel(obt_display, ob_screen);
-        attrib.border_pixel = BlackPixel(obt_display, ob_screen);
-    }
-    self->w_frame = createWindow(RootWindow(obt_display, ob_screen), visual,
-            mask, &attrib);
+    /* create decorations */
+    client_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
     self->frame = frame_engine.frame_new(self, self->w_client, self->w_frame);
-    frame_engine.frame_set_decorations (self->frame, self->decorations);
-    frame_engine.frame_update_title (self->frame, self->title);
-    frame_engine.frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    frame_engine.frame_set_decorations(self->frame, self->decorations);
+    frame_engine.frame_update_title(self->frame, self->title);
+    frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
     /* if this occurs while we are focus cycling, the indicator needs to
      match the changes */
     if (focus_cycle_target == self)
         focus_cycle_draw_indicator(self);
-    frame_engine.frame_update_skin (self->frame);
+    frame_engine.frame_update_skin(self->frame);
 
     Strut size;
-    frame_engine.frame_get_size(self->frame, &size);    
-    ob_debug("gave extents left %d right %d top %d bottom %d",
-             size.left, size.right,
-             size.top, size.bottom);
+    frame_engine.frame_get_size(self->frame, &size);
+    ob_debug("gave extents left %d right %d top %d bottom %d", size.left,
+            size.right, size.top, size.bottom);
 
     /* free the ObAppSettings shallow copy */
     g_free(settings);
@@ -694,14 +644,13 @@ void client_unmanage(ObClient *self)
     GSList *it;
     gulong ignore_start;
 
-    ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)",
-             self->w_client, self->w_frame,
-             self->class, self->title ? self->title : "");
+    ob_debug("Unmanaging window: 0x%x plate 0x%x (%s) (%s)", self->w_client,
+            self->w_frame, self->class, self->title ? self->title : "");
 
     g_assert(self != NULL);
 
     /* we dont want events no more. do this before hiding the frame so we
-       don't generate more events */
+     don't generate more events */
     XSelectInput(obt_display, self->w_client, NoEventMask);
 
     /* ignore enter events from the unmap so it doesnt mess with the focus */
@@ -718,7 +667,7 @@ void client_unmanage(ObClient *self)
     mouse_grab_for_client(self, FALSE);
 
     /* remove the window from our save set, unless we are managing an internal
-       ObPrompt window */
+     ObPrompt window */
     if (!self->prompt)
         XChangeSaveSet(obt_display, self->w_client, SetModeDelete);
 
@@ -738,7 +687,7 @@ void client_unmanage(ObClient *self)
     window_remove(self->w_client);
 
     /* once the client is out of the list, update the struts to remove its
-       influence */
+     influence */
     if (STRUT_EXISTS(self->strut))
         screen_update_areas();
 
@@ -746,13 +695,11 @@ void client_unmanage(ObClient *self)
 
     /* tell our parent(s) that we're gone */
     for (it = self->parents; it; it = g_slist_next(it))
-        ((ObClient*)it->data)->transients =
-            g_slist_remove(((ObClient*)it->data)->transients,self);
+        ((ObClient*)it->data)->transients = g_slist_remove(((ObClient*)it->data)->transients, self);
 
     /* tell our transients that we're gone */
     for (it = self->transients; it; it = g_slist_next(it)) {
-        ((ObClient*)it->data)->parents =
-            g_slist_remove(((ObClient*)it->data)->parents, self);
+        ((ObClient*)it->data)->parents = g_slist_remove(((ObClient*)it->data)->parents, self);
         /* we could be keeping our children in a higher layer */
         client_calc_layer(it->data);
     }
@@ -799,8 +746,8 @@ void client_unmanage(ObClient *self)
     XEvent ev;
     gboolean reparent = TRUE;
     /* check if the app has already reparented its window away */
-    while (XCheckTypedWindowEvent(obt_display, self->w_client,
-            ReparentNotify, &ev)) {
+    while (XCheckTypedWindowEvent(obt_display, self->w_client, ReparentNotify,
+            &ev)) {
         /* This check makes sure we don't catch our own reparent action to
          our frame window. This doesn't count as the app reparenting itself
          away of course.
@@ -818,30 +765,31 @@ void client_unmanage(ObClient *self)
     if (reparent) {
         /* according to the ICCCM - if the client doesn't reparent itself,
          then we will reparent the window to root for them */
-        XReparentWindow(obt_display, self->w_client, RootWindow(
-                obt_display, ob_screen), self->area.x,
-                self->area.y);
+        XReparentWindow(obt_display, self->w_client, RootWindow(obt_display,
+                ob_screen), self->area.x, self->area.y);
     }
     frame_engine.frame_ungrab(self->frame, window_map);
-    obt_main_loop_timeout_remove_data(ob_main_loop, client_flash_timeout, self, TRUE);
+    obt_main_loop_timeout_remove_data(ob_main_loop, client_flash_timeout, self,
+            TRUE);
     frame_engine.frame_free(self->frame);
     self->frame = NULL;
 
     if (ob_state() != OB_STATE_EXITING) {
         /* these values should not be persisted across a window
-           unmapping/mapping */
+         unmapping/mapping */
         OBT_PROP_ERASE(self->w_client, NET_WM_DESKTOP);
         OBT_PROP_ERASE(self->w_client, NET_WM_STATE);
         OBT_PROP_ERASE(self->w_client, WM_STATE);
-    } else {
+    }
+    else {
         /* if we're left in an unmapped state, the client wont be mapped.
-           this is bad, since we will no longer be managing the window on
-           restart */
+         this is bad, since we will no longer be managing the window on
+         restart */
         XMapWindow(obt_display, self->w_client);
     }
 
     /* these should not be left on the window ever.  other window managers
-       don't necessarily use them and it will mess them up (like compiz) */
+     don't necessarily use them and it will mess them up (like compiz) */
     OBT_PROP_ERASE(self->w_client, NET_WM_VISIBLE_NAME);
     OBT_PROP_ERASE(self->w_client, NET_WM_VISIBLE_ICON_NAME);
 
@@ -878,7 +826,7 @@ void client_fake_unmanage(ObClient *self)
 }
 
 /*! Returns a new structure containing the per-app settings for this client.
-  The returned structure needs to be freed with g_free. */
+ The returned structure needs to be freed with g_free. */
 static ObAppSettings *client_get_settings_state(ObClient *self)
 {
     ObAppSettings *settings;
@@ -893,24 +841,22 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         g_assert(app->name != NULL || app->class != NULL);
 
         /* we know that either name or class is not NULL so it will have to
-           match to use the rule */
-        if (app->name &&
-            !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
+         match to use the rule */
+        if (app->name && !g_pattern_match(app->name, strlen(self->name),
+                self->name, NULL))
             match = FALSE;
-        else if (app->class &&
-                !g_pattern_match(app->class,
-                                 strlen(self->class), self->class, NULL))
+        else if (app->class && !g_pattern_match(app->class,
+                strlen(self->class), self->class, NULL))
             match = FALSE;
-        else if (app->role &&
-                 !g_pattern_match(app->role,
-                                  strlen(self->role), self->role, NULL))
+        else if (app->role && !g_pattern_match(app->role, strlen(self->role),
+                self->role, NULL))
             match = FALSE;
 
         if (match) {
             ob_debug("Window matching: %s", app->name);
 
             /* copy the settings to our struct, overriding the existing
-               settings if they are not defaults */
+             settings if they are not defaults */
             config_app_settings_copy_non_defaults(app, settings);
         }
     }
@@ -937,8 +883,8 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
     if (settings->desktop) {
         if (settings->desktop == DESKTOP_ALL)
             self->desktop = settings->desktop;
-        else if (settings->desktop > 0 &&
-                 settings->desktop <= screen_num_desktops)
+        else if (settings->desktop > 0 && settings->desktop
+                <= screen_num_desktops)
             self->desktop = settings->desktop - 1;
     }
 
@@ -961,19 +907,17 @@ static void client_restore_session_state(ObClient *self)
 {
     GList *it;
 
-    ob_debug_type(OB_DEBUG_SM,
-                  "Restore session for client %s", self->title);
+    ob_debug_type(OB_DEBUG_SM, "Restore session for client %s", self->title);
 
     if (!(it = session_state_find(self))) {
-        ob_debug_type(OB_DEBUG_SM,
-                      "Session data not found for client %s", self->title);
+        ob_debug_type(OB_DEBUG_SM, "Session data not found for client %s",
+                self->title);
         return;
     }
 
     self->session = it->data;
 
-    ob_debug_type(OB_DEBUG_SM, "Session data loaded for client %s",
-                  self->title);
+    ob_debug_type(OB_DEBUG_SM, "Session data loaded for client %s", self->title);
 
     RECT_SET_POINT(self->area, self->session->x, self->session->y);
     self->positioned = USPosition;
@@ -982,12 +926,12 @@ static void client_restore_session_state(ObClient *self)
         self->area.width = self->session->w;
     if (self->session->h > 0)
         self->area.height = self->session->h;
-    XResizeWindow(obt_display, self->w_client,
-                  self->area.width, self->area.height);
+    XResizeWindow(obt_display, self->w_client, self->area.width,
+            self->area.height);
 
-    self->desktop = (self->session->desktop == DESKTOP_ALL ?
-                     self->session->desktop :
-                     MIN(screen_num_desktops - 1, self->session->desktop));
+    self->desktop
+            = (self->session->desktop == DESKTOP_ALL ? self->session->desktop
+                    : MIN(screen_num_desktops - 1, self->session->desktop));
     OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     self->shaded = self->session->shaded;
@@ -1007,7 +951,7 @@ static void client_restore_session_state(ObClient *self)
     else {
         frame_engine.frame_trigger(self->frame, OB_TRIGGER_UNMAX_HORZ);
     }
-    
+
     if (self->session->max_vert) {
         frame_engine.frame_trigger(self->frame, OB_TRIGGER_MAX_VERT);
     }
@@ -1020,10 +964,12 @@ static gboolean client_restore_session_stacking(ObClient *self)
 {
     GList *it, *mypos;
 
-    if (!self->session) return FALSE;
+    if (!self->session)
+        return FALSE;
 
     mypos = g_list_find(session_saved_state, self->session);
-    if (!mypos) return FALSE;
+    if (!mypos)
+        return FALSE;
 
     /* start above me and look for the first client */
     for (it = g_list_previous(mypos); it; it = g_list_previous(it)) {
@@ -1034,7 +980,7 @@ static gboolean client_restore_session_stacking(ObClient *self)
             /* found a client that was in the session, so go below it */
             if (c->session == it->data) {
                 stacking_below(CLIENT_AS_WINDOW(self),
-                               CLIENT_AS_WINDOW(cit->data));
+                        CLIENT_AS_WINDOW(cit->data));
                 return TRUE;
             }
         }
@@ -1046,15 +992,14 @@ void client_move_onscreen(ObClient *self, gboolean rude)
 {
     gint x = self->area.x;
     gint y = self->area.y;
-    if (client_find_onscreen(self, &x, &y,
-                             self->area.width,
-                             self->area.height, rude)) {
+    if (client_find_onscreen(self, &x, &y, self->area.width, self->area.height,
+            rude)) {
         client_move(self, x, y);
     }
 }
 
 gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
-                              gboolean rude)
+        gboolean rude)
 {
     gint ox = *x, oy = *y;
     gboolean rudel = rude, ruder = rude, rudet = rude, rudeb = rude;
@@ -1077,7 +1022,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     fh = size.top + h + size.bottom;
 
     /* If rudeness wasn't requested, then still be rude in a given direction
-       if the client is not moving, only resizing in that direction */
+     if the client is not moving, only resizing in that direction */
     if (!rude) {
         Point oldtl, oldtr, oldbl, oldbr;
         Point newtl, newtr, newbl, newbr;
@@ -1086,8 +1031,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         Rect area;
         frame_engine.frame_get_window_area(self->frame, &area);
         POINT_SET(oldtl, area.x, area.y);
-        POINT_SET(oldbr, area.x + area.width - 1,
-                  area.y + area.height - 1);
+        POINT_SET(oldbr, area.x + area.width - 1, area.y + area.height - 1);
         POINT_SET(oldtr, oldbr.x, oldtl.y);
         POINT_SET(oldbl, oldtl.x, oldbr.y);
 
@@ -1117,10 +1061,10 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     }
 
     /* we iterate through every monitor that the window is at least partially
-       on, to make sure it is obeying the rules on them all
+     on, to make sure it is obeying the rules on them all
 
-       if the window does not appear on any monitors, then use the first one
-    */
+     if the window does not appear on any monitors, then use the first one
+     */
     found_mon = FALSE;
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *a;
@@ -1130,20 +1074,21 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
                 continue;
 
             /* the window is not inside any monitor! so just use the first
-               one */
+             one */
             a = screen_area(self->desktop, 0, NULL);
-        } else {
+        }
+        else {
             found_mon = TRUE;
             a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &desired);
         }
 
         /* This makes sure windows aren't entirely outside of the screen so you
-           can't see them at all.
-           It makes sure 10% of the window is on the screen at least. At don't
-           let it move itself off the top of the screen, which would hide the
-           titlebar on you. (The user can still do this if they want too, it's
-           only limiting the application.
-        */
+         can't see them at all.
+         It makes sure 10% of the window is on the screen at least. At don't
+         let it move itself off the top of the screen, which would hide the
+         titlebar on you. (The user can still do this if they want too, it's
+         only limiting the application.
+         */
         if (client_normal(self)) {
             if (!self->strut.right && *x + fw/10 >= a->x + a->width - 1)
                 *x = a->x + a->width - fw/10;
@@ -1156,16 +1101,18 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
         }
 
         /* This here doesn't let windows even a pixel outside the
-           struts/screen. When called from client_manage, programs placing
-           themselves are forced completely onscreen, while things like
-           xterm -geometry resolution-width/2 will work fine. Trying to
-           place it completely offscreen will be handled in the above code.
-           Sorry for this confused comment, i am tired. */
-        if (rudel && !self->strut.left && *x < a->x) *x = a->x;
+         struts/screen. When called from client_manage, programs placing
+         themselves are forced completely onscreen, while things like
+         xterm -geometry resolution-width/2 will work fine. Trying to
+         place it completely offscreen will be handled in the above code.
+         Sorry for this confused comment, i am tired. */
+        if (rudel && !self->strut.left && *x < a->x)
+            *x = a->x;
         if (ruder && !self->strut.right && *x + fw > a->x + a->width)
             *x = a->x + MAX(0, a->width - fw);
 
-        if (rudet && !self->strut.top && *y < a->y) *y = a->y;
+        if (rudet && !self->strut.top && *y < a->y)
+            *y = a->y;
         if (rudeb && !self->strut.bottom && *y + fh > a->y + a->height)
             *y = a->y + MAX(0, a->height - fh);
 
@@ -1192,7 +1139,7 @@ static void client_get_all(ObClient *self, gboolean real)
     client_update_normal_hints(self);
 
     /* get the session related properties, these can change decorations
-       from per-app settings */
+     from per-app settings */
     client_get_session_ids(self);
 
     /* now we got everything that can affect the decorations */
@@ -1211,7 +1158,7 @@ static void client_get_all(ObClient *self, gboolean real)
 
     client_get_startup_id(self);
     client_get_desktop(self);/* uses transient data/group/startup id if a
-                                desktop is not specified */
+     desktop is not specified */
     client_get_shaped(self);
 
     {
@@ -1234,11 +1181,10 @@ static void client_get_all(ObClient *self, gboolean real)
 
 static void client_get_startup_id(ObClient *self)
 {
-    if (!(OBT_PROP_GETS(self->w_client, NET_STARTUP_ID, utf8,
-                        &self->startup_id)))
+    if (!(OBT_PROP_GETS(self->w_client, NET_STARTUP_ID, utf8, &self->startup_id)))
         if (self->group)
-            OBT_PROP_GETS(self->group->leader,
-                          NET_STARTUP_ID, utf8, &self->startup_id);
+            OBT_PROP_GETS(self->group->leader, NET_STARTUP_ID, utf8,
+                    &self->startup_id);
 }
 
 static void client_get_area(ObClient *self)
@@ -1254,7 +1200,7 @@ static void client_get_area(ObClient *self)
     self->border_width = wattrib.border_width;
 
     ob_debug("client area: %d %d  %d %d  bw %d", wattrib.x, wattrib.y,
-             wattrib.width, wattrib.height, wattrib.border_width);
+            wattrib.width, wattrib.height, wattrib.border_width);
 }
 
 static void client_get_desktop(ObClient *self)
@@ -1267,17 +1213,19 @@ static void client_get_desktop(ObClient *self)
         else
             self->desktop = d;
         ob_debug("client requested desktop 0x%x", self->desktop);
-    } else {
+    }
+    else {
         GSList *it;
         gboolean first = TRUE;
         guint all = screen_num_desktops; /* not a valid value */
 
         /* if they are all on one desktop, then open it on the
-           same desktop */
+         same desktop */
         for (it = self->parents; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
 
-            if (c->desktop == DESKTOP_ALL) continue;
+            if (c->desktop == DESKTOP_ALL)
+                continue;
 
             if (first) {
                 all = c->desktop;
@@ -1289,22 +1237,21 @@ static void client_get_desktop(ObClient *self)
         if (all != screen_num_desktops) {
             self->desktop = all;
 
-            ob_debug("client desktop set from parents: 0x%x",
-                     self->desktop);
+            ob_debug("client desktop set from parents: 0x%x", self->desktop);
         }
         /* try get from the startup-notification protocol */
         else if (sn_get_desktop(self->startup_id, &self->desktop)) {
-            if (self->desktop >= screen_num_desktops &&
-                self->desktop != DESKTOP_ALL)
+            if (self->desktop >= screen_num_desktops && self->desktop
+                    != DESKTOP_ALL)
                 self->desktop = screen_num_desktops - 1;
             ob_debug("client desktop set from startup-notification: 0x%x",
-                     self->desktop);
+                    self->desktop);
         }
         /* defaults to the current desktop */
         else {
             self->desktop = screen_desktop;
             ob_debug("client desktop set to the current desktop: %d",
-                     self->desktop);
+                    self->desktop);
         }
     }
 }
@@ -1363,8 +1310,8 @@ static void client_get_shaped(ObClient *self)
         XShapeSelectInput(obt_display, self->w_client, ShapeNotifyMask);
 
         XShapeQueryExtents(obt_display, self->w_client, &s, &foo,
-                           &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
-                           &ufoo);
+                &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
+                &ufoo);
         self->shaped = (s != 0);
     }
 #endif
@@ -1383,54 +1330,49 @@ void client_update_transient_for(ObClient *self)
             g_assert(tw != CLIENT_AS_WINDOW(self));
             if (tw && WINDOW_IS_CLIENT(tw)) {
                 /* watch out for windows with a parent that is something
-                   different, like a dockapp for example */
+                 different, like a dockapp for example */
                 target = WINDOW_AS_CLIENT(tw);
             }
         }
 
         /* Setting the transient_for to Root is actually illegal, however
-           applications from time have done this to specify transient for
-           their group */
+         applications from time have done this to specify transient for
+         their group */
         if (!target && self->group && t == obt_root(ob_screen))
             trangroup = TRUE;
-    } else if (self->group && self->transient)
+    }
+    else if (self->group && self->transient)
         trangroup = TRUE;
 
     client_update_transient_tree(self, self->group, self->group,
-                                 self->transient_for_group, trangroup,
-                                 client_direct_parent(self), target);
+            self->transient_for_group, trangroup, client_direct_parent(self),
+            target);
     self->transient_for_group = trangroup;
 
 }
 
-static void client_update_transient_tree(ObClient *self,
-                                         ObGroup *oldgroup, ObGroup *newgroup,
-                                         gboolean oldgtran, gboolean newgtran,
-                                         ObClient* oldparent,
-                                         ObClient *newparent)
+static void client_update_transient_tree(ObClient *self, ObGroup *oldgroup,
+        ObGroup *newgroup, gboolean oldgtran, gboolean newgtran,
+        ObClient* oldparent, ObClient *newparent)
 {
     GSList *it, *next;
     ObClient *c;
 
     g_assert(!oldgtran || oldgroup);
     g_assert(!newgtran || newgroup);
-    g_assert((!oldgtran && !oldparent) ||
-             (oldgtran && !oldparent) ||
-             (!oldgtran && oldparent));
-    g_assert((!newgtran && !newparent) ||
-             (newgtran && !newparent) ||
-             (!newgtran && newparent));
+    g_assert((!oldgtran && !oldparent) || (oldgtran && !oldparent)
+            || (!oldgtran && oldparent));
+    g_assert((!newgtran && !newparent) || (newgtran && !newparent)
+            || (!newgtran && newparent));
 
     /* * *
-      Group transient windows are not allowed to have other group
-      transient windows as their children.
-      * * */
-
+     Group transient windows are not allowed to have other group
+     transient windows as their children.
+     * * */
 
     /* No change has occured */
-    if (oldgroup == newgroup &&
-        oldgtran == newgtran &&
-        oldparent == newparent) return;
+    if (oldgroup == newgroup && oldgtran == newgtran && oldparent == newparent)
+        return;
 
     /** Remove the client from the transient tree **/
 
@@ -1450,14 +1392,11 @@ static void client_update_transient_tree(ObClient *self,
     /** Re-add the client to the transient tree **/
 
     /* If we're transient for a group then we need to add ourselves to all our
-       parents */
+     parents */
     if (newgtran) {
         for (it = newgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
-            if (c != self &&
-                !client_search_top_direct_parent(c)->transient_for_group &&
-                client_normal(c))
-            {
+            if (c != self && !client_search_top_direct_parent(c)->transient_for_group && client_normal(c)) {
                 c->transients = g_slist_prepend(c->transients, self);
                 self->parents = g_slist_prepend(self->parents, c);
             }
@@ -1465,40 +1404,34 @@ static void client_update_transient_tree(ObClient *self,
     }
 
     /* If we are now transient for a single window we need to add ourselves to
-       its children
+     its children
 
-       WARNING: Cyclical transient ness is possible if two windows are
-       transient for eachother.
-    */
+     WARNING: Cyclical transient ness is possible if two windows are
+     transient for eachother.
+     */
     else if (newparent &&
-             /* don't make ourself its child if it is already our child */
-             !client_is_direct_child(self, newparent) &&
-             client_normal(newparent))
-    {
+    /* don't make ourself its child if it is already our child */
+    !client_is_direct_child(self, newparent) && client_normal(newparent)) {
         newparent->transients = g_slist_prepend(newparent->transients, self);
         self->parents = g_slist_prepend(self->parents, newparent);
     }
 
     /* Add any group transient windows to our children. But if we're transient
-       for the group, then other group transients are not our children.
+     for the group, then other group transients are not our children.
 
-       WARNING: Cyclical transient-ness is possible. For e.g. if:
-       A is transient for the group
-       B is transient for A
-       C is transient for B
-       A can't be transient for C or we have a cycle
-    */
-    if (!newgtran && newgroup &&
-        (!newparent ||
-         !client_search_top_direct_parent(newparent)->transient_for_group) &&
-        client_normal(self))
-    {
+     WARNING: Cyclical transient-ness is possible. For e.g. if:
+     A is transient for the group
+     B is transient for A
+     C is transient for B
+     A can't be transient for C or we have a cycle
+     */
+    if (!newgtran && newgroup && (!newparent
+            || !client_search_top_direct_parent(newparent)->transient_for_group) && client_normal(self)) {
         for (it = newgroup->members; it; it = g_slist_next(it)) {
             c = it->data;
             if (c != self && c->transient_for_group &&
-                /* Don't make it our child if it is already our parent */
-                !client_is_direct_child(c, self))
-            {
+            /* Don't make it our child if it is already our parent */
+            !client_is_direct_child(c, self)) {
                 self->transients = g_slist_prepend(self->transients, c);
                 c->parents = g_slist_prepend(c->parents, self);
             }
@@ -1506,17 +1439,15 @@ static void client_update_transient_tree(ObClient *self,
     }
 
     /** If we change our group transient-ness, our children change their
-        effect group transient-ness, which affects how they relate to other
-        group windows **/
+     effect group transient-ness, which affects how they relate to other
+     group windows **/
 
     for (it = self->transients; it; it = g_slist_next(it)) {
         c = it->data;
         if (!c->transient_for_group)
             client_update_transient_tree(c, c->group, c->group,
-                                         c->transient_for_group,
-                                         c->transient_for_group,
-                                         client_direct_parent(c),
-                                         client_direct_parent(c));
+                    c->transient_for_group, c->transient_for_group,
+                    client_direct_parent(c), client_direct_parent(c));
     }
 }
 
@@ -1527,8 +1458,8 @@ static void client_get_mwm_hints(ObClient *self)
 
     self->mwmhints.flags = 0; /* default to none */
 
-    if (OBT_PROP_GETA32(self->w_client, MOTIF_WM_HINTS, MOTIF_WM_HINTS,
-                        &hints, &num)) {
+    if (OBT_PROP_GETA32(self->w_client, MOTIF_WM_HINTS, MOTIF_WM_HINTS, &hints,
+            &num)) {
         if (num >= OB_MWM_ELEMENTS) {
             self->mwmhints.flags = hints[0];
             self->mwmhints.functions = hints[1];
@@ -1566,12 +1497,11 @@ void client_get_type_and_transientness(ObClient *self)
                 self->type = OB_CLIENT_TYPE_DIALOG;
             else if (val[i] == OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_NORMAL))
                 self->type = OB_CLIENT_TYPE_NORMAL;
-            else if (val[i] == OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE))
-            {
+            else if (val[i] == OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE)) {
                 /* prevent this window from getting any decor or
-                   functionality */
-                self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS |
-                                         OB_MWM_FLAG_DECORATIONS);
+                 functionality */
+                self->mwmhints.flags &= (OB_MWM_FLAG_FUNCTIONS
+                        | OB_MWM_FLAG_DECORATIONS);
                 self->mwmhints.decorations = 0;
                 self->mwmhints.functions = 0;
             }
@@ -1586,8 +1516,8 @@ void client_get_type_and_transientness(ObClient *self)
 
     if (self->type == (ObClientType) -1) {
         /*the window type hint was not set, which means we either classify
-          ourself as a normal window or a dialog, depending on if we are a
-          transient. */
+         ourself as a normal window or a dialog, depending on if we are a
+         transient. */
         if (self->transient)
             self->type = OB_CLIENT_TYPE_DIALOG;
         else
@@ -1595,11 +1525,9 @@ void client_get_type_and_transientness(ObClient *self)
     }
 
     /* then, based on our type, we can update our transientness.. */
-    if (self->type == OB_CLIENT_TYPE_DIALOG ||
-        self->type == OB_CLIENT_TYPE_TOOLBAR ||
-        self->type == OB_CLIENT_TYPE_MENU ||
-        self->type == OB_CLIENT_TYPE_UTILITY)
-    {
+    if (self->type == OB_CLIENT_TYPE_DIALOG || self->type
+            == OB_CLIENT_TYPE_TOOLBAR || self->type == OB_CLIENT_TYPE_MENU
+            || self->type == OB_CLIENT_TYPE_UTILITY) {
         self->transient = TRUE;
     }
 }
@@ -1619,18 +1547,18 @@ void client_update_protocols(ObClient *self)
                 self->delete_window = TRUE;
             else if (proto[i] == OBT_PROP_ATOM(WM_TAKE_FOCUS))
                 /* if this protocol is requested, then the window will be
-                   notified whenever we want it to receive focus */
+                 notified whenever we want it to receive focus */
                 self->focus_notify = TRUE;
             else if (proto[i] == OBT_PROP_ATOM(NET_WM_PING))
                 /* if this protocol is requested, then the window will allow
-                   pings to determine if it is still alive */
+                 pings to determine if it is still alive */
                 self->ping = TRUE;
 #ifdef SYNC
             else if (proto[i] == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST))
-                /* if this protocol is requested, then resizing the
-                   window will be synchronized between the frame and the
-                   client */
-                self->sync_request = TRUE;
+            /* if this protocol is requested, then resizing the
+             window will be synchronized between the frame and the
+             client */
+            self->sync_request = TRUE;
 #endif
         }
         g_free(proto);
@@ -1645,8 +1573,9 @@ void client_update_sync_request_counter(ObClient *self)
     if (OBT_PROP_GET32(self->w_client, NET_WM_SYNC_REQUEST_COUNTER, CARDINAL,&i))
     {
         self->sync_counter = i;
-    } else
-        self->sync_counter = None;
+    }
+    else
+    self->sync_counter = None;
 }
 #endif
 
@@ -1660,7 +1589,8 @@ static void client_get_colormap(ObClient *self)
 
 void client_update_colormap(ObClient *self, Colormap colormap)
 {
-    if (colormap == self->colormap) return;
+    if (colormap == self->colormap)
+        return;
 
     ob_debug("Setting client %s colormap: 0x%x", self->title, colormap);
 
@@ -1668,7 +1598,8 @@ void client_update_colormap(ObClient *self, Colormap colormap)
         screen_install_colormap(self, FALSE); /* uninstall old one */
         self->colormap = colormap;
         screen_install_colormap(self, FALSE); /* install new one */
-    } else
+    }
+    else
         self->colormap = colormap;
 }
 
@@ -1688,8 +1619,8 @@ void client_update_normal_hints(ObClient *self)
     /* get the hints from the window */
     if (XGetWMNormalHints(obt_display, self->w_client, &size, &ret)) {
         /* normal windows can't request placement! har har
-        if (!client_normal(self))
-        */
+         if (!client_normal(self))
+         */
         self->positioned = (size.flags & (PPosition|USPosition));
         self->sized = (size.flags & (PSize|USSize));
 
@@ -1698,11 +1629,11 @@ void client_update_normal_hints(ObClient *self)
 
         if (size.flags & PAspect) {
             if (size.min_aspect.y)
-                self->min_ratio =
-                    (gfloat) size.min_aspect.x / size.min_aspect.y;
+                self->min_ratio = (gfloat) size.min_aspect.x
+                        / size.min_aspect.y;
             if (size.max_aspect.y)
-                self->max_ratio =
-                    (gfloat) size.max_aspect.x / size.max_aspect.y;
+                self->max_ratio = (gfloat) size.max_aspect.x
+                        / size.max_aspect.y;
         }
 
         if (size.flags & PMinSize)
@@ -1718,11 +1649,11 @@ void client_update_normal_hints(ObClient *self)
             SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
 
         ob_debug("Normal hints: min size (%d %d) max size (%d %d)",
-                 self->min_size.width, self->min_size.height,
-                 self->max_size.width, self->max_size.height);
-        ob_debug("size inc (%d %d) base size (%d %d)",
-                 self->size_inc.width, self->size_inc.height,
-                 self->base_size.width, self->base_size.height);
+                self->min_size.width, self->min_size.height,
+                self->max_size.width, self->max_size.height);
+        ob_debug("size inc (%d %d) base size (%d %d)", self->size_inc.width,
+                self->size_inc.height, self->base_size.width,
+                self->base_size.height);
     }
     else
         ob_debug("Normal hints: not set");
@@ -1731,42 +1662,31 @@ void client_update_normal_hints(ObClient *self)
 void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
 {
     /* start with everything (cept fullscreen) */
-    self->decorations =
-        (OB_FRAME_DECOR_TITLEBAR |
-         OB_FRAME_DECOR_HANDLE |
-         OB_FRAME_DECOR_GRIPS |
-         OB_FRAME_DECOR_BORDER |
-         OB_FRAME_DECOR_ICON |
-         OB_FRAME_DECOR_ALLDESKTOPS |
-         OB_FRAME_DECOR_ICONIFY |
-         OB_FRAME_DECOR_MAXIMIZE |
-         OB_FRAME_DECOR_SHADE |
-         OB_FRAME_DECOR_CLOSE);
-    self->functions =
-        (OB_CLIENT_FUNC_RESIZE |
-         OB_CLIENT_FUNC_MOVE |
-         OB_CLIENT_FUNC_ICONIFY |
-         OB_CLIENT_FUNC_MAXIMIZE |
-         OB_CLIENT_FUNC_SHADE |
-         OB_CLIENT_FUNC_CLOSE |
-         OB_CLIENT_FUNC_BELOW |
-         OB_CLIENT_FUNC_ABOVE |
-         OB_CLIENT_FUNC_UNDECORATE);
+    self->decorations = (OB_FRAME_DECOR_TITLEBAR | OB_FRAME_DECOR_HANDLE
+            | OB_FRAME_DECOR_GRIPS | OB_FRAME_DECOR_BORDER
+            | OB_FRAME_DECOR_ICON | OB_FRAME_DECOR_ALLDESKTOPS
+            | OB_FRAME_DECOR_ICONIFY | OB_FRAME_DECOR_MAXIMIZE
+            | OB_FRAME_DECOR_SHADE | OB_FRAME_DECOR_CLOSE);
+    self->functions = (OB_CLIENT_FUNC_RESIZE | OB_CLIENT_FUNC_MOVE
+            | OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_MAXIMIZE
+            | OB_CLIENT_FUNC_SHADE | OB_CLIENT_FUNC_CLOSE
+            | OB_CLIENT_FUNC_BELOW | OB_CLIENT_FUNC_ABOVE
+            | OB_CLIENT_FUNC_UNDECORATE);
 
-    if (!(self->min_size.width < self->max_size.width ||
-          self->min_size.height < self->max_size.height))
+    if (!(self->min_size.width < self->max_size.width || self->min_size.height
+            < self->max_size.height))
         self->functions &= ~OB_CLIENT_FUNC_RESIZE;
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
         /* normal windows retain all of the possible decorations and
-           functionality, and can be fullscreen */
+         functionality, and can be fullscreen */
         self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
         break;
 
     case OB_CLIENT_TYPE_DIALOG:
         /* sometimes apps make dialog windows fullscreen for some reason (for
-           e.g. kpdf does this..) */
+         e.g. kpdf does this..) */
         self->functions |= OB_CLIENT_FUNC_FULLSCREEN;
         break;
 
@@ -1777,15 +1697,14 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     case OB_CLIENT_TYPE_MENU:
     case OB_CLIENT_TYPE_TOOLBAR:
         /* these windows can't iconify or maximize */
-        self->decorations &= ~(OB_FRAME_DECOR_ICONIFY |
-                               OB_FRAME_DECOR_MAXIMIZE);
-        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY |
-                             OB_CLIENT_FUNC_MAXIMIZE);
+        self->decorations
+                &= ~(OB_FRAME_DECOR_ICONIFY | OB_FRAME_DECOR_MAXIMIZE);
+        self->functions &= ~(OB_CLIENT_FUNC_ICONIFY | OB_CLIENT_FUNC_MAXIMIZE);
         break;
 
     case OB_CLIENT_TYPE_SPLASH:
         /* these don't get get any decorations, and the only thing you can
-           do with them is move them */
+         do with them is move them */
         self->decorations = 0;
         self->functions = OB_CLIENT_FUNC_MOVE;
         break;
@@ -1798,22 +1717,21 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
 
     case OB_CLIENT_TYPE_DOCK:
         /* these windows are not manipulated by the window manager, but they
-           can set below layer which has a special meaning */
+         can set below layer which has a special meaning */
         self->decorations = 0;
         self->functions = OB_CLIENT_FUNC_BELOW;
         break;
     }
 
     /* Mwm Hints are applied subtractively to what has already been chosen for
-       decor and functionality */
+     decor and functionality */
     if (self->mwmhints.flags & OB_MWM_FLAG_DECORATIONS) {
         if (! (self->mwmhints.decorations & OB_MWM_DECOR_ALL)) {
-            if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE) ||
-                   (self->mwmhints.decorations & OB_MWM_DECOR_TITLE)))
-            {
+            if (! ((self->mwmhints.decorations & OB_MWM_DECOR_HANDLE)
+                    || (self->mwmhints.decorations & OB_MWM_DECOR_TITLE))) {
                 /* if the mwm hints request no handle or title, then all
-                   decorations are disabled, but keep the border if that's
-                   specified */
+                 decorations are disabled, but keep the border if that's
+                 specified */
                 if (self->mwmhints.decorations & OB_MWM_DECOR_BORDER)
                     self->decorations = OB_FRAME_DECOR_BORDER;
                 else
@@ -1829,14 +1747,14 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
             if (! (self->mwmhints.functions & OB_MWM_FUNC_MOVE))
                 self->functions &= ~OB_CLIENT_FUNC_MOVE;
             /* dont let mwm hints kill any buttons
-               if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
-               self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
-               if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
-               self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
-            */
+             if (! (self->mwmhints.functions & OB_MWM_FUNC_ICONIFY))
+             self->functions &= ~OB_CLIENT_FUNC_ICONIFY;
+             if (! (self->mwmhints.functions & OB_MWM_FUNC_MAXIMIZE))
+             self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
+             */
             /* dont let mwm hints kill the close button
-               if (! (self->mwmhints.functions & MwmFunc_Close))
-               self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
+             if (! (self->mwmhints.functions & MwmFunc_Close))
+             self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
         }
     }
 
@@ -1848,9 +1766,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
         self->decorations &= ~(OB_FRAME_DECOR_GRIPS | OB_FRAME_DECOR_HANDLE);
 
     /* can't maximize without moving/resizing */
-    if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) &&
-          (self->functions & OB_CLIENT_FUNC_MOVE) &&
-          (self->functions & OB_CLIENT_FUNC_RESIZE))) {
+    if (!((self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->functions
+            & OB_CLIENT_FUNC_MOVE) && (self->functions & OB_CLIENT_FUNC_RESIZE))) {
         self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
@@ -1863,12 +1780,12 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     }
 
     /* If there are no decorations to remove, don't allow the user to try
-       toggle the state */
+     toggle the state */
     if (self->decorations == 0)
         self->functions &= ~OB_CLIENT_FUNC_UNDECORATE;
 
     /* finally, the user can have requested no decorations, which overrides
-       everything (but doesnt give it a border if it doesnt have one) */
+     everything (but doesnt give it a border if it doesnt have one) */
     if (self->undecorated)
         self->decorations = 0;
 
@@ -1878,9 +1795,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
 
     /* now we need to check against rules for the client's current state */
     if (self->fullscreen) {
-        self->functions &= (OB_CLIENT_FUNC_CLOSE |
-                            OB_CLIENT_FUNC_FULLSCREEN |
-                            OB_CLIENT_FUNC_ICONIFY);
+        self->functions &= (OB_CLIENT_FUNC_CLOSE | OB_CLIENT_FUNC_FULLSCREEN
+                | OB_CLIENT_FUNC_ICONIFY);
         self->decorations = 0;
     }
 
@@ -1927,25 +1843,30 @@ static void client_change_allowed_actions(ObClient *self)
 
     /* make sure the window isn't breaking any rules now
 
-       don't check ICONIFY here.  just cuz a window can't iconify doesnt mean
-       it can't be iconified with its parent
-    */
+     don't check ICONIFY here.  just cuz a window can't iconify doesnt mean
+     it can't be iconified with its parent
+     */
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE) && self->shaded) {
-        if (self->frame) client_shade(self, FALSE);
-        else self->shaded = FALSE;
+        if (self->frame)
+            client_shade(self, FALSE);
+        else
+            self->shaded = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) && self->fullscreen) {
-        if (self->frame) client_fullscreen(self, FALSE);
-        else self->fullscreen = FALSE;
+        if (self->frame)
+            client_fullscreen(self, FALSE);
+        else
+            self->fullscreen = FALSE;
     }
-    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
-                                                         self->max_vert)) {
-        if (self->frame) client_maximize(self, FALSE, 0);
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz
+            || self->max_vert)) {
+        if (self->frame)
+            client_maximize(self, FALSE, 0);
         else {
             self->max_vert = self->max_horz = FALSE;
-            frame_engine.frame_trigger (self->frame, OB_TRIGGER_UNMAX_VERT);
-            frame_engine.frame_trigger (self->frame, OB_TRIGGER_UNMAX_HORZ);
+            frame_engine.frame_trigger(self->frame, OB_TRIGGER_UNMAX_VERT);
+            frame_engine.frame_trigger(self->frame, OB_TRIGGER_UNMAX_HORZ);
         }
 
     }
@@ -1965,7 +1886,7 @@ void client_update_wmhints(ObClient *self)
             self->can_focus = hints->input;
 
         /* only do this when first managing the window *AND* when we aren't
-           starting up! */
+         starting up! */
         if (ob_state() != OB_STATE_STARTING && self->frame == NULL)
             if (hints->flags & StateHint)
                 self->iconic = hints->initial_state == IconicState;
@@ -1981,9 +1902,7 @@ void client_update_wmhints(ObClient *self)
             hints->window_group = None;
 
         /* did the group state change? */
-        if (hints->window_group !=
-            (self->group ? self->group->leader : None))
-        {
+        if (hints->window_group != (self->group ? self->group->leader : None)) {
             ObGroup *oldgroup = self->group;
 
             /* remove from the old group if there was one */
@@ -1998,35 +1917,32 @@ void client_update_wmhints(ObClient *self)
             }
 
             /* Put ourselves into the new group's transient tree, and remove
-               ourselves from the old group's */
+             ourselves from the old group's */
             client_update_transient_tree(self, oldgroup, self->group,
-                                         self->transient_for_group,
-                                         self->transient_for_group,
-                                         client_direct_parent(self),
-                                         client_direct_parent(self));
+                    self->transient_for_group, self->transient_for_group,
+                    client_direct_parent(self), client_direct_parent(self));
 
             /* Lastly, being in a group, or not, can change if the window is
-               transient for anything.
+             transient for anything.
 
-               The logic for this is:
-               self->transient = TRUE always if the window wants to be
-               transient for something, even if transient_for was NULL because
-               it wasn't in a group before.
+             The logic for this is:
+             self->transient = TRUE always if the window wants to be
+             transient for something, even if transient_for was NULL because
+             it wasn't in a group before.
 
-               If parents was NULL and oldgroup was NULL we can assume
-               that when we add the new group, it will become transient for
-               something.
+             If parents was NULL and oldgroup was NULL we can assume
+             that when we add the new group, it will become transient for
+             something.
 
-               If transient_for_group is TRUE, then it must have already
-               had a group. If it is getting a new group, the above call to
-               client_update_transient_tree has already taken care of
-               everything ! If it is losing all group status then it will
-               no longer be transient for anything and that needs to be
-               updated.
-            */
-            if (self->transient &&
-                ((self->parents == NULL && oldgroup == NULL) ||
-                 (self->transient_for_group && !self->group)))
+             If transient_for_group is TRUE, then it must have already
+             had a group. If it is getting a new group, the above call to
+             client_update_transient_tree has already taken care of
+             everything ! If it is losing all group status then it will
+             no longer be transient for anything and that needs to be
+             updated.
+             */
+            if (self->transient && ((self->parents == NULL && oldgroup == NULL)
+                    || (self->transient_for_group && !self->group)))
                 client_update_transient_for(self);
         }
 
@@ -2050,14 +1966,15 @@ void client_update_title(ObClient *self)
     if (!OBT_PROP_GETS(self->w_client, NET_WM_NAME, utf8, &data)) {
         /* try old x stuff */
         if (!(OBT_PROP_GETS(self->w_client, WM_NAME, locale, &data)
-              || OBT_PROP_GETS(self->w_client, WM_NAME, utf8, &data))) {
+                || OBT_PROP_GETS(self->w_client, WM_NAME, utf8, &data))) {
             if (self->transient) {
-    /*
-    GNOME alert windows are not given titles:
-    http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-    */
+                /*
+                 GNOME alert windows are not given titles:
+                 http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+                 */
                 data = g_strdup("");
-            } else
+            }
+            else
                 data = g_strdup("Unnamed Window");
         }
     }
@@ -2066,7 +1983,8 @@ void client_update_title(ObClient *self)
     if (self->client_machine) {
         visible = g_strdup_printf("%s (%s)", data, self->client_machine);
         g_free(data);
-    } else
+    }
+    else
         visible = data;
 
     if (self->not_responding) {
@@ -2083,8 +2001,8 @@ void client_update_title(ObClient *self)
 
     if (self->frame) {
         /* update title render */
-        frame_engine.frame_update_title (self->frame, self->title);
-        frame_engine.frame_update_skin (self->frame);
+        frame_engine.frame_update_title(self->frame, self->title);
+        frame_engine.frame_update_skin(self->frame);
     }
 
     /* update the icon title */
@@ -2094,14 +2012,15 @@ void client_update_title(ObClient *self)
     /* try netwm */
     if (!OBT_PROP_GETS(self->w_client, NET_WM_ICON_NAME, utf8, &data))
         /* try old x stuff */
-        if (!(OBT_PROP_GETS(self->w_client, WM_ICON_NAME, locale, &data) ||
-              OBT_PROP_GETS(self->w_client, WM_ICON_NAME, utf8, &data)))
+        if (!(OBT_PROP_GETS(self->w_client, WM_ICON_NAME, locale, &data)
+                || OBT_PROP_GETS(self->w_client, WM_ICON_NAME, utf8, &data)))
             data = g_strdup(self->title);
 
     if (self->client_machine) {
         visible = g_strdup_printf("%s (%s)", data, self->client_machine);
         g_free(data);
-    } else
+    }
+    else
         visible = data;
 
     if (self->not_responding) {
@@ -2124,21 +2043,19 @@ void client_update_strut(ObClient *self)
     gboolean got = FALSE;
     StrutPartial strut;
 
-    if (OBT_PROP_GETA32(self->w_client, NET_WM_STRUT_PARTIAL, CARDINAL,
-                        &data, &num))
-    {
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_STRUT_PARTIAL, CARDINAL, &data,
+            &num)) {
         if (num == 12) {
             got = TRUE;
-            STRUT_PARTIAL_SET(strut,
-                              data[0], data[2], data[1], data[3],
-                              data[4], data[5], data[8], data[9],
-                              data[6], data[7], data[10], data[11]);
+            STRUT_PARTIAL_SET(strut, data[0], data[2], data[1], data[3],
+                    data[4], data[5], data[8], data[9], data[6], data[7],
+                    data[10], data[11]);
         }
         g_free(data);
     }
 
-    if (!got &&
-        OBT_PROP_GETA32(self->w_client, NET_WM_STRUT, CARDINAL, &data, &num)) {
+    if (!got && OBT_PROP_GETA32(self->w_client, NET_WM_STRUT, CARDINAL, &data,
+            &num)) {
         if (num == 4) {
             Rect *a;
 
@@ -2147,26 +2064,22 @@ void client_update_strut(ObClient *self)
             /* use the screen's width/height */
             a = screen_physical_area_all_monitors();
 
-            STRUT_PARTIAL_SET(strut,
-                              data[0], data[2], data[1], data[3],
-                              a->y, a->y + a->height - 1,
-                              a->x, a->x + a->width - 1,
-                              a->y, a->y + a->height - 1,
-                              a->x, a->x + a->width - 1);
+            STRUT_PARTIAL_SET(strut, data[0], data[2], data[1], data[3], a->y,
+                    a->y + a->height - 1, a->x, a->x + a->width - 1, a->y, a->y
+                            + a->height - 1, a->x, a->x + a->width - 1);
             g_free(a);
         }
         g_free(data);
     }
 
     if (!got)
-        STRUT_PARTIAL_SET(strut, 0, 0, 0, 0,
-                          0, 0, 0, 0, 0, 0, 0, 0);
+        STRUT_PARTIAL_SET(strut, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
     if (!STRUT_EQUAL(strut, self->strut)) {
         self->strut = strut;
 
         /* updating here is pointless while we're being mapped cuz we're not in
-           the client list yet */
+         the client list yet */
         if (self->frame)
             screen_update_areas();
     }
@@ -2180,8 +2093,8 @@ void client_update_icons(ObClient *self)
     guint num;
     guint32 *data;
     guint w, h, i, j;
-    guint num_seen;  /* number of icons present */
-    guint num_small_seen;  /* number of icons small enough present */
+    guint num_seen; /* number of icons present */
+    guint num_small_seen; /* number of icons small enough present */
     guint smallest, smallest_area;
 
     for (i = 0; i < self->nicons; ++i)
@@ -2201,8 +2114,9 @@ void client_update_icons(ObClient *self)
                 h = data[i++];
                 i += w * h;
                 /* watch for it being too small for the specified size, or for
-                   zero sized icons. */
-                if (i > num || w == 0 || h == 0) break;
+                 zero sized icons. */
+                if (i > num || w == 0 || h == 0)
+                    break;
 
                 if (!smallest_area || w*h < smallest_area) {
                     smallest = num_seen;
@@ -2228,7 +2142,7 @@ void client_update_icons(ObClient *self)
             h = self->icons[j].height = data[i++];
 
             /* if there are some icons smaller than the threshold, we're
-               skipping all the ones above */
+             skipping all the ones above */
             if (num_small_seen > 0) {
                 if (w > AVOID_ABOVE || h > AVOID_ABOVE) {
                     i += w*h;
@@ -2236,7 +2150,7 @@ void client_update_icons(ObClient *self)
                 }
             }
             /* if there were no icons smaller than the threshold, then we are
-               only taking the smallest available one we saw */
+             only taking the smallest available one we saw */
             else if (j != smallest) {
                 i += w*h;
                 continue;
@@ -2248,11 +2162,11 @@ void client_update_icons(ObClient *self)
                     x = 0;
                     ++y;
                 }
-                self->icons[j].data[t] =
-                    (((data[i] >> 24) & 0xff) << RrDefaultAlphaOffset) +
-                    (((data[i] >> 16) & 0xff) << RrDefaultRedOffset) +
-                    (((data[i] >> 8) & 0xff) << RrDefaultGreenOffset) +
-                    (((data[i] >> 0) & 0xff) << RrDefaultBlueOffset);
+                self->icons[j].data[t] = (((data[i] >> 24) & 0xff)
+                        << RrDefaultAlphaOffset) + (((data[i] >> 16) & 0xff)
+                        << RrDefaultRedOffset) + (((data[i] >> 8) & 0xff)
+                        << RrDefaultGreenOffset) + (((data[i] >> 0) & 0xff)
+                        << RrDefaultBlueOffset);
             }
             g_assert(i <= num);
 
@@ -2260,7 +2174,8 @@ void client_update_icons(ObClient *self)
         }
 
         g_free(data);
-    } else {
+    }
+    else {
         XWMHints *hints;
 
         if ((hints = XGetWMHints(obt_display, self->w_client))) {
@@ -2268,14 +2183,12 @@ void client_update_icons(ObClient *self)
                 self->nicons = 1;
                 self->icons = g_new(ObClientIcon, self->nicons);
                 obt_display_ignore_errors(TRUE);
-                if (!RrPixmapToRGBA(ob_rr_inst,
-                                    hints->icon_pixmap,
-                                    (hints->flags & IconMaskHint ?
-                                     hints->icon_mask : None),
-                                    &self->icons[0].width,
-                                    &self->icons[0].height,
-                                    &self->icons[0].data))
-                {
+                if (!RrPixmapToRGBA(
+                        ob_rr_inst,
+                        hints->icon_pixmap,
+                        (hints->flags & IconMaskHint ? hints->icon_mask : None),
+                        &self->icons[0].width, &self->icons[0].height,
+                        &self->icons[0].data)) {
                     g_free(self->icons);
                     self->nicons = 0;
                 }
@@ -2286,30 +2199,31 @@ void client_update_icons(ObClient *self)
     }
 
     /* set the default icon onto the window
-       in theory, this could be a race, but if a window doesn't set an icon
-       or removes it entirely, it's not very likely it is going to set one
-       right away afterwards
+     in theory, this could be a race, but if a window doesn't set an icon
+     or removes it entirely, it's not very likely it is going to set one
+     right away afterwards
 
-       if it has parents, then one of them will have an icon already
-    */
+     if it has parents, then one of them will have an icon already
+     */
     if (self->nicons == 0 && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
         gulong *data;
 
         data = g_new(gulong, 48*48+2);
-        data[0] = data[1] =  48;
+        data[0] = data[1] = 48;
         for (i = 0; i < 48*48; ++i)
-            data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24) +
-                (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16) +
-                (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8) +
-                (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
+            data[i+2] = (((icon[i] >> RrDefaultAlphaOffset) & 0xff) << 24)
+                    + (((icon[i] >> RrDefaultRedOffset) & 0xff) << 16)
+                    + (((icon[i] >> RrDefaultGreenOffset) & 0xff) << 8)
+                    + (((icon[i] >> RrDefaultBlueOffset) & 0xff) << 0);
         OBT_PROP_SETA32(self->w_client, NET_WM_ICON, CARDINAL, data, 48*48+2);
         g_free(data);
-    } else if (self->frame)
-        frame_engine.frame_update_skin (self->frame);
-        /* don't draw the icon empty if we're just setting one now anyways,
-           we'll get the property change any second */
-        //frame_adjust_icon(self->frame);
+    }
+    else if (self->frame)
+        frame_engine.frame_update_skin(self->frame);
+    /* don't draw the icon empty if we're just setting one now anyways,
+     we'll get the property change any second */
+    //frame_adjust_icon(self->frame);
 }
 
 void client_update_icon_geometry(ObClient *self)
@@ -2319,13 +2233,12 @@ void client_update_icon_geometry(ObClient *self)
 
     RECT_SET(self->icon_geometry, 0, 0, 0, 0);
 
-    if (OBT_PROP_GETA32(self->w_client, NET_WM_ICON_GEOMETRY, CARDINAL,
-                        &data, &num))
-    {
+    if (OBT_PROP_GETA32(self->w_client, NET_WM_ICON_GEOMETRY, CARDINAL, &data,
+            &num)) {
         if (num == 4)
             /* don't let them set it with an area < 0 */
-            RECT_SET(self->icon_geometry, data[0], data[1],
-                     MAX(data[2],0), MAX(data[3],0));
+            RECT_SET(self->icon_geometry, data[0], data[1], MAX(data[2], 0),
+                    MAX(data[3], 0));
         g_free(data);
     }
 }
@@ -2348,7 +2261,7 @@ static void client_get_session_ids(ObClient *self)
         OBT_PROP_GETS(self->w_client, SM_CLIENT_ID, locale, &self->sm_client_id);
 
     /* get the WM_CLASS (name and class). make them "" if they are not
-       provided */
+     provided */
     got = FALSE;
     if (leader)
         got = OBT_PROP_GETSS(leader, WM_CLASS, locale, &ss);
@@ -2364,8 +2277,10 @@ static void client_get_session_ids(ObClient *self)
         g_strfreev(ss);
     }
 
-    if (self->name == NULL) self->name = g_strdup("");
-    if (self->class == NULL) self->class = g_strdup("");
+    if (self->name == NULL)
+        self->name = g_strdup("");
+    if (self->class == NULL)
+        self->class = g_strdup("");
 
     /* get the WM_WINDOW_ROLE. make it "" if it is not provided */
     got = FALSE;
@@ -2424,7 +2339,7 @@ static void client_get_session_ids(ObClient *self)
             g_free(s);
 
         /* see if it has the PID set too (the PID requires that the
-           WM_CLIENT_MACHINE be set) */
+         WM_CLIENT_MACHINE be set) */
         if (OBT_PROP_GET32(self->w_client, NET_WM_PID, CARDINAL, &pid))
             self->pid = pid;
     }
@@ -2437,16 +2352,16 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic ||
-        (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop))
-    {
+    if (self->shaded || self->iconic || (self->desktop != DESKTOP_ALL
+            && self->desktop != screen_desktop)) {
         self->wmstate = IconicState;
-    } else
+    }
+    else
         self->wmstate = NormalState;
 
     if (old != self->wmstate) {
         OBT_PROP_MSG(ob_screen, self->w_client, KDE_WM_CHANGE_STATE,
-                     self->wmstate, 1, 0, 0, 0);
+                self->wmstate, 1, 0, 0, 0);
 
         state[0] = self->wmstate;
         state[1] = None;
@@ -2486,9 +2401,8 @@ static void client_change_state(ObClient *self)
         netstate[num++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
     OBT_PROP_SETA32(self->w_client, NET_WM_STATE, ATOM, netstate, num);
 
-    if (self->frame)
-    {
-        frame_engine.frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    if (self->frame) {
+        frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
         if (focus_cycle_target == self)
@@ -2502,8 +2416,10 @@ ObClient *client_search_focus_tree(ObClient *self)
     ObClient *ret;
 
     for (it = self->transients; it; it = g_slist_next(it)) {
-        if (client_focused(it->data)) return it->data;
-        if ((ret = client_search_focus_tree(it->data))) return ret;
+        if (client_focused(it->data))
+            return it->data;
+        if ((ret = client_search_focus_tree(it->data)))
+            return ret;
     }
     return NULL;
 }
@@ -2515,14 +2431,15 @@ ObClient *client_search_focus_tree_full(ObClient *self)
 
         for (it = self->parents; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
-            if ((c = client_search_focus_tree_full(it->data))) return c;
+            if ((c = client_search_focus_tree_full(it->data)))
+                return c;
         }
 
         return NULL;
     }
     else {
         /* this function checks the whole tree, the client_search_focus_tree
-           does not, so we need to check this window */
+         does not, so we need to check this window */
         if (client_focused(self))
             return self;
         return client_search_focus_tree(self);
@@ -2537,11 +2454,14 @@ ObClient *client_search_focus_group_full(ObClient *self)
         for (it = self->group->members; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
 
-            if (client_focused(c)) return c;
-            if ((c = client_search_focus_tree(it->data))) return c;
+            if (client_focused(c))
+                return c;
+            if ((c = client_search_focus_tree(it->data)))
+                return c;
         }
-    } else
-        if (client_focused(self)) return self;
+    }
+    else if (client_focused(self))
+        return self;
     return NULL;
 }
 
@@ -2560,29 +2480,31 @@ static ObStackingLayer calc_layer(ObClient *self)
     if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
     else if (self->type == OB_CLIENT_TYPE_DOCK) {
-        if (self->below) l = OB_STACKING_LAYER_NORMAL;
-        else l = OB_STACKING_LAYER_ABOVE;
+        if (self->below)
+            l = OB_STACKING_LAYER_NORMAL;
+        else
+            l = OB_STACKING_LAYER_ABOVE;
     }
     else if ((self->fullscreen ||
-              /* No decorations and fills the monitor = oldskool fullscreen.
-                 But not for maximized windows.
-              */
-              (self->decorations == 0 &&
-               !(self->max_horz && self->max_vert) &&
-               RECT_EQUAL(self->area, *monitor))) &&
-             /* you are fullscreen while you or your children are focused.. */
-             (client_focused(self) || client_search_focus_tree(self) ||
-              /* you can be fullscreen if you're on another desktop */
-              (self->desktop != screen_desktop &&
-               self->desktop != DESKTOP_ALL) ||
-              /* and you can also be fullscreen if the focused client is on
-                 another monitor, or nothing else is focused */
-              (!focus_client ||
-               client_monitor(focus_client) != client_monitor(self))))
+    /* No decorations and fills the monitor = oldskool fullscreen.
+     But not for maximized windows.
+     */
+    (self->decorations == 0 && !(self->max_horz && self->max_vert)
+            && RECT_EQUAL(self->area, *monitor))) &&
+    /* you are fullscreen while you or your children are focused.. */
+    (client_focused(self) || client_search_focus_tree(self) ||
+    /* you can be fullscreen if you're on another desktop */
+    (self->desktop != screen_desktop && self->desktop != DESKTOP_ALL) ||
+    /* and you can also be fullscreen if the focused client is on
+     another monitor, or nothing else is focused */
+    (!focus_client || client_monitor(focus_client) != client_monitor(self))))
         l = OB_STACKING_LAYER_FULLSCREEN;
-    else if (self->above) l = OB_STACKING_LAYER_ABOVE;
-    else if (self->below) l = OB_STACKING_LAYER_BELOW;
-    else l = OB_STACKING_LAYER_NORMAL;
+    else if (self->above)
+        l = OB_STACKING_LAYER_ABOVE;
+    else if (self->below)
+        l = OB_STACKING_LAYER_BELOW;
+    else
+        l = OB_STACKING_LAYER_NORMAL;
 
     g_free(monitor);
 
@@ -2590,7 +2512,7 @@ static ObStackingLayer calc_layer(ObClient *self)
 }
 
 static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
-                                        ObStackingLayer min)
+        ObStackingLayer min)
 {
     ObStackingLayer old, own;
     GSList *it;
@@ -2608,8 +2530,7 @@ static void client_calc_layer_recursive(ObClient *self, ObClient *orig,
     self->visited = TRUE;
 
     for (it = self->transients; it; it = g_slist_next(it))
-        client_calc_layer_recursive(it->data, orig,
-                                    self->layer);
+        client_calc_layer_recursive(it->data, orig, self->layer);
 }
 
 static void client_calc_layer_internal(ObClient *self)
@@ -2629,11 +2550,13 @@ void client_calc_layer(ObClient *self)
 
     /* skip over stuff above fullscreen layer */
     for (it = stacking_list; it; it = g_list_next(it))
-        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN) break;
+        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN)
+            break;
 
     /* find the windows in the fullscreen layer, and mark them not-visited */
     for (; it; it = g_list_next(it)) {
-        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN) break;
+        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN)
+            break;
         else if (WINDOW_IS_CLIENT(it->data))
             WINDOW_AS_CLIENT(it->data)->visited = FALSE;
     }
@@ -2642,14 +2565,15 @@ void client_calc_layer(ObClient *self)
 
     /* skip over stuff above fullscreen layer */
     for (it = stacking_list; it; it = g_list_next(it))
-        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN) break;
+        if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN)
+            break;
 
     /* now recalc any windows in the fullscreen layer which have not
-       had their layer recalced already */
+     had their layer recalced already */
     for (; it; it = g_list_next(it)) {
-        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN) break;
-        else if (WINDOW_IS_CLIENT(it->data) &&
-                 !WINDOW_AS_CLIENT(it->data)->visited)
+        if (window_layer(it->data) < OB_STACKING_LAYER_FULLSCREEN)
+            break;
+        else if (WINDOW_IS_CLIENT(it->data) && !WINDOW_AS_CLIENT(it->data)->visited)
             client_calc_layer_internal(it->data);
     }
 }
@@ -2672,16 +2596,16 @@ gboolean client_show(ObClient *self)
 
     if (client_should_show(self)) {
         /* replay pending pointer event before showing the window, in case it
-           should be going to something under the window */
+         should be going to something under the window */
         mouse_replay_pointer();
 
         client_show_frame(self);
         show = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
-           it needs to be in IconicState. This includes when it is on another
-           desktop!
-        */
+         it needs to be in IconicState. This includes when it is on another
+         desktop!
+         */
         client_change_wm_state(self);
     }
     return show;
@@ -2694,39 +2618,39 @@ gboolean client_hide(ObClient *self)
     if (!client_should_show(self)) {
         if (self == focus_client) {
             /* if there is a grab going on, then we need to cancel it. if we
-               move focus during the grab, applications will get
-               NotifyWhileGrabbed events and ignore them !
+             move focus during the grab, applications will get
+             NotifyWhileGrabbed events and ignore them !
 
-               actions should not rely on being able to move focus during an
-               interactive grab.
-            */
+             actions should not rely on being able to move focus during an
+             interactive grab.
+             */
             event_cancel_all_key_grabs();
         }
 
         /* We don't need to ignore enter events here.
-           The window can hide/iconify in 3 different ways:
-           1 - through an x message. in this case we ignore all enter events
-               caused by responding to the x message (unless underMouse)
-           2 - by a keyboard action. in this case we ignore all enter events
-               caused by the action
-           3 - by a mouse action. in this case they are doing stuff with the
-               mouse and focus _should_ move.
+         The window can hide/iconify in 3 different ways:
+         1 - through an x message. in this case we ignore all enter events
+         caused by responding to the x message (unless underMouse)
+         2 - by a keyboard action. in this case we ignore all enter events
+         caused by the action
+         3 - by a mouse action. in this case they are doing stuff with the
+         mouse and focus _should_ move.
 
-           Also in action_end, we simulate an enter event that can't be ignored
-           so trying to ignore them is futile in case 3 anyways
-        */
+         Also in action_end, we simulate an enter event that can't be ignored
+         so trying to ignore them is futile in case 3 anyways
+         */
 
         /* replay pending pointer event before hiding the window, in case it
-           should be going to the window */
+         should be going to the window */
         mouse_replay_pointer();
 
         client_hide_frame(self);
         hide = TRUE;
 
         /* According to the ICCCM (sec 4.1.3.1) when a window is not visible,
-           it needs to be in IconicState. This includes when it is on another
-           desktop!
-        */
+         it needs to be in IconicState. This includes when it is on another
+         desktop!
+         */
         client_change_wm_state(self);
     }
     return hide;
@@ -2738,37 +2662,34 @@ void client_showhide(ObClient *self)
         client_hide(self);
 }
 
-gboolean client_normal(ObClient *self) {
-    return ! (self->type == OB_CLIENT_TYPE_DESKTOP ||
-              self->type == OB_CLIENT_TYPE_DOCK ||
-              self->type == OB_CLIENT_TYPE_SPLASH);
+gboolean client_normal(ObClient *self)
+{
+    return ! (self->type == OB_CLIENT_TYPE_DESKTOP || self->type
+            == OB_CLIENT_TYPE_DOCK || self->type == OB_CLIENT_TYPE_SPLASH);
 }
 
 gboolean client_helper(ObClient *self)
 {
-    return (self->type == OB_CLIENT_TYPE_UTILITY ||
-            self->type == OB_CLIENT_TYPE_MENU ||
-            self->type == OB_CLIENT_TYPE_TOOLBAR);
+    return (self->type == OB_CLIENT_TYPE_UTILITY || self->type
+            == OB_CLIENT_TYPE_MENU || self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
 gboolean client_mouse_focusable(ObClient *self)
 {
-    return !(self->type == OB_CLIENT_TYPE_MENU ||
-             self->type == OB_CLIENT_TYPE_TOOLBAR ||
-             self->type == OB_CLIENT_TYPE_SPLASH ||
-             self->type == OB_CLIENT_TYPE_DOCK);
+    return !(self->type == OB_CLIENT_TYPE_MENU || self->type
+            == OB_CLIENT_TYPE_TOOLBAR || self->type == OB_CLIENT_TYPE_SPLASH
+            || self->type == OB_CLIENT_TYPE_DOCK);
 }
 
 gboolean client_enter_focusable(ObClient *self)
 {
     /* you can focus desktops but it shouldn't on enter */
-    return (client_mouse_focusable(self) &&
-            self->type != OB_CLIENT_TYPE_DESKTOP);
+    return (client_mouse_focusable(self) && self->type
+            != OB_CLIENT_TYPE_DESKTOP);
 }
 
-
-static void client_apply_startup_state(ObClient *self,
-                                       gint x, gint y, gint w, gint h)
+static void client_apply_startup_state(ObClient *self, gint x, gint y, gint w,
+        gint h)
 {
     /* save the states that we are going to apply */
     gboolean iconic = self->iconic;
@@ -2782,26 +2703,26 @@ static void client_apply_startup_state(ObClient *self,
     gint l;
 
     /* turn them all off in the client, so they won't affect the window
-       being placed */
-    self->iconic = self->fullscreen = self->undecorated = self->shaded =
-        self->demands_attention = self->max_horz = self->max_vert = FALSE;
+     being placed */
+    self->iconic = self->fullscreen = self->undecorated = self->shaded
+            = self->demands_attention = self->max_horz = self->max_vert = FALSE;
 
     /* move the client to its placed position, or it it's already there,
-       generate a ConfigureNotify telling the client where it is.
+     generate a ConfigureNotify telling the client where it is.
 
-       do this after adjusting the frame. otherwise it gets all weird and
-       clients don't work right
+     do this after adjusting the frame. otherwise it gets all weird and
+     clients don't work right
 
-       do this before applying the states so they have the correct
-       pre-max/pre-fullscreen values
-    */
+     do this before applying the states so they have the correct
+     pre-max/pre-fullscreen values
+     */
     client_try_configure(self, &x, &y, &w, &h, &l, &l, FALSE);
-    ob_debug("placed window 0x%x at %d, %d with size %d x %d",
-             self->w_client, x, y, w, h);
+    ob_debug("placed window 0x%x at %d, %d with size %d x %d", self->w_client,
+            x, y, w, h);
     /* save the area, and make it where it should be for the premax stuff */
     oldarea = self->area;
     RECT_SET(self->area, x, y, w, h);
-    frame_engine.frame_set_client_area (self->frame, self->area);
+    frame_engine.frame_set_client_area(self->frame, self->area);
 
     /* apply the states. these are in a carefully crafted order.. */
 
@@ -2824,27 +2745,26 @@ static void client_apply_startup_state(ObClient *self,
         client_maximize(self, TRUE, 1);
 
     /* if the window hasn't been configured yet, then do so now, in fact the
-       x,y,w,h may _not_ be the same as the area rect, which can end up
-       meaning that the client isn't properly moved/resized by the fullscreen
-       function
-       pho can cause this because it maps at size of the screen but not 0,0
-       so openbox moves it on screen to 0,0 (thus x,y=0,0 and area.x,y don't).
-       then fullscreen'ing makes it go to 0,0 which it thinks it already is at
-       cuz thats where the pre-fullscreen will be. however the actual area is
-       not, so this needs to be called even if we have fullscreened/maxed
-    */
+     x,y,w,h may _not_ be the same as the area rect, which can end up
+     meaning that the client isn't properly moved/resized by the fullscreen
+     function
+     pho can cause this because it maps at size of the screen but not 0,0
+     so openbox moves it on screen to 0,0 (thus x,y=0,0 and area.x,y don't).
+     then fullscreen'ing makes it go to 0,0 which it thinks it already is at
+     cuz thats where the pre-fullscreen will be. however the actual area is
+     not, so this needs to be called even if we have fullscreened/maxed
+     */
     self->area = oldarea;
-    frame_engine.frame_set_decorations (self->frame, self->decorations);
-    frame_engine.frame_update_layout (self->frame, self->area, FALSE, FALSE);
+    frame_engine.frame_set_decorations(self->frame, self->decorations);
+    frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
     /* when the client has StaticGravity, it likes to move around.
      also this correctly positions the client when it maps.
      this also needs to be run when the frame's decorations sizes change!
      */
     Strut size;
-    frame_engine.frame_get_size (self->frame, &size);
-    XMoveResizeWindow(obt_display, self->w_client,
-                size.left, size.top, self->area.width,
-                self->area.height);
+    frame_engine.frame_get_size(self->frame, &size);
+    XMoveResizeWindow(obt_display, self->w_client, size.left, size.top,
+            self->area.width, self->area.height);
     /* if this occurs while we are focus cycling, the indicator needs to
      match the changes */
     if (focus_cycle_target == self)
@@ -2855,18 +2775,18 @@ static void client_apply_startup_state(ObClient *self,
     OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     /* nothing to do for the other states:
-       skip_taskbar
-       skip_pager
-       modal
-       above
-       below
-    */
+     skip_taskbar
+     skip_pager
+     modal
+     above
+     below
+     */
 }
 
 void client_gravity_resize_w(ObClient *self, gint *x, gint oldw, gint neww)
 {
     /* these should be the current values. this is for when you're not moving,
-       just resizing */
+     just resizing */
     g_assert(*x == self->area.x);
     g_assert(oldw == self->area.width);
 
@@ -2895,7 +2815,7 @@ void client_gravity_resize_w(ObClient *self, gint *x, gint oldw, gint neww)
 void client_gravity_resize_h(ObClient *self, gint *y, gint oldh, gint newh)
 {
     /* these should be the current values. this is for when you're not moving,
-       just resizing */
+     just resizing */
     g_assert(*y == self->area.y);
     g_assert(oldh == self->area.height);
 
@@ -2922,17 +2842,16 @@ void client_gravity_resize_h(ObClient *self, gint *y, gint oldh, gint newh)
 }
 
 void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
-                          gint *logicalw, gint *logicalh,
-                          gboolean user)
+        gint *logicalw, gint *logicalh, gboolean user)
 {
-    Rect desired = {*x, *y, *w, *h};
+    Rect desired = { *x, *y, *w, *h };
     frame_rect_to_frame(self, &desired);
 
     /* make the frame recalculate its dimentions n shit without changing
-       anything visible for real, this way the constraints below can work with
-       the updated frame dimensions. */
-    frame_engine.frame_set_decorations (self->frame, self->decorations);
-    frame_engine.frame_update_layout (self->frame, self->area, FALSE, TRUE);
+     anything visible for real, this way the constraints below can work with
+     the updated frame dimensions. */
+    frame_engine.frame_set_decorations(self->frame, self->decorations);
+    frame_engine.frame_update_layout(self->frame, self->area, FALSE, TRUE);
 
     /* gets the frame's position */
     frame_client_gravity(self, x, y);
@@ -2953,17 +2872,18 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *h = a->height;
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
-                         is fullscreening */
+         is fullscreening */
 
         g_free(a);
-    } else if (self->max_horz || self->max_vert) {
+    }
+    else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;
 
         /* use all possible struts when maximizing to the full screen */
         i = screen_find_monitor(&desired);
         a = screen_area(self->desktop, i,
-                        (self->max_horz && self->max_vert ? NULL : &desired));
+                (self->max_horz && self->max_vert ? NULL : &desired));
 
         Strut size;
         frame_engine.frame_get_size(self->frame, &size);
@@ -2978,7 +2898,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         }
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
-                         is maximizing */
+         is maximizing */
 
         g_free(a);
     }
@@ -2994,16 +2914,17 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         incw = self->fullscreen || self->max_horz ? 1 : self->size_inc.width;
         inch = self->fullscreen || self->max_vert ? 1 : self->size_inc.height;
-        minratio = self->fullscreen || (self->max_horz && self->max_vert) ?
-            0 : self->min_ratio;
-        maxratio = self->fullscreen || (self->max_horz && self->max_vert) ?
-            0 : self->max_ratio;
+        minratio = self->fullscreen || (self->max_horz && self->max_vert) ? 0
+                : self->min_ratio;
+        maxratio = self->fullscreen || (self->max_horz && self->max_vert) ? 0
+                : self->max_ratio;
 
         /* base size is substituted with min size if not specified */
         if (self->base_size.width || self->base_size.height) {
             basew = self->base_size.width;
             baseh = self->base_size.height;
-        } else {
+        }
+        else {
             basew = self->min_size.width;
             baseh = self->min_size.height;
         }
@@ -3011,19 +2932,24 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         if (self->min_size.width || self->min_size.height) {
             minw = self->min_size.width;
             minh = self->min_size.height;
-        } else {
+        }
+        else {
             minw = self->base_size.width;
             minh = self->base_size.height;
         }
 
         /* if this is a user-requested resize, then check against min/max
-           sizes */
+         sizes */
 
         /* smaller than min size or bigger than max size? */
-        if (*w > self->max_size.width) *w = self->max_size.width;
-        if (*w < minw) *w = minw;
-        if (*h > self->max_size.height) *h = self->max_size.height;
-        if (*h < minh) *h = minh;
+        if (*w > self->max_size.width)
+            *w = self->max_size.width;
+        if (*w < minw)
+            *w = minw;
+        if (*h > self->max_size.height)
+            *h = self->max_size.height;
+        if (*h < minh)
+            *h = minh;
 
         *w -= basew;
         *h -= baseh;
@@ -3033,8 +2959,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *h /= inch;
 
         /* you cannot resize to nothing */
-        if (basew + *w < 1) *w = 1 - basew;
-        if (baseh + *h < 1) *h = 1 - baseh;
+        if (basew + *w < 1)
+            *w = 1 - basew;
+        if (baseh + *h < 1)
+            *h = 1 - baseh;
 
         /* save the logical size */
         *logicalw = incw > 1 ? *w : *w + basew;
@@ -3047,7 +2975,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *h += baseh;
 
         /* adjust the height to match the width for the aspect ratios.
-           for this, min size is not substituted for base size ever. */
+         for this, min size is not substituted for base size ever. */
         *w -= self->base_size.width;
         *h -= self->base_size.height;
 
@@ -3092,9 +3020,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     g_assert(*h > 0);
 }
 
-
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
-                      gboolean user, gboolean final, gboolean force_reply)
+        gboolean user, gboolean final, gboolean force_reply)
 {
     Rect oldframe;
     gint oldw, oldh;
@@ -3127,19 +3054,18 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     frame_engine.frame_get_window_area(self->frame, &oldframe);
     RECT_SET(self->area, x, y, w, h);
 
-    frame_engine.frame_set_client_area (self->frame, self->area);
+    frame_engine.frame_set_client_area(self->frame, self->area);
 
     /* for app-requested resizes, always resize if 'resized' is true.
-       for user-requested ones, only resize if final is true, or when
-       resizing in redraw mode */
-    send_resize_client = ((!user && resized) ||
-                          (user && (final ||
-                                    (resized && config_resize_redraw))));
+     for user-requested ones, only resize if final is true, or when
+     resizing in redraw mode */
+    send_resize_client = ((!user && resized) || (user && (final || (resized
+            && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
     if (send_resize_client && (w > oldw || h > oldh)) {
-        frame_engine.frame_set_decorations (self->frame, self->decorations);
-        frame_engine.frame_update_layout (self->frame, self->area, FALSE, FALSE);
+        frame_engine.frame_set_decorations(self->frame, self->decorations);
+        frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
         if (focus_cycle_target == self)
@@ -3151,9 +3077,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     fresized = resized;
 
     /* if decorations changed, then readjust everything for the frame */
-    if (self->decorations != fdecor ||
-        self->max_horz != fhorz || self->max_vert != fvert)
-    {
+    if (self->decorations != fdecor || self->max_horz != fhorz
+            || self->max_vert != fvert) {
         fmoved = fresized = TRUE;
     }
 
@@ -3164,11 +3089,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
             ignore_start = event_start_ignore_all_enters();
 
         /* replay pending pointer event before move the window, in case it
-           would change what window gets the event */
+         would change what window gets the event */
         mouse_replay_pointer();
 
-        frame_engine.frame_set_decorations (self->frame, self->decorations);
-        frame_engine.frame_update_layout (self->frame, self->area, TRUE, FALSE);
+        frame_engine.frame_set_decorations(self->frame, self->decorations);
+        frame_engine.frame_update_layout(self->frame, self->area, TRUE, FALSE);
 
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
@@ -3183,32 +3108,28 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         gint oldrx = self->root_pos.x;
         gint oldry = self->root_pos.y;
         /* we have reset the client to 0 border width, so don't include
-           it in these coords */
-        POINT_SET(self->root_pos,
-                  area.x + size.left -
-                  self->border_width,
-                  area.y + size.top -
-                  self->border_width);
+         it in these coords */
+        POINT_SET(self->root_pos, area.x + size.left - self->border_width,
+                area.y + size.top - self->border_width);
         if (self->root_pos.x != oldrx || self->root_pos.y != oldry)
             rootmoved = TRUE;
     }
 
     /* This is kinda tricky and should not be changed.. let me explain!
 
-       When user = FALSE, then the request is coming from the application
-       itself, and we are more strict about when to send a synthetic
-       ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
-       in this case (if force_reply is true)
+     When user = FALSE, then the request is coming from the application
+     itself, and we are more strict about when to send a synthetic
+     ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
+     in this case (if force_reply is true)
 
-       When user = TRUE, then the request is coming from "us", like when we
-       maximize a window or something.  In this case we are more lenient.  We
-       used to follow the same rules as above, but _Java_ Swing can't handle
-       this. So just to appease Swing, when user = TRUE, we always send
-       a synthetic ConfigureNotify to give the window its root coordinates.
-    */
-    if ((!user && !resized && (rootmoved || force_reply)) ||
-        (user && final && rootmoved))
-    {
+     When user = TRUE, then the request is coming from "us", like when we
+     maximize a window or something.  In this case we are more lenient.  We
+     used to follow the same rules as above, but _Java_ Swing can't handle
+     this. So just to appease Swing, when user = TRUE, we always send
+     a synthetic ConfigureNotify to give the window its root coordinates.
+     */
+    if ((!user && !resized && (rootmoved || force_reply)) || (user && final
+            && rootmoved)) {
         XEvent event;
 
         event.type = ConfigureNotify;
@@ -3216,8 +3137,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.event = self->w_client;
         event.xconfigure.window = self->w_client;
 
-        ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d",
-                 self->title, self->root_pos.x, self->root_pos.y, w, h);
+        ob_debug("Sending ConfigureNotify to %s for %d,%d %dx%d", self->title,
+                self->root_pos.x, self->root_pos.y, w, h);
 
         /* root window real coords */
         event.xconfigure.x = self->root_pos.x;
@@ -3227,24 +3148,24 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         event.xconfigure.border_width = self->border_width;
         event.xconfigure.above = None;
         event.xconfigure.override_redirect = FALSE;
-        XSendEvent(event.xconfigure.display, event.xconfigure.window,
-                   FALSE, StructureNotifyMask, &event);
+        XSendEvent(event.xconfigure.display, event.xconfigure.window, FALSE,
+                StructureNotifyMask, &event);
     }
 
     /* if the client is shrinking, then resize the frame before the client.
 
-       both of these resize sections may run, because the top one only resizes
-       in the direction that is growing
+     both of these resize sections may run, because the top one only resizes
+     in the direction that is growing
      */
     if (send_resize_client && (w <= oldw || h <= oldh)) {
-      frame_engine.frame_set_decorations (self->frame, self->decorations);
-      frame_engine.frame_update_layout (self->frame, self->area, FALSE, FALSE);
-      /* if this occurs while we are focus cycling, the indicator needs to
-       match the changes */
-      if (focus_cycle_target == self)
-          focus_cycle_draw_indicator(self);
+        frame_engine.frame_set_decorations(self->frame, self->decorations);
+        frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
+        /* if this occurs while we are focus cycling, the indicator needs to
+         match the changes */
+        if (focus_cycle_target == self)
+            focus_cycle_draw_indicator(self);
     }
-    
+
     if (user && final) {
         /* when the client has StaticGravity, it likes to move around.
          also this correctly positions the client when it maps.
@@ -3254,18 +3175,16 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
         frame_engine.frame_get_size(self->frame, &size);
         XMoveResizeWindow(obt_display, self->w_client, size.left, size.top,
                 self->area.width, self->area.height);
-        frame_engine.frame_update_skin (self->frame);
+        frame_engine.frame_update_skin(self->frame);
     }
-    
+
     XFlush(obt_display);
 
     /* if it moved between monitors, then this can affect the stacking
-       layer of this window or others - for fullscreen windows */
+     layer of this window or others - for fullscreen windows */
     Rect current_frame;
     frame_engine.frame_get_window_area(self->frame, &current_frame);
-    if (screen_find_monitor(&current_frame) !=
-        screen_find_monitor(&oldframe))
-    {
+    if (screen_find_monitor(&current_frame) != screen_find_monitor(&oldframe)) {
         client_calc_layer(self);
     }
 }
@@ -3275,7 +3194,8 @@ void client_fullscreen(ObClient *self, gboolean fs)
     gint x, y, w, h;
 
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) || /* can't */
-        self->fullscreen == fs) return;                   /* already done */
+    self->fullscreen == fs)
+        return; /* already done */
 
     self->fullscreen = fs;
     client_change_state(self); /* change the state hints on the client */
@@ -3283,7 +3203,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
     if (fs) {
         self->pre_fullscreen_area = self->area;
         /* if the window is maximized, its area isn't all that meaningful.
-           save it's premax area instead. */
+         save it's premax area instead. */
         if (self->max_horz) {
             self->pre_fullscreen_area.x = self->pre_max_area.x;
             self->pre_fullscreen_area.width = self->pre_max_area.width;
@@ -3294,14 +3214,15 @@ void client_fullscreen(ObClient *self, gboolean fs)
         }
 
         /* these will help configure_full figure out where to fullscreen
-           the window */
+         the window */
         x = self->area.x;
         y = self->area.y;
         w = self->area.width;
         h = self->area.height;
-    } else {
-        g_assert(self->pre_fullscreen_area.width > 0 &&
-                 self->pre_fullscreen_area.height > 0);
+    }
+    else {
+        g_assert(self->pre_fullscreen_area.width > 0
+                && self->pre_fullscreen_area.height > 0);
 
         x = self->pre_fullscreen_area.x;
         y = self->pre_fullscreen_area.y;
@@ -3310,15 +3231,14 @@ void client_fullscreen(ObClient *self, gboolean fs)
         RECT_SET(self->pre_fullscreen_area, 0, 0, 0, 0);
     }
 
-    ob_debug("Window %s going fullscreen (%d)",
-             self->title, self->fullscreen);
+    ob_debug("Window %s going fullscreen (%d)", self->title, self->fullscreen);
 
     client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
 
     /* and adjust our layer/stacking. do this after resizing the window,
-       and applying decorations, because windows which fill the screen are
-       considered "fullscreen" and it affects their layer */
+     and applying decorations, because windows which fill the screen are
+     considered "fullscreen" and it affects their layer */
     client_calc_layer(self);
 
     if (fs) {
@@ -3327,35 +3247,34 @@ void client_fullscreen(ObClient *self, gboolean fs)
     }
 }
 
-static void client_iconify_recursive(ObClient *self,
-                                     gboolean iconic, gboolean curdesk,
-                                     gboolean hide_animation)
+static void client_iconify_recursive(ObClient *self, gboolean iconic,
+        gboolean curdesk, gboolean hide_animation)
 {
     GSList *it;
     gboolean changed = FALSE;
 
-
     if (self->iconic != iconic) {
         ob_debug("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
-                 self->w_client);
+                self->w_client);
 
         if (iconic) {
             /* don't let non-normal windows iconify along with their parents
-               or whatever */
+             or whatever */
             if (client_normal(self)) {
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
-                   the list */
+                 the list */
                 focus_order_to_bottom(self);
 
                 changed = TRUE;
             }
-        } else {
+        }
+        else {
             self->iconic = iconic;
 
-            if (curdesk && self->desktop != screen_desktop &&
-                self->desktop != DESKTOP_ALL)
+            if (curdesk && self->desktop != screen_desktop && self->desktop
+                    != DESKTOP_ALL)
                 client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
             /* this puts it after the current focused window */
@@ -3373,16 +3292,16 @@ static void client_iconify_recursive(ObClient *self,
     }
 
     /* iconify all direct transients, and deiconify all transients
-       (non-direct too) */
+     (non-direct too) */
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data) || !iconic)
                 client_iconify_recursive(it->data, iconic, curdesk,
-                                         hide_animation);
+                        hide_animation);
 }
 
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
-                    gboolean hide_animation)
+        gboolean hide_animation)
 {
     if (self->functions & OB_CLIENT_FUNC_ICONIFY || !iconic) {
         /* move up the transient chain as far as possible first */
@@ -3396,21 +3315,29 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     gint x, y, w, h;
 
     g_assert(dir == 0 || dir == 1 || dir == 2);
-    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE))
+        return; /* can't */
 
     /* check if already done */
     if (max) {
-        if (dir == 0 && self->max_horz && self->max_vert) return;
-        if (dir == 1 && self->max_horz) return;
-        if (dir == 2 && self->max_vert) return;
-    } else {
-        if (dir == 0 && !self->max_horz && !self->max_vert) return;
-        if (dir == 1 && !self->max_horz) return;
-        if (dir == 2 && !self->max_vert) return;
+        if (dir == 0 && self->max_horz && self->max_vert)
+            return;
+        if (dir == 1 && self->max_horz)
+            return;
+        if (dir == 2 && self->max_vert)
+            return;
+    }
+    else {
+        if (dir == 0 && !self->max_horz && !self->max_vert)
+            return;
+        if (dir == 1 && !self->max_horz)
+            return;
+        if (dir == 2 && !self->max_vert)
+            return;
     }
 
     /* these will help configure_full figure out which screen to fill with
-       the window */
+     the window */
     x = self->area.x;
     y = self->area.y;
     w = self->area.width;
@@ -3418,24 +3345,23 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
     if (max) {
         if ((dir == 0 || dir == 1) && !self->max_horz) { /* horz */
-            RECT_SET(self->pre_max_area,
-                     self->area.x, self->pre_max_area.y,
-                     self->area.width, self->pre_max_area.height);
+            RECT_SET(self->pre_max_area, self->area.x, self->pre_max_area.y,
+                    self->area.width, self->pre_max_area.height);
         }
         if ((dir == 0 || dir == 2) && !self->max_vert) { /* vert */
-            RECT_SET(self->pre_max_area,
-                     self->pre_max_area.x, self->area.y,
-                     self->pre_max_area.width, self->area.height);
+            RECT_SET(self->pre_max_area, self->pre_max_area.x, self->area.y,
+                    self->pre_max_area.width, self->area.height);
         }
-    } else {
+    }
+    else {
         if ((dir == 0 || dir == 1) && self->max_horz) { /* horz */
             g_assert(self->pre_max_area.width > 0);
 
             x = self->pre_max_area.x;
             w = self->pre_max_area.width;
 
-            RECT_SET(self->pre_max_area, 0, self->pre_max_area.y,
-                     0, self->pre_max_area.height);
+            RECT_SET(self->pre_max_area, 0, self->pre_max_area.y, 0,
+                    self->pre_max_area.height);
         }
         if ((dir == 0 || dir == 2) && self->max_vert) { /* vert */
             g_assert(self->pre_max_area.height > 0);
@@ -3444,18 +3370,20 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
             h = self->pre_max_area.height;
 
             RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
-                     self->pre_max_area.width, 0);
+                    self->pre_max_area.width, 0);
         }
     }
 
-    if (dir == 0 || dir == 1) { 
+    if (dir == 0 || dir == 1) {
         self->max_horz = max; /* horz */
-        frame_engine.frame_trigger(self->frame, max? OB_TRIGGER_MAX_HORZ : OB_TRIGGER_UNMAX_HORZ);
+        frame_engine.frame_trigger(self->frame, max ? OB_TRIGGER_MAX_HORZ
+                : OB_TRIGGER_UNMAX_HORZ);
     }
 
-    if (dir == 0 || dir == 2){
+    if (dir == 0 || dir == 2) {
         self->max_vert = max; /* vert */
-        frame_engine.frame_trigger(self->frame, max? OB_TRIGGER_MAX_VERT : OB_TRIGGER_UNMAX_VERT);
+        frame_engine.frame_trigger(self->frame, max ? OB_TRIGGER_MAX_VERT
+                : OB_TRIGGER_UNMAX_VERT);
     }
 
     client_change_state(self); /* change the state hints on the client */
@@ -3466,15 +3394,15 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
 void client_shade(ObClient *self, gboolean shade)
 {
-    if ((!(self->functions & OB_CLIENT_FUNC_SHADE) &&
-         shade) ||                         /* can't shade */
-        self->shaded == shade) return;     /* already done */
+    if ((!(self->functions & OB_CLIENT_FUNC_SHADE) && shade) || /* can't shade */
+    self->shaded == shade)
+        return; /* already done */
 
     self->shaded = shade;
     client_change_state(self);
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
-    frame_engine.frame_set_is_shaded (self->frame, self->shaded);
+    frame_engine.frame_set_is_shaded(self->frame, self->shaded);
     frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
     /* if this occurs while we are focus cycling, the indicator needs to
      match the changes */
@@ -3501,7 +3429,8 @@ static void client_ping_event(ObClient *self, gboolean dead)
 
 void client_close(ObClient *self)
 {
-    if (!(self->functions & OB_CLIENT_FUNC_CLOSE)) return;
+    if (!(self->functions & OB_CLIENT_FUNC_CLOSE))
+        return;
 
     if (self->prompt) {
         prompt_cancel(self->prompt);
@@ -3509,16 +3438,16 @@ void client_close(ObClient *self)
     }
 
     /* in the case that the client provides no means to requesting that it
-       close, we just kill it */
+     close, we just kill it */
     if (!self->delete_window)
         /* don't use client_kill(), we should only kill based on PID in
-           response to a lack of PING replies */
+         response to a lack of PING replies */
         XKillClient(obt_display, self->w_client);
     else {
         /* request the client to close with WM_DELETE_WINDOW */
         OBT_PROP_MSG_TO(self->w_client, self->w_client, WM_PROTOCOLS,
-                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime,
-                        0, 0, 0, NoEventMask);
+                OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime, 0, 0, 0,
+                NoEventMask);
 
         if (self->not_responding)
             client_prompt_kill(self);
@@ -3543,10 +3472,8 @@ static void client_prompt_kill(ObClient *self)
 {
     /* check if we're already prompting */
     if (!self->kill_prompt) {
-        ObPromptAnswer answers[] = {
-            { _("No"), OB_KILL_RESULT_NO },
-            { _("Yes"), OB_KILL_RESULT_YES }
-        };
+        ObPromptAnswer answers[] = { { _("No"), OB_KILL_RESULT_NO }, {
+                _("Yes"), OB_KILL_RESULT_YES } };
         gchar *m;
         const gchar *sig;
 
@@ -3555,14 +3482,16 @@ static void client_prompt_kill(ObClient *self)
         else
             sig = "kill";
 
-        m = g_strdup_printf
-            (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
+        m
+                = g_strdup_printf(
+                        _("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
+                        self->original_title, sig);
 
-        self->kill_prompt = prompt_new(m, answers,
-                                       sizeof(answers)/sizeof(answers[0]),
-                                       OB_KILL_RESULT_NO, /* default = no */
-                                       OB_KILL_RESULT_NO, /* cancel = no */
-                                       client_kill_requested, self);
+        self->kill_prompt = prompt_new(m, answers, sizeof(answers)
+                /sizeof(answers[0]), 
+        OB_KILL_RESULT_NO, /* default = no */
+        OB_KILL_RESULT_NO, /* cancel = no */
+        client_kill_requested, self);
         g_free(m);
     }
 
@@ -3572,13 +3501,14 @@ static void client_prompt_kill(ObClient *self)
 void client_kill(ObClient *self)
 {
     /* don't kill our own windows */
-    if (self->prompt) return;
+    if (self->prompt)
+        return;
 
     if (!self->client_machine && self->pid) {
         /* running on the local host */
         if (self->kill_level == 0) {
             ob_debug("killing window 0x%x with pid %lu, with SIGTERM",
-                     self->w_client, self->pid);
+                    self->w_client, self->pid);
             kill(self->pid, SIGTERM);
             ++self->kill_level;
 
@@ -3587,7 +3517,7 @@ void client_kill(ObClient *self)
         }
         else {
             ob_debug("killing window 0x%x with pid %lu, with SIGKILL",
-                     self->w_client, self->pid);
+                    self->w_client, self->pid);
             kill(self->pid, SIGKILL); /* kill -9 */
         }
     }
@@ -3606,17 +3536,15 @@ void client_hilite(ObClient *self, gboolean hilite)
     self->demands_attention = hilite && !client_focused(self);
     if (self->frame != NULL) { /* if we're mapping, just set the state */
         if (self->demands_attention)
-        client_flash_start(self);
+            client_flash_start(self);
         else
-        client_flash_stop(self);
+            client_flash_stop(self);
         client_change_state(self);
     }
 }
 
-static void client_set_desktop_recursive(ObClient *self,
-                                         guint target,
-                                         gboolean donthide,
-                                         gboolean dontraise)
+static void client_set_desktop_recursive(ObClient *self, guint target,
+        gboolean donthide, gboolean dontraise)
 {
     guint old;
     GSList *it;
@@ -3631,7 +3559,7 @@ static void client_set_desktop_recursive(ObClient *self,
         self->desktop = target;
         OBT_PROP_SET32(self->w_client, NET_WM_DESKTOP, CARDINAL, target);
         /* the frame can display the current desktop state */
-        frame_engine.frame_set_decorations (self->frame, self->decorations);
+        frame_engine.frame_set_decorations(self->frame, self->decorations);
         frame_engine.frame_update_layout(self->frame, self->area, FALSE, FALSE);
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
@@ -3648,7 +3576,7 @@ static void client_set_desktop_recursive(ObClient *self,
             screen_update_areas();
         else
             /* the new desktop's geometry may be different, so we may need to
-               resize, for example if we are maximized */
+             resize, for example if we are maximized */
             client_reconfigure(self, FALSE);
     }
 
@@ -3656,12 +3584,12 @@ static void client_set_desktop_recursive(ObClient *self,
     for (it = self->transients; it; it = g_slist_next(it))
         if (it->data != self)
             if (client_is_direct_child(self, it->data))
-                client_set_desktop_recursive(it->data, target,
-                                             donthide, dontraise);
+                client_set_desktop_recursive(it->data, target, donthide,
+                        dontraise);
 }
 
-void client_set_desktop(ObClient *self, guint target,
-                        gboolean donthide, gboolean dontraise)
+void client_set_desktop(ObClient *self, guint target, gboolean donthide,
+        gboolean dontraise)
 {
     self = client_search_top_direct_parent(self);
     client_set_desktop_recursive(self, target, donthide, dontraise);
@@ -3669,7 +3597,8 @@ void client_set_desktop(ObClient *self, guint target,
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
 {
-    while (child != parent && (child = client_direct_parent(child)));
+    while (child != parent && (child = client_direct_parent(child)))
+        ;
     return child == parent;
 }
 
@@ -3680,8 +3609,10 @@ ObClient *client_search_modal_child(ObClient *self)
 
     for (it = self->transients; it; it = g_slist_next(it)) {
         ObClient *c = it->data;
-        if ((ret = client_search_modal_child(c))) return ret;
-        if (c->modal) return c;
+        if ((ret = client_search_modal_child(c)))
+            return ret;
+        if (c->modal)
+            return c;
     }
     return NULL;
 }
@@ -3692,9 +3623,9 @@ gboolean client_validate(ObClient *self)
 
     XSync(obt_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(obt_display, self->w_client, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(obt_display, self->w_client, UnmapNotify, &e))
-    {
+    if (XCheckTypedWindowEvent(obt_display, self->w_client, DestroyNotify, &e)
+            || XCheckTypedWindowEvent(obt_display, self->w_client, UnmapNotify,
+                    &e)) {
         XPutBackEvent(obt_display, &e);
         return FALSE;
     }
@@ -3704,7 +3635,8 @@ gboolean client_validate(ObClient *self)
 
 void client_set_wm_state(ObClient *self, glong state)
 {
-    if (state == self->wmstate) return; /* no change */
+    if (state == self->wmstate)
+        return; /* no change */
 
     switch (state) {
     case IconicState:
@@ -3730,115 +3662,136 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     gboolean below = self->below;
     gint i;
 
-    if (!(action == OBT_PROP_ATOM(NET_WM_STATE_ADD) ||
-          action == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) ||
-          action == OBT_PROP_ATOM(NET_WM_STATE_TOGGLE)))
+    if (!(action == OBT_PROP_ATOM(NET_WM_STATE_ADD) || action
+            == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) || action
+            == OBT_PROP_ATOM(NET_WM_STATE_TOGGLE)))
         /* an invalid action was passed to the client message, ignore it */
         return;
 
     for (i = 0; i < 2; ++i) {
         Atom state = i == 0 ? data1 : data2;
 
-        if (!state) continue;
+        if (!state)
+            continue;
 
         /* if toggling, then pick whether we're adding or removing */
         if (action == OBT_PROP_ATOM(NET_WM_STATE_TOGGLE)) {
             if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL))
-                action = modal ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = modal ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT))
-                action = self->max_vert ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->max_vert ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ))
-                action = self->max_horz ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->max_horz ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED))
-                action = shaded ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = shaded ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR))
-                action = self->skip_taskbar ?
-                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action
+                        = self->skip_taskbar ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                                : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER))
-                action = self->skip_pager ?
-                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->skip_pager ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN))
-                action = self->iconic ?
-                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->iconic ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN))
-                action = fullscreen ?
-                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = fullscreen ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE))
-                action = self->above ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->above ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW))
-                action = self->below ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = self->below ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION))
-                action = self->demands_attention ?
-                    OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action
+                        = self->demands_attention ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                                : OBT_PROP_ATOM(NET_WM_STATE_ADD);
             else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED))
-                action = undecorated ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
-                    OBT_PROP_ATOM(NET_WM_STATE_ADD);
+                action = undecorated ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE)
+                        : OBT_PROP_ATOM(NET_WM_STATE_ADD);
         }
 
         if (action == OBT_PROP_ATOM(NET_WM_STATE_ADD)) {
             if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL)) {
                 modal = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
                 max_vert = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
                 max_horz = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
                 shaded = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
                 self->skip_taskbar = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
                 self->skip_pager = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
                 iconic = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
                 fullscreen = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
                 above = TRUE;
                 below = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
                 above = FALSE;
                 below = TRUE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)){
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)) {
                 demands_attention = TRUE;
-            } else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
+            }
+            else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
                 undecorated = TRUE;
             }
 
-        } else { /* action == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) */
+        }
+        else { /* action == OBT_PROP_ATOM(NET_WM_STATE_REMOVE) */
             if (state == OBT_PROP_ATOM(NET_WM_STATE_MODAL)) {
                 modal = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_VERT)) {
                 max_vert = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_MAXIMIZED_HORZ)) {
                 max_horz = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SHADED)) {
                 shaded = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_TASKBAR)) {
                 self->skip_taskbar = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_SKIP_PAGER)) {
                 self->skip_pager = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_HIDDEN)) {
                 iconic = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_FULLSCREEN)) {
                 fullscreen = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_ABOVE)) {
                 above = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_BELOW)) {
                 below = FALSE;
-            } else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)){
+            }
+            else if (state == OBT_PROP_ATOM(NET_WM_STATE_DEMANDS_ATTENTION)) {
                 demands_attention = FALSE;
-            } else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
+            }
+            else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED)) {
                 undecorated = FALSE;
             }
         }
@@ -3849,11 +3802,13 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
             /* toggling both */
             if (max_horz == max_vert) { /* both going the same way */
                 client_maximize(self, max_horz, 0);
-            } else {
+            }
+            else {
                 client_maximize(self, max_horz, 1);
                 client_maximize(self, max_vert, 2);
             }
-        } else {
+        }
+        else {
             /* toggling one */
             if (max_horz != self->max_horz)
                 client_maximize(self, max_horz, 1);
@@ -3862,7 +3817,7 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         }
     }
     /* change fullscreen state before shading, as it will affect if the window
-       can shade or not */
+     can shade or not */
     if (fullscreen != self->fullscreen)
         client_fullscreen(self, fullscreen);
     if (shaded != self->shaded)
@@ -3878,11 +3833,11 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
     if (modal != self->modal) {
         self->modal = modal;
         /* when a window changes modality, then its stacking order with its
-           transients needs to change */
+         transients needs to change */
         stacking_raise(CLIENT_AS_WINDOW(self));
 
         /* it also may get focused. if something is focused that shouldn't
-           be focused anymore, then move the focus */
+         be focused anymore, then move the focus */
         if (focus_client && client_focus_target(focus_client) != focus_client)
             client_focus(focus_client);
     }
@@ -3901,7 +3856,8 @@ ObClient *client_focus_target(ObClient *self)
     ObClient *child = NULL;
 
     child = client_search_modal_child(self);
-    if (child) return child;
+    if (child)
+        return child;
     return self;
 }
 
@@ -3922,42 +3878,40 @@ gboolean client_can_focus(ObClient *self)
 gboolean client_focus(ObClient *self)
 {
     /* we might not focus this window, so if we have modal children which would
-       be focused instead, bring them to this desktop */
+     be focused instead, bring them to this desktop */
     client_bring_modal_windows(self);
 
     /* choose the correct target */
     self = client_focus_target(self);
 
     if (!client_can_focus(self)) {
-        ob_debug_type(OB_DEBUG_FOCUS,
-                      "Client %s can't be focused", self->title);
+        ob_debug_type(OB_DEBUG_FOCUS, "Client %s can't be focused", self->title);
         return FALSE;
     }
 
-    ob_debug_type(OB_DEBUG_FOCUS,
-                  "Focusing client \"%s\" (0x%x) at time %u",
-                  self->title, self->w_client, event_curtime);
+    ob_debug_type(OB_DEBUG_FOCUS, "Focusing client \"%s\" (0x%x) at time %u",
+            self->title, self->w_client, event_curtime);
 
     /* if using focus_delay, stop the timer now so that focus doesn't
-       go moving on us */
+     go moving on us */
     event_halt_focus_delay();
 
     /* if there is a grab going on, then we need to cancel it. if we move
-       focus during the grab, applications will get NotifyWhileGrabbed events
-       and ignore them !
+     focus during the grab, applications will get NotifyWhileGrabbed events
+     and ignore them !
 
-       actions should not rely on being able to move focus during an
-       interactive grab.
-    */
+     actions should not rely on being able to move focus during an
+     interactive grab.
+     */
     event_cancel_all_key_grabs();
 
     obt_display_ignore_errors(TRUE);
 
     if (self->can_focus) {
         /* This can cause a BadMatch error with CurrentTime, or if an app
-           passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
+         passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
         XSetInputFocus(obt_display, self->w_client, RevertToPointerRoot,
-                       event_curtime);
+                event_curtime);
     }
 
     if (self->focus_notify) {
@@ -3978,27 +3932,26 @@ gboolean client_focus(ObClient *self)
     obt_display_ignore_errors(FALSE);
 
     ob_debug_type(OB_DEBUG_FOCUS, "Error focusing? %d",
-                  obt_display_error_occured);
+            obt_display_error_occured);
     return !obt_display_error_occured;
 }
 
 static void client_present(ObClient *self, gboolean here, gboolean raise,
-                           gboolean unshade)
+        gboolean unshade)
 {
     if (client_normal(self) && screen_showing_desktop)
         screen_show_desktop(FALSE, self);
     if (self->iconic)
         client_iconify(self, FALSE, here, FALSE);
-    if (self->desktop != DESKTOP_ALL &&
-        self->desktop != screen_desktop)
-    {
+    if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop) {
         if (here)
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else
             screen_set_desktop(self->desktop, FALSE);
-    } else if (!frame_engine.frame_is_visible(self->frame))
+    }
+    else if (!frame_engine.frame_is_visible(self->frame))
         /* if its not visible for other reasons, then don't mess
-           with it */
+         with it */
         return;
     if (self->shaded && unshade)
         client_shade(self, FALSE);
@@ -4009,28 +3962,23 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 }
 
 void client_activate(ObClient *self, gboolean here, gboolean raise,
-                     gboolean unshade, gboolean user)
+        gboolean unshade, gboolean user)
 {
     client_present(self, here, raise, unshade);
 }
 
-static void client_bring_windows_recursive(ObClient *self,
-                                           guint desktop,
-                                           gboolean helpers,
-                                           gboolean modals,
-                                           gboolean iconic)
+static void client_bring_windows_recursive(ObClient *self, guint desktop,
+        gboolean helpers, gboolean modals, gboolean iconic)
 {
     GSList *it;
 
     for (it = self->transients; it; it = g_slist_next(it))
-        client_bring_windows_recursive(it->data, desktop,
-                                       helpers, modals, iconic);
+        client_bring_windows_recursive(it->data, desktop, helpers, modals,
+                iconic);
 
-    if (((helpers && client_helper(self)) ||
-         (modals && self->modal)) &&
-        ((self->desktop != desktop && self->desktop != DESKTOP_ALL) ||
-         (iconic && self->iconic)))
-    {
+    if (((helpers && client_helper(self)) || (modals && self->modal))
+            && ((self->desktop != desktop && self->desktop != DESKTOP_ALL)
+                    || (iconic && self->iconic))) {
         if (iconic && self->iconic)
             client_iconify(self, FALSE, TRUE, FALSE);
         else
@@ -4072,8 +4020,8 @@ static ObClientIcon* client_icon_recursive(ObClient *self, gint w, gint h)
     }
 
     /* some kind of crappy approximation to find the icon closest in size to
-       what we requested, but icons are generally all the same ratio as
-       eachother so it's good enough. */
+     what we requested, but icons are generally all the same ratio as
+     eachother so it's good enough. */
 
     min_diff = ABS(self->icons[0].width - w) + ABS(self->icons[0].height - h);
     min_i = 0;
@@ -4108,9 +4056,11 @@ void client_set_layer(ObClient *self, gint layer)
     if (layer < 0) {
         self->below = TRUE;
         self->above = FALSE;
-    } else if (layer == 0) {
+    }
+    else if (layer == 0) {
         self->below = self->above = FALSE;
-    } else {
+    }
+    else {
         self->below = FALSE;
         self->above = TRUE;
     }
@@ -4121,10 +4071,9 @@ void client_set_layer(ObClient *self, gint layer)
 void client_set_undecorated(ObClient *self, gboolean undecorated)
 {
     if (self->undecorated != undecorated &&
-        /* don't let it undecorate if the function is missing, but let
-           it redecorate */
-        (self->functions & OB_CLIENT_FUNC_UNDECORATE || !undecorated))
-    {
+    /* don't let it undecorate if the function is missing, but let
+     it redecorate */
+    (self->functions & OB_CLIENT_FUNC_UNDECORATE || !undecorated)) {
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self, TRUE);
         client_change_state(self); /* reflect this in the state hints */
@@ -4140,28 +4089,29 @@ guint client_monitor(ObClient *self)
 
 ObClient *client_direct_parent(ObClient *self)
 {
-    if (!self->parents) return NULL;
-    if (self->transient_for_group) return NULL;
+    if (!self->parents)
+        return NULL;
+    if (self->transient_for_group)
+        return NULL;
     return self->parents->data;
 }
 
 ObClient *client_search_top_direct_parent(ObClient *self)
 {
     ObClient *p;
-    while ((p = client_direct_parent(self))) self = p;
+    while ((p = client_direct_parent(self)))
+        self = p;
     return self;
 }
 
 static GSList *client_search_all_top_parents_internal(ObClient *self,
-                                                      gboolean bylayer,
-                                                      ObStackingLayer layer)
+        gboolean bylayer, ObStackingLayer layer)
 {
     GSList *ret;
     ObClient *p;
 
     /* move up the direct transient chain as far as possible */
-    while ((p = client_direct_parent(self)) &&
-           (!bylayer || p->layer == layer))
+    while ((p = client_direct_parent(self)) && (!bylayer || p->layer == layer))
         self = p;
 
     if (!self->parents)
@@ -4187,7 +4137,8 @@ ObClient *client_search_focus_parent(ObClient *self)
     GSList *it;
 
     for (it = self->parents; it; it = g_slist_next(it))
-        if (client_focused(it->data)) return it->data;
+        if (client_focused(it->data))
+            return it->data;
 
     return NULL;
 }
@@ -4197,7 +4148,8 @@ ObClient *client_search_parent(ObClient *self, ObClient *search)
     GSList *it;
 
     for (it = self->parents; it; it = g_slist_next(it))
-        if (it->data == search) return search;
+        if (it->data == search)
+            return search;
 
     return NULL;
 }
@@ -4215,95 +4167,92 @@ ObClient *client_search_transient(ObClient *self, ObClient *search)
     return NULL;
 }
 
-static void detect_edge(Rect area, ObDirection dir,
-                        gint my_head, gint my_size,
-                        gint my_edge_start, gint my_edge_size,
-                        gint *dest, gboolean *near_edge)
+static void detect_edge(Rect area, ObDirection dir, gint my_head, gint my_size,
+        gint my_edge_start, gint my_edge_size, gint *dest, gboolean *near_edge)
 {
     gint edge_start, edge_size, head, tail;
     gboolean skip_head = FALSE, skip_tail = FALSE;
 
     switch (dir) {
-        case OB_DIRECTION_NORTH:
-        case OB_DIRECTION_SOUTH:
-            edge_start = area.x;
-            edge_size = area.width;
-            break;
-        case OB_DIRECTION_EAST:
-        case OB_DIRECTION_WEST:
-            edge_start = area.y;
-            edge_size = area.height;
-            break;
-        default:
-            g_assert_not_reached();
+    case OB_DIRECTION_NORTH:
+    case OB_DIRECTION_SOUTH:
+        edge_start = area.x;
+        edge_size = area.width;
+        break;
+    case OB_DIRECTION_EAST:
+    case OB_DIRECTION_WEST:
+        edge_start = area.y;
+        edge_size = area.height;
+        break;
+    default:
+        g_assert_not_reached();
     }
 
     /* do we collide with this window? */
-    if (!RANGES_INTERSECT(my_edge_start, my_edge_size,
-                edge_start, edge_size))
+    if (!RANGES_INTERSECT(my_edge_start, my_edge_size, edge_start, edge_size))
         return;
 
     switch (dir) {
-        case OB_DIRECTION_NORTH:
-            head = RECT_BOTTOM(area);
-            tail = RECT_TOP(area);
-            break;
-        case OB_DIRECTION_SOUTH:
-            head = RECT_TOP(area);
-            tail = RECT_BOTTOM(area);
-            break;
-        case OB_DIRECTION_WEST:
-            head = RECT_RIGHT(area);
-            tail = RECT_LEFT(area);
-            break;
-        case OB_DIRECTION_EAST:
-            head = RECT_LEFT(area);
-            tail = RECT_RIGHT(area);
-            break;
-        default:
-            g_assert_not_reached();
+    case OB_DIRECTION_NORTH:
+        head = RECT_BOTTOM(area);
+        tail = RECT_TOP(area);
+        break;
+    case OB_DIRECTION_SOUTH:
+        head = RECT_TOP(area);
+        tail = RECT_BOTTOM(area);
+        break;
+    case OB_DIRECTION_WEST:
+        head = RECT_RIGHT(area);
+        tail = RECT_LEFT(area);
+        break;
+    case OB_DIRECTION_EAST:
+        head = RECT_LEFT(area);
+        tail = RECT_RIGHT(area);
+        break;
+    default:
+        g_assert_not_reached();
     }
     switch (dir) {
-        case OB_DIRECTION_NORTH:
-        case OB_DIRECTION_WEST:
-            /* check if our window is past the head of this window */
-            if (my_head <= head + 1)
-                skip_head = TRUE;
-            /* check if our window's tail is past the tail of this window */
-            if (my_head + my_size - 1 <= tail)
-                skip_tail = TRUE;
-            /* check if the head of this window is closer than the previously
-               chosen edge (take into account that the previously chosen
-               edge might have been a tail, not a head) */
-            if (head + (*near_edge ? 0 : my_size) < *dest)
-                skip_head = TRUE;
-            /* check if the tail of this window is closer than the previously
-               chosen edge (take into account that the previously chosen
-               edge might have been a head, not a tail) */
-            if (tail - (!*near_edge ? 0 : my_size) < *dest)
-                skip_tail = TRUE;
-            break;
-        case OB_DIRECTION_SOUTH:
-        case OB_DIRECTION_EAST:
-            /* check if our window is past the head of this window */
-            if (my_head >= head - 1)
-                skip_head = TRUE;
-            /* check if our window's tail is past the tail of this window */
-            if (my_head - my_size + 1 >= tail)
-                skip_tail = TRUE;
-            /* check if the head of this window is closer than the previously
-               chosen edge (take into account that the previously chosen
-               edge might have been a tail, not a head) */
-            if (head - (*near_edge ? 0 : my_size) > *dest)
-                skip_head = TRUE;
-            /* check if the tail of this window is closer than the previously
-               chosen edge (take into account that the previously chosen
-               edge might have been a head, not a tail) */
-            if (tail + (!*near_edge ? 0 : my_size) > *dest)
-                skip_tail = TRUE;
-            break;
-        default:
-            g_assert_not_reached();
+    case OB_DIRECTION_NORTH:
+    case OB_DIRECTION_WEST:
+        /* check if our window is past the head of this window */
+        if (my_head <= head + 1)
+            skip_head = TRUE;
+        /* check if our window's tail is past the tail of this window */
+        if (my_head + my_size - 1 <= tail)
+            skip_tail = TRUE;
+        /* check if the head of this window is closer than the previously
+         chosen edge (take into account that the previously chosen
+         edge might have been a tail, not a head) */
+        if (head + (*near_edge ? 0 : my_size) < *dest)
+            skip_head = TRUE;
+        /* check if the tail of this window is closer than the previously
+         chosen edge (take into account that the previously chosen
+         edge might have been a head, not a tail) */
+        if (tail - (!*near_edge ? 0 : my_size) < *dest)
+            skip_tail = TRUE;
+        break;
+    case OB_DIRECTION_SOUTH:
+    case OB_DIRECTION_EAST:
+        /* check if our window is past the head of this window */
+        if (my_head >= head - 1)
+            skip_head = TRUE;
+        /* check if our window's tail is past the tail of this window */
+        if (my_head - my_size + 1 >= tail)
+            skip_tail = TRUE;
+        /* check if the head of this window is closer than the previously
+         chosen edge (take into account that the previously chosen
+         edge might have been a tail, not a head) */
+        if (head - (*near_edge ? 0 : my_size) > *dest)
+            skip_head = TRUE;
+        /* check if the tail of this window is closer than the previously
+         chosen edge (take into account that the previously chosen
+         edge might have been a head, not a tail) */
+        if (tail + (!*near_edge ? 0 : my_size) > *dest)
+            skip_tail = TRUE;
+        break;
+    default:
+        g_assert_not_reached();
     }
 
     ob_debug("my head %d size %d", my_head, my_size);
@@ -4321,9 +4270,8 @@ static void detect_edge(Rect area, ObDirection dir,
 }
 
 void client_find_edge_directional(ObClient *self, ObDirection dir,
-                                  gint my_head, gint my_size,
-                                  gint my_edge_start, gint my_edge_size,
-                                  gint *dest, gboolean *near_edge)
+        gint my_head, gint my_size, gint my_edge_start, gint my_edge_size,
+        gint *dest, gboolean *near_edge)
 {
     GList *it;
     Rect *a, *mon;
@@ -4335,10 +4283,8 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     Rect area;
     frame_engine.frame_get_window_area(self->frame, &area);
 
-    a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
-                    &area);
-    mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
-                      &area);
+    a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, &area);
+    mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &area);
 
     switch (dir) {
     case OB_DIRECTION_NORTH:
@@ -4380,31 +4326,30 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
             continue;
         if (cur->iconic)
             continue;
-        if (self->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&
-            cur->desktop != screen_desktop)
+        if (self->desktop != cur->desktop && cur->desktop != DESKTOP_ALL
+                && cur->desktop != screen_desktop)
             continue;
 
         ob_debug("trying window %s", cur->title);
 
         Rect area;
-        frame_engine.frame_get_window_area(self->frame, &area); 
-        detect_edge(area, dir, my_head, my_size, my_edge_start,
-                    my_edge_size, dest, near_edge);
+        frame_engine.frame_get_window_area(self->frame, &area);
+        detect_edge(area, dir, my_head, my_size, my_edge_start, my_edge_size,
+                dest, near_edge);
     }
     dock_get_area(&dock_area);
-    detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
-                my_edge_size, dest, near_edge);
+    detect_edge(dock_area, dir, my_head, my_size, my_edge_start, my_edge_size,
+            dest, near_edge);
     g_free(a);
     g_free(mon);
 }
 
-void client_find_move_directional(ObClient *self, ObDirection dir,
-                                  gint *x, gint *y)
+void client_find_move_directional(ObClient *self, ObDirection dir, gint *x,
+        gint *y)
 {
     gint head, size;
     gint e, e_start, e_size;
     gboolean near;
-
 
     Rect area;
     frame_engine.frame_get_window_area(self->frame, &area);
@@ -4438,29 +4383,37 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
         g_assert_not_reached();
     }
 
-    client_find_edge_directional(self, dir, head, size,
-                                 e_start, e_size, &e, &near);
+    client_find_edge_directional(self, dir, head, size, e_start, e_size, &e,
+            &near);
     *x = area.x;
     *y = area.y;
     switch (dir) {
     case OB_DIRECTION_EAST:
-        if (near) e -= area.width;
-        else      e++;
+        if (near)
+            e -= area.width;
+        else
+            e++;
         *x = e;
         break;
     case OB_DIRECTION_WEST:
-        if (near) e++;
-        else      e -= area.width;
+        if (near)
+            e++;
+        else
+            e -= area.width;
         *x = e;
         break;
     case OB_DIRECTION_NORTH:
-        if (near) e++;
-        else      e -= area.height;
+        if (near)
+            e++;
+        else
+            e -= area.height;
         *y = e;
         break;
     case OB_DIRECTION_SOUTH:
-        if (near) e -= area.height;
-        else      e++;
+        if (near)
+            e -= area.height;
+        else
+            e++;
         *y = e;
         break;
     default:
@@ -4470,8 +4423,7 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
 }
 
 void client_find_resize_directional(ObClient *self, ObDirection side,
-                                    gboolean grow,
-                                    gint *x, gint *y, gint *w, gint *h)
+        gboolean grow, gint *x, gint *y, gint *w, gint *h)
 {
     gint head;
     gint e, e_start, e_size, delta;
@@ -4485,29 +4437,26 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
 
     switch (side) {
     case OB_DIRECTION_EAST:
-        head = RECT_RIGHT(area) +
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+        head = RECT_RIGHT(area) + (self->size_inc.width - 1) * (grow ? 1 : -1);
         e_start = RECT_TOP(area);
         e_size = area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
-        head = RECT_LEFT(area) -
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+        head = RECT_LEFT(area) - (self->size_inc.width - 1) * (grow ? 1 : -1);
         e_start = RECT_TOP(area);
         e_size = area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
-        head = RECT_TOP(area) -
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+        head = RECT_TOP(area) - (self->size_inc.height - 1) * (grow ? 1 : -1);
         e_start = RECT_LEFT(area);
         e_size = area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
-        head = RECT_BOTTOM(area) +
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+        head = RECT_BOTTOM(area) + (self->size_inc.height - 1)
+                * (grow ? 1 : -1);
         e_start = RECT_LEFT(area);
         e_size = area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;
@@ -4517,8 +4466,7 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     }
 
     ob_debug("head %d dir %d", head, dir);
-    client_find_edge_directional(self, dir, head, 1,
-                                 e_start, e_size, &e, &near);
+    client_find_edge_directional(self, dir, head, 1, e_start, e_size, &e, &near);
     ob_debug("edge %d", e);
     *x = area.x;
     *y = area.y;
@@ -4526,24 +4474,28 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     *h = area.height;
     switch (side) {
     case OB_DIRECTION_EAST:
-        if (grow == near) --e;
+        if (grow == near)
+            --e;
         delta = e - RECT_RIGHT(area);
         *w += delta;
         break;
     case OB_DIRECTION_WEST:
-        if (grow == near) ++e;
+        if (grow == near)
+            ++e;
         delta = RECT_LEFT(area) - e;
         *x -= delta;
         *w += delta;
         break;
     case OB_DIRECTION_NORTH:
-        if (grow == near) ++e;
+        if (grow == near)
+            ++e;
         delta = RECT_TOP(area) - e;
         *y -= delta;
         *h += delta;
         break;
     case OB_DIRECTION_SOUTH:
-        if (grow == near) --e;
+        if (grow == near)
+            --e;
         delta = e - RECT_BOTTOM(area);
         *h += delta;
         break;
@@ -4568,13 +4520,11 @@ ObClient* client_under_pointer(void)
                 Rect area;
                 frame_engine.frame_get_window_area(c->frame, &area);
                 if (frame_engine.frame_is_visible(c->frame) &&
-                    /* check the desktop, this is done during desktop
-                       switching and windows are shown/hidden status is not
-                       reliable */
-                    (c->desktop == screen_desktop ||
-                     c->desktop == DESKTOP_ALL) &&   
-                    RECT_CONTAINS(area, x, y))
-                {
+                /* check the desktop, this is done during desktop
+                 switching and windows are shown/hidden status is not
+                 reliable */
+                (c->desktop == screen_desktop || c->desktop == DESKTOP_ALL)
+                        && RECT_CONTAINS(area, x, y)) {
                     ret = c;
                     break;
                 }
@@ -4622,7 +4572,7 @@ gboolean client_flash_timeout(gpointer data)
     ObClient * self = (ObClient *) data;
     GTimeVal now;
     g_get_current_time(&now);
-    
+
     if (now.tv_sec > self->flash_end.tv_sec
             || (now.tv_sec == self->flash_end.tv_sec && now.tv_usec
                     >= self->flash_end.tv_usec))
@@ -4634,7 +4584,7 @@ gboolean client_flash_timeout(gpointer data)
     self->flash_on = !self->flash_on;
     if (!self->focused) {
         frame_engine.frame_set_is_focus(self->frame, self->flash_on);
-        frame_engine.frame_update_skin (self->frame);
+        frame_engine.frame_update_skin(self->frame);
         self->focused = FALSE;
     }
     return TRUE; /* go again */
@@ -4660,9 +4610,41 @@ void client_flash_stop(ObClient * self)
 void client_flash_done(gpointer data)
 {
     ObClient * self = (ObClient *) data;
-    if (self->focused != self->flash_on)
-    {
+    if (self->focused != self->flash_on) {
         frame_engine.frame_set_is_focus(self->frame, self->focused);
-        frame_engine.frame_update_skin (self->frame);
+        frame_engine.frame_update_skin(self->frame);
     }
+}
+
+void client_create_window(ObClient * self, Window * dst, Window parent)
+{
+    Visual * visual = NULL;
+    gulong mask = 0;
+    XSetWindowAttributes attrib;
+    XWindowAttributes wattrib;
+    Status ret;
+    /* First we check if we are in 32 bits */
+    /* we're already running at 32 bit depth, yay. we don't need to use their
+     visual */
+    if (RrDepth(ob_rr_inst) != 32) {
+        ret = XGetWindowAttributes(obt_display, self->w_client, &wattrib);
+        g_assert(ret != BadDrawable);
+        g_assert(ret != BadWindow);
+        if (wattrib.depth == 32)
+            visual = wattrib.visual;
+    }
+
+    if (visual) {
+        /* client has a 32-bit visual or is allready set ?*/
+        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        /* create a colormap with the visual */
+        attrib.colormap = XCreateColormap(obt_display, RootWindow(obt_display,
+                ob_screen), visual, AllocNone);
+        attrib.background_pixel = BlackPixel(obt_display, ob_screen);
+        attrib.border_pixel = BlackPixel(obt_display, ob_screen);
+    }
+    
+    *dst = CREATE_WINDOW(parent, visual, mask, &attrib);
+    /* Register the frame */
+    g_hash_table_insert(window_map, dst, self);
 }

@@ -328,7 +328,7 @@ void frame_grab(gpointer _self, GHashTable * window_map)
      */
 
     /* set all the windows for the frame in the window_map */
-    g_hash_table_insert(window_map, &self->window, self->client);
+    //g_hash_table_insert(window_map, &self->window, self->client);
     g_hash_table_insert(window_map, &self->backback, self->client);
     g_hash_table_insert(window_map, &self->backfront, self->client);
     g_hash_table_insert(window_map, &self->innerleft, self->client);

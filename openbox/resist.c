@@ -106,7 +106,7 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
     Rect dock_area;
 
     Rect c_area;
-    frame_engine->frame_get_window_area(c->frame, &c_area);
+    frame_engine.frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 
@@ -120,14 +120,14 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
         target = it->data;
 
         /* don't snap to self or non-visibles */
-        if (!frame_engine->frame_is_visible(target->frame) || target == c)
+        if (!frame_engine.frame_is_visible(target->frame) || target == c)
             continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
         Rect target_area;
-        frame_engine->frame_get_window_area(target->frame, &target_area);
+        frame_engine.frame_get_window_area(target->frame, &target_area);
         if (resist_move_window(c_area, target_area,
                                resist, x, y))
             break;
@@ -150,7 +150,7 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     Rect desired_area;
 
     Rect c_area;
-    frame_engine->frame_get_window_area(c->frame, &c_area);
+    frame_engine.frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 
@@ -306,7 +306,7 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
     Rect dock_area;
 
     Rect c_area;
-    frame_engine->frame_get_window_area(c->frame, &c_area);
+    frame_engine.frame_get_window_area(c->frame, &c_area);
     if (!resist) return;
 
     for (it = stacking_list; it; it = g_list_next(it)) {
@@ -315,14 +315,14 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
         target = it->data;
 
         /* don't snap to invisibles or ourself */
-        if (!frame_engine->frame_is_visible(target->frame) || target == c)
+        if (!frame_engine.frame_is_visible(target->frame) || target == c)
             continue;
         /* don't snap to windows set to below and skip_taskbar (desklets) */
         if (target->below && !c->below && target->skip_taskbar)
             continue;
 
         Rect target_area;
-        frame_engine->frame_get_window_area(target->frame, &target_area);
+        frame_engine.frame_get_window_area(target->frame, &target_area);
         if (resist_size_window(c_area, target_area,
                                resist, w, h, dir))
             break;
@@ -345,7 +345,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     Rect desired_area;
 
     Rect c_area;
-    frame_engine->frame_get_window_area(c->frame, &c_area);
+    frame_engine.frame_get_window_area(c->frame, &c_area);
 
     if (!resist) return;
 

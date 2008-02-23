@@ -150,7 +150,7 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     guint i;
 
     Rect area;
-    frame_engine->frame_get_window_area(client->frame, &area);
+    frame_engine.frame_get_window_area(client->frame, &area);
 
     areas = pick_head(client);
     i = (config_place_monitor != OB_PLACE_MONITOR_ANY) ?
@@ -315,7 +315,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
                 /* don't ignore this window, so remove it from the available
                    area */
                 Rect test_area;
-                frame_engine->frame_get_window_area(test->frame, &test_area);
+                frame_engine.frame_get_window_area(test->frame, &test_area);
                 spaces = area_remove(spaces, &test_area);
             }
 
@@ -326,7 +326,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
             }
 
             Rect c_area;
-            frame_engine->frame_get_window_area(c->frame, &c_area);
+            frame_engine.frame_get_window_area(c->frame, &c_area);
             for (sit = spaces; sit; sit = g_slist_next(sit)) {
                 Rect *r = sit->data;
 
@@ -372,9 +372,9 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     Rect *area;
 
     Strut fsize;
-    frame_engine->frame_get_size(client->frame, &fsize);
+    frame_engine.frame_get_size(client->frame, &fsize);
     Rect farea;
-    frame_engine->frame_get_window_area(client->frame, &farea);
+    frame_engine.frame_get_window_area(client->frame, &farea);
 
     if (!screen_pointer_pos(&px, &py))
         return FALSE;
@@ -425,7 +425,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     }
 
     Rect farea;
-    frame_engine->frame_get_window_area(client->frame, &farea);
+    frame_engine.frame_get_window_area(client->frame, &farea);
     if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
     else if (settings->position.x.opposite)
@@ -455,7 +455,7 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         for (it = client->parents; it; it = g_slist_next(it)) {
             ObClient *m = it->data;
             Rect area;
-            frame_engine->frame_get_window_area(m->frame, &area);
+            frame_engine.frame_get_window_area(m->frame, &area);
             if (!m->iconic) {
                 if (first) {
                     l = RECT_LEFT(area);
@@ -483,7 +483,7 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
     {
         Rect **areas;
         Rect area;
-        frame_engine->frame_get_window_area(client->frame, &area);
+        frame_engine.frame_get_window_area(client->frame, &area);
         guint i;
 
         areas = pick_head(client);

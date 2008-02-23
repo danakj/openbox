@@ -24,7 +24,6 @@
 #include "obt/paths.h"
 
 #define SHARED_SUFFIX ".la"
-#define PLUGIN_PATH "/.config/openbox/engines/"
 
 gchar *create_class_name(const gchar *rname);
 
@@ -34,7 +33,7 @@ XrmDatabase loaddb(const gchar *name, gchar **path);
 /* Read string in XrmDatabase */
 gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value);
 
-ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
+void init_frame_engine(ObFrameEngine * p_engine, const gchar *name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font)
 {
@@ -45,23 +44,7 @@ ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
         db = loaddb(name, &path);
         if (db == NULL) {
             g_message("Unable to load the theme '%s'", name);
-            if (allow_fallback)
-                //g_message("Falling back to the default theme '%s'", DEFAULT_THEME);
-                /* fallback to the default theme */
-                name = NULL;
         }
-    }
-    if (name == NULL) {
-        if (allow_fallback) {
-            //db = loaddb(DEFAULT_THEME, &path);
-            db = NULL;
-            if (db == NULL) {
-                //g_message("Unable to load the theme '%s'", DEFAULT_THEME);
-                return 0;
-            }
-        }
-        else
-            return 0;
     }
 
     gchar * engine_filename;
@@ -74,26 +57,19 @@ ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
     ObFrameEngine * p = load_frame_engine(absolute_engine_filename);
     g_free(absolute_engine_filename);
 
-    update_frame_engine(p);
+    memcpy(p_engine, p, sizeof(ObFrameEngine));
+    update_frame_engine();
 
     (p->load_theme_config)(ob_rr_inst, name, path, db, active_window_font,
             inactive_window_font, menu_title_font, menu_item_font, osd_font);
 
     g_free(path);
     XrmDestroyDatabase(db);
-
-    return p;
 }
 
-void update_frame_engine(ObFrameEngine * self)
+void update_frame_engine()
 {
-    self->init (obt_display, ob_screen);
-    //self->ob_display = obt_display;
-    //self->ob_screen = ob_screen;
-    //self->ob_rr_inst = ob_rr_inst;
-    //self->config_theme_keepborder = config_theme_keepborder;
-    //self->config_title_layout = config_title_layout;
-    //self->ob_main_loop = ob_main_loop;
+    frame_engine.init (obt_display, ob_screen);
 }
 
 ObFrameEngine * load_frame_engine(const gchar * filename)
@@ -249,7 +225,7 @@ ObFrameContext frame_context_from_string(const gchar *name)
 ObFrameContext engine_frame_context(ObClient *client, Window win, gint x, gint y)
 {
     /* this part is commun to all engine */
-    if (frame_engine->moveresize_in_progress)
+    if (frame_engine.moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
     if (win == obt_root(ob_screen))
         return OB_FRAME_CONTEXT_ROOT;
@@ -263,14 +239,14 @@ ObFrameContext engine_frame_context(ObClient *client, Window win, gint x, gint y
         return OB_FRAME_CONTEXT_CLIENT;
     }
     /* this part is specific to the plugin */
-    return frame_engine->frame_context(client->frame, win, x, y);
+    return frame_engine.frame_context(client->frame, win, x, y);
 
 }
 
 void frame_client_gravity(ObClient *self, gint *x, gint *y)
 {
     Strut size;
-    frame_engine->frame_get_size(self->frame, &size);
+    frame_engine.frame_get_size(self->frame, &size);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -333,7 +309,7 @@ void frame_client_gravity(ObClient *self, gint *x, gint *y)
 void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 {
     Strut size;
-    frame_engine->frame_get_size(self->frame, &size);
+    frame_engine.frame_get_size(self->frame, &size);
     /* horizontal */
     switch (self->gravity) {
     default:
@@ -390,7 +366,7 @@ void frame_frame_gravity(ObClient *self, gint *x, gint *y)
 void frame_rect_to_frame(ObClient * self, Rect *r)
 {
     Strut size;
-    frame_engine->frame_get_size(self->frame, &size);
+    frame_engine.frame_get_size(self->frame, &size);
     r->width += size.left + size.right;
     r->height += size.top + size.bottom;
     frame_client_gravity(self, &r->x, &r->y);
@@ -399,7 +375,7 @@ void frame_rect_to_frame(ObClient * self, Rect *r)
 void frame_rect_to_client(ObClient * self, Rect *r)
 {
     Strut size;
-    frame_engine->frame_get_size(self, &size);
+    frame_engine.frame_get_size(self, &size);
     r->width -= size.left + size.right;
     r->height -= size.top + size.bottom;
     frame_frame_gravity(self, &r->x, &r->y);

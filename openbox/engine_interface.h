@@ -151,9 +151,6 @@ struct _ObFrameEngine
     void (*frame_set_is_max_horz)(gpointer, gboolean);
     void (*frame_set_is_shaded)(gpointer, gboolean);
 
-    void (*frame_flash_start)(gpointer self);
-    void (*frame_flash_stop)(gpointer self);
-
     /* Set the layout wanted by client */
     void (*frame_set_decorations)(gpointer, ObFrameDecorations);
     
@@ -190,7 +187,6 @@ struct _ObFrameEngine
     /* Filled by openbox-core */
     struct _ObClient *focus_cycle_target;
     gboolean moveresize_in_progress;
-    //struct _ObtMainLoop *ob_main_loop;
 };
 /* Define how to draw the current windows */
 enum _ObStyle
@@ -212,12 +208,12 @@ typedef ObFrameEngine * (*ObFrameEngineFunc)(void);
 
 /* initialize theme plugin, it read themerc and load
  * the plugin needed */
-ObFrameEngine * init_frame_engine(const gchar *name, gboolean allow_fallback,
+void init_frame_engine(ObFrameEngine * engine_ptr, const gchar * name, gboolean allow_fallback,
         RrFont *active_window_font, RrFont *inactive_window_font,
         RrFont *menu_title_font, RrFont *menu_item_font, RrFont *osd_font);
 
 /* Update plugin data */
-void update_frame_engine(ObFrameEngine *);
+void update_frame_engine();
 
 /* Load modules specified in filename */
 ObFrameEngine * load_frame_engine(const gchar * filename);

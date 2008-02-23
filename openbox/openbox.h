@@ -48,7 +48,7 @@ extern gboolean ob_replace_wm;
 extern gboolean ob_debug_xinerama;
 
 /* render function */
-extern ObFrameEngine * frame_engine;
+extern ObFrameEngine frame_engine;
 
 /* The state of execution of the window manager */
 ObState ob_state();

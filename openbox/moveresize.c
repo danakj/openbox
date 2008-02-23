@@ -85,7 +85,7 @@ void moveresize_startup(gboolean reconfig)
 void moveresize_shutdown(gboolean reconfig)
 {
     if (!reconfig) {
-        if (frame_engine->moveresize_in_progress)
+        if (frame_engine.moveresize_in_progress)
             moveresize_end(FALSE);
         client_remove_destroy_notify(client_dest);
     }
@@ -99,9 +99,9 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
     gchar *text;
 
     Strut size;
-    frame_engine->frame_get_size(c->frame, &size);
+    frame_engine.frame_get_size(c->frame, &size);
     Rect area;
-    frame_engine->frame_get_window_area(c->frame, &area);
+    frame_engine.frame_get_window_area(c->frame, &area);
     text = g_strdup_printf(format, a, b);
     if (config_resize_popup_pos == OB_RESIZE_POS_TOP)
         popup_position(popup, SouthGravity,
@@ -175,7 +175,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     gint up = 1;
     gint left = 1;
 
-    if (frame_engine->moveresize_in_progress || !frame_engine->frame_is_visible(c->frame) ||
+    if (frame_engine.moveresize_in_progress || !frame_engine.frame_is_visible(c->frame) ||
         !(mv ?
           (c->functions & OB_CLIENT_FUNC_MOVE) :
           (c->functions & OB_CLIENT_FUNC_RESIZE)))
@@ -253,7 +253,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     cur_w = start_cw;
     cur_h = start_ch;
 
-    frame_engine->moveresize_in_progress = TRUE;
+    frame_engine.moveresize_in_progress = TRUE;
 
 #ifdef SYNC
     if (config_resize_redraw && !moving && obt_display_extension_sync &&
@@ -331,7 +331,7 @@ void moveresize_end(gboolean cancel)
     /* dont edge warp after its ended */
     cancel_edge_warp();
 
-    frame_engine->moveresize_in_progress = FALSE;
+    frame_engine.moveresize_in_progress = FALSE;
     moveresize_client = NULL;
 }
 
@@ -350,7 +350,7 @@ static void do_move(gboolean keyboard, gint keydist)
     if (config_resize_popup_show == 2) /* == "Always" */
     {
         Rect area;
-        frame_engine->frame_get_window_area(moveresize_client->frame, &area);
+        frame_engine.frame_get_window_area(moveresize_client->frame, &area);
         popup_coords(moveresize_client, "%d x %d",
                      area.x,
                      area.y);
@@ -487,7 +487,7 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
 
 
     Strut size;
-    frame_engine->frame_get_size(moveresize_client->frame, &size);
+    frame_engine.frame_get_size(moveresize_client->frame, &size);
     /* resist_size_* needs the frame size */
     nw += size.left +
         size.right;
@@ -835,7 +835,7 @@ gboolean moveresize_event(XEvent *e)
 {
     gboolean used = FALSE;
 
-    if (!frame_engine->moveresize_in_progress) return FALSE;
+    if (!frame_engine.moveresize_in_progress) return FALSE;
 
     if (e->type == ButtonPress) {
         if (!button) {

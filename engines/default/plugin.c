@@ -1563,8 +1563,6 @@ ObFrameEngine engine = {
         frame_set_is_max_vert, /* */
         frame_set_is_max_horz, /* */
         frame_set_is_shaded, /* */
-        0, //frame_flash_start, /* */
-        0, //frame_flash_stop, /* */
         frame_set_decorations, /* */
         frame_update_title, /* */
         /* This give the window area */

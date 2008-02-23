@@ -92,7 +92,7 @@ gchar       *ob_sm_id = NULL;
 gchar       *ob_sm_save_file = NULL;
 gboolean     ob_sm_restore = TRUE;
 gboolean     ob_debug_xinerama = FALSE;
-ObFrameEngine * frame_engine = NULL;
+ObFrameEngine frame_engine;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -257,7 +257,7 @@ gint main(gint argc, gchar **argv)
             /* load the theme specified in the rc file */
               {
                 ob_debug("Entering LoadThemeConfig");
-                frame_engine = init_frame_engine (
+                init_frame_engine (&frame_engine,
                     config_theme, TRUE, config_font_activewindow,
                     config_font_inactivewindow, config_font_menutitle,
                     config_font_menuitem, config_font_osd);
@@ -287,7 +287,7 @@ gint main(gint argc, gchar **argv)
                 /* update all existing windows for the new theme */
                 for (it = client_list; it; it = g_list_next(it)) {
                     ObClient *c = it->data;
-                    frame_engine->frame_adjust_theme(c->frame);
+                    frame_engine.frame_adjust_theme(c->frame);
                   }
               }
             event_startup(reconfigure);
@@ -337,7 +337,7 @@ gint main(gint argc, gchar **argv)
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
-                    frame_engine->frame_update_layout (c->frame, c->area, FALSE, FALSE);
+                    frame_engine.frame_update_layout (c->frame, c->area, FALSE, FALSE);
                     /* if this occurs while we are focus cycling, the indicator needs to
                      match the changes */
                     if (focus_cycle_target == c)
@@ -383,11 +383,6 @@ gint main(gint argc, gchar **argv)
 
     XSync(obt_display, FALSE);
 
-    if (frame_engine)
-    {
-    //RrThemeFree(render_plugin->ob_rr_theme);
-    //RrInstanceFree(render_plugin->ob_rr_inst);
-    }
     session_shutdown(being_replaced);
 
     obt_display_close(obt_display);

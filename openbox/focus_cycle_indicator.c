@@ -152,7 +152,7 @@ void focus_cycle_draw_indicator(ObClient *c)
     }
     else if (c) {
         Rect area;
-        frame_engine->frame_get_window_area(c->frame, &area);
+        frame_engine.frame_get_window_area(c->frame, &area);
         /*
           if (c)
               frame_adjust_focus(c->frame, FALSE);

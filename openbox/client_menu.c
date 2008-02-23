@@ -298,9 +298,9 @@ static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
     if (!mouse && frame->client) {
 
     Strut size;
-    frame_engine->frame_get_size(frame->client->frame, &size);
+    frame_engine.frame_get_size(frame->client->frame, &size);
     Rect area;
-    frame_engine->frame_get_window_area(frame->client->frame, &area);
+    frame_engine.frame_get_window_area(frame->client->frame, &area);
 
         *x = area.x;
 

@@ -127,9 +127,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
 
         Strut c_size;
-        frame_engine->frame_get_size(c->frame, &c_size);
+        frame_engine.frame_get_size(c->frame, &c_size);
         Rect c_area;
-        frame_engine->frame_get_window_area(c->frame, &c_area);
+        frame_engine.frame_get_window_area(c->frame, &c_area);
         /* get the frame's size */
         w += c_size.left + c_size.right;
         h += c_size.top + c_size.bottom;

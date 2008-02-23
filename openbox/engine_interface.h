@@ -185,7 +185,7 @@ struct _ObFrameEngine
             RrFont *menu_item_font, RrFont *osd_font);
 
     /* Filled by openbox-core */
-    struct _ObClient *focus_cycle_target;
+    //struct _ObClient *focus_cycle_target;
     //gboolean moveresize_in_progress;
 };
 /* Define how to draw the current windows */

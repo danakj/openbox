@@ -1580,8 +1580,6 @@ ObFrameEngine engine = {
         frame_is_max_vert, /* */
         frame_trigger, /* */
         load_theme_config, /* */
-        /* This fields are fill by openbox. */
-        0, /*struct _ObClient *focus_cycle_target; */
 };
 
 ObFrameEngine * get_info()

@@ -1892,7 +1892,7 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
                in the case where it is animating before disappearing */
             mouse_event(client, e);
         } else
-            keyboard_event((frame_engine.focus_cycle_target ? frame_engine.focus_cycle_target :
+            keyboard_event((focus_cycle_target ? focus_cycle_target :
                             (client ? client : focus_client)), e);
     }
 }

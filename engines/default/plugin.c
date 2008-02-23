@@ -54,14 +54,14 @@ typedef enum
 
 Display * obp_display;
 gint obp_screen;
-RrInstance *ob_rr_inst;
+RrInstance *obp_rr_inst;
 
 Window createWindow(Window parent, Visual *visual, gulong mask,
         XSetWindowAttributes *attrib)
 {
     return XCreateWindow(obp_display, parent, 0, 0, 1, 1, 0, (visual ? 32
-            : RrDepth(ob_rr_inst)), InputOutput, (visual ? visual
-            : RrVisual(ob_rr_inst)), mask, attrib);
+            : RrDepth(obp_rr_inst)), InputOutput, (visual ? visual
+            : RrVisual(obp_rr_inst)), mask, attrib);
 
 }
 
@@ -72,7 +72,7 @@ Visual *check_32bit_client(ObClient *c)
 
     /* we're already running at 32 bit depth, yay. we don't need to use their
      visual */
-    if (RrDepth(ob_rr_inst) == 32)
+    if (RrDepth(obp_rr_inst) == 32)
         return NULL;
 
     ret = XGetWindowAttributes(obp_display, c->w_client, &wattrib);
@@ -87,8 +87,8 @@ Visual *check_32bit_client(ObClient *c)
 /* Not used */
 gint init(Display * display, gint screen)
 {
-    ob_rr_inst = RrInstanceNew(display, screen);
-    if (ob_rr_inst == NULL)
+    obp_rr_inst = RrInstanceNew(display, screen);
+    if (obp_rr_inst == NULL)
         ob_exit_with_error(_("Failed to initialize the obrender library."));
     obp_display = display;
     obp_screen = screen;
@@ -96,95 +96,74 @@ gint init(Display * display, gint screen)
 
 gpointer frame_new(struct _ObClient * client, Window w_client, Window w_frame)
 {
-    XSetWindowAttributes attrib;
     gulong mask;
+    XSetWindowAttributes attrib;
     ObDefaultFrame *self;
-    Visual *visual;
 
     self = g_new0(ObDefaultFrame, 1);
     self->client = client;
-
-    visual = check_32bit_client(client);
-
-    /* create the non-visible decor windows */
-
-    mask = 0;
-    if (visual) {
-        /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
-        /* create a colormap with the visual */
-        OBDEFAULTFRAME(self)->colormap = attrib.colormap = XCreateColormap(
-                obp_display, RootWindow(obp_display, obp_screen), visual,
-                AllocNone);
-        attrib.background_pixel = BlackPixel(obp_display, obp_screen);
-        attrib.border_pixel = BlackPixel(obp_display, obp_screen);
-    }
     self->window = w_frame;
 
     /* create the visible decor windows */
 
-    mask = 0;
-    if (visual) {
-        /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
-        attrib.colormap = RrColormap(ob_rr_inst);
-    }
+    client_simple_create_window (client, &self->backback, self->window);
+    client_simple_create_window (client, &self->backfront, self->window);
 
-    self->backback = createWindow(self->window, NULL, mask, &attrib);
-    self->backfront = createWindow(self->backback, NULL, mask, &attrib);
-
-    mask |= CWEventMask;
+    /* set spesific data */
+    mask = CWEventMask;
     attrib.event_mask = ELEMENT_EVENTMASK;
-    self->innerleft = createWindow(self->window, NULL, mask, &attrib);
-    self->innertop = createWindow(self->window, NULL, mask, &attrib);
-    self->innerright = createWindow(self->window, NULL, mask, &attrib);
-    self->innerbottom = createWindow(self->window, NULL, mask, &attrib);
+    
+    client_create_window (client, &self->innerleft, self->window, mask, attrib);
+    client_create_window (client, &self->innertop, self->window, mask, attrib);
+    client_create_window (client, &self->innerright, self->window, mask, attrib);
+    client_create_window (client, &self->innerbottom, self->window, mask, attrib);
 
-    self->innerblb = createWindow(self->innerbottom, NULL, mask, &attrib);
-    self->innerbrb = createWindow(self->innerbottom, NULL, mask, &attrib);
-    self->innerbll = createWindow(self->innerleft, NULL, mask, &attrib);
-    self->innerbrr = createWindow(self->innerright, NULL, mask, &attrib);
+    client_create_window (client, &self->innerblb, self->innerbottom, mask, attrib);
+    client_create_window (client, &self->innerbrb, self->innerbottom, mask, attrib);
+    client_create_window (client, &self->innerbll, self->innerleft, mask, attrib);
+    client_create_window (client, &self->innerbrr, self->innerright, mask, attrib);
 
-    self->title = createWindow(self->window, NULL, mask, &attrib);
-    self->titleleft = createWindow(self->window, NULL, mask, &attrib);
-    self->titletop = createWindow(self->window, NULL, mask, &attrib);
-    self->titletopleft = createWindow(self->window, NULL, mask, &attrib);
-    self->titletopright = createWindow(self->window, NULL, mask, &attrib);
-    self->titleright = createWindow(self->window, NULL, mask, &attrib);
-    self->titlebottom = createWindow(self->window, NULL, mask, &attrib);
+    client_create_window (client, &self->title, self->window, mask, attrib);
+    client_create_window (client, &self->titleleft, self->window, mask, attrib);
+    client_create_window (client, &self->titletop, self->window, mask, attrib);
+    client_create_window (client, &self->titletopleft, self->window, mask, attrib);
+    client_create_window (client, &self->titletopright, self->window, mask, attrib);
+    client_create_window (client, &self->titleright, self->window, mask, attrib);
+    client_create_window (client, &self->titlebottom, self->window, mask, attrib);
+    
+    client_create_window (client, &self->topresize, self->title, mask, attrib);
+    client_create_window (client, &self->tltresize, self->title, mask, attrib);
+    client_create_window (client, &self->tllresize, self->title, mask, attrib);
+    client_create_window (client, &self->trtresize, self->title, mask, attrib);
+    client_create_window (client, &self->trrresize, self->title, mask, attrib);
+    
+    client_create_window (client, &self->left, self->window, mask, attrib);
+    client_create_window (client, &self->right, self->window, mask, attrib);   
 
-    self->topresize = createWindow(self->title, NULL, mask, &attrib);
-    self->tltresize = createWindow(self->title, NULL, mask, &attrib);
-    self->tllresize = createWindow(self->title, NULL, mask, &attrib);
-    self->trtresize = createWindow(self->title, NULL, mask, &attrib);
-    self->trrresize = createWindow(self->title, NULL, mask, &attrib);
+    client_create_window (client, &self->label, self->title, mask, attrib);
+    client_create_window (client, &self->max, self->title, mask, attrib);
+    client_create_window (client, &self->close, self->title, mask, attrib);
+    client_create_window (client, &self->desk, self->title, mask, attrib);
+    client_create_window (client, &self->shade, self->title, mask, attrib);
+    client_create_window (client, &self->icon, self->title, mask, attrib);
+    client_create_window (client, &self->iconify, self->title, mask, attrib);
+    
+    client_create_window (client, &self->handle, self->window, mask, attrib);
+    
+    client_create_window (client, &self->lgrip, self->handle, mask, attrib);
+    client_create_window (client, &self->rgrip, self->handle, mask, attrib);
 
-    self->left = createWindow(self->window, NULL, mask, &attrib);
-    self->right = createWindow(self->window, NULL, mask, &attrib);
-
-    self->label = createWindow(self->title, NULL, mask, &attrib);
-    self->max = createWindow(self->title, NULL, mask, &attrib);
-    self->close = createWindow(self->title, NULL, mask, &attrib);
-    self->desk = createWindow(self->title, NULL, mask, &attrib);
-    self->shade = createWindow(self->title, NULL, mask, &attrib);
-    self->icon = createWindow(self->title, NULL, mask, &attrib);
-    self->iconify = createWindow(self->title, NULL, mask, &attrib);
-
-    self->handle = createWindow(self->window, NULL, mask, &attrib);
-    self->lgrip = createWindow(self->handle, NULL, mask, &attrib);
-    self->rgrip = createWindow(self->handle, NULL, mask, &attrib);
-
-    self->handleleft = createWindow(self->handle, NULL, mask, &attrib);
-    self->handleright = createWindow(self->handle, NULL, mask, &attrib);
-
-    self->handletop = createWindow(self->window, NULL, mask, &attrib);
-    self->handlebottom = createWindow(self->window, NULL, mask, &attrib);
-    self->lgripleft = createWindow(self->window, NULL, mask, &attrib);
-    self->lgriptop = createWindow(self->window, NULL, mask, &attrib);
-    self->lgripbottom = createWindow(self->window, NULL, mask, &attrib);
-    self->rgripright = createWindow(self->window, NULL, mask, &attrib);
-    self->rgriptop = createWindow(self->window, NULL, mask, &attrib);
-    self->rgripbottom = createWindow(self->window, NULL, mask, &attrib);
+    client_create_window (client, &self->handleleft, self->handle, mask, attrib);
+    client_create_window (client, &self->handleright, self->handle, mask, attrib);
+    
+    client_create_window (client, &self->handletop, self->window, mask, attrib);
+    client_create_window (client, &self->handlebottom, self->window, mask, attrib);
+    client_create_window (client, &self->lgripleft, self->window, mask, attrib);
+    client_create_window (client, &self->lgriptop, self->window, mask, attrib);
+    client_create_window (client, &self->lgripbottom, self->window, mask, attrib);
+    client_create_window (client, &self->rgripright, self->window, mask, attrib);
+    client_create_window (client, &self->rgriptop, self->window, mask, attrib);
+    client_create_window (client, &self->rgripbottom, self->window, mask, attrib);
 
     self->stitle = g_strdup("");
     self->focused = FALSE;
@@ -321,54 +300,7 @@ void frame_adjust_shape(gpointer _self)
 
 void frame_grab(gpointer _self, GHashTable * window_map)
 {
-    ObDefaultFrame * self = (ObDefaultFrame *) _self;
-    /* DO NOT map the client window here. we used to do that, but it is bogus.
-     we need to set up the client's dimensions and everything before we
-     send a mapnotify or we create race conditions.
-     */
 
-    /* set all the windows for the frame in the window_map */
-    //g_hash_table_insert(window_map, &self->window, self->client);
-    g_hash_table_insert(window_map, &self->backback, self->client);
-    g_hash_table_insert(window_map, &self->backfront, self->client);
-    g_hash_table_insert(window_map, &self->innerleft, self->client);
-    g_hash_table_insert(window_map, &self->innertop, self->client);
-    g_hash_table_insert(window_map, &self->innerright, self->client);
-    g_hash_table_insert(window_map, &self->innerbottom, self->client);
-    g_hash_table_insert(window_map, &self->title, self->client);
-    g_hash_table_insert(window_map, &self->label, self->client);
-    g_hash_table_insert(window_map, &self->max, self->client);
-    g_hash_table_insert(window_map, &self->close, self->client);
-    g_hash_table_insert(window_map, &self->desk, self->client);
-    g_hash_table_insert(window_map, &self->shade, self->client);
-    g_hash_table_insert(window_map, &self->icon, self->client);
-    g_hash_table_insert(window_map, &self->iconify, self->client);
-    g_hash_table_insert(window_map, &self->handle, self->client);
-    g_hash_table_insert(window_map, &self->lgrip, self->client);
-    g_hash_table_insert(window_map, &self->rgrip, self->client);
-    g_hash_table_insert(window_map, &self->topresize, self->client);
-    g_hash_table_insert(window_map, &self->tltresize, self->client);
-    g_hash_table_insert(window_map, &self->tllresize, self->client);
-    g_hash_table_insert(window_map, &self->trtresize, self->client);
-    g_hash_table_insert(window_map, &self->trrresize, self->client);
-    g_hash_table_insert(window_map, &self->left, self->client);
-    g_hash_table_insert(window_map, &self->right, self->client);
-    g_hash_table_insert(window_map, &self->titleleft, self->client);
-    g_hash_table_insert(window_map, &self->titletop, self->client);
-    g_hash_table_insert(window_map, &self->titletopleft, self->client);
-    g_hash_table_insert(window_map, &self->titletopright, self->client);
-    g_hash_table_insert(window_map, &self->titleright, self->client);
-    g_hash_table_insert(window_map, &self->titlebottom, self->client);
-    g_hash_table_insert(window_map, &self->handleleft, self->client);
-    g_hash_table_insert(window_map, &self->handletop, self->client);
-    g_hash_table_insert(window_map, &self->handleright, self->client);
-    g_hash_table_insert(window_map, &self->handlebottom, self->client);
-    g_hash_table_insert(window_map, &self->lgripleft, self->client);
-    g_hash_table_insert(window_map, &self->lgriptop, self->client);
-    g_hash_table_insert(window_map, &self->lgripbottom, self->client);
-    g_hash_table_insert(window_map, &self->rgripright, self->client);
-    g_hash_table_insert(window_map, &self->rgriptop, self->client);
-    g_hash_table_insert(window_map, &self->rgripbottom, self->client);
 }
 
 void frame_ungrab(gpointer _self, GHashTable * window_map)

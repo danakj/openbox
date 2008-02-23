@@ -742,6 +742,6 @@ void client_flash_start(ObClient *);
 void client_flash_stop(ObClient *);
 void client_flash_done(gpointer);
 
-void client_create_window (ObClient *, Window *, Window);
-
+void client_simple_create_window (ObClient *, Window *, Window);
+void client_create_window(ObClient *, Window *, Window, gulong, XSetWindowAttributes);
 #endif

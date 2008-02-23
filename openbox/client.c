@@ -107,11 +107,6 @@ static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
 
-#define CREATE_WINDOW(parent, visual, mask, attrib) XCreateWindow(obt_display,\
-        (parent), 0, 0, 1, 1, 0, ((visual) ? 32 : RrDepth(ob_rr_inst)), \
-        InputOutput, ((visual) ? (visual) : RrVisual(ob_rr_inst)), (mask), \
-        (attrib))
-
 Visual *check_32bit_client(ObClient *c)
 {
     XWindowAttributes wattrib;
@@ -255,7 +250,7 @@ void client_manage(Window window, ObPrompt *prompt)
         XChangeSaveSet(obt_display, window, SetModeInsert);
 
     /* create decorations */
-    client_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
+    client_simple_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
     self->frame = frame_engine.frame_new(self, self->w_client, self->w_frame);
     /* reparent the client to the frame */
     XReparentWindow(obt_display, self->w_client, self->w_frame, 0, 0);
@@ -610,7 +605,7 @@ ObClient *client_fake_manage(Window window)
     client_setup_decor_and_functions(self, FALSE);
 
     /* create decorations */
-    client_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
+    client_simple_create_window (self, &self->w_frame, RootWindow(obt_display, ob_screen));
     self->frame = frame_engine.frame_new(self, self->w_client, self->w_frame);
     frame_engine.frame_set_decorations(self->frame, self->decorations);
     frame_engine.frame_update_title(self->frame, self->title);
@@ -4616,16 +4611,21 @@ void client_flash_done(gpointer data)
     }
 }
 
-void client_create_window(ObClient * self, Window * dst, Window parent)
+
+void client_simple_create_window(ObClient * self, Window * dst, Window parent)
+{
+    gulong mask = 0;
+    XSetWindowAttributes attrib = {0};
+    client_create_window(self, dst, parent, mask, attrib);
+}
+
+void client_create_window(ObClient * self, Window * dst, Window parent, gulong mask, XSetWindowAttributes attrib)
 {
     Visual * visual = NULL;
-    gulong mask = 0;
-    XSetWindowAttributes attrib;
     XWindowAttributes wattrib;
     Status ret;
-    /* First we check if we are in 32 bits */
-    /* we're already running at 32 bit depth, yay. we don't need to use their
-     visual */
+
+    /* strange things */
     if (RrDepth(ob_rr_inst) != 32) {
         ret = XGetWindowAttributes(obt_display, self->w_client, &wattrib);
         g_assert(ret != BadDrawable);
@@ -4644,7 +4644,10 @@ void client_create_window(ObClient * self, Window * dst, Window parent)
         attrib.border_pixel = BlackPixel(obt_display, ob_screen);
     }
     
-    *dst = CREATE_WINDOW(parent, visual, mask, &attrib);
+    *dst = XCreateWindow(obt_display,\
+        (parent), 0, 0, 1, 1, 0, ((visual) ? 32 : RrDepth(ob_rr_inst)), \
+        InputOutput, ((visual) ? (visual) : RrVisual(ob_rr_inst)), (mask), \
+        (&attrib));
     /* Register the frame */
     g_hash_table_insert(window_map, dst, self);
 }

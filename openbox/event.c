@@ -528,12 +528,12 @@ static void event_process(const XEvent *ec, gpointer data)
                from our Inferior up to us. This happens when iconifying a
                window with RevertToParent focus */
             frame_engine.frame_set_is_focus(client->frame, FALSE);
-            frame_engine.frame_update_layout (client->frame, client->area, FALSE, FALSE);
+            frame_engine.frame_render (client->frame, client->area);
             /* if this occurs while we are focus cycling, the indicator needs to
              match the changes */
             if (focus_cycle_target == client)
                 focus_cycle_draw_indicator(client);
-            frame_engine.frame_update_skin(client->frame);
+            //frame_engine.frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called */
         }
         else if (e->xfocus.detail == NotifyPointerRoot ||
@@ -597,12 +597,12 @@ static void event_process(const XEvent *ec, gpointer data)
         else if (client != focus_client) {
             focus_left_screen = FALSE;
             frame_engine.frame_set_is_focus(client->frame, TRUE);
-            frame_engine.frame_update_layout (client->frame, client->area, FALSE, FALSE);
+            frame_engine.frame_render (client->frame, client->area);
             /* if this occurs while we are focus cycling, the indicator needs to
              match the changes */
             if (focus_cycle_target == client)
                 focus_cycle_draw_indicator(client);
-            frame_engine.frame_update_skin (client->frame);
+            //frame_engine.frame_update_skin (client->frame);
             focus_set_client(client);
             client_calc_layer(client);
             client_bring_helper_windows(client);
@@ -648,12 +648,12 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (client && client != focus_client) {
           frame_engine.frame_set_is_focus(client->frame, FALSE);
-          frame_engine.frame_update_layout (client->frame, client->area, FALSE, FALSE);
+          frame_engine.frame_render (client->frame, client->area);
           /* if this occurs while we are focus cycling, the indicator needs to
            match the changes */
           if (focus_cycle_target == client)
               focus_cycle_draw_indicator(client);
-          frame_engine.frame_update_skin(client->frame);
+          //frame_engine.frame_update_skin(client->frame);
             /* focus_set_client(NULL) has already been called in this
                section or by focus_fallback */
         }

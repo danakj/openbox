@@ -161,6 +161,8 @@ struct _ObFrameEngine
     /* set the requested client area */
     void (*frame_set_client_area)(gpointer, Rect);
     /* Update size, move/resize windows */
+    void (*frame_fake_update_layout) (gpointer, Rect);
+    void (*frame_render) (gpointer, Rect);
     void (*frame_update_layout)(gpointer self, Rect, gboolean is_resize,
             gboolean is_fake);
     /* Update skin, color/texture windows */ 

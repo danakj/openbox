@@ -309,7 +309,6 @@ void frame_update_skin(gpointer _self)
         }
     }
 
-    XFlush(obp_display);
 }
 
 static void framerender_label(ObDefaultFrame *self, RrAppearance *a)

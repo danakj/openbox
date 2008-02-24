@@ -573,13 +573,13 @@ static void screen_fallback_focus(void)
             /* reduce flicker by hiliting now rather than waiting for the
                server FocusIn event */
         frame_engine.frame_set_is_focus (c->frame, TRUE);
-        frame_engine.frame_update_layout (c->frame, c->area, FALSE, FALSE);
+        frame_engine.frame_render (c->frame, c->area);
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
         if (focus_cycle_target == c)
             focus_cycle_draw_indicator(c);
-        frame_engine.frame_update_skin (c->frame);
-            /* do this here so that if you switch desktops to a window with
+        //frame_engine.frame_update_skin (c->frame);
+        /* do this here so that if you switch desktops to a window with
                helper windows then the helper windows won't flash */
             client_bring_helper_windows(c);
         }
@@ -1234,12 +1234,12 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
                 /* reduce flicker by hiliting now rather than waiting for the
                    server FocusIn event */
         frame_engine.frame_set_is_focus(c->frame, TRUE);
-        frame_engine.frame_update_layout (c->frame, c->area, FALSE, FALSE);
+        frame_engine.frame_render (c->frame, c->area);
         /* if this occurs while we are focus cycling, the indicator needs to
          match the changes */
         if (focus_cycle_target == c)
             focus_cycle_draw_indicator(c);
-        frame_engine.frame_update_skin (c->frame);
+        //frame_engine.frame_update_skin (c->frame);
             }
         }
     }

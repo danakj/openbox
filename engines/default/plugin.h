@@ -44,9 +44,10 @@ struct _ObDefaultFrame
     guint decorations;
 
     Strut size;
-    Rect area;
-    Rect client_area;
 
+    Rect client_area;
+    Rect window_area;
+    
     gint bwidth;
 
     ObFrameButton hover_flag;
@@ -148,6 +149,8 @@ struct _ObDefaultFrame
     gboolean need_render;
 
     GTimeVal iconify_animation_end;
+    
+    gboolean need_update;
 
 };
 
@@ -173,6 +176,8 @@ void frame_set_is_max_vert(gpointer, gboolean);
 void frame_set_is_max_horz(gpointer, gboolean);
 void frame_set_is_shaded(gpointer, gboolean);
 
+void frame_fake_update_layout(gpointer, Rect);
+void frame_render(gpointer, Rect);
 void frame_update_layout(gpointer, Rect, gboolean, gboolean);
 void frame_adjust_client_area(gpointer self);
 void frame_adjust_state(gpointer self);

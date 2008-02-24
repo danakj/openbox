@@ -337,7 +337,7 @@ gint main(gint argc, gchar **argv)
                     /* the new config can change the window's decorations */
                     client_setup_decor_and_functions(c, FALSE);
                     /* redraw the frames */
-                    frame_engine.frame_update_layout (c->frame, c->area, FALSE, FALSE);
+                    frame_engine.frame_render (c->frame, c->area);
                     /* if this occurs while we are focus cycling, the indicator needs to
                      match the changes */
                     if (focus_cycle_target == c)

@@ -688,6 +688,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     ob_debug("Moving to desktop %d\n", num+1);
 
+    if (ob_state() == OB_STATE_RUNNING)
+        screen_show_desktop_popup(screen_desktop);
+
     /* ignore enter events caused by the move */
     ignore_start = event_start_ignore_all_enters();
 
@@ -718,9 +721,6 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;
-
-    if (ob_state() == OB_STATE_RUNNING)
-        screen_show_desktop_popup(screen_desktop);
 }
 
 void screen_add_desktop(gboolean current)

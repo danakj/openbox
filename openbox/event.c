@@ -836,11 +836,47 @@ void event_enter_client(ObClient *client)
     }
 }
 
+static gboolean *context_to_button(ObFrame *f, ObFrameContext con, gboolean press)
+{
+    if (press) {
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            return &f->max_press;
+        case OB_FRAME_CONTEXT_CLOSE:
+            return &f->close_press;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            return &f->iconify_press;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            return &f->desk_press;
+        case OB_FRAME_CONTEXT_SHADE:
+            return &f->shade_press;
+        default:
+            return NULL;
+        }
+    } else {
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            return &f->max_hover;
+        case OB_FRAME_CONTEXT_CLOSE:
+            return &f->close_hover;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            return &f->iconify_hover;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            return &f->desk_hover;
+        case OB_FRAME_CONTEXT_SHADE:
+            return &f->shade_hover;
+        default:
+            return NULL;
+        }
+    }
+}
+
 static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
     ObFrameContext con;
+    gboolean *but;
     static gint px = -1, py = -1;
     static guint pb = 0;
     static ObFrameContext pcon = OB_FRAME_CONTEXT_NONE;
@@ -878,30 +914,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 e->xbutton.button == pb)
                 pb = 0, px = py = -1, pcon = OB_FRAME_CONTEXT_NONE;
 
-            switch (con) {
-            case OB_FRAME_CONTEXT_MAXIMIZE:
-                client->frame->max_press = (e->type == ButtonPress);
+            but = context_to_button(client->frame, con, TRUE);
+            if (but) {
+                *but = (e->type == ButtonPress);
                 frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_CLOSE:
-                client->frame->close_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_ICONIFY:
-                client->frame->iconify_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_ALLDESKTOPS:
-                client->frame->desk_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_SHADE:
-                client->frame->shade_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            default:
-                /* nothing changes with clicks for any other contexts */
-                break;
             }
         }
         break;
@@ -929,37 +945,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 frame_adjust_state(client->frame);
             }
             break;
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            if (!client->frame->max_hover && !pb) {
-                client->frame->max_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            if (!client->frame->desk_hover && !pb) {
-                client->frame->desk_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            if (!client->frame->shade_hover && !pb) {
-                client->frame->shade_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            if (!client->frame->iconify_hover && !pb) {
-                client->frame->iconify_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            if (!client->frame->close_hover && !pb) {
-                client->frame->close_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but && !*but && !pb) {
+                *but = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;
@@ -983,37 +974,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 client->frame->iconify_press = FALSE;
                 client->frame->close_press = FALSE;
             }
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            client->frame->max_hover = FALSE;
-            if (e->xcrossing.mode == NotifyGrab)
-                client->frame->max_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            client->frame->desk_hover = FALSE;
-            if (e->xcrossing.mode == NotifyGrab)
-                client->frame->desk_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            client->frame->shade_hover = FALSE;
-            if (e->xcrossing.mode == NotifyGrab)
-                client->frame->shade_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            client->frame->iconify_hover = FALSE;
-            if (e->xcrossing.mode == NotifyGrab)
-                client->frame->iconify_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            client->frame->close_hover = FALSE;
-            if (e->xcrossing.mode == NotifyGrab)
-                client->frame->close_press = FALSE;
-            frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
             /* When the mouse leaves an animating window, don't use the
@@ -1041,6 +1001,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but) {
+                *but = FALSE;
+                if (e->xcrossing.mode == NotifyGrab) {
+                    but = context_to_button(client->frame, con, TRUE);
+                    *but = FALSE;
+                }
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;
@@ -1049,36 +1018,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            client->frame->max_hover = TRUE;
-            if (e->xcrossing.mode == NotifyUngrab)
-                client->frame->max_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            client->frame->desk_hover = TRUE;
-            if (e->xcrossing.mode == NotifyUngrab)
-                client->frame->desk_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            client->frame->shade_hover = TRUE;
-            if (e->xcrossing.mode == NotifyUngrab)
-                client->frame->shade_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            client->frame->iconify_hover = TRUE;
-            if (e->xcrossing.mode == NotifyUngrab)
-                client->frame->iconify_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            client->frame->close_hover = TRUE;
-            if (e->xcrossing.mode == NotifyUngrab)
-                client->frame->close_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
         case OB_FRAME_CONTEXT_FRAME:
             if (grab_on_keyboard())
                 break;
@@ -1110,6 +1049,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but) {
+                *but = TRUE;
+                if (e->xcrossing.mode == NotifyUngrab) {
+                    but = context_to_button(client->frame, con, TRUE);
+                    *but = (con == pcon);
+                }
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;

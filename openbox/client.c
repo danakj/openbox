@@ -3413,8 +3413,8 @@ static void client_prompt_kill(ObClient *self)
     /* check if we're already prompting */
     if (!self->kill_prompt) {
         ObPromptAnswer answers[] = {
-            { _("No"), OB_KILL_RESULT_NO },
-            { _("Yes"), OB_KILL_RESULT_YES }
+            { _("Cancel"), OB_KILL_RESULT_NO },
+            { _("Force Exit"), OB_KILL_RESULT_YES }
         };
         gchar *m;
 

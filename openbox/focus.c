@@ -197,13 +197,6 @@ void focus_nothing(void)
     /* nothing is focused, update the colormap and _the root property_ */
     focus_set_client(NULL);
 
-    /* if there is a grab going on, then we need to cancel it. if we move
-       focus during the grab, applications will get NotifyWhileGrabbed events
-       and ignore them !
-
-       actions should not rely on being able to move focus during an
-       interactive grab.
-    */
     event_cancel_all_key_grabs();
 
     /* when nothing will be focused, send focus to the backup target */

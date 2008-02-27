@@ -67,7 +67,7 @@ typedef struct
     gpointer data;
 } ClientCallback;
 
-GList            *client_list           = NULL;
+GList          *client_list             = NULL;
 
 static GSList  *client_destroy_notifies = NULL;
 static RrImage *client_default_icon     = NULL;
@@ -460,7 +460,7 @@ void client_manage(Window window, ObPrompt *prompt)
                               "Not focusing the window because the user is "
                               "working in another window");
             }
-            /* If its a transient (and its parents aren't focused) */
+            /* If it's a transient (and its parents aren't focused) */
             else if (client_has_parent(self)) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
@@ -501,7 +501,7 @@ void client_manage(Window window, ObPrompt *prompt)
         if (!activate) {
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Focus stealing prevention activated for %s at "
-                          "time %u (last user interactioon time %u)",
+                          "time %u (last user interaction time %u)",
                           self->title, map_time, event_last_user_time);
             /* if the client isn't focused, then hilite it so the user
                knows it is there */
@@ -598,7 +598,7 @@ ObClient *client_fake_manage(Window window)
 
 void client_unmanage_all(void)
 {
-    while (client_list != NULL)
+    while (client_list)
         client_unmanage(client_list->data);
 }
 
@@ -1003,7 +1003,7 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
         /* This makes sure windows aren't entirely outside of the screen so you
            can't see them at all.
-           It makes sure 10% of the window is on the screen at least. At don't
+           It makes sure 10% of the window is on the screen at least. And don't
            let it move itself off the top of the screen, which would hide the
            titlebar on you. (The user can still do this if they want too, it's
            only limiting the application.
@@ -1214,7 +1214,7 @@ static void client_get_state(ObClient *self)
 static void client_get_shaped(ObClient *self)
 {
     self->shaped = FALSE;
-#ifdef   SHAPE
+#ifdef SHAPE
     if (obt_display_extension_shape) {
         gint foo;
         guint ufoo;
@@ -1225,7 +1225,7 @@ static void client_get_shaped(ObClient *self)
         XShapeQueryExtents(obt_display, self->window, &s, &foo,
                            &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
                            &ufoo);
-        self->shaped = (s != 0);
+        self->shaped = !!s;
     }
 #endif
 }
@@ -1237,9 +1237,9 @@ void client_update_transient_for(ObClient *self)
     gboolean trangroup = FALSE;
 
     if (XGetTransientForHint(obt_display, self->window, &t)) {
-        if (t != self->window) { /* cant be transient to itself! */
+        if (t != self->window) { /* can't be transient to itself! */
             ObWindow *tw = window_find(t);
-            /* if this happens then we need to check for it*/
+            /* if this happens then we need to check for it */
             g_assert(tw != CLIENT_AS_WINDOW(self));
             if (tw && WINDOW_IS_CLIENT(tw)) {
                 /* watch out for windows with a parent that is something
@@ -1327,7 +1327,7 @@ static void client_update_transient_tree(ObClient *self,
     /* If we are now transient for a single window we need to add ourselves to
        its children
 
-       WARNING: Cyclical transient ness is possible if two windows are
+       WARNING: Cyclical transient-ness is possible if two windows are
        transient for eachother.
     */
     else if (newparent &&
@@ -1366,7 +1366,7 @@ static void client_update_transient_tree(ObClient *self,
     }
 
     /** If we change our group transient-ness, our children change their
-        effect group transient-ness, which affects how they relate to other
+        effective group transient-ness, which affects how they relate to other
         group windows **/
 
     for (it = self->transients; it; it = g_slist_next(it)) {
@@ -1527,7 +1527,7 @@ void client_update_colormap(ObClient *self, Colormap colormap)
     if (client_focused(self)) {
         screen_install_colormap(self, FALSE); /* uninstall old one */
         self->colormap = colormap;
-        screen_install_colormap(self, FALSE); /* install new one */
+        screen_install_colormap(self, TRUE); /* install new one */
     } else
         self->colormap = colormap;
 }
@@ -1810,7 +1810,7 @@ void client_update_wmhints(ObClient *self)
 {
     XWMHints *hints;
 
-    /* assume a window takes input if it doesnt specify */
+    /* assume a window takes input if it doesn't specify */
     self->can_focus = TRUE;
 
     if ((hints = XGetWMHints(obt_display, self->window)) != NULL) {
@@ -1842,7 +1842,7 @@ void client_update_wmhints(ObClient *self)
             ObGroup *oldgroup = self->group;
 
             /* remove from the old group if there was one */
-            if (self->group != NULL) {
+            if (self->group) {
                 group_remove(self->group, self);
                 self->group = NULL;
             }
@@ -1913,7 +1913,7 @@ void client_update_title(ObClient *self)
     */
                 data = g_strdup("");
             } else
-                data = g_strdup("Unnamed Window");
+                data = g_strdup(_("Unnamed Window"));
         }
     }
     self->original_title = g_strdup(data);
@@ -2529,13 +2529,6 @@ gboolean client_hide(ObClient *self)
 
     if (!client_should_show(self)) {
         if (self == focus_client) {
-            /* if there is a grab going on, then we need to cancel it. if we
-               move focus during the grab, applications will get
-               NotifyWhileGrabbed events and ignore them !
-
-               actions should not rely on being able to move focus during an
-               interactive grab.
-            */
             event_cancel_all_key_grabs();
         }
 
@@ -2748,7 +2741,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     Rect desired = {*x, *y, *w, *h};
     frame_rect_to_frame(self->frame, &desired);
 
-    /* make the frame recalculate its dimentions n shit without changing
+    /* make the frame recalculate its dimensions n shit without changing
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
@@ -2803,7 +2796,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* gets the client's position */
     frame_frame_gravity(self->frame, x, y);
 
-    /* work within the prefered sizes given by the window */
+    /* work within the preferred sizes given by the window */
     if (!(*w == self->area.width && *h == self->area.height)) {
         gint basew, baseh, minw, minh;
         gint incw, inch;
@@ -2833,6 +2826,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
             minh = self->base_size.height;
         }
 
+        /* This comment is no longer true */
         /* if this is a user-requested resize, then check against min/max
            sizes */
 
@@ -3068,7 +3062,7 @@ void client_fullscreen(ObClient *self, gboolean fs)
     if (fs) {
         self->pre_fullscreen_area = self->area;
         /* if the window is maximized, its area isn't all that meaningful.
-           save it's premax area instead. */
+           save its premax area instead. */
         if (self->max_horz) {
             self->pre_fullscreen_area.x = self->pre_max_area.x;
             self->pre_fullscreen_area.width = self->pre_max_area.width;
@@ -3118,7 +3112,6 @@ static void client_iconify_recursive(ObClient *self,
 {
     GSList *it;
     gboolean changed = FALSE;
-
 
     if (self->iconic != iconic) {
         ob_debug("%sconifying window: 0x%lx", (iconic ? "I" : "Uni"),
@@ -3335,10 +3328,11 @@ static void client_prompt_kill(ObClient *self)
     /* check if we're already prompting */
     if (!self->kill_prompt) {
         ObPromptAnswer answers[] = {
-            { _("Cancel"), OB_KILL_RESULT_NO },
-            { _("Force Exit"), OB_KILL_RESULT_YES }
+            { 0, OB_KILL_RESULT_NO },
+            { 0, OB_KILL_RESULT_YES }
         };
         gchar *m;
+        const gchar *y;
 
         if (client_on_localhost(self)) {
             const gchar *sig;
@@ -3349,12 +3343,19 @@ static void client_prompt_kill(ObClient *self)
                 sig = "kill";
 
             m = g_strdup_printf
-                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
+                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
+                 self->original_title, sig);
+            y = _("End Process");
         }
-        else
+        else {
             m = g_strdup_printf
-                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"), self->original_title);
-
+                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"),
+                 self->original_title);
+            y = _("Disconnect");
+        }
+        /* set the dialog buttons' text */
+        answers[0].text = _("Cancel");  /* "no" */
+        answers[1].text = y;            /* "yes" */
 
         self->kill_prompt = prompt_new(m, answers,
                                        sizeof(answers)/sizeof(answers[0]),
@@ -3735,13 +3736,6 @@ gboolean client_focus(ObClient *self)
        go moving on us */
     event_halt_focus_delay();
 
-    /* if there is a grab going on, then we need to cancel it. if we move
-       focus during the grab, applications will get NotifyWhileGrabbed events
-       and ignore them !
-
-       actions should not rely on being able to move focus during an
-       interactive grab.
-    */
     event_cancel_all_key_grabs();
 
     obt_display_ignore_errors(TRUE);
@@ -3801,6 +3795,8 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
     client_focus(self);
 }
 
+/* this function exists to map to the client_activate message in the ewmh,
+   the user arg is unused because nobody uses it correctly anyway. */
 void client_activate(ObClient *self, gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
@@ -3845,8 +3841,6 @@ gboolean client_focused(ObClient *self)
 {
     return self == focus_client;
 }
-
-
 
 RrImage* client_icon(ObClient *self)
 {

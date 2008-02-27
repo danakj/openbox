@@ -74,7 +74,7 @@ typedef enum {
     /*! Display a button to toggle the window's placement on
       all desktops */
     OB_FRAME_DECOR_ALLDESKTOPS = 1 << 7,
-    OB_FRAME_DECOR_SHADE       = 1 << 8, /*!< Displays a shade button */
+    OB_FRAME_DECOR_SHADE       = 1 << 8, /*!< Display a shade button */
     OB_FRAME_DECOR_CLOSE       = 1 << 9  /*!< Display a close button */
 } ObFrameDecorations;
 

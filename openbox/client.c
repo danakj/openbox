@@ -1993,7 +1993,7 @@ void client_update_title(ObClient *self)
     */
                 data = g_strdup("");
             } else
-                data = g_strdup("Unnamed Window");
+                data = g_strdup(_("Unnamed Window"));
         }
     }
     self->original_title = g_strdup(data);

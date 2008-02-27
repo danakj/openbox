@@ -1607,7 +1607,7 @@ void client_update_colormap(ObClient *self, Colormap colormap)
     if (client_focused(self)) {
         screen_install_colormap(self, FALSE); /* uninstall old one */
         self->colormap = colormap;
-        screen_install_colormap(self, FALSE); /* install new one */
+        screen_install_colormap(self, TRUE); /* install new one */
     } else
         self->colormap = colormap;
 }

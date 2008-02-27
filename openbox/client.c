@@ -3406,10 +3406,11 @@ static void client_prompt_kill(ObClient *self)
     /* check if we're already prompting */
     if (!self->kill_prompt) {
         ObPromptAnswer answers[] = {
-            { _("Cancel"), OB_KILL_RESULT_NO },
-            { _("Force Exit"), OB_KILL_RESULT_YES }
+            { 0, OB_KILL_RESULT_NO },
+            { 0, OB_KILL_RESULT_YES }
         };
         gchar *m;
+        const gchar *y;
 
         if (client_on_localhost(self)) {
             const gchar *sig;
@@ -3420,12 +3421,19 @@ static void client_prompt_kill(ObClient *self)
                 sig = "kill";
 
             m = g_strdup_printf
-                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"), self->original_title, sig);
+                (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
+                 self->original_title, sig);
+            y = _("End Process");
         }
-        else
+        else {
             m = g_strdup_printf
-                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"), self->original_title);
-
+                (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"),
+                 self->original_title);
+            y = _("Disconnect");
+        }
+        /* set the dialog buttons' text */
+        answers[0].text = _("Cancel");  /* "no" */
+        answers[1].text = y;            /* "yes" */
 
         self->kill_prompt = prompt_new(m, answers,
                                        sizeof(answers)/sizeof(answers[0]),

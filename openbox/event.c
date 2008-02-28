@@ -836,11 +836,63 @@ void event_enter_client(ObClient *client)
     }
 }
 
+static gboolean *context_to_button(ObFrame *f, ObFrameContext con, gboolean press)
+{
+    if (press) {
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            return &f->max_press;
+        case OB_FRAME_CONTEXT_CLOSE:
+            return &f->close_press;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            return &f->iconify_press;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            return &f->desk_press;
+        case OB_FRAME_CONTEXT_SHADE:
+            return &f->shade_press;
+        default:
+            return NULL;
+        }
+    } else {
+        switch (con) {
+        case OB_FRAME_CONTEXT_MAXIMIZE:
+            return &f->max_hover;
+        case OB_FRAME_CONTEXT_CLOSE:
+            return &f->close_hover;
+        case OB_FRAME_CONTEXT_ICONIFY:
+            return &f->iconify_hover;
+        case OB_FRAME_CONTEXT_ALLDESKTOPS:
+            return &f->desk_hover;
+        case OB_FRAME_CONTEXT_SHADE:
+            return &f->shade_hover;
+        default:
+            return NULL;
+        }
+    }
+}
+
+static void compress_client_message_event(XEvent *e, XEvent *ce, Window window,
+                                          Atom msgtype)
+{
+    /* compress changes into a single change */
+    while (XCheckTypedWindowEvent(ob_display, window, e->type, ce)) {
+        /* XXX: it would be nice to compress ALL messages of a
+           type, not just messages in a row without other
+           message types between. */
+        if (ce->xclient.message_type != msgtype) {
+            XPutBackEvent(ob_display, ce);
+            break;
+        }
+        e->xclient = ce->xclient;
+    }
+}
+
 static void event_handle_client(ObClient *client, XEvent *e)
 {
     XEvent ce;
     Atom msgtype;
     ObFrameContext con;
+    gboolean *but;
     static gint px = -1, py = -1;
     static guint pb = 0;
     static ObFrameContext pcon = OB_FRAME_CONTEXT_NONE;
@@ -872,33 +924,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
             con = mouse_button_frame_context(con, e->xbutton.button,
                                              e->xbutton.state);
 
-            if (e->type == ButtonRelease && e->xbutton.button == pb)
+            /* button presses on CLIENT_CONTEXTs are not accompanied by a
+               release because they are Replayed to the client */
+            if ((e->type == ButtonRelease || CLIENT_CONTEXT(con, client)) &&
+                e->xbutton.button == pb)
                 pb = 0, px = py = -1, pcon = OB_FRAME_CONTEXT_NONE;
 
-            switch (con) {
-            case OB_FRAME_CONTEXT_MAXIMIZE:
-                client->frame->max_press = (e->type == ButtonPress);
+            but = context_to_button(client->frame, con, TRUE);
+            if (but) {
+                *but = (e->type == ButtonPress);
                 frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_CLOSE:
-                client->frame->close_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_ICONIFY:
-                client->frame->iconify_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_ALLDESKTOPS:
-                client->frame->desk_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            case OB_FRAME_CONTEXT_SHADE:
-                client->frame->shade_press = (e->type == ButtonPress);
-                frame_adjust_state(client->frame);
-                break;
-            default:
-                /* nothing changes with clicks for any other contexts */
-                break;
             }
         }
         break;
@@ -918,45 +953,20 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 client->frame->shade_hover || client->frame->iconify_hover ||
                 client->frame->close_hover)
             {
-                client->frame->max_hover = FALSE;
-                client->frame->desk_hover = FALSE;
-                client->frame->shade_hover = FALSE;
-                client->frame->iconify_hover = FALSE;
-                client->frame->close_hover = FALSE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            if (!client->frame->max_hover && !pb) {
-                client->frame->max_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            if (!client->frame->desk_hover && !pb) {
-                client->frame->desk_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            if (!client->frame->shade_hover && !pb) {
-                client->frame->shade_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            if (!client->frame->iconify_hover && !pb) {
-                client->frame->iconify_hover = TRUE;
-                frame_adjust_state(client->frame);
-            }
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            if (!client->frame->close_hover && !pb) {
-                client->frame->close_hover = TRUE;
+                client->frame->max_hover =
+                    client->frame->desk_hover =
+                    client->frame->shade_hover =
+                    client->frame->iconify_hover =
+                    client->frame->close_hover = FALSE;
                 frame_adjust_state(client->frame);
             }
             break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but && !*but && !pb) {
+                *but = TRUE;
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;
@@ -968,42 +978,18 @@ static void event_handle_client(ObClient *client, XEvent *e)
         case OB_FRAME_CONTEXT_TLCORNER:
         case OB_FRAME_CONTEXT_TRCORNER:
             /* we've left the button area inside the titlebar */
-            if (client->frame->max_hover || client->frame->desk_hover ||
-                client->frame->shade_hover || client->frame->iconify_hover ||
-                client->frame->close_hover)
-            {
-                client->frame->max_hover = FALSE;
-                client->frame->desk_hover = FALSE;
-                client->frame->shade_hover = FALSE;
-                client->frame->iconify_hover = FALSE;
+            client->frame->max_hover =
+                client->frame->desk_hover =
+                client->frame->shade_hover =
+                client->frame->iconify_hover =
                 client->frame->close_hover = FALSE;
-                frame_adjust_state(client->frame);
+            if (e->xcrossing.mode == NotifyGrab) {
+                client->frame->max_press =
+                    client->frame->desk_press =
+                    client->frame->shade_press =
+                    client->frame->iconify_press =
+                    client->frame->close_press = FALSE;
             }
-            break;
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            client->frame->max_hover = FALSE;
-            client->frame->max_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            client->frame->desk_hover = FALSE;
-            client->frame->desk_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            client->frame->shade_hover = FALSE;
-            client->frame->shade_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            client->frame->iconify_hover = FALSE;
-            client->frame->iconify_press = FALSE;
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            client->frame->close_hover = FALSE;
-            client->frame->close_press = FALSE;
-            frame_adjust_state(client->frame);
             break;
         case OB_FRAME_CONTEXT_FRAME:
             /* When the mouse leaves an animating window, don't use the
@@ -1031,6 +1017,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but) {
+                *but = FALSE;
+                if (e->xcrossing.mode == NotifyGrab) {
+                    but = context_to_button(client->frame, con, TRUE);
+                    *but = FALSE;
+                }
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;
@@ -1039,31 +1034,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
         con = frame_context(client, e->xcrossing.window,
                             e->xcrossing.x, e->xcrossing.y);
         switch (con) {
-        case OB_FRAME_CONTEXT_MAXIMIZE:
-            client->frame->max_hover = TRUE;
-            client->frame->max_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ALLDESKTOPS:
-            client->frame->desk_hover = TRUE;
-            client->frame->desk_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_SHADE:
-            client->frame->shade_hover = TRUE;
-            client->frame->shade_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_ICONIFY:
-            client->frame->iconify_hover = TRUE;
-            client->frame->iconify_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
-        case OB_FRAME_CONTEXT_CLOSE:
-            client->frame->close_hover = TRUE;
-            client->frame->close_press = (con == pcon);
-            frame_adjust_state(client->frame);
-            break;
         case OB_FRAME_CONTEXT_FRAME:
             if (grab_on_keyboard())
                 break;
@@ -1095,6 +1065,15 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             break;
         default:
+            but = context_to_button(client->frame, con, FALSE);
+            if (but) {
+                *but = TRUE;
+                if (e->xcrossing.mode == NotifyUngrab) {
+                    but = context_to_button(client->frame, con, TRUE);
+                    *but = (con == pcon);
+                }
+                frame_adjust_state(client->frame);
+            }
             break;
         }
         break;
@@ -1115,7 +1094,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         RECT_TO_DIMS(client->area, x, y, w, h);
 
         ob_debug("ConfigureRequest for \"%s\" desktop %d wmstate %d "
-                 "visibile %d\n"
+                 "visible %d\n"
                  "                     x %d y %d w %d h %d b %d\n",
                  client->title,
                  screen_desktop, client->wmstate, client->frame->visible,
@@ -1128,7 +1107,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 /* if the border width is changing then that is the same
                    as requesting a resize, but we don't actually change
                    the client's border, so it will change their root
-                   coordiantes (since they include the border width) and
+                   coordinates (since they include the border width) and
                    we need to a notify then */
                 move = TRUE;
             }
@@ -1173,16 +1152,14 @@ static void event_handle_client(ObClient *client, XEvent *e)
             (e->xconfigurerequest.value_mask & CWWidth) ||
             (e->xconfigurerequest.value_mask & CWHeight))
         {
+            /* don't allow clients to move shaded windows (fvwm does this)
+            */
             if (e->xconfigurerequest.value_mask & CWX) {
-                /* don't allow clients to move shaded windows (fvwm does this)
-                 */
                 if (!client->shaded)
                     x = e->xconfigurerequest.x;
                 move = TRUE;
             }
             if (e->xconfigurerequest.value_mask & CWY) {
-                /* don't allow clients to move shaded windows (fvwm does this)
-                 */
                 if (!client->shaded)
                     y = e->xconfigurerequest.y;
                 move = TRUE;
@@ -1236,7 +1213,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 
         {
-            gint lw,lh;
+            gint lw, lh;
 
             client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
 
@@ -1245,8 +1222,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if ((e->xconfigurerequest.value_mask & CWWidth &&
                  !(e->xconfigurerequest.value_mask & CWX)))
                 client_gravity_resize_w(client, &x, client->area.width, w);
-            /* if y was not given, then use gravity to figure out the new
-               y.  the reference point should not be moved */
+            /* same for y */
             if ((e->xconfigurerequest.value_mask & CWHeight &&
                  !(e->xconfigurerequest.value_mask & CWY)))
                 client_gravity_resize_h(client, &y, client->area.height,h);
@@ -1309,32 +1285,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xclient.message_type;
         if (msgtype == prop_atoms.wm_change_state) {
-            /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(ob_display, client->window,
-                                          e->type, &ce)) {
-                /* XXX: it would be nice to compress ALL messages of a
-                   type, not just messages in a row without other
-                   message types between. */
-                if (ce.xclient.message_type != msgtype) {
-                    XPutBackEvent(ob_display, &ce);
-                    break;
-                }
-                e->xclient = ce.xclient;
-            }
+            compress_client_message_event(e, &ce, client->window, msgtype);
             client_set_wm_state(client, e->xclient.data.l[0]);
         } else if (msgtype == prop_atoms.net_wm_desktop) {
-            /* compress changes into a single change */
-            while (XCheckTypedWindowEvent(ob_display, client->window,
-                                          e->type, &ce)) {
-                /* XXX: it would be nice to compress ALL messages of a
-                   type, not just messages in a row without other
-                   message types between. */
-                if (ce.xclient.message_type != msgtype) {
-                    XPutBackEvent(ob_display, &ce);
-                    break;
-                }
-                e->xclient = ce.xclient;
-            }
+            compress_client_message_event(e, &ce, client->window, msgtype);
             if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
@@ -1449,8 +1403,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (e->xclient.data.l[0] & 1 << 11) {
                 h = e->xclient.data.l[4];
 
-                /* if y was not given, then use gravity to figure out the new
-                   y.  the reference point should not be moved */
+                /* same for y */
                 if (!(e->xclient.data.l[0] & 1 << 9))
                     client_gravity_resize_h(client, &y, client->area.height,h);
             }
@@ -1580,10 +1533,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_protocols(client);
             client_setup_decor_and_functions(client, TRUE);
         }
-        else if (msgtype == prop_atoms.net_wm_strut) {
-            client_update_strut(client);
-        }
-        else if (msgtype == prop_atoms.net_wm_strut_partial) {
+        else if (msgtype == prop_atoms.net_wm_strut ||
+                 msgtype == prop_atoms.net_wm_strut_partial) {
             client_update_strut(client);
         }
         else if (msgtype == prop_atoms.net_wm_icon) {
@@ -1657,8 +1608,6 @@ static void event_handle_dockapp(ObDockApp *app, XEvent *e)
         dock_remove(app, TRUE);
         break;
     case DestroyNotify:
-        dock_remove(app, FALSE);
-        break;
     case ReparentNotify:
         dock_remove(app, FALSE);
         break;

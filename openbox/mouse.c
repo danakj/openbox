@@ -38,12 +38,6 @@ typedef struct {
     GSList *actions[OB_NUM_MOUSE_ACTIONS]; /* lists of Action pointers */
 } ObMouseBinding;
 
-#define FRAME_CONTEXT(co, cl) ((cl && cl->type != OB_CLIENT_TYPE_DESKTOP) ? \
-                               co == OB_FRAME_CONTEXT_FRAME : FALSE)
-#define CLIENT_CONTEXT(co, cl) ((cl && cl->type == OB_CLIENT_TYPE_DESKTOP) ? \
-                                co == OB_FRAME_CONTEXT_DESKTOP : \
-                                co == OB_FRAME_CONTEXT_CLIENT)
-
 /* Array of GSList*s of ObMouseBinding*s. */
 static GSList *bound_contexts[OB_FRAME_NUM_CONTEXTS];
 /* TRUE when we have a grab on the pointer and need to replay the pointer event

@@ -56,6 +56,12 @@ typedef enum {
     OB_FRAME_NUM_CONTEXTS
 } ObFrameContext;
 
+#define FRAME_CONTEXT(co, cl) ((cl && cl->type != OB_CLIENT_TYPE_DESKTOP) ? \
+                               co == OB_FRAME_CONTEXT_FRAME : FALSE)
+#define CLIENT_CONTEXT(co, cl) ((cl && cl->type == OB_CLIENT_TYPE_DESKTOP) ? \
+                                co == OB_FRAME_CONTEXT_DESKTOP : \
+                                co == OB_FRAME_CONTEXT_CLIENT)
+
 /*! The decorations the client window wants to be displayed on it */
 typedef enum {
     OB_FRAME_DECOR_TITLEBAR    = 1 << 0, /*!< Display a titlebar */
@@ -68,7 +74,7 @@ typedef enum {
     /*! Display a button to toggle the window's placement on
       all desktops */
     OB_FRAME_DECOR_ALLDESKTOPS = 1 << 7,
-    OB_FRAME_DECOR_SHADE       = 1 << 8, /*!< Displays a shade button */
+    OB_FRAME_DECOR_SHADE       = 1 << 8, /*!< Display a shade button */
     OB_FRAME_DECOR_CLOSE       = 1 << 9  /*!< Display a close button */
 } ObFrameDecorations;
 

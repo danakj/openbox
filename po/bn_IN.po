@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2007-06-01 19:02+0530\n"
 "Last-Translator: Runa Bhattacharjee <runabh@gmail.com>\n"
 "Language-Team: Bengali (India) <en@li.org>\n"
@@ -33,6 +33,10 @@ msgstr "\"%s\" পাথটি utf8 থেকে রূপান্তর কর
 msgid "Failed to execute \"%s\": %s"
 msgstr "\"%s\" সঞ্চালন করতে ব্যর্থ: %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr ""
@@ -41,26 +45,30 @@ msgstr ""
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr ""
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr ""
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
+msgstr ""
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -180,12 +188,12 @@ msgstr "অনুপস্থিত মেনু \"%s\" ব্যবহারে
 msgid "More..."
 msgstr "অতিরিক্ত..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "মাউস বাইন্ডিং সংক্রান্ত অবৈধ বাটন \"%s\""
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "মাউস বাইন্ডিং সংক্রান্ত অবৈধ কনটেক্সট \"%s\""
@@ -401,7 +409,7 @@ msgstr "অনুরোধ করা কি \"%s\", প্রদর্শন ক
 msgid "X Error: %s"
 msgstr "X সংক্রান্ত ত্রুটি: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr ""
 

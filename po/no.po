@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2008-01-29 13:37+0100\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@gmail.com>\n"
 "Language-Team: None\n"
@@ -30,6 +30,10 @@ msgstr "Feil ved konvertering av \"%s\" fra utf8 "
 msgid "Failed to execute \"%s\": %s"
 msgstr "Kunne ikke kjøre \"%s\": %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "Dreper..."
@@ -38,26 +42,30 @@ msgstr "Dreper..."
 msgid "Not Responding"
 msgstr "Svarer Ikke"
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr ""
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr ""
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
+msgstr ""
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -177,12 +185,12 @@ msgstr "Forsøkte å åpne menyen \"%s\", men denne finnes ikke"
 msgid "More..."
 msgstr "Mer..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Ugyldig knapp \"%s\" i binding for mus"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Ugyldig innhold \"%s\" i binding for mus"
@@ -397,7 +405,7 @@ msgstr "Ønsket tast \"%s\" eksisterer ikke i displayet"
 msgid "X Error: %s"
 msgstr "Feil i X: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr ""
 

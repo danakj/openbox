@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2007-07-12 13:01+0200\n"
 "Last-Translator: Marvin Vek\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -32,6 +32,10 @@ msgstr "Converteren van het pad \"%s\" vanuit utf8 mislukt"
 msgid "Failed to execute \"%s\": %s"
 msgstr "Uitvoeren van \"%s\" mislukt: %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "Termineren..."
@@ -40,26 +44,30 @@ msgstr "Termineren..."
 msgid "Not Responding"
 msgstr "Reageert Niet"
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr ""
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr ""
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
+msgstr ""
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -179,12 +187,12 @@ msgstr "Toegang gevraagd tot menu \"%s\" maar het bestaat niet"
 msgid "More..."
 msgstr "Meer..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Ongeldige knop \"%s\" in muis binding"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Ongeldige context \"%s\" in muis binding"
@@ -403,7 +411,7 @@ msgstr "Aangevraagde toets \"%s\" bestaat niet op het scherm"
 msgid "X Error: %s"
 msgstr "X Fout: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr ""
 

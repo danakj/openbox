@@ -4107,7 +4107,7 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head <= head + 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head + my_size - 1 < tail)
+            if (my_head + my_size - 1 <= tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
@@ -4126,7 +4126,7 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head >= head - 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head - my_size + 1 > tail)
+            if (my_head - my_size + 1 >= tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
@@ -4307,28 +4307,28 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     switch (side) {
     case OB_DIRECTION_EAST:
         head = RECT_RIGHT(self->frame->area) +
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
         head = RECT_LEFT(self->frame->area) -
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
         head = RECT_TOP(self->frame->area) -
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
         head = RECT_BOTTOM(self->frame->area) +
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;

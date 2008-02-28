@@ -3410,7 +3410,14 @@ static void client_prompt_kill(ObClient *self)
             { 0, OB_KILL_RESULT_YES }
         };
         gchar *m;
-        const gchar *y;
+        const gchar *y, *title;
+
+        title = self->original_title;
+        if (title[0] == '\0') {
+            /* empty string, so use its parent */
+            ObClient *p = client_search_top_direct_parent(self);
+            if (p) title = p->original_title;
+        }
 
         if (client_on_localhost(self)) {
             const gchar *sig;
@@ -3422,13 +3429,13 @@ static void client_prompt_kill(ObClient *self)
 
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
-                 self->original_title, sig);
+                 title, sig);
             y = _("End Process");
         }
         else {
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"),
-                 self->original_title);
+                 title);
             y = _("Disconnect");
         }
         /* set the dialog buttons' text */

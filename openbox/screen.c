@@ -542,6 +542,7 @@ void screen_set_num_desktops(guint num)
                 stacking_raise(CLIENT_AS_WINDOW(c));
         }
     }
+    g_list_free(stacking_copy);
 
     /* change our struts/area to match (after moving windows) */
     screen_update_areas();
@@ -798,6 +799,7 @@ void screen_remove_desktop(gboolean current)
             }
         }
     }
+    g_list_free(stacking_copy);
 
     /* fallback focus like we're changing desktops */
     if (screen_desktop < screen_num_desktops - 1) {

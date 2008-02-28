@@ -37,9 +37,9 @@
 #define LAYER_MENU_NAME   "client-layer-menu"
 
 enum {
-    LAYER_TOP,
-    LAYER_NORMAL,
-    LAYER_BOTTOM
+    LAYER_TOP    =  1,
+    LAYER_NORMAL =  0,
+    LAYER_BOTTOM = -1
 };
 
 enum {
@@ -54,6 +54,15 @@ enum {
     CLIENT_RESIZE,
     CLIENT_CLOSE
 };
+
+static void set_icon_color(ObMenuEntry *e)
+{
+    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
+    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
+    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
+    e->data.normal.mask_disabled_selected_color =
+        ob_rr_theme->menu_disabled_selected_color;
+}
 
 static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
 {
@@ -211,19 +220,7 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
 
-    switch (e->id) {
-    case LAYER_TOP:
-        client_set_layer(c, 1);
-        break;
-    case LAYER_NORMAL:
-        client_set_layer(c, 0);
-        break;
-    case LAYER_BOTTOM:
-        client_set_layer(c, -1);
-        break;
-    default:
-        g_assert_not_reached();
-    }
+    client_set_layer(c, e->id);
 
     if (!config_focus_under_mouse)
         event_end_ignore_all_enters(ignore_start);
@@ -238,44 +235,52 @@ static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
+    ObClient *c = frame->client;
     guint i;
     ObMenuEntry *e;
+    GList *it;
 
-    menu_clear_entries(menu);
-
-    if (frame->client == NULL || !client_normal(frame->client))
+    if (c == NULL || !client_normal(c))
         return FALSE; /* don't show the menu */
 
-    for (i = 0; i <= screen_num_desktops; ++i) {
-        const gchar *name;
-        guint desk;
+    if (!data)
+        menu_clear_entries(menu);
 
-        if (i >= screen_num_desktops) {
-            menu_add_separator(menu, -1, NULL);
+    if (!menu->entries) {
+        for (i = 0; i <= screen_num_desktops; ++i) {
+            const gchar *name;
+            guint desk;
 
-            desk = DESKTOP_ALL;
-            name = _("All desktops");
-        } else {
-            desk = i;
-            name = screen_desktop_names[i];
+            if (i == screen_num_desktops) {
+                menu_add_separator(menu, -1, NULL);
+
+                desk = DESKTOP_ALL;
+                name = _("All desktops");
+            } else {
+                desk = i;
+                name = screen_desktop_names[i];
+            }
+
+            e = menu_add_normal(menu, desk, name, NULL, FALSE);
+            e->id = desk;
         }
-
-        e = menu_add_normal(menu, desk, name, NULL, FALSE);
-        e->id = desk;
-        if (desk == DESKTOP_ALL) {
-            e->data.normal.mask = ob_rr_theme->desk_mask;
-            e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-            e->data.normal.mask_selected_color =
-                ob_rr_theme->menu_selected_color;
-            e->data.normal.mask_disabled_color =
-                ob_rr_theme->menu_disabled_color;
-            e->data.normal.mask_disabled_selected_color =
-                ob_rr_theme->menu_disabled_selected_color;
-        }
-
-        if (frame->client->desktop == desk)
-            e->data.normal.enabled = FALSE;
     }
+
+    for (it = menu->entries; it; it = g_list_next(it)) {
+        ObMenuEntry *e = it->data;
+        guint desk = e->id;
+
+        e->data.normal.enabled = c->desktop != desk;
+
+        if ((desk == DESKTOP_ALL && c->desktop != DESKTOP_ALL) ||
+            (c->desktop == DESKTOP_ALL && desk == screen_desktop))
+        {
+            e->data.normal.mask = ob_rr_theme->desk_mask;
+            set_icon_color(e);
+        } else
+            e->data.normal.mask = NULL;
+    }
+
     return TRUE; /* show the menu */
 }
 
@@ -285,9 +290,13 @@ static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     g_assert(c);
 
     client_set_desktop(c, e->id, FALSE, FALSE);
-    /* the client won't even be on the screen anymore, so hide the menu */
-    if (f)
+    if (f && c->desktop != screen_desktop && c->desktop != DESKTOP_ALL)
+        /* the client won't even be on the screen anymore, so hide the menu */
         menu_frame_hide_all();
+    else if (f) {
+        send_to_menu_update(f, (gpointer)1);
+        menu_frame_render(f);
+    }
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
@@ -367,7 +376,6 @@ void client_menu_startup(void)
     menu_add_normal(menu, LAYER_NORMAL, _("_Normal"), NULL, TRUE);
     menu_add_normal(menu, LAYER_BOTTOM, _("Always on _bottom"),NULL, TRUE);
 
-
     menu = menu_new(SEND_TO_MENU_NAME, _("_Send to desktop"), TRUE, NULL);
     menu_set_update_func(menu, send_to_menu_update);
     menu_set_execute_func(menu, send_to_menu_execute);
@@ -384,11 +392,7 @@ void client_menu_startup(void)
 
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_toggled_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_disabled_selected_color =
-        ob_rr_theme->menu_disabled_selected_color;
+    set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, TRUE);
 
@@ -396,19 +400,11 @@ void client_menu_startup(void)
 
     e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->iconify_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_disabled_selected_color =
-        ob_rr_theme->menu_disabled_selected_color;
+    set_icon_color(e);
 
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->max_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_disabled_selected_color =
-        ob_rr_theme->menu_disabled_selected_color;
+    set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
 
@@ -418,9 +414,5 @@ void client_menu_startup(void)
 
     e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->close_mask;
-    e->data.normal.mask_normal_color = ob_rr_theme->menu_color;
-    e->data.normal.mask_selected_color = ob_rr_theme->menu_selected_color;
-    e->data.normal.mask_disabled_color = ob_rr_theme->menu_disabled_color;
-    e->data.normal.mask_disabled_selected_color =
-        ob_rr_theme->menu_disabled_selected_color;
+    set_icon_color(e);
 }

@@ -2874,8 +2874,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* gets the client's position */
     frame_frame_gravity(self->frame, x, y);
 
-    /* work within the preferred sizes given by the window */
-    if (!(*w == self->area.width && *h == self->area.height)) {
+    /* work within the preferred sizes given by the window, these may have
+       changed rather than it's requested width and height, so always run
+       through this code */
+    {
         gint basew, baseh, minw, minh;
         gint incw, inch;
         gfloat minratio, maxratio;
@@ -3254,7 +3256,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     gint x, y, w, h;
 
     g_assert(dir == 0 || dir == 1 || dir == 2);
-    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && max) return;/* can't */
 
     /* check if already done */
     if (max) {
@@ -4107,7 +4109,7 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head <= head + 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head + my_size - 1 < tail)
+            if (my_head + my_size - 1 <= tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
@@ -4126,7 +4128,7 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head >= head - 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head - my_size + 1 > tail)
+            if (my_head - my_size + 1 >= tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
@@ -4307,28 +4309,28 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     switch (side) {
     case OB_DIRECTION_EAST:
         head = RECT_RIGHT(self->frame->area) +
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
         head = RECT_LEFT(self->frame->area) -
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
         head = RECT_TOP(self->frame->area) -
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
         head = RECT_BOTTOM(self->frame->area) +
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;

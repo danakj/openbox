@@ -4107,17 +4107,17 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head <= head + 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head + my_size - 1 <= tail)
+            if (my_head + my_size - 1 < tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head + (*near_edge ? 0 : my_size) < *dest)
+            if (head + (*near_edge ? 0 : my_size) <= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail - (!*near_edge ? 0 : my_size) < *dest)
+            if (tail - (!*near_edge ? 0 : my_size) <= *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
@@ -4126,17 +4126,17 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head >= head - 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head - my_size + 1 >= tail)
+            if (my_head - my_size + 1 > tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head - (*near_edge ? 0 : my_size) > *dest)
+            if (head - (*near_edge ? 0 : my_size) >= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail + (!*near_edge ? 0 : my_size) > *dest)
+            if (tail + (!*near_edge ? 0 : my_size) >= *dest)
                 skip_tail = TRUE;
             break;
         default:
@@ -4144,7 +4144,7 @@ static void detect_edge(Rect area, ObDirection dir,
     }
 
     ob_debug("my head %d size %d\n", my_head, my_size);
-    ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
+    ob_debug("head %d tail %d dest %d\n", head, tail, *dest);
     if (!skip_head) {
         ob_debug("using near edge %d\n", head);
         *dest = head;

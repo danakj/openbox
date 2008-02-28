@@ -2874,8 +2874,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* gets the client's position */
     frame_frame_gravity(self->frame, x, y);
 
-    /* work within the preferred sizes given by the window */
-    if (!(*w == self->area.width && *h == self->area.height)) {
+    /* work within the preferred sizes given by the window, these may have
+       changed rather than it's requested width and height, so always run
+       through this code */
+    {
         gint basew, baseh, minw, minh;
         gint incw, inch;
         gfloat minratio, maxratio;
@@ -3254,7 +3256,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     gint x, y, w, h;
 
     g_assert(dir == 0 || dir == 1 || dir == 2);
-    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && max) return;/* can't */
 
     /* check if already done */
     if (max) {

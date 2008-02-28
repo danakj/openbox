@@ -76,6 +76,7 @@ static void free_func(gpointer options)
         g_free(o->sn_name);
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
+        g_free(o->prompt);
         g_free(o);
     }
 }
@@ -94,20 +95,13 @@ static Options* dup_options(Options *in)
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-static void prompt_cb(ObPrompt *p, gint result, gpointer data)
+static void prompt_cb(ObPrompt *p, gint result, gpointer options)
 {
-    Options *options = data;
-
     if (result)
         run_func(NULL, options);
 
     prompt_unref(p);
-
-    g_free(options->cmd);
-    g_free(options->sn_name);
-    g_free(options->sn_icon);
-    g_free(options->sn_wmclass);
-    g_free(options);
+    free_func(options);
 }
 
 /* Always return FALSE because its not interactive */

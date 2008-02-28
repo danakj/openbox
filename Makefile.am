@@ -33,7 +33,7 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
-secretbin_SCRIPTS = \
+dist_secretbin_SCRIPTS = \
 	tools/xdg-autostart/xdg-autostart
 
 nodist_bin_SCRIPTS = \
@@ -417,8 +417,10 @@ nodist_pkgconfig_DATA = \
 dist_pixmap_DATA = \
 	data/openbox.png
 
+nodist_rc_DATA = \
+	data/autostart.sh
+
 dist_rc_DATA = \
-	data/autostart.sh \
 	data/rc.xml \
 	data/menu.xml
 
@@ -457,6 +459,7 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
+	data/autostart.sh.in \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/xsession/openbox.desktop.in \

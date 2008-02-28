@@ -43,8 +43,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (o->prompt) {
         ObPrompt *p;
         ObPromptAnswer answers[] = {
-            { _("No"), 0 },
-            { _("Yes"), 1 }
+            { _("Cancel"), 0 },
+            { _("Exit"), 1 }
         };
 
         p = prompt_new(_("Are you sure you want to exit Openbox?"),

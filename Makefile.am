@@ -405,8 +405,10 @@ nodist_pkgconfig_DATA = \
 dist_pixmap_DATA = \
 	data/openbox.png
 
+nodist_rc_DATA = \
+	data/autostart.sh
+
 dist_rc_DATA = \
-	data/autostart.sh \
 	data/rc.xml \
 	data/menu.xml
 
@@ -446,6 +448,7 @@ nodist_xsessions_DATA = \
 
 dist_noinst_DATA = \
 	version.h.in \
+	data/autostart.sh.in \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/xsession/openbox.desktop.in \

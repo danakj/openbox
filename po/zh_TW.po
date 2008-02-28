@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-27 04:52+0100\n"
+"POT-Creation-Date: 2008-02-27 21:03-0500\n"
 "PO-Revision-Date: 2008-02-17 23:29+0800\n"
 "Last-Translator: 洪任諭 <pcman.tw@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -22,15 +22,27 @@ msgstr ""
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "要求的動作「%s」無效。無此類動作存在。"
 
-#: openbox/actions/execute.c:92
+#: openbox/actions/execute.c:130 openbox/actions/exit.c:46
+msgid "No"
+msgstr "否"
+
+#: openbox/actions/execute.c:131 openbox/actions/exit.c:47
+msgid "Yes"
+msgstr "是"
+
+#: openbox/actions/execute.c:143
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "轉換路徑「%s」自 utf8 時失敗"
 
-#: openbox/actions/execute.c:101 openbox/actions/execute.c:120
+#: openbox/actions/execute.c:152 openbox/actions/execute.c:171
 #, c-format
 msgid "Failed to execute \"%s\": %s"
 msgstr "執行「%s」時失敗：%s"
+
+#: openbox/actions/exit.c:50
+msgid "Are you sure you want to exit Openbox?"
+msgstr ""
 
 #: openbox/client.c:1996
 msgid "Unnamed Window"
@@ -410,12 +422,6 @@ msgstr "X 錯誤：%s"
 #: openbox/prompt.c:182
 msgid "OK"
 msgstr "確定"
-
-#~ msgid "No"
-#~ msgstr "否"
-
-#~ msgid "Yes"
-#~ msgstr "是"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "使用的動作「%s」無效。動作將被忽略。"

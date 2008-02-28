@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-27 04:52+0100\n"
+"POT-Creation-Date: 2008-02-27 21:03-0500\n"
 "PO-Revision-Date: 2007-07-20 15:18+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -21,15 +21,27 @@ msgstr ""
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr ""
 
-#: openbox/actions/execute.c:92
+#: openbox/actions/execute.c:130 openbox/actions/exit.c:46
+msgid "No"
+msgstr ""
+
+#: openbox/actions/execute.c:131 openbox/actions/exit.c:47
+msgid "Yes"
+msgstr ""
+
+#: openbox/actions/execute.c:143
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Impossibile convertire il percorso utf8 \"%s\""
 
-#: openbox/actions/execute.c:101 openbox/actions/execute.c:120
+#: openbox/actions/execute.c:152 openbox/actions/execute.c:171
 #, c-format
 msgid "Failed to execute \"%s\": %s"
 msgstr "Impossibile eseguire il comando \"%s\": %s"
+
+#: openbox/actions/exit.c:50
+msgid "Are you sure you want to exit Openbox?"
+msgstr ""
 
 #: openbox/client.c:1996
 msgid "Unnamed Window"

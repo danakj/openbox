@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-27 04:52+0100\n"
+"POT-Creation-Date: 2008-02-27 21:03-0500\n"
 "PO-Revision-Date: 2008-02-27 04:53+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -20,15 +20,27 @@ msgstr ""
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Ogiltig action \"%s\" efterfrågades, men den finns inte."
 
-#: openbox/actions/execute.c:92
+#: openbox/actions/execute.c:130 openbox/actions/exit.c:46
+msgid "No"
+msgstr "Nej"
+
+#: openbox/actions/execute.c:131 openbox/actions/exit.c:47
+msgid "Yes"
+msgstr "Ja"
+
+#: openbox/actions/execute.c:143
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Lyckades inte konvertera sökvägen \"%s\" från utf8"
 
-#: openbox/actions/execute.c:101 openbox/actions/execute.c:120
+#: openbox/actions/execute.c:152 openbox/actions/execute.c:171
 #, c-format
 msgid "Failed to execute \"%s\": %s"
 msgstr "Kunde inte exekvera \"%s\": %s"
+
+#: openbox/actions/exit.c:50
+msgid "Are you sure you want to exit Openbox?"
+msgstr ""
 
 #: openbox/client.c:1996
 msgid "Unnamed Window"
@@ -414,12 +426,6 @@ msgstr "X-fel: %s"
 #: openbox/prompt.c:182
 msgid "OK"
 msgstr "OK"
-
-#~ msgid "No"
-#~ msgstr "Nej"
-
-#~ msgid "Yes"
-#~ msgstr "Ja"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "Ogiltigt användande av action \"%s\", den kommer ignoreras."

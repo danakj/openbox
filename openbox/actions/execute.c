@@ -1,6 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
+#include "openbox/prompt.h"
 #include "openbox/screen.h"
 #include "gettext.h"
 
@@ -14,6 +15,7 @@ typedef struct {
     gchar   *sn_name;
     gchar   *sn_icon;
     gchar   *sn_wmclass;
+    gchar   *prompt;
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
@@ -51,6 +53,9 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         g_free(s);
     }
 
+    if ((n = parse_find_node("prompt", node)))
+        o->prompt = parse_string(doc, n);
+
     if ((n = parse_find_node("startupnotify", node))) {
         xmlNodePtr m;
         if ((m = parse_find_node("enabled", n->xmlChildrenNode)))
@@ -78,6 +83,36 @@ static void free_func(gpointer options)
     }
 }
 
+static Options* dup_options(Options *in)
+{
+    Options *o = g_new(Options, 1);
+    o->cmd = g_strdup(in->cmd);
+    o->sn = in->sn;
+    o->sn_name = g_strdup(in->sn_name);
+    o->sn_icon = g_strdup(in->sn_icon);
+    o->sn_wmclass = g_strdup(in->sn_wmclass);
+    o->prompt = NULL;
+    return o;
+}
+
+static gboolean run_func(ObActionsData *data, gpointer options);
+
+static void prompt_cb(ObPrompt *p, gint result, gpointer data)
+{
+    Options *options = data;
+
+    if (result)
+        run_func(NULL, options);
+
+    prompt_unref(p);
+
+    g_free(options->cmd);
+    g_free(options->sn_name);
+    g_free(options->sn_icon);
+    g_free(options->sn_wmclass);
+    g_free(options);
+}
+
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
@@ -87,6 +122,22 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
 
     if (!o->cmd) return FALSE;
+
+    if (o->prompt) {
+        ObPrompt *p;
+        Options *ocp;
+        ObPromptAnswer answers[] = {
+            { _("No"), 0 },
+            { _("Yes"), 1 }
+        };
+
+        ocp = dup_options(options);
+        p = prompt_new(o->prompt, answers, 2, 0, 0, prompt_cb, ocp);
+        prompt_show(p, NULL, FALSE);
+
+        return FALSE;
+    }
+
     cmd = g_filename_from_utf8(o->cmd, -1, NULL, NULL, NULL);
     if (!cmd) {
         g_message(_("Failed to convert the path \"%s\" from utf8"), o->cmd);

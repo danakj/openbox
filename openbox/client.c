@@ -3410,7 +3410,14 @@ static void client_prompt_kill(ObClient *self)
             { 0, OB_KILL_RESULT_YES }
         };
         gchar *m;
-        const gchar *y;
+        const gchar *y, *title;
+
+        title = self->original_title;
+        if (title[0] == '\0') {
+            /* empty string, so use its parent */
+            ObClient *p = client_search_top_direct_parent(self);
+            if (p) title = p->original_title;
+        }
 
         if (client_on_localhost(self)) {
             const gchar *sig;
@@ -3422,13 +3429,13 @@ static void client_prompt_kill(ObClient *self)
 
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
-                 self->original_title, sig);
+                 title, sig);
             y = _("End Process");
         }
         else {
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"),
-                 self->original_title);
+                 title);
             y = _("Disconnect");
         }
         /* set the dialog buttons' text */
@@ -4100,17 +4107,17 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head <= head + 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head + my_size - 1 <= tail)
+            if (my_head + my_size - 1 < tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head + (*near_edge ? 0 : my_size) < *dest)
+            if (head + (*near_edge ? 0 : my_size) <= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail - (!*near_edge ? 0 : my_size) < *dest)
+            if (tail - (!*near_edge ? 0 : my_size) <= *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
@@ -4119,17 +4126,17 @@ static void detect_edge(Rect area, ObDirection dir,
             if (my_head >= head - 1)
                 skip_head = TRUE;
             /* check if our window's tail is past the tail of this window */
-            if (my_head - my_size + 1 >= tail)
+            if (my_head - my_size + 1 > tail)
                 skip_tail = TRUE;
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head - (*near_edge ? 0 : my_size) > *dest)
+            if (head - (*near_edge ? 0 : my_size) >= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail + (!*near_edge ? 0 : my_size) > *dest)
+            if (tail + (!*near_edge ? 0 : my_size) >= *dest)
                 skip_tail = TRUE;
             break;
         default:
@@ -4137,7 +4144,7 @@ static void detect_edge(Rect area, ObDirection dir,
     }
 
     ob_debug("my head %d size %d\n", my_head, my_size);
-    ob_debug("head %d tail %d deest %d\n", head, tail, *dest);
+    ob_debug("head %d tail %d dest %d\n", head, tail, *dest);
     if (!skip_head) {
         ob_debug("using near edge %d\n", head);
         *dest = head;

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2008-02-17 23:29+0800\n"
 "Last-Translator: 洪任諭 <pcman.tw@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -32,6 +32,10 @@ msgstr "轉換路徑「%s」自 utf8 時失敗"
 msgid "Failed to execute \"%s\": %s"
 msgstr "執行「%s」時失敗：%s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "正在中止..."
@@ -40,27 +44,31 @@ msgstr "正在中止..."
 msgid "Not Responding"
 msgstr "沒有回應"
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr "否"
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr "是"
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr "視窗「%s」似乎已經停止回應。  你想送出 \"%s\" 訊息強制結束程式嗎？"
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "視窗「%s」似乎已經停止回應。  你想從 X 伺服器將它斷線嗎？"
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -179,12 +187,12 @@ msgstr "試圖存取選單「%s」但是它不存在"
 msgid "More..."
 msgstr "更多…"
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "與滑鼠組合的按鈕「%s」無效"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "與滑鼠組合的上下文「%s」無效"
@@ -399,9 +407,15 @@ msgstr "要求的按鍵「%s」不存在於畫面之中"
 msgid "X Error: %s"
 msgstr "X 錯誤：%s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr "確定"
+
+#~ msgid "No"
+#~ msgstr "否"
+
+#~ msgid "Yes"
+#~ msgstr "是"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "使用的動作「%s」無效。動作將被忽略。"

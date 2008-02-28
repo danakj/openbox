@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2008-02-19 00:15+0100\n"
 "Last-Translator: Elián Hanisch <lambdae2@gmail.com>\n"
 "Language-Team: español <es@li.org>\n"
@@ -34,6 +34,10 @@ msgstr "Falló al convertir la ruta \"%s\" desde utf8"
 msgid "Failed to execute \"%s\": %s"
 msgstr "Falló al ejecutar \"%s\": %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "Terminando..."
@@ -42,15 +46,7 @@ msgstr "Terminando..."
 msgid "Not Responding"
 msgstr "No está respondiendo"
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr "No"
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr "Sí"
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -59,7 +55,11 @@ msgstr ""
 "La ventana \"%s\" no parece estar respondiendo.  ¿Desea forzarla a salir "
 "enviándole la señal %s?"
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -67,6 +67,14 @@ msgid ""
 msgstr ""
 "La ventana \"%s\" no parece estar respondiendo. ¿Desea desconectarla del "
 "servidor X?"
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
+msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -185,12 +193,12 @@ msgstr "Intentó acceder al menú \"%s\" pero este no existe"
 msgid "More..."
 msgstr "Más..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Botón inválido \"%s\" en mouse binding"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Contexto inválido \"%s\" en mouse binding"
@@ -418,9 +426,15 @@ msgstr "Tecla solicitada \"%s\" no existe en la pantalla"
 msgid "X Error: %s"
 msgstr "Error en X: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr "OK"
+
+#~ msgid "No"
+#~ msgstr "No"
+
+#~ msgid "Yes"
+#~ msgstr "Sí"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "Uso inválido de la acción \"%s\". La acción sera ignorada."

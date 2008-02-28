@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2007-07-20 15:18+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -31,6 +31,10 @@ msgstr "Impossibile convertire il percorso utf8 \"%s\""
 msgid "Failed to execute \"%s\": %s"
 msgstr "Impossibile eseguire il comando \"%s\": %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr ""
@@ -39,26 +43,30 @@ msgstr ""
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr ""
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr ""
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
+msgstr ""
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -180,12 +188,12 @@ msgstr "Tentativo di accedere al menù \"%s\". Il menù non esiste"
 msgid "More..."
 msgstr "Altri..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Il pulsante \"%s\" specificato nelle associazioni mouse non è valido"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Il contesto \"%s\" specificato nelle associazioni mouse non è valido"
@@ -410,6 +418,6 @@ msgstr "Il tasto richiesto \"%s\" non esiste sul display"
 msgid "X Error: %s"
 msgstr "Errore del server X: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr ""

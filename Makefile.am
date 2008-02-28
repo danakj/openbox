@@ -12,6 +12,7 @@ obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
 rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
+secretbindir    = $(libdir)/openbox
 
 theme = Clearlooks
 
@@ -32,7 +33,7 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
-bin_SCRIPTS = \
+secretbin_SCRIPTS = \
 	tools/xdg-autostart/xdg-autostart
 
 nodist_bin_SCRIPTS = \
@@ -424,7 +425,12 @@ dist_rc_DATA = \
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@configdir\@!$(configdir)!' \
+	-e 's!@secretbindir\@!$(secretbindir)!' \
 	-e 's!@bindir\@!$(bindir)!'
+
+data/autostart.sh: $(srcdir)/data/autostart.sh.in Makefile
+	@echo make: creating $@
+	@$(edit) $< >$@
 
 %.desktop: %.desktop.in Makefile
 	@echo make: creating $@

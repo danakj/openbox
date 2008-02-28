@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.999.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
-"PO-Revision-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
+"PO-Revision-Date: 2008-02-27 04:52+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -56,6 +56,10 @@ msgstr "Failed to convert the path “[1m%s[0m” from utf8"
 msgid "Failed to execute \"%s\": %s"
 msgstr "Failed to execute “[1m%s[0m”: %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr "Unnamed Window"
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr "Killing..."
@@ -64,15 +68,7 @@ msgstr "Killing..."
 msgid "Not Responding"
 msgstr "Not Responding"
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr "No"
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr "Yes"
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -81,7 +77,11 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to force "
 "it to exit by sending the %s signal?"
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr "End Process"
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -89,6 +89,14 @@ msgid ""
 msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to "
 "disconnect it from the X server?"
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr "Disconnect"
+
+#: openbox/client.c:3435
+msgid "Cancel"
+msgstr "Cancel"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -207,12 +215,12 @@ msgstr "Attempted to access menu “[1m%s[0m” but it does not exist"
 msgid "More..."
 msgstr "More..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Invalid button “[1m%s[0m” in mouse binding"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Invalid context “[1m%s[0m” in mouse binding"
@@ -427,6 +435,6 @@ msgstr "Requested key “[1m%s[0m” does not exist on the display"
 msgid "X Error: %s"
 msgstr "X Error: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr "OK"

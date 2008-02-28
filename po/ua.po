@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-21 11:58+0100\n"
+"POT-Creation-Date: 2008-02-27 04:52+0100\n"
 "PO-Revision-Date: 2007-06-16 13:02+0200\n"
 "Last-Translator: Dmitriy Moroz <zux@dimaka.org.ua>\n"
 "Language-Team: Ukrainian <root@archlinux.org.ua>\n"
@@ -30,6 +30,10 @@ msgstr "Не вдалося сконвертувати шлях \"%s\" з utf8"
 msgid "Failed to execute \"%s\": %s"
 msgstr "Невдалося виконати \"%s\": %s"
 
+#: openbox/client.c:1996
+msgid "Unnamed Window"
+msgstr ""
+
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
 msgstr ""
@@ -38,26 +42,30 @@ msgstr ""
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3416
-msgid "No"
-msgstr ""
-
-#: openbox/client.c:3417
-msgid "Yes"
-msgstr ""
-
-#: openbox/client.c:3430
+#: openbox/client.c:3424
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3434
+#: openbox/client.c:3426
+msgid "End Process"
+msgstr ""
+
+#: openbox/client.c:3430
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
+msgstr ""
+
+#: openbox/client.c:3432
+msgid "Disconnect"
+msgstr ""
+
+#: openbox/client.c:3435
+msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -177,12 +185,12 @@ msgstr "Спроба доступа до меню \"%s\" якого не існ�
 msgid "More..."
 msgstr "Більше..."
 
-#: openbox/mouse.c:379
+#: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "Некоректна клавіша \"%s\" в прив'язці клавіш мишки"
 
-#: openbox/mouse.c:385
+#: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Некоректний контекст \"%s\" в прив'зці клавіш мишки"
@@ -400,7 +408,7 @@ msgstr "Клавіша \"%s\" на яку здійснено запит - не �
 msgid "X Error: %s"
 msgstr "Помилка X-серверу: %s"
 
-#: openbox/prompt.c:181
+#: openbox/prompt.c:182
 msgid "OK"
 msgstr ""
 

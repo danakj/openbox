@@ -90,3 +90,4 @@ tests/strut
 tests/title
 tests/urgent
 tests/usertimewin
+data/autostart.sh

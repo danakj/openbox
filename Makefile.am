@@ -32,7 +32,7 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gnome-panel-control/gnome-panel-control
 
-secretbin_SCRIPTS = \
+dist_secretbin_SCRIPTS = \
 	tools/xdg-autostart/xdg-autostart
 
 nodist_bin_SCRIPTS = \

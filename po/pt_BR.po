@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-27 21:03-0500\n"
+"POT-Creation-Date: 2008-02-28 23:00+0100\n"
 "PO-Revision-Date: 2008-01-22 21:42+0100\n"
 "Last-Translator: Og Maciel <ogmaciel@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
@@ -22,23 +22,31 @@ msgstr ""
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Ação inválida \"%s\" requisitada. Ação não existe."
 
-#: openbox/actions/execute.c:130 openbox/actions/exit.c:46
+#: openbox/actions/execute.c:124
 msgid "No"
 msgstr ""
 
-#: openbox/actions/execute.c:131 openbox/actions/exit.c:47
+#: openbox/actions/execute.c:125
 msgid "Yes"
 msgstr ""
 
-#: openbox/actions/execute.c:143
+#: openbox/actions/execute.c:137
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Falha ao converter o caminho \"%s\" do utf8"
 
-#: openbox/actions/execute.c:152 openbox/actions/execute.c:171
+#: openbox/actions/execute.c:146 openbox/actions/execute.c:165
 #, c-format
 msgid "Failed to execute \"%s\": %s"
 msgstr "Falha ao executar \"%s\": %s"
+
+#: openbox/actions/exit.c:46 openbox/client.c:3444
+msgid "Cancel"
+msgstr ""
+
+#: openbox/actions/exit.c:47
+msgid "Exit"
+msgstr ""
 
 #: openbox/actions/exit.c:50
 msgid "Are you sure you want to exit Openbox?"
@@ -56,30 +64,26 @@ msgstr "Terminando..."
 msgid "Not Responding"
 msgstr "Não Responsivo"
 
-#: openbox/client.c:3424
+#: openbox/client.c:3433
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3426
+#: openbox/client.c:3435
 msgid "End Process"
 msgstr ""
 
-#: openbox/client.c:3430
+#: openbox/client.c:3439
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
 
-#: openbox/client.c:3432
+#: openbox/client.c:3441
 msgid "Disconnect"
-msgstr ""
-
-#: openbox/client.c:3435
-msgid "Cancel"
 msgstr ""
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
@@ -106,47 +110,47 @@ msgstr "Janelas"
 msgid "Desktops"
 msgstr "Áreas de trabalho"
 
-#: openbox/client_menu.c:257
+#: openbox/client_menu.c:258
 msgid "All desktops"
 msgstr "Todas as áreas de trabalho"
 
-#: openbox/client_menu.c:361
+#: openbox/client_menu.c:370
 msgid "_Layer"
 msgstr "_Camada"
 
-#: openbox/client_menu.c:366
+#: openbox/client_menu.c:375
 msgid "Always on _top"
 msgstr "Sempre no _topo"
 
-#: openbox/client_menu.c:367
+#: openbox/client_menu.c:376
 msgid "_Normal"
 msgstr "_Normal"
 
-#: openbox/client_menu.c:368
+#: openbox/client_menu.c:377
 msgid "Always on _bottom"
 msgstr "Sempre no _fundo"
 
-#: openbox/client_menu.c:371
+#: openbox/client_menu.c:379
 msgid "_Send to desktop"
 msgstr "Enviar para área de _trabalho"
 
-#: openbox/client_menu.c:375
+#: openbox/client_menu.c:383
 msgid "Client menu"
 msgstr "Menu do cliente"
 
-#: openbox/client_menu.c:385
+#: openbox/client_menu.c:393
 msgid "R_estore"
 msgstr "R_estaurar"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:397
 msgid "_Move"
 msgstr "_Mover"
 
-#: openbox/client_menu.c:395
+#: openbox/client_menu.c:399
 msgid "Resi_ze"
 msgstr "Redimen_sionar"
 
-#: openbox/client_menu.c:397
+#: openbox/client_menu.c:401
 msgid "Ico_nify"
 msgstr "Mi_nimizar"
 
@@ -154,15 +158,15 @@ msgstr "Mi_nimizar"
 msgid "Ma_ximize"
 msgstr "Ma_ximizar"
 
-#: openbox/client_menu.c:413
+#: openbox/client_menu.c:409
 msgid "_Roll up/down"
 msgstr "(Des)en_rolar"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:411
 msgid "Un/_Decorate"
 msgstr "(Não) _Decorar"
 
-#: openbox/client_menu.c:419
+#: openbox/client_menu.c:415
 msgid "_Close"
 msgstr "_Fechar"
 
@@ -274,16 +278,19 @@ msgstr "  --version           Mostra a versão e sai\n"
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Substitui o gerenciador de janelas ativo\n"
 
-#: openbox/openbox.c:514
+#. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
+#. aligned still, if you have to, make a new line with \n and 22 spaces. It's
+#. fine to leave it as FILE though.
+#: openbox/openbox.c:517
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 
-#: openbox/openbox.c:515
+#: openbox/openbox.c:518
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 "  --sm-disable        Desabilita conexão com o gerenciador de sessões\n"
 
-#: openbox/openbox.c:516
+#: openbox/openbox.c:519
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -291,19 +298,19 @@ msgstr ""
 "\n"
 "Passando mensagens para uma instância do Openbox em execução:\n"
 
-#: openbox/openbox.c:517
+#: openbox/openbox.c:520
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Recarrega a configuração do Openbox\n"
 
-#: openbox/openbox.c:518
+#: openbox/openbox.c:521
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Reinicia o Openbox\n"
 
-#: openbox/openbox.c:519
+#: openbox/openbox.c:522
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Sai do Openbox\n"
 
-#: openbox/openbox.c:520
+#: openbox/openbox.c:523
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -311,26 +318,26 @@ msgstr ""
 "\n"
 "Opções de depuração:\n"
 
-#: openbox/openbox.c:521
+#: openbox/openbox.c:524
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Executa em modo sincronizado\n"
 
-#: openbox/openbox.c:522
+#: openbox/openbox.c:525
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra saida de depuração\n"
 
-#: openbox/openbox.c:523
+#: openbox/openbox.c:526
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra saída de depuração para manipulação de foco\n"
 
-#: openbox/openbox.c:524
+#: openbox/openbox.c:527
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 "  --debug-xinerama    Divide a exibição de telas em telas de xinerama "
 "falsas\n"
 
-#: openbox/openbox.c:525
+#: openbox/openbox.c:528
 #, c-format
 msgid ""
 "\n"
@@ -339,11 +346,11 @@ msgstr ""
 "\n"
 "Por favor reporte erros em %s\n"
 
-#: openbox/openbox.c:594
+#: openbox/openbox.c:597
 msgid "--config-file requires an argument\n"
 msgstr ""
 
-#: openbox/openbox.c:637
+#: openbox/openbox.c:640
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Argumento de linha de comando inválido \"%s\"\n"
@@ -375,7 +382,7 @@ msgid ""
 "Overriding the Openbox configuration."
 msgstr ""
 
-#: openbox/screen.c:1178
+#: openbox/screen.c:1180
 #, c-format
 msgid "desktop %i"
 msgstr "área de trabalho %i"

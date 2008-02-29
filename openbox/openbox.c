@@ -490,6 +490,9 @@ static void print_help(void)
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("  --replace           Replace the currently running window manager\n"));
+    /* TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
+       aligned still, if you have to, make a new line with \n and 22 spaces. It's
+       fine to leave it as FILE though. */
     g_print(_("  --config-file FILE  Specify the path to the config file to use\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));

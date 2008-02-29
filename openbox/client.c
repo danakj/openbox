@@ -2796,8 +2796,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     /* gets the client's position */
     frame_frame_gravity(self->frame, x, y);
 
-    /* work within the preferred sizes given by the window */
-    if (!(*w == self->area.width && *h == self->area.height)) {
+    /* work within the preferred sizes given by the window, these may have
+       changed rather than it's requested width and height, so always run
+       through this code */
+    {
         gint basew, baseh, minw, minh;
         gint incw, inch;
         gfloat minratio, maxratio;
@@ -3176,7 +3178,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     gint x, y, w, h;
 
     g_assert(dir == 0 || dir == 1 || dir == 2);
-    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE)) return; /* can't */
+    if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && max) return;/* can't */
 
     /* check if already done */
     if (max) {
@@ -3332,7 +3334,14 @@ static void client_prompt_kill(ObClient *self)
             { 0, OB_KILL_RESULT_YES }
         };
         gchar *m;
-        const gchar *y;
+        const gchar *y, *title;
+
+        title = self->original_title;
+        if (title[0] == '\0') {
+            /* empty string, so use its parent */
+            ObClient *p = client_search_top_direct_parent(self);
+            if (p) title = p->original_title;
+        }
 
         if (client_on_localhost(self)) {
             const gchar *sig;
@@ -3344,13 +3353,13 @@ static void client_prompt_kill(ObClient *self)
 
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to force it to exit by sending the %s signal?"),
-                 self->original_title, sig);
+                 title, sig);
             y = _("End Process");
         }
         else {
             m = g_strdup_printf
                 (_("The window \"%s\" does not seem to be responding.  Do you want to disconnect it from the X server?"),
-                 self->original_title);
+                 title);
             y = _("Disconnect");
         }
         /* set the dialog buttons' text */
@@ -3991,12 +4000,12 @@ static void detect_edge(Rect area, ObDirection dir,
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head + (*near_edge ? 0 : my_size) < *dest)
+            if (head + (*near_edge ? 0 : my_size) <= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail - (!*near_edge ? 0 : my_size) < *dest)
+            if (tail - (!*near_edge ? 0 : my_size) <= *dest)
                 skip_tail = TRUE;
             break;
         case OB_DIRECTION_SOUTH:
@@ -4010,12 +4019,12 @@ static void detect_edge(Rect area, ObDirection dir,
             /* check if the head of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a tail, not a head) */
-            if (head - (*near_edge ? 0 : my_size) > *dest)
+            if (head - (*near_edge ? 0 : my_size) >= *dest)
                 skip_head = TRUE;
             /* check if the tail of this window is closer than the previously
                chosen edge (take into account that the previously chosen
                edge might have been a head, not a tail) */
-            if (tail + (!*near_edge ? 0 : my_size) > *dest)
+            if (tail + (!*near_edge ? 0 : my_size) >= *dest)
                 skip_tail = TRUE;
             break;
         default:
@@ -4023,7 +4032,7 @@ static void detect_edge(Rect area, ObDirection dir,
     }
 
     ob_debug("my head %d size %d", my_head, my_size);
-    ob_debug("head %d tail %d deest %d", head, tail, *dest);
+    ob_debug("head %d tail %d dest %d", head, tail, *dest);
     if (!skip_head) {
         ob_debug("using near edge %d", head);
         *dest = head;
@@ -4186,28 +4195,28 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
     switch (side) {
     case OB_DIRECTION_EAST:
         head = RECT_RIGHT(self->frame->area) +
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
         head = RECT_LEFT(self->frame->area) -
-            (self->size_inc.width - 1) * (grow ? 1 : -1);
+            (self->size_inc.width - 1) * (grow ? 1 : 0);
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
         head = RECT_TOP(self->frame->area) -
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
         head = RECT_BOTTOM(self->frame->area) +
-            (self->size_inc.height - 1) * (grow ? 1 : -1);
+            (self->size_inc.height - 1) * (grow ? 1 : 0);
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;

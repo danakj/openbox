@@ -98,7 +98,7 @@ ObFrame *frame_new(ObClient *client)
     mask = 0;
     if (visual) {
         /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        mask = CWColormap | CWBackPixel | CWBorderPixel;
         /* create a colormap with the visual */
         self->colormap = attrib.colormap =
             XCreateColormap(obt_display, obt_root(ob_screen),
@@ -114,7 +114,7 @@ ObFrame *frame_new(ObClient *client)
     mask = 0;
     if (visual) {
         /* client has a 32-bit visual */
-        mask |= CWColormap | CWBackPixel | CWBorderPixel;
+        mask = CWColormap | CWBackPixel | CWBorderPixel;
         attrib.colormap = RrColormap(ob_rr_inst);
     }
 
@@ -188,7 +188,7 @@ ObFrame *frame_new(ObClient *client)
 
     set_theme_statics(self);
 
-    return (ObFrame*)self;
+    return self;
 }
 
 static void set_theme_statics(ObFrame *self)
@@ -1150,7 +1150,7 @@ static void layout_title(ObFrame *self)
     self->label_width = self->width - (ob_rr_theme->paddingx + 1) * 2;
     self->leftmost = self->rightmost = OB_FRAME_CONTEXT_NONE;
 
-    /* figure out what's being show, find each element's position, and the
+    /* figure out what's being shown, find each element's position, and the
        width of the label
 
        do the ones before the label, then after the label,

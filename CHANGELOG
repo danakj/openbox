@@ -7,6 +7,7 @@
     runs things based on the freedesktop.org autostart specification.  You can
     have it run GNOME, KDE, ROX, or XFCE specific things if you want.  The
     new default system-wide autostart.sh script runs it automatically
+  * Update the default menu.xml to include a lot of common apps
   * Fix white font shadows (negative shadowtint)
   * Update the autostart.sh to find gnome-settings-daemon correctly, as the
     GNOME people have moved it to libexec
@@ -43,12 +44,16 @@
     working)
   * Fix the resize popup box for terminal windows with a base size of 0 (show
     the right size values for urxvt terminals)
+  * Fix some off-by-one bugs with the edge growing/shrinking code
   * Add new theme options for menu line separators: menu.separator.color,
     menu.separator.width, menu.separator.padding.width,
     menu.separator.padding.height
   * Add xfce-mcs-manager to the default autostart.sh, and run it automatically
     when gnome-settings-daemon is not present to have GTK apps inherit settings
     from the XFCE configuration tools
+  * Make the send-to-desktop menu in the client-menu indicate which is the current
+    desktop for omnipresent windows, and don't close it if just toggling
+    omni-presence when ctrl-clicking
 
 3.4.6.1:
   * Updated Clearlooks theme

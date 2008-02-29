@@ -1,5 +1,5 @@
 3.4.7-pre1:
-  * Updated Czech, Chinese, Dutch, Swedish, Finnish and Spanish, translations
+  * Updated Czech, Chinese, Dutch, Swedish, Finnish and Spanish translations
   * Add an example of the "force" option for the per-app placement options to
     the default rc.xml file
   * Add a new xdg-autostart script.  This will eventually end up in the PyXDG
@@ -24,6 +24,13 @@
   * Add new Openbox-themed prompt windows.  Use these prompt windows to ask
     before killing off windows that aren't responding.  This also means we
     don't need to ping every window constantly forever
+  * Add a new <prompt> option to the Execute action.  If this is set to a
+    string, a dialog will be shown with that string in it and "yes"/"no"
+    buttons.  The command to be executed will only be run if the user selects
+    "yes" in the dialog
+  * Add a new <prompt> option to the Exit action, which is a boolean (not a
+    string).  When true, Openbox will show a dialog confirming if you want to
+    exit
   * Reduce Openbox's memory footprint and speed up rendering through the use
     of a new icon cache, so that Openbox only needs to keep 1 copy of an icon
     when 100 different windows share it
@@ -42,13 +49,6 @@
   * Add xfce-mcs-manager to the default autostart.sh, and run it automatically
     when gnome-settings-daemon is not present to have GTK apps inherit settings
     from the XFCE configuration tools
-  * Add a new <prompt> option to the Execute action.  If this is set to a
-    string, a dialog will be shown with that string in it and "yes"/"no"
-    buttons.  The command to be executed will only be run if the user selects
-    "yes" in the dialog
-  * Add a new <prompt> option to the Exit action, which is a boolean (not a
-    string).  When true, Openbox will show a dialog confirming if you want to
-    exit
 
 3.4.6.1:
   * Updated Clearlooks theme

@@ -26,8 +26,8 @@ check_PROGRAMS = \
 	render/rendertest
 
 lib_LTLIBRARIES = \
-	render/libobrender.la \
-	obt/libobt.la
+	obt/libobt.la \
+	render/libobrender.la
 
 bin_PROGRAMS = \
 	openbox/openbox \

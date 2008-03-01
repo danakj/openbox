@@ -31,6 +31,7 @@
 #include "event.h"
 #include "focus.h"
 #include "popup.h"
+#include "hooks.h"
 #include "render/render.h"
 #include "gettext.h"
 #include "obt/display.h"
@@ -708,6 +709,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     if (event_curtime != CurrentTime)
         screen_desktop_user_time = event_curtime;
+
+    hooks_run(OB_HOOK_SCREEN_DESK_CHANGE, NULL);
 }
 
 void screen_add_desktop(gboolean current)

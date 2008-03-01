@@ -20,10 +20,10 @@ typedef enum {
     OB_HOOK_WIN_UNSHADE,
     OB_HOOK_WIN_FOCUS,
     OB_HOOK_WIN_UNFOCUS,
-    OB_HOOK_WIN_CURRENT_DESK,
-    OB_HOOK_WIN_OTHER_DESK,
+    OB_HOOK_WIN_DESK_CHANGE,
     OB_HOOK_WIN_DECORATED,
     OB_HOOK_WIN_UNDECORATED,
+    OB_HOOK_SCREEN_DESK_CHANGE,
     OB_NUM_HOOKS
 } ObHook;
 
@@ -36,7 +36,7 @@ ObHook hooks_hook_from_name(const gchar *n);
   @param on TRUE if the hook is being run cuz a state was turned on, FALSE
             if a state was turned off
 */
-void hooks_fire(ObHook hook, struct _ObClient *c);
+void hooks_run(ObHook hook, struct _ObClient *c);
 
 void hooks_add(ObHook hook, struct _ObActionsAct *act);
 

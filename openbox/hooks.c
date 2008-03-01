@@ -67,7 +67,7 @@ void hooks_run(ObHook hook, struct _ObClient *client)
                      OB_USER_ACTION_HOOK,
                      0, -1, -1, 0,
                      OB_FRAME_CONTEXT_NONE,
-                     event_target_client(client));
+                     client);
 }
 
 void hooks_add(ObHook hook, struct _ObActionsAct *act)

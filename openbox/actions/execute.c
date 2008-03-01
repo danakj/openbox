@@ -166,10 +166,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
             if ((c[1] == 'w' || c[1] == 'W') &&
                 (c[2] == 'i' || c[2] == 'I') &&
-                (c[3] == 'n' || c[3] == 'N') &&
-                (c[4] == 'd' || c[4] == 'D') &&
-                (c[5] == 'o' || c[5] == 'O') &&
-                (c[6] == 'w' || c[6] == 'W') &&
+                (c[3] == 'd' || c[3] == 'D') &&
                 !g_ascii_isalnum(c[7]))
             {
                 /* found $window */

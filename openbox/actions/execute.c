@@ -136,6 +136,71 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         return FALSE;
     }
 
+    if (data->client) {
+        gchar *c, *before, *expand;
+
+        /* replace occurances of $pid and $window */
+
+        expand = NULL;
+        before = cmd;
+
+        while ((c = strchr(before, '$'))) {
+            if ((c[1] == 'p' || c[1] == 'P') &&
+                (c[2] == 'i' || c[2] == 'I') &&
+                (c[3] == 'd' || c[3] == 'D') &&
+                !g_ascii_isalnum(c[4]))
+            {
+                /* found $pid */
+                gchar *tmp;
+
+                *c = '\0';
+                tmp = expand;
+                expand = g_strdup_printf("%s%s%u",
+                                         (expand ? expand : ""),
+                                         before,
+                                         data->client->pid);
+                g_free(tmp);
+
+                before = c + 4; /* 4 = strlen("$pid") */
+            }
+
+            if ((c[1] == 'w' || c[1] == 'W') &&
+                (c[2] == 'i' || c[2] == 'I') &&
+                (c[3] == 'n' || c[3] == 'N') &&
+                (c[4] == 'd' || c[4] == 'D') &&
+                (c[5] == 'o' || c[5] == 'O') &&
+                (c[6] == 'w' || c[6] == 'W') &&
+                !g_ascii_isalnum(c[7]))
+            {
+                /* found $window */
+                gchar *tmp;
+
+                *c = '\0';
+                tmp = expand;
+                expand = g_strdup_printf("%s%s%lu",
+                                         (expand ? expand : ""),
+                                         before,
+                                         data->client->window);
+                g_free(tmp);
+
+                before = c + 7; /* 4 = strlen("$window") */
+            }
+        }
+
+        if (expand) {
+            gchar *tmp;
+
+            /* add on the end of the string after the last replacement */
+            tmp = expand;
+            expand = g_strconcat(expand, before, NULL);
+            g_free(tmp);
+
+            /* replace the command with the expanded one */
+            g_free(cmd);
+            cmd = expand;
+        }
+    }
+
     /* If there is a keyboard grab going on then we need to cancel
        it so the application can grab things */
     event_cancel_all_key_grabs();
@@ -156,26 +221,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                        screen_desktop);
         }
 
-        if (data->client && data->client->pid) {
-            gchar *pid;
-
-            pid = g_strdup_printf("%u", data->client->pid);
-            setenv("PID", pid, TRUE);
-            g_free(pid);
-        }
-        else
-            unsetenv("PID");
-
-        if (data->client) {
-            gchar *wid;
-
-            wid = g_strdup_printf("%u", data->client->window);
-            setenv("WINDOW_ID", wid, TRUE);
-            g_free(wid);
-        }
-        else
-            unsetenv("WINDOW_ID");
-
         if (!g_spawn_async(NULL, argv, NULL,
                            G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e))
@@ -188,9 +233,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         }
         if (o->sn)
             unsetenv("DESKTOP_STARTUP_ID");
-
-        unsetenv("PID");
-        unsetenv("WINDOW_ID");
 
         g_free(program);
         g_strfreev(argv);

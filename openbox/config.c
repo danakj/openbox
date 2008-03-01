@@ -22,6 +22,7 @@
 #include "mouse.h"
 #include "actions.h"
 #include "translate.h"
+#include "hooks.h"
 #include "client.h"
 #include "screen.h"
 #include "openbox.h"
@@ -340,6 +341,47 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
         app = obt_parse_find_node(app->next, "application");
     }
+}
+
+static void parse_hook(xmlNodePtr node, gpointer d)
+{
+    gchar *name;
+    ObHook hook;
+    xmlNodePtr n;
+
+
+    if (!obt_parse_attr_string(node, "name", &name)) {
+        g_message(_("Hook in config file is missing a name"));
+        return;
+    }
+
+    hook = hooks_hook_from_name(name);
+    if (!hook)
+        g_message(_("Unknown hook \"%s\" in config file"), name);
+    else {
+        if ((n = obt_parse_find_node(node->children, "action")))
+            while (n) {
+                ObActionsAct *action;
+
+                action = actions_parse(n);
+                if (action)
+                    hooks_add(hook, action);
+                n = obt_parse_find_node(n->next, "action");
+            }
+    }
+
+    g_free(name);
+}
+
+static void parse_hooks(xmlNodePtr node, gpointer d)
+{
+    xmlNodePtr n;
+
+    if ((n = obt_parse_find_node(node->children, "hook")))
+        while (n) {
+            parse_hook(n, NULL);
+            n = obt_parse_find_node(n->next, "hook");
+        }
 }
 
 /*
@@ -986,6 +1028,8 @@ void config_startup(ObtParseInst *i)
     config_menu_files = NULL;
 
     obt_parse_register(i, "menu", parse_menu, NULL);
+
+    obt_parse_register(i, "hooks", parse_hooks, NULL);
 
     config_per_app_settings = NULL;
 

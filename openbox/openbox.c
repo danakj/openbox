@@ -42,6 +42,7 @@
 #include "config.h"
 #include "ping.h"
 #include "prompt.h"
+#include "hooks.h"
 #include "gettext.h"
 #include "render/render.h"
 #include "render/theme.h"
@@ -297,6 +298,7 @@ gint main(gint argc, gchar **argv)
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             sn_startup(reconfigure);
+            hooks_startup(reconfigure);
             window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
@@ -373,6 +375,7 @@ gint main(gint argc, gchar **argv)
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);
+            hooks_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();

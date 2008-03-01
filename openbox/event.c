@@ -33,6 +33,7 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "hooks.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "moveresize.h"

@@ -1,6 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
+#include "openbox/client.h"
 #include "openbox/prompt.h"
 #include "openbox/screen.h"
 #include "obt/paths.h"
@@ -155,6 +156,26 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                        screen_desktop);
         }
 
+        if (data->client && data->client->pid) {
+            gchar *pid;
+
+            pid = g_strdup_printf("%u", data->client->pid);
+            setenv("PID", pid, TRUE);
+            g_free(pid);
+        }
+        else
+            unsetenv("PID");
+
+        if (data->client) {
+            gchar *wid;
+
+            wid = g_strdup_printf("%u", data->client->window);
+            setenv("WINDOW_ID", wid, TRUE);
+            g_free(wid);
+        }
+        else
+            unsetenv("WINDOW_ID");
+
         if (!g_spawn_async(NULL, argv, NULL,
                            G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e))
@@ -167,6 +188,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         }
         if (o->sn)
             unsetenv("DESKTOP_STARTUP_ID");
+
+        unsetenv("PID");
+        unsetenv("WINDOW_ID");
 
         g_free(program);
         g_strfreev(argv);

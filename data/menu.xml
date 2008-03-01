@@ -77,7 +77,7 @@
 <menu id="apps-term-menu" label="Terminals">
   <item label="Rxvt Unicode">
     <action name="Execute">
-      <command>rxvt-unicode</command>
+      <command>urxvt</command>
     </action>
   </item>
   <item label="Gnome Terminal">

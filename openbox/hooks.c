@@ -3,17 +3,21 @@
 
 #include <glib.h>
 
-static GSList *hooks[OB_NUM_HOOKS*2];
+static GSList *hooks[OB_NUM_HOOKS];
 
 void hooks_startup(gboolean reconfig)
 {
+    gint i;
+
+    for (i = 0; i < OB_NUM_HOOKS; ++i)
+        hooks[i] = NULL;
 }
 
 void hooks_shutdown(gboolean reconfig)
 {
     gint i;
 
-    for (i = 0; i < OB_NUM_HOOKS*2; ++i)
+    for (i = 0; i < OB_NUM_HOOKS; ++i)
         while (hooks[i]) {
             actions_act_unref(hooks[i]->data);
             hooks[i] = g_slist_delete_link(hooks[i], hooks[i]);
@@ -46,29 +50,28 @@ ObHook hooks_hook_from_name(const gchar *n)
         return OB_HOOK_WIN_FOCUS;
     if (!g_ascii_strcasecmp(n, "WindowUnfocused"))
         return OB_HOOK_WIN_UNFOCUS;
-    if (!g_ascii_strcasecmp(n, "WindowOnCurrentDesktop"))
-        return OB_HOOK_WIN_CURRENT_DESK;
-    if (!g_ascii_strcasecmp(n, "WindowOnOtherDesktop"))
-        return OB_HOOK_WIN_OTHER_DESK;
+    if (!g_ascii_strcasecmp(n, "WindowOnNewDesktop"))
+        return OB_HOOK_WIN_DESK_CHANGE;
     if (!g_ascii_strcasecmp(n, "WindowDecorated"))
         return OB_HOOK_WIN_DECORATED;
     if (!g_ascii_strcasecmp(n, "WindowUndecorated"))
         return OB_HOOK_WIN_UNDECORATED;
+    if (!g_ascii_strcasecmp(n, "DesktopChanged"))
+        return OB_HOOK_SCREEN_DESK_CHANGE;
     return OB_HOOK_INVALID;
 }
 
-void hooks_fire(ObHook hook, struct _ObClient *c)
+void hooks_run(ObHook hook, struct _ObClient *c)
 {
     GSList *it;
 
     g_assert(hook < OB_NUM_HOOKS);
 
-    for (it = hooks[hook]; it; it = g_slist_next(it))
-        actions_run_acts(it->data,
-                         OB_USER_ACTION_HOOK,
-                         0, -1, -1, 0,
-                         OB_FRAME_CONTEXT_NONE,
-                         c);
+    actions_run_acts(hooks[hook],
+                     OB_USER_ACTION_HOOK,
+                     0, -1, -1, 0,
+                     OB_FRAME_CONTEXT_NONE,
+                     c);
 }
 
 void hooks_add(ObHook hook, struct _ObActionsAct *act)

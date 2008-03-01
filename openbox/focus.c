@@ -27,6 +27,7 @@
 #include "focus_cycle.h"
 #include "screen.h"
 #include "keyboard.h"
+#include "hooks.h"
 #include "focus.h"
 #include "stacking.h"
 #include "obt/prop.h"
@@ -72,6 +73,7 @@ static void push_to_top(ObClient *client)
 void focus_set_client(ObClient *client)
 {
     Window active;
+    ObClient *old;
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "focus_set_client 0x%lx", client ? client->window : 0);
@@ -87,6 +89,7 @@ void focus_set_client(ObClient *client)
     focus_cycle_stop(focus_client);
     focus_cycle_stop(client);
 
+    old = focus_client;
     focus_client = client;
 
     if (client != NULL) {
@@ -101,6 +104,9 @@ void focus_set_client(ObClient *client)
         active = client ? client->window : None;
         OBT_PROP_SET32(obt_root(ob_screen), NET_ACTIVE_WINDOW, WINDOW, active);
     }
+
+    hooks_run(OB_HOOK_WIN_UNFOCUS, old);
+    hooks_run(OB_HOOK_WIN_FOCUS, client);
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,

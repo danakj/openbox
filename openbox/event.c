@@ -738,6 +738,11 @@ static void event_process(const XEvent *ec, gpointer data)
              e->type == MotionNotify)
         event_handle_user_input(client, e);
 
+    XFlush(obt_display);
+
+    /* run all the hooks at once */
+    hooks_run_queue();
+
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
     event_curtime = CurrentTime;

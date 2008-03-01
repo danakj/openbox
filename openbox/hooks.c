@@ -3,11 +3,21 @@
 #include "client.h"
 #include "focus.h"
 #include "debug.h"
+#include "obt/display.h"
 
 #include <glib.h>
 
 static GSList *hooks[OB_NUM_HOOKS];
 static const gchar *names[OB_NUM_HOOKS];
+
+typedef struct {
+    ObHook hook;
+    struct _ObClient *client;
+} ObHookQueue;
+
+#define QUEUE_SIZE 20
+ObHookQueue run_queue[QUEUE_SIZE];
+gint        queue_size;
 
 void hooks_startup(gboolean reconfig)
 {
@@ -15,6 +25,8 @@ void hooks_startup(gboolean reconfig)
 
     for (i = 0; i < OB_NUM_HOOKS; ++i)
         hooks[i] = NULL;
+
+    queue_size = 0;
 
     names[OB_HOOK_WIN_NEW] = "WindowNew";
     names[OB_HOOK_WIN_CLOSE] = "WindowClosed";
@@ -55,19 +67,27 @@ ObHook hooks_hook_from_name(const gchar *n)
     return OB_HOOK_INVALID;
 }
 
-void hooks_run(ObHook hook, struct _ObClient *client)
+void hooks_queue(ObHook hook, struct _ObClient *client)
 {
-    GSList *it;
+    ObHookQueue *q;
 
     g_assert(hook < OB_NUM_HOOKS && hook > OB_HOOK_INVALID);
 
-    ob_debug("Running hook %s for client 0x%x", names[hook],
+    ob_debug("Queing hook %s for client 0x%x", names[hook],
              (client ? client->window : 0));
-    actions_run_acts(hooks[hook],
-                     OB_USER_ACTION_HOOK,
-                     0, -1, -1, 0,
-                     OB_FRAME_CONTEXT_NONE,
-                     client);
+    q = &run_queue[queue_size++];
+    q->hook = hook;
+    q->client = client;
+
+    if (queue_size == QUEUE_SIZE)
+        /* queue is full */
+        hooks_run_queue();
+}
+
+void hooks_run(ObHook hook, struct _ObClient *c)
+{
+    hooks_queue(hook, c);
+    hooks_run_queue();
 }
 
 void hooks_add(ObHook hook, struct _ObActionsAct *act)
@@ -77,4 +97,22 @@ void hooks_add(ObHook hook, struct _ObActionsAct *act)
     /* append so they are executed in the same order as they appear in the
        config file */
     hooks[hook] = g_slist_append(hooks[hook], act);
+}
+
+void hooks_run_queue(void)
+{
+    gint i;
+
+    for (i = 0; i < queue_size; ++i) {
+        const ObHookQueue *q = &run_queue[i];
+
+        ob_debug("Running hook %s for client 0x%x", names[q->hook],
+                 (q->client ? q->client->window : 0));
+        actions_run_acts(hooks[q->hook],
+                         OB_USER_ACTION_HOOK,
+                         0, -1, -1, 0,
+                         OB_FRAME_CONTEXT_NONE,
+                         q->client);
+    }
+    queue_size = 0;
 }

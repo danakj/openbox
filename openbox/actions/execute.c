@@ -108,7 +108,7 @@ static void prompt_cb(ObPrompt *p, gint result, gpointer options)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
-    GError *e = NULL;
+    GError *e;
     gchar **argv = NULL;
     gchar *cmd;
     Options *o = options;
@@ -205,12 +205,14 @@ static gboolean run_func(ObActionsData *data, gpointer options)
        it so the application can grab things */
     event_cancel_all_key_grabs();
 
+    e = NULL;
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
         g_message(_("Failed to execute \"%s\": %s"), o->cmd, e->message);
         g_error_free(e);
     }
     else {
         gchar *program = NULL;
+        gboolean ok;
 
         if (o->sn) {
             program = g_path_get_basename(argv[0]);
@@ -221,18 +223,21 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                        screen_desktop);
         }
 
-        if (!g_spawn_async(NULL, argv, NULL,
-                           G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
-                           NULL, NULL, NULL, &e))
-        {
-            g_message(_("Failed to execute \"%s\": %s"), o->cmd, e->message);
+        e = NULL;
+        ok = g_spawn_async(NULL, argv, NULL,
+                           G_SPAWN_SEARCH_PATH |
+                           G_SPAWN_DO_NOT_REAP_CHILD,
+                           NULL, NULL, NULL, &e);
+        if (!ok) {
+            g_message(_("Failed to execute \"%s\": %s"),
+                      o->cmd, e->message);
             g_error_free(e);
-
-            if (o->sn)
-                sn_spawn_cancel();
         }
-        if (o->sn)
+
+        if (o->sn) {
+            if (!ok) sn_spawn_cancel();
             unsetenv("DESKTOP_STARTUP_ID");
+        }
 
         g_free(program);
         g_strfreev(argv);

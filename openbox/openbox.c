@@ -233,6 +233,7 @@ gint main(gint argc, gchar **argv)
 
                 /* register all the available actions */
                 actions_startup(reconfigure);
+                hooks_startup(reconfigure);
                 /* start up config which sets up with the parser */
                 config_startup(i);
 
@@ -298,7 +299,6 @@ gint main(gint argc, gchar **argv)
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             sn_startup(reconfigure);
-            hooks_startup(reconfigure);
             window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
@@ -375,10 +375,10 @@ gint main(gint argc, gchar **argv)
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);
-            hooks_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
+            hooks_shutdown(reconfigure);
             actions_shutdown(reconfigure);
         } while (reconfigure);
     }

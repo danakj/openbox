@@ -562,7 +562,7 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
 
-    hooks_run(OB_HOOK_WIN_NEW, self);
+    hooks_queue(OB_HOOK_WIN_NEW, self);
 }
 
 
@@ -638,6 +638,7 @@ void client_unmanage(ObClient *self)
     if (!self->prompt)
         XChangeSaveSet(obt_display, self->window, SetModeDelete);
 
+    /* this can't be queued to run later */
     hooks_run(OB_HOOK_WIN_CLOSE, self);
 
     /* update the focus lists */
@@ -2525,7 +2526,7 @@ gboolean client_show(ObClient *self)
         */
         client_change_wm_state(self);
 
-        hooks_run(OB_HOOK_WIN_VISIBLE, self);
+        hooks_queue(OB_HOOK_WIN_VISIBLE, self);
     }
     return show;
 }
@@ -2565,7 +2566,7 @@ gboolean client_hide(ObClient *self)
         */
         client_change_wm_state(self);
 
-        hooks_run(OB_HOOK_WIN_INVISIBLE, self);
+        hooks_queue(OB_HOOK_WIN_INVISIBLE, self);
     }
     return hide;
 }
@@ -3162,7 +3163,8 @@ static void client_iconify_recursive(ObClient *self,
         /* do this after starting the animation so it doesn't flash */
         client_showhide(self);
 
-        hooks_run((iconic ? OB_HOOK_WIN_ICONIC : OB_HOOK_WIN_UNICONIC), self);
+        hooks_queue((iconic ? OB_HOOK_WIN_ICONIC : OB_HOOK_WIN_UNICONIC),
+                    self);
     }
 
     /* iconify all direct transients, and deiconify all transients
@@ -3251,7 +3253,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
 
-    hooks_run((max ? OB_HOOK_WIN_MAX : OB_HOOK_WIN_UNMAX), self);
+    hooks_queue((max ? OB_HOOK_WIN_MAX : OB_HOOK_WIN_UNMAX), self);
 }
 
 void client_shade(ObClient *self, gboolean shade)
@@ -3266,7 +3268,7 @@ void client_shade(ObClient *self, gboolean shade)
     /* resize the frame to just the titlebar */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 
-    hooks_run((shade ? OB_HOOK_WIN_SHADE : OB_HOOK_WIN_UNSHADE), self);
+    hooks_queue((shade ? OB_HOOK_WIN_SHADE : OB_HOOK_WIN_UNSHADE), self);
 }
 
 static void client_ping_event(ObClient *self, gboolean dead)
@@ -3470,7 +3472,7 @@ static void client_set_desktop_recursive(ObClient *self,
             client_reconfigure(self, FALSE);
 
         if (old != self->desktop)
-            hooks_run(OB_HOOK_WIN_DESK_CHANGE, self);
+            hooks_queue(OB_HOOK_WIN_DESK_CHANGE, self);
     }
 
     /* move all transients */
@@ -3874,8 +3876,8 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
         client_setup_decor_and_functions(self, TRUE);
         client_change_state(self); /* reflect this in the state hints */
 
-        hooks_run((undecorated ?
-                   OB_HOOK_WIN_UNDECORATED : OB_HOOK_WIN_DECORATED), self);
+        hooks_queue((undecorated ?
+                     OB_HOOK_WIN_UNDECORATED : OB_HOOK_WIN_DECORATED), self);
     }
 }
 

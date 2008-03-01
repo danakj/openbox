@@ -105,8 +105,8 @@ void focus_set_client(ObClient *client)
         OBT_PROP_SET32(obt_root(ob_screen), NET_ACTIVE_WINDOW, WINDOW, active);
     }
 
-    hooks_run(OB_HOOK_WIN_UNFOCUS, old);
-    hooks_run(OB_HOOK_WIN_FOCUS, client);
+    hooks_queue(OB_HOOK_WIN_UNFOCUS, old);
+    hooks_queue(OB_HOOK_WIN_FOCUS, client);
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,

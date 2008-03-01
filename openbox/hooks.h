@@ -32,12 +32,11 @@ void hooks_shutdown(gboolean reconfig);
 
 ObHook hooks_hook_from_name(const gchar *n);
 
-/*! Run a hook.
-  @param on TRUE if the hook is being run cuz a state was turned on, FALSE
-            if a state was turned off
-*/
+void hooks_queue(ObHook hook, struct _ObClient *c);
 void hooks_run(ObHook hook, struct _ObClient *c);
 
 void hooks_add(ObHook hook, struct _ObActionsAct *act);
+
+void hooks_run_queue(void);
 
 #endif

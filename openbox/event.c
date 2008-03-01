@@ -1884,9 +1884,14 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
             if (!client || !frame_iconify_animating(client->frame))
                 mouse_event(client, e);
         } else
-            keyboard_event((focus_cycle_target ? focus_cycle_target :
-                            (client ? client : focus_client)), e);
+            keyboard_event(event_target_client(client), e);
     }
+}
+
+ObClient* event_target_client(ObClient *client)
+{
+    return (focus_cycle_target ? focus_cycle_target :
+            (client ? client : focus_client));
 }
 
 static void focus_delay_dest(gpointer data)

@@ -56,20 +56,20 @@ static gboolean replace_wm(void);
 static void     screen_tell_ksplash(void);
 static void     screen_fallback_focus(void);
 
-guint    screen_num_desktops;
-guint    screen_num_monitors;
-guint    screen_desktop;
-guint    screen_last_desktop;
-gboolean screen_showing_desktop;
+guint           screen_num_desktops;
+guint           screen_num_monitors;
+guint           screen_desktop;
+guint           screen_last_desktop;
+gboolean        screen_showing_desktop;
 ObDesktopLayout screen_desktop_layout;
-gchar  **screen_desktop_names;
-Window   screen_support_win;
-Time     screen_desktop_user_time = CurrentTime;
+gchar         **screen_desktop_names;
+Window          screen_support_win;
+Time            screen_desktop_user_time = CurrentTime;
 
 static Size     screen_physical_size;
 static guint    screen_old_desktop;
 static gboolean screen_desktop_timeout = TRUE;
-/*! An array of desktops, holding array of areas per monitor */
+/*! An array of desktops, holding an array of areas per monitor */
 static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */
 static GSList *struts_top = NULL;
@@ -340,7 +340,7 @@ static void screen_tell_ksplash(void)
     e.xclient.display = ob_display;
     e.xclient.window = RootWindow(ob_display, ob_screen);
     e.xclient.message_type =
-        XInternAtom(ob_display, "_KDE_SPLASH_PROGRESS", False );
+        XInternAtom(ob_display, "_KDE_SPLASH_PROGRESS", False);
     e.xclient.format = 8;
     strcpy(e.xclient.data.b, "wm started");
     XSendEvent(ob_display, RootWindow(ob_display, ob_screen),
@@ -542,12 +542,13 @@ void screen_set_num_desktops(guint num)
                 stacking_raise(CLIENT_AS_WINDOW(c));
         }
     }
+    g_list_free(stacking_copy);
 
     /* change our struts/area to match (after moving windows) */
     screen_update_areas();
 
     /* may be some unnamed desktops that we need to fill in with names
-     (after updating the areas so the popup can resize) */
+       (after updating the areas so the popup can resize) */
     screen_update_desktop_names();
 
     /* change our desktop if we're on one that no longer exists! */
@@ -798,6 +799,7 @@ void screen_remove_desktop(gboolean current)
             }
         }
     }
+    g_list_free(stacking_copy);
 
     /* fallback focus like we're changing desktops */
     if (screen_desktop < screen_num_desktops - 1) {

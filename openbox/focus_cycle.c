@@ -73,7 +73,6 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                       gboolean showbar, gboolean dialog,
                       gboolean done, gboolean cancel)
 {
-    static ObClient *t = NULL;
     static GList *order = NULL;
     GList *it, *start, *list;
     ObClient *ft = NULL;
@@ -150,7 +149,6 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
 done_cycle:
     if (done && !cancel) ret = focus_cycle_target;
 
-    t = NULL;
     focus_cycle_target = NULL;
     g_list_free(order);
     order = NULL;

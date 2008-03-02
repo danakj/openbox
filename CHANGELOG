@@ -32,7 +32,7 @@
     "yes" in the dialog
   * Add a new <prompt> option to the Exit action, which is a boolean (not a
     string).  When true, Openbox will show a dialog confirming if you want to
-    exit.  The default is now to show the prompt
+    exit.  The default is to show the prompt
   * Reduce Openbox's memory footprint and speed up rendering through the use
     of a new icon cache, so that Openbox only needs to keep 1 copy of an icon
     when 100 different windows share it
@@ -65,8 +65,7 @@
     then immediately log out of the current session, and the computer will be
     rebooted
   * Show an information dialog when an error occurs for Openbox, such as when
-    the Execute action fails
-  * Show an information dialog when there are XML syntax errors in the Openbox
+    the Execute action fails or when XML syntax errors are present in the
     configuration files
 
 3.4.6.1:

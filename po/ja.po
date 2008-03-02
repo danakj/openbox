@@ -2,14 +2,14 @@
 # Copyright (C) 2004 Mikael Magnusson
 # This file is distributed under the same license as the Openbox package.
 # Yukihiro Nakai <nakai@gnome.gr.jp>, 2003.
-# Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>, 2007.
+# Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>, 2007, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-02-28 23:00+0100\n"
-"PO-Revision-Date: 2007-06-07 14:49+0200\n"
+"PO-Revision-Date: 2008-03-02 17:18+0100\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,11 +25,11 @@ msgstr ""
 
 #: openbox/actions/execute.c:124
 msgid "No"
-msgstr ""
+msgstr "いいえ"
 
 #: openbox/actions/execute.c:125
 msgid "Yes"
-msgstr ""
+msgstr "はい"
 
 #: openbox/actions/execute.c:137
 #, c-format
@@ -43,27 +43,27 @@ msgstr "\"%s\"の実行に失敗しました: %s"
 
 #: openbox/actions/exit.c:46 openbox/client.c:3444
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: openbox/actions/exit.c:47
 msgid "Exit"
-msgstr ""
+msgstr "終了"
 
 #: openbox/actions/exit.c:50
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Openbox を終了してもよろしいですか？"
 
 #: openbox/client.c:1996
 msgid "Unnamed Window"
-msgstr ""
+msgstr "名称未設定"
 
 #: openbox/client.c:2010 openbox/client.c:2042
 msgid "Killing..."
-msgstr ""
+msgstr "強制終了中..."
 
 #: openbox/client.c:2012 openbox/client.c:2044
 msgid "Not Responding"
-msgstr ""
+msgstr "応答なし"
 
 #: openbox/client.c:3433
 #, c-format
@@ -71,21 +71,22 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"ウィンドウ \"%s\" は応答していないようです。%s 信号を送り強制終了しますか？"
 
 #: openbox/client.c:3435
 msgid "End Process"
-msgstr ""
+msgstr "プロセスを終了する"
 
 #: openbox/client.c:3439
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
-msgstr ""
+msgstr "ウィンドウ \"%s\" は応答していないようです。Xサーバから切断しますか？"
 
 #: openbox/client.c:3441
 msgid "Disconnect"
-msgstr ""
+msgstr "切断する"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -121,7 +122,7 @@ msgstr "階層(_L)"
 
 #: openbox/client_menu.c:375
 msgid "Always on _top"
-msgstr "常に最上位にする(_T)"
+msgstr "常に最上層にする(_T)"
 
 #: openbox/client_menu.c:376
 msgid "_Normal"
@@ -129,7 +130,7 @@ msgstr "通常(_N)"
 
 #: openbox/client_menu.c:377
 msgid "Always on _bottom"
-msgstr "常に最下位にする(_B)"
+msgstr "常に最下層にする(_B)"
 
 #: openbox/client_menu.c:379
 msgid "_Send to desktop"
@@ -153,7 +154,7 @@ msgstr "サイズの変更(_Z)"
 
 #: openbox/client_menu.c:401
 msgid "Ico_nify"
-msgstr "アイコン化(_N)"
+msgstr "最小化(_N)"
 
 #: openbox/client_menu.c:405
 msgid "Ma_ximize"
@@ -163,7 +164,6 @@ msgstr "最大化(_X)"
 msgid "_Roll up/down"
 msgstr "巻き上げ/展開(_R)"
 
-# not sure about this one
 #: openbox/client_menu.c:411
 msgid "Un/_Decorate"
 msgstr "非/装飾(_D)"
@@ -251,7 +251,7 @@ msgstr "再起動の際新しい実行ファイル\"%s\"の実行に失敗しま
 
 #: openbox/openbox.c:498 openbox/openbox.c:500
 msgid "Copyright (c)"
-msgstr ""
+msgstr "著作権 (c)"
 
 #: openbox/openbox.c:509
 msgid "Syntax: openbox [options]\n"
@@ -265,44 +265,46 @@ msgstr ""
 
 #: openbox/openbox.c:511
 msgid "  --help              Display this help and exit\n"
-msgstr ""
+msgstr "  --help              この使い方を表示して終了します\n"
 
 #: openbox/openbox.c:512
 msgid "  --version           Display the version and exit\n"
-msgstr ""
+msgstr "  --version           バージョンを表示して終了します\n"
 
 #: openbox/openbox.c:513
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
+msgstr "  --replace           現在実行中のウィンドウマネージャを置き換えます\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:517
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file FILE  使用する設定ファイルのパスを指定します\n"
 
 #: openbox/openbox.c:518
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
+msgstr "  --sm-disable        セッションマネージャへの接続を止めます\n"
 
 #: openbox/openbox.c:519
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
+"\n"
+"実行中の Openbox にメッセージを送ります:\n"
 
 #: openbox/openbox.c:520
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
+msgstr "  --reconfigure       Openbox の設定を再読み込みします\n"
 
 #: openbox/openbox.c:521
 msgid "  --restart           Restart Openbox\n"
-msgstr ""
+msgstr "  --restart           Openbox を再起動します\n"
 
 #: openbox/openbox.c:522
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Openbox を終了します\n"
 
 #: openbox/openbox.c:523
 msgid ""
@@ -312,19 +314,19 @@ msgstr ""
 
 #: openbox/openbox.c:524
 msgid "  --sync              Run in synchronous mode\n"
-msgstr ""
+msgstr "  --sync              同期モードで実行します\n"
 
 #: openbox/openbox.c:525
 msgid "  --debug             Display debugging output\n"
-msgstr ""
+msgstr "  --debug             デバッグ情報を表示します\n"
 
 #: openbox/openbox.c:526
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
+msgstr "  --debug-focus       フォーカスの扱いに関するデバッグ情報を表示します\n"
 
 #: openbox/openbox.c:527
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr ""
+msgstr "  --debug-xinerama    偽の xinerama スクリーンに分割表示します\n"
 
 #: openbox/openbox.c:528
 #, c-format
@@ -332,10 +334,12 @@ msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
+"\n"
+"バグは %s 宛へ報告して下さい\n"
 
 #: openbox/openbox.c:597
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file requires an argument\n"
 
 #: openbox/openbox.c:640
 #, c-format
@@ -367,6 +371,8 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"Openbox は %d 個のデスクトップを設定されましたが, 現在のセッションは %d 個"
+"持っています。 Openbox の設定を無視します。"
 
 #: openbox/screen.c:1180
 #, c-format

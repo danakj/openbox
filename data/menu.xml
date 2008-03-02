@@ -331,6 +331,45 @@
   </item>
 </menu>
 
+<menu id="system-menu" label="System">
+  <item label="Openbox Configuration Manager">
+    <action name="Execute">
+      <command>obconf</command>
+      <startupnotify><enabled>yes</enabled></startupnotify>
+    </action>
+  </item>
+  <item label="Gnome Control Center">
+    <action name="Execute">
+      <command>gnome-control-center</command>
+      <startupnotify><enabled>yes</enabled></startupnotify>
+    </action>
+  </item>
+  <item label="KDE Control Center">
+    <action name="Execute">
+      <command>kcontrol</command>
+      <startupnotify><enabled>yes</enabled></startupnotify>
+    </action>
+  </item>
+  <item label="Manage Cups Printers">
+    <action name="Execute">
+      <command>xdg-open http://localhost:631/</command>
+      <startupnotify>
+        <enabled>no</enabled>
+        <icon>cups</icon>
+      </startupnotify>
+    </action>
+  </item>
+  <separator />
+  <item label="Reconfigure Openbox">
+    <action name="Reconfigure" />
+  </item>
+  <item label="Exit Openbox">
+    <action name="Exit">
+      <prompt>yes</prompt>
+    </action>
+  </item>
+</menu>
+
 <menu id="root-menu" label="Openbox 3">
   <separator label="Applications" />
   <menu id="apps-accessories-menu"/>
@@ -342,18 +381,10 @@
   <menu id="apps-term-menu"/>
   <menu id="apps-fileman-menu"/>
   <separator label="System" />
-  <item label="ObConf">
-    <action name="Execute">
-      <command>obconf</command>
-      <startupnotify><enabled>yes</enabled></startupnotify>
-    </action>
-  </item>
-  <item label="Reconfigure">
-    <action name="Reconfigure" />
-  </item>
+  <menu id="system-menu"/>
   <separator />
-  <item label="Exit">
-    <action name="Exit">
+  <item label="Logout">
+    <action name="SessionLogout">
       <prompt>yes</prompt>
     </action>
   </item>

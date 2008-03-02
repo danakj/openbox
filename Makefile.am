@@ -31,6 +31,7 @@ lib_LTLIBRARIES = \
 
 bin_PROGRAMS = \
 	openbox/openbox \
+	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control
 
 dist_secretbin_SCRIPTS = \
@@ -190,6 +191,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/if.c \
 	openbox/actions/kill.c \
 	openbox/actions/layer.c \
+	openbox/actions/session.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
 	openbox/actions/move.c \
@@ -291,6 +293,17 @@ tools_gnome_panel_control_gnome_panel_control_LDADD = \
 	$(X_LIBS)
 tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 	tools/gnome-panel-control/gnome-panel-control.c
+
+## gdm-control ##
+
+tools_gdm_control_gdm_control_CPPFLAGS = \
+	$(X_CFLAGS) \
+	$(GLIB_CFLAGS)
+tools_gdm_control_gdm_control_LDADD = \
+	$(X_LIBS) \
+	$(GLIB_LIBS)
+tools_gdm_control_gdm_control_SOURCES = \
+	tools/gdm-control/gdm-control.c
 
 
 ## default button masks ##

@@ -1,5 +1,6 @@
-3.4.7-pre1:
-  * Updated Czech, Chinese, Dutch, Swedish, Finnish and Spanish translations
+3.4.7-pre2:
+  * Updated Czech, Chinese, Dutch, Swedish, Finnish, Spanish, Brasilian
+    Portuguese, Japanese and Portuguese translations
   * Add an example of the "force" option for the per-app placement options to
     the default rc.xml file
   * Add a new xdg-autostart script.  This will eventually end up in the PyXDG
@@ -31,7 +32,7 @@
     "yes" in the dialog
   * Add a new <prompt> option to the Exit action, which is a boolean (not a
     string).  When true, Openbox will show a dialog confirming if you want to
-    exit
+    exit.  The default is now to show the prompt
   * Reduce Openbox's memory footprint and speed up rendering through the use
     of a new icon cache, so that Openbox only needs to keep 1 copy of an icon
     when 100 different windows share it
@@ -54,6 +55,19 @@
   * Make the send-to-desktop menu in the client-menu indicate which is the current
     desktop for omnipresent windows, and don't close it if just toggling
     omni-presence when ctrl-clicking
+  * Add a new SessionLogout action that logs out through the session manager,
+    when running Openbox within a session manager such as within an
+    GNOME/Openbox or KDE/Openbox session.  The action includes a <prompt>
+    option which is similar to the Exit action's
+  * Add a new gdm-control command that lets you control gdm from within an X
+    session.  The gdm-control lets you change GDM's behaviour for when you end
+    the current session.  For instance, you can tell GDM to reboot, and
+    then immediately log out of the current session, and the computer will be
+    rebooted
+  * Show an information dialog when an error occurs for Openbox, such as when
+    the Execute action fails
+  * Show an information dialog when there are XML syntax errors in the Openbox
+    configuration files
 
 3.4.6.1:
   * Updated Clearlooks theme

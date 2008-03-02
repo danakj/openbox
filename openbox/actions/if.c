@@ -86,7 +86,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         m = parse_find_node("action", n->xmlChildrenNode);
         while (m) {
             ObActionsAct *action = actions_parse(i, doc, m);
-            if (action) o->thenacts = g_slist_prepend(o->thenacts, action);
+            if (action) o->thenacts = g_slist_append(o->thenacts, action);
             m = parse_find_node("action", m->next);
         }
     }
@@ -96,7 +96,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         m = parse_find_node("action", n->xmlChildrenNode);
         while (m) {
             ObActionsAct *action = actions_parse(i, doc, m);
-            if (action) o->elseacts = g_slist_prepend(o->elseacts, action);
+            if (action) o->elseacts = g_slist_append(o->elseacts, action);
             m = parse_find_node("action", m->next);
         }
     }

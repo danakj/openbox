@@ -10,6 +10,7 @@ void action_showdesktop_startup();
 void action_reconfigure_startup();
 void action_exit_startup();
 void action_restart_startup();
+void action_session_startup();
 void action_cyclewindows_startup();
 void action_breakchroot_startup();
 void action_close_startup();

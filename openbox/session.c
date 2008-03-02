@@ -33,6 +33,7 @@ GSList *session_desktop_names = NULL;
 void session_startup(gint argc, gchar **argv) {}
 void session_shutdown(gboolean permanent) {}
 GList* session_state_find(struct _ObClient *c) { return NULL; }
+void session_request_logout(gboolean silent) {}
 #else
 
 #include "debug.h"
@@ -802,6 +803,22 @@ static void session_load_file(const gchar *path)
     }
 
     xmlFreeDoc(doc);
+}
+
+void session_request_logout(gboolean silent)
+{
+    if (sm_conn) {
+        SmcRequestSaveYourself(sm_conn,
+                               SmSaveBoth,
+                               TRUE, /* logout */
+                               (silent ?
+                                SmInteractStyleNone : SmInteractStyleAny),
+                               TRUE,  /* if false, with GSM, it shows the old
+                                         logout prompt */
+                               TRUE); /* global */
+    }
+    else
+        g_message(_("Not connected to a session manager"));
 }
 
 #endif

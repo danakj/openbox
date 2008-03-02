@@ -90,6 +90,7 @@ class AutostartFile:
         if path[0] == '/':
             if match_func(path): return path
             else: return None
+        else:
             # check relative path
             for dirname in search.split(os.pathsep):
                 if dirname != "":

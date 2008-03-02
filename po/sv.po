@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-03-02 18:34-0500\n"
-"PO-Revision-Date: 2008-03-03 00:07+0100\n"
+"PO-Revision-Date: 2008-03-03 00:43+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
@@ -63,7 +63,6 @@ msgstr ""
 "utan stöd för sessionshantering"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
-#, fuzzy
 msgid "Log Out"
 msgstr "Logga ut"
 
@@ -73,7 +72,7 @@ msgstr "Är du säker på att du vill logga ut?"
 
 #: openbox/client.c:2004
 msgid "Unnamed Window"
-msgstr "Namnlöst Fönster"
+msgstr "Namnlöst fönster"
 
 #: openbox/client.c:2018 openbox/client.c:2050
 msgid "Killing..."
@@ -81,7 +80,7 @@ msgstr "Dödar..."
 
 #: openbox/client.c:2020 openbox/client.c:2052
 msgid "Not Responding"
-msgstr "Svarar Inte"
+msgstr "Svarar inte"
 
 #: openbox/client.c:3449
 #, c-format
@@ -94,7 +93,7 @@ msgstr ""
 
 #: openbox/client.c:3451
 msgid "End Process"
-msgstr "Avsluta Process"
+msgstr "Avsluta process"
 
 #: openbox/client.c:3455
 #, c-format
@@ -107,7 +106,7 @@ msgstr ""
 
 #: openbox/client.c:3457
 msgid "Disconnect"
-msgstr "Stäng Anslutning"
+msgstr "Stäng anslutning"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -279,7 +278,7 @@ msgstr ""
 
 #: openbox/openbox.c:382
 msgid "Openbox Syntax Error"
-msgstr "Openbox Syntaxfel"
+msgstr "Openbox syntaxfel"
 
 #: openbox/openbox.c:382
 msgid "Close"
@@ -438,7 +437,7 @@ msgstr "Kunde inte spara sessionen till \"%s\": %s"
 #: openbox/session.c:584
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
-msgstr "Fel inträffade när sessionen skulle sparas till \"%s\": %s"
+msgstr "Ett fel inträffade när sessionen skulle sparas till \"%s\": %s"
 
 #: openbox/session.c:821
 msgid "Not connected to a session manager"

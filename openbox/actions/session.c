@@ -35,7 +35,7 @@ static void prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
     Options *o = data;
     if (result) {
-#ifndef USE_SM
+#ifdef USE_SM
         session_request_logout(o->silent);
 #else
         g_message(_("The SessionLogout actions is not available since Openbox was built without session management support"));

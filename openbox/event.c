@@ -1682,7 +1682,8 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
         else if (keycode == ob_keycode(OB_KEY_LEFT)) {
             /* Left goes to the parent menu */
-            menu_frame_select(frame, NULL, TRUE);
+            if (frame->parent)
+                menu_frame_select(frame, NULL, TRUE);
             ret = TRUE;
         }
 

@@ -264,7 +264,6 @@ static void prompt_layout(ObPrompt *self)
         self->button[i].width = bw;
         self->button[i].height = bh;
         RrMinSize(prompt_a_focus, &bw, &bh);
-        g_print("button w %d h %d\n", bw, bh);
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
         RrMinSize(prompt_a_press, &bw, &bh);
@@ -388,8 +387,6 @@ static void setup_button_focus_tex(ObPromptElement *e, RrAppearance *a,
     a->texture[4].data.lineart.x2 = e->width - r - 1;
     a->texture[4].data.lineart.y1 = t;
     a->texture[4].data.lineart.y2 = e->height - b - 1;
-
-    g_print("setting x2 %d\n", e->width - r - 1);
 }
 
 static void render_button(ObPrompt *self, ObPromptElement *e)
@@ -507,8 +504,6 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e)
     guint shift_mask;
 
     if (e->type != KeyPress) return FALSE;
-
-    g_print("key 0x%x 0x%x\n", e->xkey.keycode, ob_keycode(OB_KEY_TAB));
 
     shift_mask = modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT);
     shift = !!(e->xkey.state & shift_mask);

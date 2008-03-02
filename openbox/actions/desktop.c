@@ -86,7 +86,7 @@ static gpointer setup_go_func(xmlNodePtr node)
         }
         else {
             o->type = ABSOLUTE;
-            o->abs.desktop = obt_parse_node_int(n) - 1;
+            o->abs.desktop = atoi(s) - 1;
         }
         g_free(s);
     }

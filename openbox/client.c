@@ -3400,12 +3400,20 @@ void client_close(ObClient *self)
 #define OB_KILL_RESULT_NO 0
 #define OB_KILL_RESULT_YES 1
 
-static void client_kill_requested(ObPrompt *p, gint result, gpointer data)
+static gboolean client_kill_requested(ObPrompt *p, gint result, gpointer data)
 {
     ObClient *self = data;
 
     if (result == OB_KILL_RESULT_YES)
         client_kill(self);
+    return TRUE; /* call the cleanup func */
+}
+
+static void client_kill_cleanup(ObPrompt *p, gpointer data)
+{
+    ObClient *self = data;
+
+    g_assert(p == self->kill_prompt);
 
     prompt_unref(self->kill_prompt);
     self->kill_prompt = NULL;
@@ -3452,11 +3460,13 @@ static void client_prompt_kill(ObClient *self)
         answers[0].text = _("Cancel");  /* "no" */
         answers[1].text = y;            /* "yes" */
 
-        self->kill_prompt = prompt_new(m, answers,
+        self->kill_prompt = prompt_new(m, NULL, answers,
                                        sizeof(answers)/sizeof(answers[0]),
                                        OB_KILL_RESULT_NO, /* default = no */
                                        OB_KILL_RESULT_NO, /* cancel = no */
-                                       client_kill_requested, self);
+                                       client_kill_requested,
+                                       client_kill_cleanup,
+                                       self);
         g_free(m);
     }
 

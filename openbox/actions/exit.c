@@ -29,10 +29,15 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static void prompt_cb(ObPrompt *p, gint result, gpointer data)
+static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
     if (result)
         ob_exit(0);
+    return TRUE; /* call the cleanup func */
+}
+
+static void prompt_cleanup(ObPrompt *p, gpointer data)
+{
     prompt_unref(p);
 }
 
@@ -49,7 +54,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         };
 
         p = prompt_new(_("Are you sure you want to exit Openbox?"),
-                       answers, 2, 0, 0, prompt_cb, NULL);
+                       _("Exit Openbox"),
+                       answers, 2, 0, 0, prompt_cb, prompt_cleanup, NULL);
         prompt_show(p, NULL, FALSE);
     }
     else

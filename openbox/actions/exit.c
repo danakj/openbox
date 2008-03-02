@@ -21,6 +21,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     Options *o;
 
     o = g_new0(Options, 1);
+    o->prompt = TRUE;
 
     if ((n = parse_find_node("prompt", node)))
         o->prompt = parse_bool(doc, n);

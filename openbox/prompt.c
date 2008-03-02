@@ -140,7 +140,7 @@ void prompt_shutdown(gboolean reconfig)
     RrAppearanceFree(prompt_a_msg);
 }
 
-ObPrompt* prompt_new(const gchar *msg,
+ObPrompt* prompt_new(const gchar *msg, const gchar *title,
                      const ObPromptAnswer *answers, gint n_answers,
                      gint default_result, gint cancel_result,
                      ObPromptCallback func, ObPromptCleanup cleanup,
@@ -171,6 +171,10 @@ ObPrompt* prompt_new(const gchar *msg,
     /* make it a dialog type window */
     PROP_SET32(self->super.window, net_wm_window_type, atom,
                prop_atoms.net_wm_window_type_dialog);
+
+    /* set the window's title */
+    if (title)
+        PROP_SETS(self->super.window, net_wm_name, title);
 
     /* listen for key presses on the window */
     self->event_mask = KeyPressMask;
@@ -624,16 +628,18 @@ static void prompt_show_message_cleanup(ObPrompt *p, gpointer data)
     prompt_unref(p);
 }
 
-void prompt_show_message(const gchar *msg, const gchar *answer)
+ObPrompt* prompt_show_message(const gchar *msg, const gchar *title,
+                              const gchar *answer)
 {
     ObPrompt *p;
     ObPromptAnswer ans[] = {
         { answer, 0 }
     };
 
-    p = prompt_new(msg, ans, 1, 0, 0,
+    p = prompt_new(msg, title, ans, 1, 0, 0,
                    prompt_show_message_cb, prompt_show_message_cleanup, NULL);
     prompt_show(p, NULL, FALSE);
+    return p;
 }
 
 static void prompt_run_callback(ObPrompt *self, gint result)

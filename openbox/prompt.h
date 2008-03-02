@@ -100,7 +100,7 @@ void prompt_shutdown(gboolean reconfig);
          callback function returns TRUE.
   @param data User defined data which will be passed to the callback
 */
-ObPrompt* prompt_new(const gchar *msg,
+ObPrompt* prompt_new(const gchar *msg, const gchar *title,
                      const ObPromptAnswer *answers, gint n_answers,
                      gint default_result, gint cancel_result,
                      ObPromptCallback func, ObPromptCleanup cleanup,
@@ -116,6 +116,7 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e);
 gboolean prompt_mouse_event(ObPrompt *self, XEvent *e);
 void prompt_cancel(ObPrompt *self);
 
-void prompt_show_message(const gchar *msg, const gchar *answer);
+ObPrompt* prompt_show_message(const gchar *msg, const gchar *title,
+                              const gchar *answer);
 
 #endif

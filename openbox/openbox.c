@@ -229,6 +229,8 @@ gint main(gint argc, gchar **argv)
 
     if (screen_annex()) { /* it will be ours! */
         do {
+            ObPrompt *xmlprompt = NULL;
+
             modkeys_startup(reconfigure);
 
             /* get the keycodes for keys we use */
@@ -376,7 +378,8 @@ gint main(gint argc, gchar **argv)
                     gchar *m;
 
                     m = g_strdup_printf(_("One or more XML syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"), e->file, e->line, e->message);
-                    prompt_show_message(m, _("Close"));
+                    xmlprompt =
+                        prompt_show_message(m, _("Openbox Syntax Error"), _("Close"));
                     g_free(m);
                     xmlResetError(e);
                 }
@@ -385,6 +388,11 @@ gint main(gint argc, gchar **argv)
             ob_main_loop_run(ob_main_loop);
             ob_set_state(reconfigure ?
                          OB_STATE_RECONFIGURING : OB_STATE_EXITING);
+
+            if (xmlprompt) {
+                prompt_unref(xmlprompt);
+                xmlprompt = NULL;
+            }
 
             if (!reconfigure) {
                 dock_remove_all();

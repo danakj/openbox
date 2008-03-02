@@ -54,6 +54,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         };
 
         p = prompt_new(_("Are you sure you want to exit Openbox?"),
+                       _("Exit Openbox"),
                        answers, 2, 0, 0, prompt_cb, prompt_cleanup, NULL);
         prompt_show(p, NULL, FALSE);
     }

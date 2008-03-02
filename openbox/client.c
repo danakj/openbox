@@ -3460,7 +3460,7 @@ static void client_prompt_kill(ObClient *self)
         answers[0].text = _("Cancel");  /* "no" */
         answers[1].text = y;            /* "yes" */
 
-        self->kill_prompt = prompt_new(m, answers,
+        self->kill_prompt = prompt_new(m, NULL, answers,
                                        sizeof(answers)/sizeof(answers[0]),
                                        OB_KILL_RESULT_NO, /* default = no */
                                        OB_KILL_RESULT_NO, /* cancel = no */

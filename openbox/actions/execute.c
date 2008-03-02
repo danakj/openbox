@@ -130,7 +130,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         };
 
         ocp = dup_options(options);
-        p = prompt_new(o->prompt, answers, 2, 0, 0,
+        p = prompt_new(o->prompt, _("Execute"), answers, 2, 0, 0,
                        prompt_cb, prompt_cleanup, ocp);
         prompt_show(p, NULL, FALSE);
 

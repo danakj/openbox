@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-28 23:00+0100\n"
+"POT-Creation-Date: 2008-03-02 17:58-0500\n"
 "PO-Revision-Date: 2007-06-01 19:02+0530\n"
 "Last-Translator: Runa Bhattacharjee <runabh@gmail.com>\n"
 "Language-Team: Bengali (India) <en@li.org>\n"
@@ -23,67 +23,85 @@ msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr ""
 "অবৈধ কর্ম \"%s\"-র অনুরোধ জানানো হয়েছে। এই ধরনের কোনো কর্ম বর্তমানে উপস্থিত নেই।"
 
-#: openbox/actions/execute.c:124
+#: openbox/actions/execute.c:128
 msgid "No"
 msgstr ""
 
-#: openbox/actions/execute.c:125
+#: openbox/actions/execute.c:129
 msgid "Yes"
 msgstr ""
 
-#: openbox/actions/execute.c:137
+#: openbox/actions/execute.c:133
+msgid "Execute"
+msgstr ""
+
+#: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "\"%s\" পাথটি utf8 থেকে রূপান্তর করতে ব্যর্থ"
 
-#: openbox/actions/execute.c:146 openbox/actions/execute.c:165
-#, c-format
-msgid "Failed to execute \"%s\": %s"
-msgstr "\"%s\" সঞ্চালন করতে ব্যর্থ: %s"
-
-#: openbox/actions/exit.c:46 openbox/client.c:3444
+#: openbox/actions/exit.c:52 openbox/actions/session.c:62
+#: openbox/client.c:3460
 msgid "Cancel"
 msgstr ""
 
-#: openbox/actions/exit.c:47
+#: openbox/actions/exit.c:53
 msgid "Exit"
 msgstr ""
 
-#: openbox/actions/exit.c:50
+#: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
 msgstr ""
 
-#: openbox/client.c:1996
+#: openbox/actions/exit.c:57
+msgid "Exit Openbox"
+msgstr ""
+
+#: openbox/actions/session.c:41
+msgid ""
+"The SessionLogout actions is not available since Openbox was built without "
+"session management support"
+msgstr ""
+
+#: openbox/actions/session.c:63 openbox/actions/session.c:68
+msgid "Log out"
+msgstr ""
+
+#: openbox/actions/session.c:67
+msgid "Are you sure you want to log out?"
+msgstr ""
+
+#: openbox/client.c:2004
 msgid "Unnamed Window"
 msgstr ""
 
-#: openbox/client.c:2010 openbox/client.c:2042
+#: openbox/client.c:2018 openbox/client.c:2050
 msgid "Killing..."
 msgstr ""
 
-#: openbox/client.c:2012 openbox/client.c:2044
+#: openbox/client.c:2020 openbox/client.c:2052
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3433
+#: openbox/client.c:3449
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3435
+#: openbox/client.c:3451
 msgid "End Process"
 msgstr ""
 
-#: openbox/client.c:3439
+#: openbox/client.c:3455
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
 
-#: openbox/client.c:3441
+#: openbox/client.c:3457
 msgid "Disconnect"
 msgstr ""
 
@@ -235,28 +253,44 @@ msgstr "X সার্ভার দ্বারা লোকেইল সমর�
 msgid "Cannot set locale modifiers for the X server."
 msgstr "X সার্ভারের জন্য লোকেইল মডিফায়ার নির্ধারণ করতে ব্যর্থ।"
 
-#: openbox/openbox.c:264
+#: openbox/openbox.c:266
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "বৈধ কনফিগ ফাইল সনাক্ত করতে ব্যর্থ, কয়েকটি সাধারণ ডিফল্ট মান প্রয়োগ করা হবে।"
 
-#: openbox/openbox.c:298
+#: openbox/openbox.c:300
 msgid "Unable to load a theme."
 msgstr "থিম লোড করতে ব্যর্থ।"
 
-#: openbox/openbox.c:428
+#: openbox/openbox.c:380
+#, c-format
+msgid ""
+"One or more XML syntax errors were found while parsing the Openbox "
+"configuration files.  See stdout for more information.  The last error seen "
+"was in file \"%s\" line %d, with message: %s"
+msgstr ""
+
+#: openbox/openbox.c:382
+msgid "Openbox Syntax Error"
+msgstr ""
+
+#: openbox/openbox.c:382
+msgid "Close"
+msgstr "বন্ধ করুন"
+
+#: openbox/openbox.c:451
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "পুনরাম্ভের পরে নতুন এক্সেকিউটেবল \"%s\" সঞ্চালন করতে ব্যর্থ: %s"
 
-#: openbox/openbox.c:498 openbox/openbox.c:500
+#: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
 msgstr "স্বত্বাধিকার (c)"
 
-#: openbox/openbox.c:509
+#: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
 msgstr "ব্যবহারপ্রণালী: openbox [বিকল্প]\n"
 
-#: openbox/openbox.c:510
+#: openbox/openbox.c:533
 msgid ""
 "\n"
 "Options:\n"
@@ -264,15 +298,15 @@ msgstr ""
 "\n"
 "বিবিধ বিকল্প:\n"
 
-#: openbox/openbox.c:511
+#: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              সহায়তা বার্তা প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:512
+#: openbox/openbox.c:535
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           সংস্করণ প্রদর্শন করে প্রস্থান\n"
 
-#: openbox/openbox.c:513
+#: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           বর্তমানে চলমান উইন্ডো পরিচালন ব্যবস্থা পরিবর্তন করা হবে\n"
@@ -280,16 +314,16 @@ msgstr ""
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:517
+#: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 
-#: openbox/openbox.c:518
+#: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 "  --sm-disable        সেশান পরিচালন ব্যবস্থার সাথে সংযোগ নিষ্ক্রিয় করা হবে\n"
 
-#: openbox/openbox.c:519
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -297,19 +331,19 @@ msgstr ""
 "\n"
 "চলমান Openbox ইনস্ট্যান্সে বার্তা প্রেরণ:\n"
 
-#: openbox/openbox.c:520
+#: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox-র কনফিগারেশন পুনরায় লোড করে\n"
 
-#: openbox/openbox.c:521
+#: openbox/openbox.c:544
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox পুনরারম্ভ\n"
 
-#: openbox/openbox.c:522
+#: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:523
+#: openbox/openbox.c:546
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -317,24 +351,24 @@ msgstr ""
 "\n"
 "ডিবাগ করার বিভিন্ন বিকল্প:\n"
 
-#: openbox/openbox.c:524
+#: openbox/openbox.c:547
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              সিঙ্ক্রোনাস মোডে সঞ্চালিত হবে\n"
 
-#: openbox/openbox.c:525
+#: openbox/openbox.c:548
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             ডিবাগ-এর ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:526
+#: openbox/openbox.c:549
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       ফোকাস হ্যান্ডলিং সংক্রান্ত ডিবাগের ফলাফল প্রদর্শন করে\n"
 
-#: openbox/openbox.c:527
+#: openbox/openbox.c:550
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    প্রদর্শন ক্ষেত্রটি নকল xinerama পর্দায় ভাগ করা হবে\n"
 
-#: openbox/openbox.c:528
+#: openbox/openbox.c:551
 #, c-format
 msgid ""
 "\n"
@@ -343,11 +377,11 @@ msgstr ""
 "\n"
 "অনুগ্রহ করে %s-এ বাগ সংক্রান্ত সূচনা দায়ের করুন\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:620
 msgid "--config-file requires an argument\n"
 msgstr ""
 
-#: openbox/openbox.c:640
+#: openbox/openbox.c:663
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "অবৈধ কমান্ড-লাইন আর্গুমেন্ট \"%s\"\n"
@@ -383,20 +417,24 @@ msgstr ""
 msgid "desktop %i"
 msgstr "desktop %i"
 
-#: openbox/session.c:103
+#: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "\"%s\" ডিরেক্টরি নির্মাণ করতে ব্যর্থ: %s"
 
-#: openbox/session.c:451
+#: openbox/session.c:452
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "\"%s\"-র সেশান সংরক্ষণ করতে ব্যর্থ: %s"
 
-#: openbox/session.c:583
+#: openbox/session.c:584
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "\"%s\"-এ সেশান সংরক্ষণকালে সমস্যা: %s"
+
+#: openbox/session.c:821
+msgid "Not connected to a session manager"
+msgstr ""
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -428,9 +466,12 @@ msgstr "অনুরোধ করা কি \"%s\", প্রদর্শন ক
 msgid "X Error: %s"
 msgstr "X সংক্রান্ত ত্রুটি: %s"
 
-#: openbox/prompt.c:182
+#: openbox/prompt.c:200
 msgid "OK"
 msgstr ""
+
+#~ msgid "Failed to execute \"%s\": %s"
+#~ msgstr "\"%s\" সঞ্চালন করতে ব্যর্থ: %s"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "\"%s\" কর্মের অবৈধ ব্যবহার। কর্ম উপেক্ষা করা হবে।"

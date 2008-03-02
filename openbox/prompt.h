@@ -107,4 +107,6 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e);
 gboolean prompt_mouse_event(ObPrompt *self, XEvent *e);
 void prompt_cancel(ObPrompt *self);
 
+void prompt_show_message(const gchar *msg, const gchar *answer);
+
 #endif

@@ -28,6 +28,7 @@
 #include "gettext.h"
 
 static GList *prompt_list = NULL;
+static GList *prompt_msg_list = NULL;
 
 /* we construct these */
 static RrAppearance *prompt_a_bg;
@@ -121,6 +122,9 @@ void prompt_startup(gboolean reconfig)
 
 void prompt_shutdown(gboolean reconfig)
 {
+    while (prompt_msg_list)
+        prompt_cancel(prompt_msg_list->data);
+
     RrAppearanceFree(prompt_a_button);
     RrAppearanceFree(prompt_a_focus);
     RrAppearanceFree(prompt_a_press);
@@ -215,6 +219,9 @@ void prompt_unref(ObPrompt *self)
 {
     if (self && --self->ref == 0) {
         gint i;
+
+        if (self->mapped)
+            prompt_hide(self);
 
         prompt_list = g_list_remove(prompt_list, self);
 
@@ -598,4 +605,22 @@ void prompt_cancel(ObPrompt *self)
 {
     if (self->func) self->func(self, self->cancel_result, self->data);
     prompt_hide(self);
+}
+
+static void prompt_show_message_cb(ObPrompt *p, int res, gpointer data)
+{
+    prompt_msg_list = g_list_remove(prompt_msg_list, p);
+    prompt_unref(p);
+}
+
+void prompt_show_message(const gchar *msg, const gchar *answer)
+{
+    ObPrompt *p;
+    ObPromptAnswer ans[] = {
+        { answer, 0 }
+    };
+
+    p = prompt_new(msg, ans, 1, 0, 0, prompt_show_message_cb, NULL);
+    prompt_msg_list = g_list_prepend(prompt_msg_list, p);
+    prompt_show(p, NULL, FALSE);
 }

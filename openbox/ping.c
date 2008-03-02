@@ -38,7 +38,7 @@ static guint32     ping_next_id = 1;
 
 #define PING_TIMEOUT (G_USEC_PER_SEC * 3)
 /*! Warn the user after this many PING_TIMEOUT intervals */
-#define PING_TIMEOUT_WARN 1
+#define PING_TIMEOUT_WARN 2
 
 static void     ping_send(ObPingTarget *t);
 static void     ping_end(ObClient *client, gpointer data);

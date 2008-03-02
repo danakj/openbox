@@ -255,13 +255,15 @@ msgstr "著作権 (c)"
 
 #: openbox/openbox.c:509
 msgid "Syntax: openbox [options]\n"
-msgstr ""
+msgstr "使い方: openbox [オプション]\n"
 
 #: openbox/openbox.c:510
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
+"\n"
+"オプション:\n"
 
 #: openbox/openbox.c:511
 msgid "  --help              Display this help and exit\n"
@@ -311,6 +313,8 @@ msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
+"\n"
+"デバッグオプション:\n"
 
 #: openbox/openbox.c:524
 msgid "  --sync              Run in synchronous mode\n"
@@ -426,7 +430,7 @@ msgstr "Xエラー: %s"
 
 #: openbox/prompt.c:182
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "アクション\"%s\"の不正な使用です。このアクションは無視されます。"

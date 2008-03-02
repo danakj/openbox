@@ -494,6 +494,12 @@ void client_manage(Window window, ObPrompt *prompt)
                   activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
+        gboolean relative_focused = FALSE;
+
+        relative_focused = (focus_client != NULL &&
+                            client_search_focus_tree_full(self) != NULL &&
+                            client_search_focus_group_full(self) != NULL);
+
 
         /* This is focus stealing prevention */
         ob_debug_type(OB_DEBUG_FOCUS,
@@ -524,10 +530,8 @@ void client_manage(Window window, ObPrompt *prompt)
                           "Not focusing the window because its on another "
                           "desktop\n");
         }
-        /* If something is focused, and it's not our relative... */
-        else if (focus_client && client_search_focus_tree_full(self) == NULL &&
-                 client_search_focus_group_full(self) == NULL)
-        {
+        /* If something is focused... */
+        else if (focus_client) {
             /* If the user is working in another window right now, then don't
                steal focus */
             if (event_last_user_time && launch_time &&
@@ -541,8 +545,9 @@ void client_manage(Window window, ObPrompt *prompt)
                               "Not focusing the window because the user is "
                               "working in another window\n");
             }
-            /* If it's a transient (and its parents aren't focused) */
-            else if (client_has_parent(self)) {
+            /* If the new window is a transient (and its relatives aren't
+               focused) */
+            else if (client_has_parent(self) && !relative_focused) {
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because it is a "
@@ -568,8 +573,11 @@ void client_manage(Window window, ObPrompt *prompt)
                               "Not focusing the window because another window "
                               "would get the focus anyway\n");
             }
+            /* Don't move focus if the window is not visible on the current
+               desktop and none of its relatives are focused */
             else if (!(self->desktop == screen_desktop ||
-                       self->desktop == DESKTOP_ALL))
+                       self->desktop == DESKTOP_ALL) &&
+                     !relative_focused)
             {
                 activate = FALSE;
                 raise = TRUE;

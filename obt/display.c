@@ -131,11 +131,11 @@ static gint xerror_handler(Display *d, XErrorEvent *e)
     XGetErrorText(d, e->error_code, errtxt, 127);
     if (!xerror_ignore) {
         if (e->error_code == BadWindow)
-            /*g_message(_("X Error: %s\n"), errtxt)*/;
+            /*g_debug(_("X Error: %s\n"), errtxt)*/;
         else
             g_error("X Error: %s", errtxt);
     } else
-        g_message("Ignoring XError code %d '%s'", e->error_code, errtxt);
+        g_debug("Ignoring XError code %d '%s'", e->error_code, errtxt);
 #else
     (void)d; (void)e;
 #endif

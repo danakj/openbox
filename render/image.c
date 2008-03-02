@@ -74,10 +74,10 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
     g_hash_table_insert(self->cache->table, (*list)[0], self);
 
 #ifdef DEBUG
-    g_message("Adding %s picture to the cache:\n    "
-              "Image 0x%x, w %d h %d Hash %u",
-              (*list == self->original ? "ORIGINAL" : "RESIZED"),
-              (guint)self, pic->width, pic->height, RrImagePicHash(pic));
+    g_debug("Adding %s picture to the cache:\n    "
+            "Image 0x%x, w %d h %d Hash %u",
+            (*list == self->original ? "ORIGINAL" : "RESIZED"),
+            (guint)self, pic->width, pic->height, RrImagePicHash(pic));
 #endif
 }
 
@@ -89,11 +89,11 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
     gint j;
 
 #ifdef DEBUG
-    g_message("Removing %s picture from the cache:\n    "
-              "Image 0x%x, w %d h %d Hash %u",
-              (*list == self->original ? "ORIGINAL" : "RESIZED"),
-              (guint)self, (*list)[i]->width, (*list)[i]->height,
-              RrImagePicHash((*list)[i]));
+    g_debug("Removing %s picture from the cache:\n    "
+            "Image 0x%x, w %d h %d Hash %u",
+            (*list == self->original ? "ORIGINAL" : "RESIZED"),
+            (guint)self, (*list)[i]->width, (*list)[i]->height,
+            RrImagePicHash((*list)[i]));
 #endif
 
     /* remove the picture as a key in the cache */
@@ -323,8 +323,8 @@ void RrImageUnref(RrImage *self)
 {
     if (self && --self->ref == 0) {
 #ifdef DEBUG
-        g_message("Refcount to 0, removing ALL pictures from the cache:\n    "
-                  "Image 0x%x", (guint)self);
+        g_debug("Refcount to 0, removing ALL pictures from the cache:\n    "
+                "Image 0x%x", (guint)self);
 #endif
         while (self->n_original > 0)
             RemovePicture(self, &self->original, 0, &self->n_original);
@@ -346,8 +346,8 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
     for (i = 0; i < self->n_original; ++i)
         if (self->original[i]->width == w && self->original[i]->height == h) {
 #ifdef DEBUG
-            g_message("Found duplicate ORIGINAL image:\n    "
-                      "Image 0x%x, w %d h %d", (guint)self, w, h);
+            g_debug("Found duplicate ORIGINAL image:\n    "
+                    "Image 0x%x, w %d h %d", (guint)self, w, h);
 #endif
             return;
         }

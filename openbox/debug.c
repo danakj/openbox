@@ -135,7 +135,7 @@ static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
                            const gchar *message, gpointer data)
 {
     if (ob_state() == OB_STATE_RUNNING)
-        prompt_show_message(message, _("Close"));
+        prompt_show_message(message, _("Openbox"), _("Close"));
 }
 
 static inline void log_argv(ObDebugType type,

@@ -96,11 +96,15 @@ static Options* dup_options(Options *in)
 
 static gboolean run_func(ObActionsData *data, gpointer options);
 
-static void prompt_cb(ObPrompt *p, gint result, gpointer options)
+static gboolean prompt_cb(ObPrompt *p, gint result, gpointer options)
 {
     if (result)
         run_func(NULL, options);
+    return TRUE; /* call the cleanup func */
+}
 
+static void prompt_cleanup(ObPrompt *p, gpointer options)
+{
     prompt_unref(p);
     free_func(options);
 }
@@ -124,7 +128,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         };
 
         ocp = dup_options(options);
-        p = prompt_new(o->prompt, answers, 2, 0, 0, prompt_cb, ocp);
+        p = prompt_new(o->prompt, _("Execute"), answers, 2, 0, 0,
+                       prompt_cb, prompt_cleanup, ocp);
         prompt_show(p, NULL, FALSE);
 
         return FALSE;
@@ -204,7 +209,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     e = NULL;
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
-        g_message(_("Failed to execute \"%s\": %s"), o->cmd, e->message);
+        g_message(e->message, o->cmd);
         g_error_free(e);
     }
     else {
@@ -226,8 +231,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                            G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e);
         if (!ok) {
-            g_message(_("Failed to execute \"%s\": %s"),
-                      o->cmd, e->message);
+            g_message(e->message, o->cmd);
             g_error_free(e);
         }
 

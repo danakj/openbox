@@ -481,7 +481,7 @@ void screen_resize(void)
     OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_DESKTOP_GEOMETRY, CARDINAL, geometry, 2);
 
-    if (ob_state() == OB_STATE_STARTING)
+    if (ob_state() != OB_STATE_RUNNING)
         return;
 
     screen_update_areas();

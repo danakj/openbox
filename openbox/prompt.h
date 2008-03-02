@@ -29,7 +29,8 @@ typedef struct _ObPrompt       ObPrompt;
 typedef struct _ObPromptElement ObPromptElement;
 typedef struct _ObPromptAnswer ObPromptAnswer;
 
-typedef void (*ObPromptCallback)(ObPrompt *p, gint result, gpointer data);
+typedef gboolean (*ObPromptCallback)(ObPrompt *p, gint result, gpointer data);
+typedef void (*ObPromptCleanup)(ObPrompt *p, gpointer data);
 
 struct _ObPromptElement {
     gchar *text;
@@ -69,6 +70,7 @@ struct _ObPrompt
     gint cancel_result;
 
     ObPromptCallback func;
+    ObPromptCleanup cleanup;
     gpointer data;
 };
 
@@ -90,12 +92,19 @@ void prompt_shutdown(gboolean reconfig);
          of having a button presssed
   @param func The callback function which is called when the dialog is closed
          or a button is pressed
+  @param cleanup The cleanup function which is called if the prompt system
+         is shutting down, and someone is still holding a reference to the
+         prompt.  This callback should cause the prompt's refcount to go to
+         zero so it can be freed, and free any other memory associated with
+         the prompt.  The cleanup function is also called if the prompt's
+         callback function returns TRUE.
   @param data User defined data which will be passed to the callback
 */
-ObPrompt* prompt_new(const gchar *msg,
+ObPrompt* prompt_new(const gchar *msg, const gchar *title,
                      const ObPromptAnswer *answers, gint n_answers,
                      gint default_result, gint cancel_result,
-                     ObPromptCallback func, gpointer data);
+                     ObPromptCallback func, ObPromptCleanup cleanup,
+                     gpointer data);
 void prompt_ref(ObPrompt *self);
 void prompt_unref(ObPrompt *self);
 
@@ -107,6 +116,7 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e);
 gboolean prompt_mouse_event(ObPrompt *self, XEvent *e);
 void prompt_cancel(ObPrompt *self);
 
-void prompt_show_message(const gchar *msg, const gchar *answer);
+ObPrompt* prompt_show_message(const gchar *msg, const gchar *title,
+                              const gchar *answer);
 
 #endif

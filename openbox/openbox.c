@@ -118,7 +118,7 @@ gint main(gint argc, gchar **argv)
 {
     gchar *program_name;
 
-    state = OB_STATE_STARTING;
+    ob_set_state(OB_STATE_STARTING);
 
     ob_debug_startup();
 
@@ -212,6 +212,8 @@ gint main(gint argc, gchar **argv)
 
     if (screen_annex()) { /* it will be ours! */
         do {
+            ObPrompt *xmlprompt = NULL;
+
             if (reconfigure) obt_keyboard_reload();
 
             /* get the keycodes for keys we use */
@@ -308,7 +310,6 @@ gint main(gint argc, gchar **argv)
             grab_startup(reconfigure);
             group_startup(reconfigure);
             ping_startup(reconfigure);
-            prompt_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
@@ -316,6 +317,7 @@ gint main(gint argc, gchar **argv)
             mouse_startup(reconfigure);
             menu_frame_startup(reconfigure);
             menu_startup(reconfigure);
+            prompt_startup(reconfigure);
 
             if (!reconfigure) {
                 guint32 xid;
@@ -351,13 +353,35 @@ gint main(gint argc, gchar **argv)
 
             reconfigure = FALSE;
 
-            state = OB_STATE_RUNNING;
+            ob_set_state(OB_STATE_RUNNING);
+
+            /* look for parsing errors */
+            {
+                xmlErrorPtr e = xmlGetLastError();
+                if (e) {
+                    gchar *m;
+
+                    m = g_strdup_printf(_("One or more XML syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"), e->file, e->line, e->message);
+                    xmlprompt =
+                        prompt_show_message(m, _("Openbox Syntax Error"), _("Close"));
+                    g_free(m);
+                    xmlResetError(e);
+                }
+            }
+
             obt_main_loop_run(ob_main_loop);
-            state = OB_STATE_EXITING;
+            ob_set_state(reconfigure ?
+                         OB_STATE_RECONFIGURING : OB_STATE_EXITING);
+
+            if (xmlprompt) {
+                prompt_unref(xmlprompt);
+                xmlprompt = NULL;
+            }
 
             if (!reconfigure)
                 window_unmanage_all();
 
+            prompt_shutdown(reconfigure);
             menu_shutdown(reconfigure);
             menu_frame_shutdown(reconfigure);
             mouse_shutdown(reconfigure);
@@ -365,7 +389,6 @@ gint main(gint argc, gchar **argv)
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
-            prompt_shutdown(reconfigure);
             ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);
@@ -694,4 +717,9 @@ KeyCode ob_keycode(ObKey key)
 ObState ob_state(void)
 {
     return state;
+}
+
+void ob_set_state(ObState s)
+{
+    state = s;
 }

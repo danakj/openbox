@@ -49,6 +49,7 @@ extern gboolean ob_debug_xinerama;
 
 /* The state of execution of the window manager */
 ObState ob_state(void);
+void ob_set_state(ObState state);
 
 void ob_restart_other(const gchar *path);
 void ob_restart(void);

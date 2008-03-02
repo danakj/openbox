@@ -28,7 +28,6 @@
 #include "gettext.h"
 
 static GList *prompt_list = NULL;
-static GList *prompt_msg_list = NULL;
 
 /* we construct these */
 static RrAppearance *prompt_a_bg;
@@ -51,6 +50,7 @@ static void prompt_layout(ObPrompt *self);
 static void render_all(ObPrompt *self);
 static void render_button(ObPrompt *self, ObPromptElement *e);
 static void prompt_resize(ObPrompt *self, gint w, gint h);
+static void prompt_run_callback(ObPrompt *self, gint result);
 
 void prompt_startup(gboolean reconfig)
 {
@@ -122,8 +122,16 @@ void prompt_startup(gboolean reconfig)
 
 void prompt_shutdown(gboolean reconfig)
 {
-    while (prompt_msg_list)
-        prompt_cancel(prompt_msg_list->data);
+    GList *it;
+
+    if (!reconfig) {
+        for (it = prompt_list; it; it = g_list_next(it)) {
+            ObPrompt *p = it->data;
+            if (p->cleanup) p->cleanup(p, p->data);
+        }
+
+        g_assert(prompt_list == NULL);
+    }
 
     RrAppearanceFree(prompt_a_button);
     RrAppearanceFree(prompt_a_focus);
@@ -132,10 +140,11 @@ void prompt_shutdown(gboolean reconfig)
     RrAppearanceFree(prompt_a_msg);
 }
 
-ObPrompt* prompt_new(const gchar *msg,
+ObPrompt* prompt_new(const gchar *msg, const gchar *title,
                      const ObPromptAnswer *answers, gint n_answers,
                      gint default_result, gint cancel_result,
-                     ObPromptCallback func, gpointer data)
+                     ObPromptCallback func, ObPromptCleanup cleanup,
+                     gpointer data)
 {
     ObPrompt *self;
     XSetWindowAttributes attrib;
@@ -146,6 +155,7 @@ ObPrompt* prompt_new(const gchar *msg,
     self = g_new0(ObPrompt, 1);
     self->ref = 1;
     self->func = func;
+    self->cleanup = cleanup;
     self->data = data;
     self->default_result = default_result;
     self->cancel_result = cancel_result;
@@ -160,6 +170,10 @@ ObPrompt* prompt_new(const gchar *msg,
     /* make it a dialog type window */
     OBT_PROP_SET32(self->super.window, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG));
+
+    /* set the window's title */
+    if (title)
+        OBT_PROP_SETS(self->super.window, NET_WM_NAME, utf8, title);
 
     /* listen for key presses on the window */
     self->event_mask = KeyPressMask;
@@ -523,8 +537,7 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e)
     else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN) ||
              e->xkey.keycode == ob_keycode(OB_KEY_SPACE))
     {
-        if (self->func) self->func(self, self->focus->result, self->data);
-        prompt_hide(self);
+        prompt_run_callback(self, self->focus->result);
     }
     else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB) ||
              e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
@@ -582,10 +595,8 @@ gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
         render_button(self, but);
     }
     else if (e->type == ButtonRelease) {
-        if (but->pressed) {
-            if (self->func) self->func(self, but->result, self->data);
-            prompt_hide(self);
-        }
+        if (but->pressed)
+            prompt_run_callback(self, but->result);
     }
     else if (e->type == MotionNotify) {
         gboolean press;
@@ -603,24 +614,41 @@ gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
 
 void prompt_cancel(ObPrompt *self)
 {
-    if (self->func) self->func(self, self->cancel_result, self->data);
-    prompt_hide(self);
+    prompt_run_callback(self, self->cancel_result);
 }
 
-static void prompt_show_message_cb(ObPrompt *p, int res, gpointer data)
+static gboolean prompt_show_message_cb(ObPrompt *p, int res, gpointer data)
 {
-    prompt_msg_list = g_list_remove(prompt_msg_list, p);
+    return TRUE; /* call the cleanup func */
+}
+
+static void prompt_show_message_cleanup(ObPrompt *p, gpointer data)
+{
     prompt_unref(p);
 }
 
-void prompt_show_message(const gchar *msg, const gchar *answer)
+ObPrompt* prompt_show_message(const gchar *msg, const gchar *title,
+                              const gchar *answer)
 {
     ObPrompt *p;
     ObPromptAnswer ans[] = {
         { answer, 0 }
     };
 
-    p = prompt_new(msg, ans, 1, 0, 0, prompt_show_message_cb, NULL);
-    prompt_msg_list = g_list_prepend(prompt_msg_list, p);
+    p = prompt_new(msg, title, ans, 1, 0, 0,
+                   prompt_show_message_cb, prompt_show_message_cleanup, NULL);
     prompt_show(p, NULL, FALSE);
+    return p;
+}
+
+static void prompt_run_callback(ObPrompt *self, gint result)
+{
+    prompt_ref(self);
+    if (self->func) {
+        gboolean clean = self->func(self, self->focus->result, self->data);
+        if (clean && self->cleanup)
+            self->cleanup(self, self->data);
+    }
+    prompt_hide(self);
+    prompt_unref(self);
 }

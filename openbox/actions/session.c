@@ -31,7 +31,7 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
-static void prompt_cb(ObPrompt *p, gint result, gpointer data)
+static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
     Options *o = data;
     if (result) {
@@ -41,7 +41,12 @@ static void prompt_cb(ObPrompt *p, gint result, gpointer data)
         g_message(_("The SessionLogout actions is not available since Openbox was built without session management support"));
 #endif
     }
-    g_free(o);
+    return TRUE; /* call cleanup func */
+}
+
+static void prompt_cleanup(ObPrompt *p, gpointer data)
+{
+    g_free(data);
     prompt_unref(p);
 }
 
@@ -60,7 +65,7 @@ static gboolean logout_func(ObActionsData *data, gpointer options)
 
         o2 = g_memdup(o, sizeof(Options));
         p = prompt_new(_("Are you sure you want to log out?"),
-                       answers, 2, 0, 0, prompt_cb, o2);
+                       answers, 2, 0, 0, prompt_cb, prompt_cleanup, o2);
         prompt_show(p, NULL, FALSE);
     }
     else

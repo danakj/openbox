@@ -121,7 +121,7 @@ class AutostartFile:
                 self._alert("Excluded by: OnlyShowIn (" + s + ")")
             if default and noshow and not force:
                 s = ""
-                for i in self.de.getOnlyShowIn():
+                for i in self.de.getNotShowIn():
                     if s: s += ", "
                     s += i
                 self._alert("Excluded by: NotShowIn (" + s + ")")

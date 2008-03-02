@@ -3,10 +3,6 @@
 #include "openbox/session.h"
 #include "gettext.h"
 
-#ifndef USE_SM
-void action_logout_startup(void) {}
-#else
-
 typedef struct {
     gboolean prompt;
     gboolean silent;
@@ -38,8 +34,13 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 static void prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
     Options *o = data;
-    if (result)
+    if (result) {
+#ifndef USE_SM
         session_request_logout(o->silent);
+#else
+        g_message(_("The SessionLogout actions is not available since Openbox was built without session management support"));
+#endif
+    }
     g_free(o);
     prompt_unref(p);
 }
@@ -67,5 +68,3 @@ static gboolean logout_func(ObActionsData *data, gpointer options)
 
     return FALSE;
 }
-
-#endif

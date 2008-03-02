@@ -121,7 +121,7 @@ gint main(gint argc, gchar **argv)
 {
     gchar *program_name;
 
-    state = OB_STATE_STARTING;
+    ob_set_state(OB_STATE_STARTING);
 
     /* initialize the locale */
     if (!setlocale(LC_ALL, ""))
@@ -367,9 +367,10 @@ gint main(gint argc, gchar **argv)
 
             reconfigure = FALSE;
 
-            state = OB_STATE_RUNNING;
+            ob_set_state(OB_STATE_RUNNING);
             ob_main_loop_run(ob_main_loop);
-            state = OB_STATE_EXITING;
+            ob_set_state(reconfigure ?
+                         OB_STATE_RECONFIGURING : OB_STATE_EXITING);
 
             if (!reconfigure) {
                 dock_remove_all();
@@ -708,4 +709,9 @@ KeyCode ob_keycode(ObKey key)
 ObState ob_state()
 {
     return state;
+}
+
+void ob_set_state(ObState s)
+{
+    state = s;
 }

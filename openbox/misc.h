@@ -60,7 +60,8 @@ typedef enum
 {
     OB_STATE_STARTING,
     OB_STATE_RUNNING,
-    OB_STATE_EXITING
+    OB_STATE_EXITING,
+    OB_STATE_RECONFIGURING
 } ObState;
 
 typedef enum

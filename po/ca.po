@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-02-28 23:00+0100\n"
+"POT-Creation-Date: 2008-03-02 17:58-0500\n"
 "PO-Revision-Date: 2007-05-28 15:54+0200\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
@@ -20,67 +20,85 @@ msgstr ""
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "L'acció sollicitada \"%s\" no és vàlida. Aquesta acció no existeix."
 
-#: openbox/actions/execute.c:124
+#: openbox/actions/execute.c:128
 msgid "No"
 msgstr ""
 
-#: openbox/actions/execute.c:125
+#: openbox/actions/execute.c:129
 msgid "Yes"
 msgstr ""
 
-#: openbox/actions/execute.c:137
+#: openbox/actions/execute.c:133
+msgid "Execute"
+msgstr ""
+
+#: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "No s'ha pogut convertir el camí \"%s\" des de utf8"
 
-#: openbox/actions/execute.c:146 openbox/actions/execute.c:165
-#, c-format
-msgid "Failed to execute \"%s\": %s"
-msgstr "No s'ha pogut executar \"%s\": %s"
-
-#: openbox/actions/exit.c:46 openbox/client.c:3444
+#: openbox/actions/exit.c:52 openbox/actions/session.c:62
+#: openbox/client.c:3460
 msgid "Cancel"
 msgstr ""
 
-#: openbox/actions/exit.c:47
+#: openbox/actions/exit.c:53
 msgid "Exit"
 msgstr ""
 
-#: openbox/actions/exit.c:50
+#: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
 msgstr ""
 
-#: openbox/client.c:1996
+#: openbox/actions/exit.c:57
+msgid "Exit Openbox"
+msgstr ""
+
+#: openbox/actions/session.c:41
+msgid ""
+"The SessionLogout actions is not available since Openbox was built without "
+"session management support"
+msgstr ""
+
+#: openbox/actions/session.c:63 openbox/actions/session.c:68
+msgid "Log out"
+msgstr ""
+
+#: openbox/actions/session.c:67
+msgid "Are you sure you want to log out?"
+msgstr ""
+
+#: openbox/client.c:2004
 msgid "Unnamed Window"
 msgstr ""
 
-#: openbox/client.c:2010 openbox/client.c:2042
+#: openbox/client.c:2018 openbox/client.c:2050
 msgid "Killing..."
 msgstr ""
 
-#: openbox/client.c:2012 openbox/client.c:2044
+#: openbox/client.c:2020 openbox/client.c:2052
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3433
+#: openbox/client.c:3449
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3435
+#: openbox/client.c:3451
 msgid "End Process"
 msgstr ""
 
-#: openbox/client.c:3439
+#: openbox/client.c:3455
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
 
-#: openbox/client.c:3441
+#: openbox/client.c:3457
 msgid "Disconnect"
 msgstr ""
 
@@ -233,32 +251,48 @@ msgstr "El servidor X no te suport per a idiomes"
 msgid "Cannot set locale modifiers for the X server."
 msgstr "No s'ha pogut assignar els modificadors del locale per al servidor X."
 
-#: openbox/openbox.c:264
+#: openbox/openbox.c:266
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "No s'ha pogut trobat un fitxer de configuració vàlid, s'utilitzaran alguns "
 "valors predeterminats"
 
-#: openbox/openbox.c:298
+#: openbox/openbox.c:300
 msgid "Unable to load a theme."
 msgstr "No s'ha pogut carregar el tema."
 
-#: openbox/openbox.c:428
+#: openbox/openbox.c:380
+#, c-format
+msgid ""
+"One or more XML syntax errors were found while parsing the Openbox "
+"configuration files.  See stdout for more information.  The last error seen "
+"was in file \"%s\" line %d, with message: %s"
+msgstr ""
+
+#: openbox/openbox.c:382
+msgid "Openbox Syntax Error"
+msgstr ""
+
+#: openbox/openbox.c:382
+msgid "Close"
+msgstr "Tanca"
+
+#: openbox/openbox.c:451
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "S'ha produït un error en tornar a iniciar i executar el nou executable \"%s"
 "\": %s"
 
-#: openbox/openbox.c:498 openbox/openbox.c:500
+#: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:509
+#: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintaxis: openbox [opcions]\n"
 
-#: openbox/openbox.c:510
+#: openbox/openbox.c:533
 msgid ""
 "\n"
 "Options:\n"
@@ -266,15 +300,15 @@ msgstr ""
 "\n"
 "Opcions:\n"
 
-#: openbox/openbox.c:511
+#: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Visualitza aquesta ajuda i surt\n"
 
-#: openbox/openbox.c:512
+#: openbox/openbox.c:535
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Visualitza la versió i surt\n"
 
-#: openbox/openbox.c:513
+#: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
 "  --replace           Reemplaça el gestor de finestres que s'està executant "
@@ -283,15 +317,15 @@ msgstr ""
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:517
+#: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 
-#: openbox/openbox.c:518
+#: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Inhabilita la connexió amb gestor de sessió\n"
 
-#: openbox/openbox.c:519
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -300,19 +334,19 @@ msgstr ""
 "S'està transferint missatges a la instància del Openbox que s'està "
 "executant:\n"
 
-#: openbox/openbox.c:520
+#: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Torna a carregar la configuració de Openbox\n"
 
-#: openbox/openbox.c:521
+#: openbox/openbox.c:544
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Torna a iniciar Openbox\n"
 
-#: openbox/openbox.c:522
+#: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:523
+#: openbox/openbox.c:546
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -320,27 +354,27 @@ msgstr ""
 "\n"
 "Opcions de depuració:\n"
 
-#: openbox/openbox.c:524
+#: openbox/openbox.c:547
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Executa en mode sincronitzat\n"
 
-#: openbox/openbox.c:525
+#: openbox/openbox.c:548
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Mostra la sortida de depuració\n"
 
-#: openbox/openbox.c:526
+#: openbox/openbox.c:549
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Mostra la sortida de depuració per a la gestió del "
 "focus\n"
 
-#: openbox/openbox.c:527
+#: openbox/openbox.c:550
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 "  --debug-xinerama    Divideix la visualització en pantalles xinerama "
 "falses\n"
 
-#: openbox/openbox.c:528
+#: openbox/openbox.c:551
 #, c-format
 msgid ""
 "\n"
@@ -349,11 +383,11 @@ msgstr ""
 "\n"
 "Informeu dels errors a %s\n"
 
-#: openbox/openbox.c:597
+#: openbox/openbox.c:620
 msgid "--config-file requires an argument\n"
 msgstr ""
 
-#: openbox/openbox.c:640
+#: openbox/openbox.c:663
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Opció \"%s\" no vàlida a la línia d'ordres\n"
@@ -390,20 +424,24 @@ msgstr ""
 msgid "desktop %i"
 msgstr "escriptori %i"
 
-#: openbox/session.c:103
+#: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "No és pot crear el directori \"%s\": %s"
 
-#: openbox/session.c:451
+#: openbox/session.c:452
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "No s'ha pogut desar la sessió a \"%s\": %s"
 
-#: openbox/session.c:583
+#: openbox/session.c:584
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "S'ha produït un error mentre es desava la sessió a \"%s\": %s"
+
+#: openbox/session.c:821
+msgid "Not connected to a session manager"
+msgstr ""
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -436,9 +474,12 @@ msgstr "La tecla seleccionada \"%s\" no existeix a la pantalla"
 msgid "X Error: %s"
 msgstr "Error d'X: %s"
 
-#: openbox/prompt.c:182
+#: openbox/prompt.c:200
 msgid "OK"
 msgstr ""
+
+#~ msgid "Failed to execute \"%s\": %s"
+#~ msgstr "No s'ha pogut executar \"%s\": %s"
 
 #~ msgid "Invalid use of action \"%s\". Action will be ignored."
 #~ msgstr "L'ús de l'acció \"%s\" no és vàlid. S'ignorarà aquesta acció."

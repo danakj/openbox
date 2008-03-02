@@ -60,7 +60,7 @@ static gboolean logout_func(ObActionsData *data, gpointer options)
         ObPrompt *p;
         ObPromptAnswer answers[] = {
             { _("Cancel"), 0 },
-            { _("Log out"), 1 }
+            { _("Log Out"), 1 }
         };
 
         o2 = g_memdup(o, sizeof(Options));

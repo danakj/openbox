@@ -17,6 +17,8 @@
 */
 
 #include "debug.h"
+#include "prompt.h"
+#include "openbox.h"
 #include "gettext.h"
 #include "obt/paths.h"
 
@@ -35,9 +37,12 @@ static FILE     *log_file = NULL;
 static guint     rr_handler_id = 0;
 static guint     obt_handler_id = 0;
 static guint     ob_handler_id = 0;
+static guint     ob_handler_prompt_id = 0;
 
 static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
                         const gchar *message, gpointer user_data);
+static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
+                           const gchar *message, gpointer user_data);
 
 void ob_debug_startup(void)
 {
@@ -67,6 +72,9 @@ void ob_debug_startup(void)
     ob_handler_id =
         g_log_set_handler("Openbox", G_LOG_LEVEL_MASK | G_LOG_FLAG_FATAL |
                           G_LOG_FLAG_RECURSION, log_handler, NULL);
+    ob_handler_prompt_id =
+        g_log_set_handler("Openbox", G_LOG_LEVEL_MASK & ~G_LOG_LEVEL_DEBUG,
+                          prompt_handler, NULL);
 
     obt_paths_unref(p);
     g_free(dir);
@@ -77,6 +85,7 @@ void ob_debug_shutdown(void)
     g_log_remove_handler("ObRender", rr_handler_id);
     g_log_remove_handler("Obt", obt_handler_id);
     g_log_remove_handler("Openbox", ob_handler_id);
+    g_log_remove_handler("Openbox", ob_handler_prompt_id);
 
     if (log_file) {
         fclose(log_file);
@@ -120,6 +129,13 @@ static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
 
     log_print(out, log_domain, level, message);
     if (log_file) log_print(log_file, log_domain, level, message);
+}
+
+static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
+                           const gchar *message, gpointer data)
+{
+    if (ob_state() == OB_STATE_RUNNING)
+        prompt_show_message(message, _("Close"));
 }
 
 static inline void log_argv(ObDebugType type,

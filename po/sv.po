@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-02 23:59+0100\n"
+"POT-Creation-Date: 2008-03-02 18:34-0500\n"
 "PO-Revision-Date: 2008-03-03 00:07+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
@@ -63,7 +63,8 @@ msgstr ""
 "utan stöd för sessionshantering"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
-msgid "Log out"
+#, fuzzy
+msgid "Log Out"
 msgstr "Logga ut"
 
 #: openbox/actions/session.c:67

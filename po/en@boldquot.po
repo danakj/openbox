@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.7-pre1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-02 17:58-0500\n"
-"PO-Revision-Date: 2008-03-02 17:58-0500\n"
+"POT-Creation-Date: 2008-03-02 18:34-0500\n"
+"PO-Revision-Date: 2008-03-02 18:34-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -89,8 +89,8 @@ msgstr ""
 "session management support"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
-msgid "Log out"
-msgstr "Log out"
+msgid "Log Out"
+msgstr "Log Out"
 
 #: openbox/actions/session.c:67
 msgid "Are you sure you want to log out?"

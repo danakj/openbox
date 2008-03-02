@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-02 17:58-0500\n"
+"POT-Creation-Date: 2008-03-02 18:34-0500\n"
 "PO-Revision-Date: 2008-01-19 14:34+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
@@ -61,7 +61,7 @@ msgid ""
 msgstr ""
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
-msgid "Log out"
+msgid "Log Out"
 msgstr ""
 
 #: openbox/actions/session.c:67

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.6.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-02 17:58-0500\n"
+"POT-Creation-Date: 2008-03-02 18:34-0500\n"
 "PO-Revision-Date: 2008-02-20 20:58+0200\n"
 "Last-Translator: Elias Julkunen <elias.julkunen@gmail.com>\n"
 "Language-Team: None\n"
@@ -64,7 +64,7 @@ msgid ""
 msgstr ""
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
-msgid "Log out"
+msgid "Log Out"
 msgstr ""
 
 #: openbox/actions/session.c:67

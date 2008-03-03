@@ -38,7 +38,7 @@ static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
 #ifdef USE_SM
         session_request_logout(o->silent);
 #else
-        g_message(_("The SessionLogout actions is not available since Openbox was built without session management support"));
+        g_message(_("The SessionLogout action is not available since Openbox was built without session management support"));
 #endif
     }
     return TRUE; /* call cleanup func */

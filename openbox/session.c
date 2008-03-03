@@ -404,7 +404,22 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
     ObSMSaveData *savedata = NULL;
     gchar *vendor;
 
-    ob_debug_type(OB_DEBUG_SM, "Session save requested\n");
+#ifdef DEBUG
+    {
+        const gchar *sname =
+            (save_type == SmSaveLocal ? "SmSaveLocal" :
+             (save_type == SmSaveGlobal ? "SmSaveGlobal" :
+              (save_type == SmSaveBoth ? "SmSaveBoth" : "INVALID!!")));
+        ob_debug_type(OB_DEBUG_SM, "Session save requested, type %s\n", sname);
+    }
+#endif
+
+    if (save_type == SmSaveGlobal) {
+        /* we have no data to save.  we only store state to get back to where
+           we were, we don't keep open writable files or anything */
+        SmcSaveYourselfDone(conn, TRUE);
+        return;
+    }
 
     vendor = SmcVendor(sm_conn);
     ob_debug_type(OB_DEBUG_SM, "Session manager's vendor: %s\n", vendor);
@@ -809,7 +824,7 @@ void session_request_logout(gboolean silent)
 {
     if (sm_conn) {
         SmcRequestSaveYourself(sm_conn,
-                               SmSaveBoth,
+                               SmSaveGlobal,
                                TRUE, /* logout */
                                (silent ?
                                 SmInteractStyleNone : SmInteractStyleAny),

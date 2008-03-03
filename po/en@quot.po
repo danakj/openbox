@@ -29,8 +29,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.7-pre1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-02 18:34-0500\n"
-"PO-Revision-Date: 2008-03-02 18:34-0500\n"
+"POT-Creation-Date: 2008-03-03 02:10+0100\n"
+"PO-Revision-Date: 2008-03-03 02:10+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -79,10 +79,10 @@ msgstr "Exit Openbox"
 
 #: openbox/actions/session.c:41
 msgid ""
-"The SessionLogout actions is not available since Openbox was built without "
+"The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
-"The SessionLogout actions is not available since Openbox was built without "
+"The SessionLogout action is not available since Openbox was built without "
 "session management support"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68

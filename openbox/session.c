@@ -809,7 +809,7 @@ void session_request_logout(gboolean silent)
 {
     if (sm_conn) {
         SmcRequestSaveYourself(sm_conn,
-                               SmSaveBoth,
+                               SmSaveGlobal,
                                TRUE, /* logout */
                                (silent ?
                                 SmInteractStyleNone : SmInteractStyleAny),

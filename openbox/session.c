@@ -679,6 +679,7 @@ static void session_load_file(const gchar *path)
     i = obt_parse_instance_new();
 
     if (!obt_parse_load_file(i, path, "openbox_session")) {
+        ob_debug_type(OB_DEBUG_SM, "ERROR: session file is missing root node");
         obt_parse_instance_unref(i);
         return;
     }
@@ -712,6 +713,7 @@ static void session_load_file(const gchar *path)
         }
     }
 
+    ob_debug_type(OB_DEBUG_SM, "loading windows");
     for (node = obt_parse_find_node(node->children, "window"); node != NULL;
          node = obt_parse_find_node(node->next, "window"))
     {
@@ -776,9 +778,11 @@ static void session_load_file(const gchar *path)
         /* save this. they are in the file in stacking order, so preserve
            that order here */
         session_saved_state = g_list_append(session_saved_state, state);
+        ob_debug_type(OB_DEBUG_SM, "loaded %s", state->name);
         continue;
 
     session_load_bail:
+        ob_debug_type(OB_DEBUG_SM, "loading FAILED");
         session_state_free(state);
     }
 
@@ -813,6 +817,7 @@ static void session_load_file(const gchar *path)
                 !strcmp(s1->class, s2->class) &&
                 !strcmp(s1->role, s2->role))
             {
+                ob_debug_type(OB_DEBUG_SM, "removing duplicate %s", s2->name);
                 session_state_free(s2);
                 session_saved_state =
                     g_list_delete_link(session_saved_state, jt);
@@ -821,6 +826,7 @@ static void session_load_file(const gchar *path)
         }
 
         if (founddup) {
+            ob_debug_type(OB_DEBUG_SM, "removing duplicate %s", s1->name);
             session_state_free(s1);
             session_saved_state = g_list_delete_link(session_saved_state, it);
         }

@@ -580,13 +580,9 @@ static void parse_args(gint *argc, gchar **argv)
             ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-focus")) {
-            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
-            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_FOCUS, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-session")) {
-            ob_debug_enable(OB_DEBUG_NORMAL, TRUE);
-            ob_debug_enable(OB_DEBUG_APP_BUGS, TRUE);
             ob_debug_enable(OB_DEBUG_SM, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-xinerama")) {

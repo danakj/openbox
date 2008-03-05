@@ -294,6 +294,7 @@ void RrImageDrawRGBA(RrPixel32 *target, RrTextureRGBA *rgba,
             DrawRGBA(target, target_w, target_h,
                      scaled->data, scaled->width, scaled->height,
                      rgba->alpha, area);
+            RrImagePicFree(scaled);
     }
     else
         DrawRGBA(target, target_w, target_h,

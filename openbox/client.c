@@ -495,7 +495,10 @@ void client_manage(Window window, ObPrompt *prompt)
     if (activate) {
         gboolean raise = FALSE;
         gboolean relative_focused = FALSE;
+        gboolean parent_focused = FALSE;
 
+        parent_focused = (focus_client != NULL &&
+                          client_search_focus_parent(self));
         relative_focused = (focus_client != NULL &&
                             client_search_focus_tree_full(self) != NULL &&
                             client_search_focus_group_full(self) != NULL);
@@ -534,7 +537,8 @@ void client_manage(Window window, ObPrompt *prompt)
         else if (focus_client) {
             /* If the user is working in another window right now, then don't
                steal focus */
-            if (event_last_user_time && launch_time &&
+            if (!parent_focused &&
+                event_last_user_time && launch_time &&
                 event_time_after(event_last_user_time, launch_time) &&
                 event_last_user_time != launch_time &&
                 event_time_after(event_last_user_time,
@@ -543,7 +547,8 @@ void client_manage(Window window, ObPrompt *prompt)
                 activate = FALSE;
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "Not focusing the window because the user is "
-                              "working in another window\n");
+                              "working in another window that is not "
+                              "its parent\n");
             }
             /* If the new window is a transient (and its relatives aren't
                focused) */
@@ -4047,6 +4052,21 @@ ObClient *client_search_focus_parent(ObClient *self)
         if (client_focused(it->data)) return it->data;
 
     return NULL;
+}
+
+ObClient *client_search_focus_parent_full(ObClient *self)
+{
+    GSList *it;
+    ObClient *ret = NULL;
+
+    for (it = self->parents; it; it = g_slist_next(it)) {
+        if (client_focused(it->data))
+            ret = it->data;
+        else
+            ret = client_search_focus_parent_full(it->data);
+        if (ret) break;
+    }
+    return ret;
 }
 
 ObClient *client_search_parent(ObClient *self, ObClient *search)

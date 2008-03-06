@@ -6,6 +6,7 @@
 
 typedef enum {
     LAST,
+    CURRENT,
     RELATIVE,
     ABSOLUTE
 } SwitchType;
@@ -168,6 +169,8 @@ static gpointer setup_func(xmlNodePtr node,
         gchar *s = obt_xml_node_string(n);
         if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
+        else if (!g_ascii_strcasecmp(s, "current"))
+            o->type = CURRENT;
         else if (!g_ascii_strcasecmp(s, "next")) {
             o->type = RELATIVE;
             o->u.rel.linear = TRUE;
@@ -272,6 +275,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     case LAST:
         d = screen_last_desktop;
         break;
+    case CURRENT:
+        d = screen_desktop;
+        break;
     case ABSOLUTE:
         d = o->u.abs.desktop;
         break;
@@ -283,7 +289,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         g_assert_not_reached();
     }
 
-    if (d < screen_num_desktops && d != screen_desktop) {
+    if (d < screen_num_desktops &&
+        (d != screen_desktop ||
+         (data->client && data->client->desktop != screen_desktop))) {
         gboolean go = TRUE;
 
         actions_client_move(data, TRUE);

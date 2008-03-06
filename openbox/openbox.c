@@ -529,7 +529,7 @@ static void print_help(void)
     g_print(_("  --sync              Run in synchronous mode\n"));
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
-    g_print(_("  --debug-session     Display debugging output for session managment\n"));
+    g_print(_("  --debug-session     Display debugging output for session management\n"));
     g_print(_("  --debug-xinerama    Split the display into fake xinerama screens\n"));
     g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
 }

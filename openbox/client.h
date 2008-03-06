@@ -641,11 +641,17 @@ RrImage* client_icon(ObClient *self);
   transient for */
 gboolean client_has_parent(ObClient *self);
 
-/*! Searches a client's direct parents for a focused window. The function does
-  not check for the passed client, only for *ONE LEVEL* of its parents.
-  If no focused parentt is found, NULL is returned.
+/*! Searches a client's immediate parents for a focused window. The function
+  does not check for the passed client, only for *ONE LEVEL* of its parents.
+  If no focused parent is found, NULL is returned.
 */
 ObClient *client_search_focus_parent(ObClient *self);
+
+/*! Searches a client's parents for a focused window. The function
+  does not check for the passed client, but searches through all of its
+  parents. If no focused parent is found, NULL is returned.
+*/
+ObClient *client_search_focus_parent_full(ObClient *self);
 
 /*! Searches a client's transients for a focused window. The function does not
   check for the passed client, only for its transients.

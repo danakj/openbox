@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6.1\n"
+"Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2008-03-02 17:18+0100\n"
+"POT-Creation-Date: 2008-03-04 16:31+0100\n"
+"PO-Revision-Date: 2008-03-04 16:32+0100\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -33,7 +33,7 @@ msgstr "はい"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "実行する"
 
 #: openbox/actions/execute.c:142
 #, c-format
@@ -55,21 +55,23 @@ msgstr "Openbox を終了してもよろしいですか？"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Openbox を終了する"
 
 #: openbox/actions/session.c:41
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"Openbox がセッション管理の機能なしに作られたので SessionLogout アクションは利"
+"用できません。"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
 msgid "Log Out"
-msgstr ""
+msgstr "ログアウト"
 
 #: openbox/actions/session.c:67
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "ログアウトしてもよろしいですか？"
 
 #: openbox/client.c:2004
 msgid "Unnamed Window"
@@ -269,10 +271,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Openbox の設定ファイルを解析中に XML の構文エラーが見つかりました。詳しい情報"
+"は標準出力を見て下さい。最後に見つかったエラーは\"%s\"ファイルの%d 行目で、説"
+"明はこうです：%s"
 
 #: openbox/openbox.c:382
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openbox 構文エラー"
 
 #: openbox/openbox.c:382
 msgid "Close"
@@ -328,7 +333,7 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"実行中の Openbox にメッセージを送ります:\n"
+"実行中の Openbox に命令を送ります:\n"
 
 #: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
@@ -423,19 +428,19 @@ msgstr "デスクトップ%i"
 msgid "Unable to make directory \"%s\": %s"
 msgstr "ディレクトリ\"%s\"を作れません: %s"
 
-#: openbox/session.c:452
+#: openbox/session.c:467
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "セッションを\"%s\"に保存できません: %s"
 
-#: openbox/session.c:584
+#: openbox/session.c:599
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "セッションを\"%s\"に保存中にエラーが起きました: %s"
 
-#: openbox/session.c:821
+#: openbox/session.c:836
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "セッションマネージャに接続されていません。"
 
 #: openbox/startupnotify.c:243
 #, c-format

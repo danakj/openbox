@@ -494,8 +494,8 @@ void client_manage(Window window, ObPrompt *prompt)
                   activate ? "yes" : "no");
     if (activate) {
         gboolean raise = FALSE;
-        gboolean relative_focused = FALSE;
-        gboolean parent_focused = FALSE;
+        gboolean relative_focused;
+        gboolean parent_focused;
 
         parent_focused = (focus_client != NULL &&
                           client_search_focus_parent(self));

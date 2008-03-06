@@ -500,8 +500,8 @@ void client_manage(Window window, ObPrompt *prompt)
         parent_focused = (focus_client != NULL &&
                           client_search_focus_parent(self));
         relative_focused = (focus_client != NULL &&
-                            client_search_focus_tree_full(self) != NULL &&
-                            client_search_focus_group_full(self) != NULL);
+                            (client_search_focus_tree_full(self) != NULL ||
+                             client_search_focus_group_full(self) != NULL));
 
 
         /* This is focus stealing prevention */

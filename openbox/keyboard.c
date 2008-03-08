@@ -326,4 +326,3 @@ void keyboard_shutdown(gboolean reconfig)
     popup_free(popup);
     popup = NULL;
 }
-

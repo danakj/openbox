@@ -187,4 +187,3 @@ KeyCode modkeys_sym_to_code(KeySym sym)
                 return i;
     return 0;
 }
-

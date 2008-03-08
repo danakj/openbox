@@ -85,7 +85,6 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-
 RrInstance   *ob_rr_inst;
 RrImageCache *ob_rr_icons;
 RrTheme      *ob_rr_theme;
@@ -147,7 +146,6 @@ gint main(gint argc, gchar **argv)
 
         session_startup(argc, argv);
     }
-
 
     ob_display = XOpenDisplay(NULL);
     if (ob_display == NULL)
@@ -222,7 +220,6 @@ gint main(gint argc, gchar **argv)
     cursors[OB_CURSOR_WEST] = load_cursor("left_side", XC_left_side);
     cursors[OB_CURSOR_NORTHWEST] = load_cursor("top_left_corner",
                                                XC_top_left_corner);
-
 
     prop_startup(); /* get atoms values for the display */
     extensions_query_all(); /* find which extensions are present */

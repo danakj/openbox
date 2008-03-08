@@ -66,7 +66,6 @@ int main () {
                   PropModeReplace, (unsigned char*)&num, 1);
   XFlush(display);
 
-
   while (1) {
     XNextEvent(display, &report);
   }

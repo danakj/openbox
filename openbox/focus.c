@@ -359,4 +359,3 @@ gboolean focus_valid_target(ObClient *ft,
 
     return ok;
 }
-

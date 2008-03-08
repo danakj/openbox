@@ -659,7 +659,6 @@ static void gradient_vertical(RrSurface *sf, gint w, gint h)
     }
 }
 
-
 static void gradient_diagonal(RrSurface *sf, gint w, gint h)
 {
     gint x, y;

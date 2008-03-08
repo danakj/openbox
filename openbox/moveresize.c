@@ -348,7 +348,6 @@ static void do_move(gboolean keyboard, gint keydist)
                      moveresize_client->frame->area.y);
 }
 
-
 static void do_resize(void)
 {
     gint x, y, w, h, lw, lh;

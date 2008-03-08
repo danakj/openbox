@@ -108,7 +108,6 @@ static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
 
-
 void client_startup(gboolean reconfig)
 {
     if ((client_default_icon = RrImageCacheFind(ob_rr_icons,
@@ -503,7 +502,6 @@ void client_manage(Window window, ObPrompt *prompt)
                             (client_search_focus_tree_full(self) != NULL ||
                              client_search_focus_group_full(self) != NULL));
 
-
         /* This is focus stealing prevention */
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Want to focus new window 0x%x at time %u "
@@ -657,7 +655,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     return;
 }
-
 
 ObClient *client_fake_manage(Window window)
 {
@@ -1380,7 +1377,6 @@ static void client_update_transient_tree(ObClient *self,
       Group transient windows are not allowed to have other group
       transient windows as their children.
       * * */
-
 
     /* No change has occured */
     if (oldgroup == newgroup &&
@@ -2194,7 +2190,6 @@ void client_update_icons(ObClient *self)
                                        (gint*)&w, (gint*)&h, &data);
                 xerror_set_ignore(FALSE);
 
-
                 if (xicon) {
                     if (w > 0 && h > 0) {
                         /* is this icon in the cache yet? */
@@ -2686,7 +2681,6 @@ gboolean client_enter_focusable(ObClient *self)
             self->type != OB_CLIENT_TYPE_DESKTOP);
 }
 
-
 static void client_apply_startup_state(ObClient *self,
                                        gint x, gint y, gint w, gint h)
 {
@@ -2995,7 +2989,6 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     g_assert(*w > 0);
     g_assert(*h > 0);
 }
-
 
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final, gboolean force_reply)

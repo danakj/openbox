@@ -590,7 +590,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                                  sidebwidth) * 2,
                                   self->bwidth);
 
-
                 if (sidebwidth) {
                     XMoveResizeWindow(ob_display, self->lgripleft,
                                       0,

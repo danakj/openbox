@@ -577,7 +577,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->def_win_icon_w = OB_DEFAULT_ICON_WIDTH;
     theme->def_win_icon_h = OB_DEFAULT_ICON_HEIGHT;
 
-
     /* read the decoration textures */
     if (!read_appearance(db, inst,
                          "window.active.title.bg", theme->a_focused_title,
@@ -1779,7 +1778,6 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
     else
         *interlaced = FALSE;
 }
-
 
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 const gchar *rname, RrAppearance *value,

@@ -401,7 +401,6 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
     SmcSaveYourselfDone(conn, success);
 }
 
-
 static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
                              Bool shutdown, gint interact_style, Bool fast)
 {

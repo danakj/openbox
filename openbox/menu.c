@@ -58,7 +58,6 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gchar **strippedlabel, guint *position,
                                gboolean *always_show);
 
-
 static void client_dest(ObClient *client, gpointer data)
 {
     /* menus can be associated with a client, so close any that are since

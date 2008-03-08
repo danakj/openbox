@@ -1125,7 +1125,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 move = TRUE;
             }
 
-
         if (e->xconfigurerequest.value_mask & CWStackMode) {
             ObClient *sibling = NULL;
             gulong ignore_start;

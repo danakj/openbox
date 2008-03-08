@@ -197,5 +197,4 @@ ObAppSettings* config_create_app_settings(void);
 void config_app_settings_copy_non_defaults(const ObAppSettings *src,
                                            ObAppSettings *dest);
 
-
 #endif

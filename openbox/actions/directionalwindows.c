@@ -91,7 +91,7 @@ static gpointer setup_func(xmlNodePtr node)
         m = obt_parse_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
-            if (action) o->actions = g_slist_prepend(o->actions, action);
+            if (action) o->actions = g_slist_append(o->actions, action);
             m = obt_parse_find_node(m->next, "action");
         }
     }

@@ -4,106 +4,113 @@
 # Sebastian Vahl <svahl@web.de>, 2006.
 # Simon A. Wilper <simonaw@openoffice.org>, Apr 2007
 # Peter Schwindt <schwindt@ba-loerrach.de>
-# Finn Zirngibl <finn@s23.org>, 2008"
+# Finn Zirngibl <finn@s23.org>, 2008
+# Florian Walch <florian.walch@gmx.at>, 2008
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.5\n"
+"Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2008-01-17 22:49+0100\n"
-"Last-Translator: Finn Zirngibl <finn@s23.org>\n"
+"POT-Creation-Date: 2008-03-13 13:29+0100\n"
+"PO-Revision-Date: 2008-03-13 13:38+0100\n"
+"Last-Translator: Florian Walch <florian.walch@gmx.at>\n"
 "Language-Team:  <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions.c:150
+#: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Unzulässige Aktion \"%s\" angefordert. Diese Aktion existiert nicht."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "Ausführen"
 
 #: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Konnte Pfad \"%s\" nicht von utf8 konvertieren"
+msgstr "Konnte Pfad \"%s\" nicht von UTF-8 konvertieren"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:62
-#: openbox/client.c:3460
+#: openbox/client.c:3458
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr ""
+msgstr "Beenden"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Openbox beendet werden soll?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Beende Openbox"
 
 #: openbox/actions/session.c:41
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"Die SessionLogout-Aktion ist nicht verfügbar, da Openbox ohne Unterstützung "
+"für Sitzungsmanagement kompiliert wurde"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
 msgid "Log Out"
-msgstr ""
+msgstr "Abmelden"
 
 #: openbox/actions/session.c:67
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie sich abmelden wollen?"
 
-#: openbox/client.c:2004
+#: openbox/client.c:2005
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Unbenanntes Fenster"
 
-#: openbox/client.c:2018 openbox/client.c:2050
+#: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
 msgstr "Wird beendet..."
 
-#: openbox/client.c:2020 openbox/client.c:2052
+#: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
 msgstr "Reagiert nicht"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3447
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Das Fenster \"%s\" scheint nicht zu reagieren. Wollen Sie die Beendigung "
+"durch das Senden des %s-Signals erzwingen?"
 
-#: openbox/client.c:3451
+#: openbox/client.c:3449
 msgid "End Process"
-msgstr ""
+msgstr "Beende Prozess"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3453
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
+"Das Fenster \"%s\" scheint nicht zu reagieren. Soll es vom X-Server getrennt "
+"werden?"
 
-#: openbox/client.c:3457
+#: openbox/client.c:3455
 msgid "Disconnect"
-msgstr ""
+msgstr "Trennen"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -192,34 +199,34 @@ msgstr "_Schließen"
 #: openbox/config.c:781
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Unzulässiger Knopf \"%s\" in der Konfigurationsdatei angegeben"
+msgstr "Unzulässiger Button \"%s\" in der Konfigurationsdatei angegeben"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
 msgstr "Konflikt mit Tastenkombination in der Konfigurationsdatei"
 
-#: openbox/menu.c:103 openbox/menu.c:111
+#: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
 msgstr "Konnte keine gültige Menü-Datei \"%s\" finden"
 
-#: openbox/menu.c:171
+#: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
 msgstr "Konnte Befehl \"%s\" für pipe-menu nicht ausführen: %s"
 
-#: openbox/menu.c:185
+#: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
 msgstr "Ungültige Ausgabe vom pipe-menu \"%s\""
 
-#: openbox/menu.c:198
+#: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr ""
-"Das Menü \"%s\" wurde bei dem Versuch darauf zuzugreifen nicht gefunden"
+"Auf das Menü \"%s\" konnte nicht zugegriffen werden, da es nicht existiert"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
 msgstr "Mehr..."
 
@@ -233,69 +240,72 @@ msgstr "Maus-Binding enthält ungültigen Button \"%s\""
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Maus-Binding enthält ungültigen Kontext \"%s\""
 
-#: openbox/openbox.c:134
+#: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "Konnte nicht in das Heimatverzeichnis \"%s\" wechseln: %s"
 
-#: openbox/openbox.c:154
+#: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Konnte das Display aus der Umgebungsvariable DISPLAY nicht öffnen."
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
-msgstr "Konnte die obrender Bibliothek nicht initialisieren."
+msgstr "Konnte die obrender-Bibliothek nicht initialisieren."
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:194
 msgid "X server does not support locale."
 msgstr "Die gewählte Lokalisierung wird vom X-Server nicht unterstützt."
 
-#: openbox/openbox.c:198
+#: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
 msgstr ""
 "Die Lokalisierungsmodifizierer für den X-Server konnten nicht gesetzt werden."
 
-#: openbox/openbox.c:266
+#: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Es wurde keine gültige Konfigurationsdatei gefunden, benutze einfache "
-"Standardwerte."
+"Standardwerte"
 
-#: openbox/openbox.c:300
+#: openbox/openbox.c:297
 msgid "Unable to load a theme."
 msgstr "Konnte kein Thema laden."
 
-#: openbox/openbox.c:380
+#: openbox/openbox.c:377
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Beim Parsen der Openbox-Konfigurationsdateien wurden ein oder mehrere XML-"
+"Syntaxfehler gefunden. Die Standardausgabe enthält weitere Informationen. "
+"Der letzte Fehler wurde in der Datei \"%s\" in Zeile %d festgestellt: %s"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openbox Syntax-Fehler"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Close"
 msgstr "Schließen"
 
-#: openbox/openbox.c:451
+#: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "Neustart fehlgeschlagen, um die ausführbare Datei \"%s\" zu starten: %s"
 
-#: openbox/openbox.c:521 openbox/openbox.c:523
+#: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [Optionen]\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:530
 msgid ""
 "\n"
 "Options:\n"
@@ -303,30 +313,30 @@ msgstr ""
 "\n"
 "Optionen:\n"
 
-#: openbox/openbox.c:534
+#: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Diese Hilfe anzeigen und beenden\n"
 
-#: openbox/openbox.c:535
+#: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Version anzeigen und beenden\n"
 
-#: openbox/openbox.c:536
+#: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Den aktuell laufenden Fenstermanager ersetzen\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:540
+#: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file DATEI Pfad zur Konfigurationsdatei\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Keine Verbindung zum Sitzungsmanager aufbauen\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:539
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -334,19 +344,19 @@ msgstr ""
 "\n"
 "Nachrichten an eine laufende Openbox-Instanz weiterleiten:\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox's Konfiguration neu laden\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox neu starten\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Beende Openbox\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:543
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -354,25 +364,25 @@ msgstr ""
 "\n"
 "Debugging Optionen:\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              im Synchronisierungsmodus starten\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Debugging-Informationen anzeigen\n"
 
-#: openbox/openbox.c:549
+#: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Debugging-Informationen für's Fokus-Handling anzeigen\n"
 
-#: openbox/openbox.c:550
+#: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 "  --debug-xinerama    Anzeige in künstliche Xinerama-Bildschirme aufteilen\n"
 
-#: openbox/openbox.c:551
+#: openbox/openbox.c:548
 #, c-format
 msgid ""
 "\n"
@@ -381,11 +391,11 @@ msgstr ""
 "\n"
 "Bitte melden Sie Bugreports an: %s\n"
 
-#: openbox/openbox.c:620
+#: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file erfordert einen Parameter\n"
 
-#: openbox/openbox.c:663
+#: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Ungültiges Kommandozeilen Argument \"%s\"\n"
@@ -415,30 +425,32 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"Openbox wurde für %d Desktops konfiguriert, aber die aktuelle Sitzung hat %"
+"d. Überschreibe die Openbox-Konfiguration."
 
 #: openbox/screen.c:1180
 #, c-format
 msgid "desktop %i"
-msgstr "desktop %i"
+msgstr "Desktop %i"
 
 #: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Das Verzeichnis \"%s\" konnte nicht angelegt werden: %s"
 
-#: openbox/session.c:452
+#: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Konnte die Sitzung \"%s\" nicht sichern: %s"
 
-#: openbox/session.c:584
+#: openbox/session.c:598
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Fehler beim Speichern der Sitzung nach \"%s\": %s"
 
-#: openbox/session.c:821
+#: openbox/session.c:835
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "Nicht mit einem Sitzungsmanager verbunden"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -453,7 +465,7 @@ msgstr "Ungültige Modifier-Taste \"%s\" in Tastenbelegung/Maus-Binding"
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code \"%s\" in key binding"
-msgstr "Ungültiger Keycode \"%s\" in Tastenkombination"
+msgstr "Ungültiger Tastencode \"%s\" in Tastenkombination"
 
 #: openbox/translate.c:145
 #, c-format
@@ -468,11 +480,11 @@ msgstr "Angeforderte Taste \"%s\" existiert nicht auf dem Display"
 #: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
-msgstr "X Fehler: %s"
+msgstr "X-Fehler: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "Konnte \"%s\" nicht ausführen: %s"

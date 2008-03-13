@@ -132,6 +132,8 @@ extern gboolean config_theme_keepborder;
 extern gchar *config_title_layout;
 /*! Animate windows iconifying and restoring */
 extern gboolean config_animate_iconify;
+/*! Size of icons in focus switching dialogs */
+extern guint config_theme_window_list_icon_size;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;

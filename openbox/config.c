@@ -44,6 +44,7 @@ StrutPartial config_margins;
 
 gchar   *config_theme;
 gboolean config_theme_keepborder;
+guint    config_theme_window_list_icon_size;
 
 gchar   *config_title_layout;
 
@@ -602,6 +603,13 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         config_theme_keepborder = obt_parse_node_bool(n);
     if ((n = obt_parse_find_node(node, "animateIconify")))
         config_animate_iconify = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "windowListIconSize"))) {
+        config_theme_window_list_icon_size = obt_parse_node_int(n);
+        if (config_theme_window_list_icon_size < 16)
+            config_theme_window_list_icon_size = 16;
+        else if (config_theme_window_list_icon_size > 96)
+            config_theme_window_list_icon_size = 96;
+    }
 
     n = obt_parse_find_node(node, "font");
     while (n) {
@@ -962,6 +970,7 @@ void config_startup(ObtParseInst *i)
     config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
+    config_theme_window_list_icon_size = 36;
 
     config_font_activewindow = NULL;
     config_font_inactivewindow = NULL;

@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "focus.h"
 #include "openbox.h"
+#include "config.h"
 #include "window.h"
 #include "event.h"
 #include "render/render.h"
@@ -30,16 +31,16 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+/* Size of the icons, which can appear inside or outside of a hilite box */
+#define ICON_SIZE config_theme_window_list_icon_size
 /* Size of the hilite box around a window's icon */
-#define HILITE_SIZE 40
+#define HILITE_SIZE (ICON_SIZE + 2*HILITE_OFFSET)
 /* Width of the outer ring around the hilite box */
 #define HILITE_WIDTH 2
 /* Space between the outer ring around the hilite box and the icon inside it */
 #define HILITE_MARGIN 1
 /* Total distance from the edge of the hilite box to the icon inside it */
 #define HILITE_OFFSET (HILITE_WIDTH + HILITE_MARGIN)
-/* Size of the icons, which can appear inside or outside of a hilite box */
-#define ICON_SIZE (HILITE_SIZE - 2*HILITE_OFFSET)
 /* Margin area around the outside of the dialog */
 #define OUTSIDE_BORDER 3
 /* Margin area around the text */

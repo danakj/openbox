@@ -1,26 +1,28 @@
-# Dutch messages for openbox.
-# Copyright (C) 2007 Mark Pustjens
+# Dutch translations for openbox.
 # This file is distributed under the same license as the openbox package.
+#
 # Mark Pustjens <pustjens@dds.nl>, 2007.
 # Jochem Kossen <jkossen@xs4all.nl>, 2007.
-# Marvin Vek <laen@onedot.nl>, 2008
+# Marvin Vek <laen@onedot.nl>, 2008.
+# Benno Schulenberg <benno@vertaalt.nl>, 2008.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-11 02:01+0100\n"
-"PO-Revision-Date: 2008-03-11 14:57+0100\n"
-"Last-Translator: Marvin Vek <laen@onedot.nl>\n"
-"Language-Team: Dutch <nl@li.org>\n"
+"POT-Creation-Date: 2008-03-17 18:13+0100\n"
+"PO-Revision-Date: 2008-03-18 23:30+0100\n"
+"Last-Translator: Benno Schulenberg <benno@vertaalt.nl>\n"
+"Language-Team: Dutch <vertaling@vrijschrift.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr "Ongeldige actie \"%s\" gevraagd. Deze actie bestaat niet"
+msgstr "Ongeldige actie \"%s\" werd gevraagd. Deze actie bestaat niet."
 
 #: openbox/actions/execute.c:128
 msgid "No"
@@ -37,7 +39,7 @@ msgstr "Uitvoeren"
 #: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Converteren van het pad \"%s\" vanuit utf8 mislukt"
+msgstr "Converteren van het pad \"%s\" vanuit UTF-8 is mislukt"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:62
 #: openbox/client.c:3458
@@ -61,8 +63,8 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
-"De SessionLogout actie is niet beschikbaar omdat Openbox gecompileerd is "
-"zonder sessie management ondersteuning"
+"De actie 'SessionLogout' is niet beschikbaar omdat Openbox gecompileerd is "
+"zonder ondersteuning voor sessiebeheer."
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
 msgid "Log Out"
@@ -74,7 +76,7 @@ msgstr "Weet u zeker dat u wilt uitloggen?"
 
 #: openbox/client.c:2005
 msgid "Unnamed Window"
-msgstr "Naamloos Venster"
+msgstr "Naamloos venster"
 
 #: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
@@ -82,7 +84,7 @@ msgstr "Termineren..."
 
 #: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
-msgstr "Reageert Niet"
+msgstr "Reageert niet"
 
 #: openbox/client.c:3447
 #, c-format
@@ -90,12 +92,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"Het venster \"%s\" reageert niet.  Wilt u het afsluiten forceren door het %s "
-"signaal te sturen?"
+"Het venster \"%s\" reageert niet.  Wilt u het afsluiten forceren door het "
+"signaal %s te sturen?"
 
 #: openbox/client.c:3449
 msgid "End Process"
-msgstr "Beëindig Proces"
+msgstr "Beëindig proces"
 
 #: openbox/client.c:3453
 #, c-format
@@ -103,8 +105,8 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
-"Het venster \"%s\" reageert niet.  Wilt u de connectie van het venster aan "
-"de X server verbreken?"
+"Het venster \"%s\" reageert niet.  Wilt u de verbinding van het venster met "
+"de X-server verbreken?"
 
 #: openbox/client.c:3455
 msgid "Disconnect"
@@ -116,7 +118,7 @@ msgstr "Ga hierheen..."
 
 #: openbox/client_list_combined_menu.c:94
 msgid "Manage desktops"
-msgstr "Beheer bureaubladen"
+msgstr "Bureaubladen beheren"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
@@ -160,7 +162,7 @@ msgstr "Verplaats _naar bureaublad"
 
 #: openbox/client_menu.c:383
 msgid "Client menu"
-msgstr "Venster menu"
+msgstr "Venstermenu"
 
 #: openbox/client_menu.c:393
 msgid "R_estore"
@@ -197,21 +199,21 @@ msgstr "_Sluiten"
 #: openbox/config.c:781
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Ongeldige knop \"%s\" gespecificeerd in het configuratiebestand"
+msgstr "Ongeldige knop \"%s\" opgegeven in het configuratiebestand"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
-msgstr "Conflict met toetsenbinding in het configuratiebestand"
+msgstr "Conflict in toetsbindingen in het configuratiebestand"
 
 #: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr "Het vinden van een geldig menubestand \"%s\" is mislukt"
+msgstr "Kan geen geldig menubestand \"%s\" vinden"
 
 #: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Uitvoeren mislukt van het commando \"%s\" voor pipe-menu: %s"
+msgstr "Uitvoeren van commando voor pipe-menu \"%s\" is mislukt: %s"
 
 #: openbox/menu.c:184
 #, c-format
@@ -221,7 +223,7 @@ msgstr "Ongeldige uitvoer van pipe-menu \"%s\""
 #: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Toegang gevraagd tot menu \"%s\" maar het bestaat niet"
+msgstr "Toegang tot niet-bestaand menu \"%s\" werd gevraagd"
 
 #: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
@@ -230,43 +232,43 @@ msgstr "Meer..."
 #: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Ongeldige knop \"%s\" in muis binding"
+msgstr "Ongeldige knop \"%s\" in muisbinding"
 
 #: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
-msgstr "Ongeldige context \"%s\" in muis binding"
+msgstr "Ongeldige context \"%s\" in muisbinding"
 
 #: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr "Pad instellen mislukt naar de thuismap \"%s\": %s"
+msgstr "Kan thuismap \"%s\" niet de huidige map maken: %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Scherm van de DISPLAY omgevingsvariabele te openen mislukt."
+msgstr "Kan scherm genoemd in omgevingsvariabele DISPLAY niet openen."
 
 #: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
-msgstr "Initialiseren van de obrender bibliotheek mislukt."
+msgstr "Initialiseren van de 'obrender'-bibliotheek is mislukt."
 
 #: openbox/openbox.c:194
 msgid "X server does not support locale."
-msgstr "X server ondersteunt locale niet"
+msgstr "X-server ondersteunt lokalisatie niet."
 
 #: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Kan de locale bepaling van de X server niet instellen"
+msgstr "Kan lokalisatie voor de X-server niet instellen."
 
 #: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Kon geen geldig configuratiebestand vinden, simpele standaardinstellingen "
+"Kan geen geldig configuratiebestand vinden; simpele standaardinstellingen "
 "worden gebruikt"
 
 #: openbox/openbox.c:297
 msgid "Unable to load a theme."
-msgstr "Thema laden mislukt."
+msgstr "Kan geen thema laden."
 
 #: openbox/openbox.c:377
 #, c-format
@@ -275,13 +277,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
-"Een of meer XML syntax fouten gevonden tijdens het inlezen van de Openbox "
-"configuratiebestanden.  Zie stdout voor meer informatie.  De laatste fout "
-"werd gevonden in bestand \"%s\" regel %d, met bericht: %s"
+"Een of meer XML-syntaxfouten zijn gevonden tijdens het inlezen van de "
+"Openbox-configuratiebestanden.  Zie standaarduitvoer voor meer informatie.  "
+"De laatste fout werd gevonden in bestand \"%s\" regel %d, met bericht: %s"
 
 #: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr "Openbox Syntax Fout"
+msgstr "Openbox-syntaxfout"
 
 #: openbox/openbox.c:379
 msgid "Close"
@@ -290,7 +292,7 @@ msgstr "Sluiten"
 #: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
-msgstr "Uitvoeren van nieuw programma \"%s\" tijdens herstart miskukt: %s"
+msgstr "Uitvoeren van nieuw programma \"%s\" bij herstart is mislukt: %s"
 
 #: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
@@ -298,7 +300,7 @@ msgstr "Copyright (c)"
 
 #: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
-msgstr "Syntax: openbox [opties]\n"
+msgstr "Gebruik: openbox [opties]\n"
 
 #: openbox/openbox.c:530
 msgid ""
@@ -310,15 +312,15 @@ msgstr ""
 
 #: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Toon deze helptekst en sluit af\n"
+msgstr "  --help              Deze hulptekst tonen en stoppen\n"
 
 #: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Toon versie en sluit af\n"
+msgstr "  --version           Versie tonen en stoppen\n"
 
 #: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr "  --replace           Vervang de huidig draaiende window manager\n"
+msgstr "  --replace           De draaiende vensterbeheerder vervangen\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
@@ -326,8 +328,8 @@ msgstr "  --replace           Vervang de huidig draaiende window manager\n"
 #: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
-"  --config-file FILE  Specificeer het pad naar het te gebruiken "
-"configuratiebestand\n"
+"  --config-file BESTAND\n"
+"                      Dit configuratiebestand gebruiken\n"
 
 #: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -339,15 +341,15 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Berichten worden naar een draaiende Openbox instantie gestuurd:\n"
+"Berichten worden naar een draaiende Openbox-instantie gestuurd:\n"
 
 #: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Openbox configuratie opnieuw laden\n"
+msgstr "  --reconfigure       Openbox-configuratie opnieuw laden\n"
 
 #: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Herstart Openbox\n"
+msgstr "  --restart           Openbox herstarten\n"
 
 #: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
@@ -359,11 +361,11 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Debugging opties:\n"
+"Debugging-opties:\n"
 
 #: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Start in synchrone modus\n"
+msgstr "  --sync              In synchrone modus starten\n"
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -371,11 +373,11 @@ msgstr "  --debug             Debuguitvoer weergeven\n"
 
 #: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr "  --debug-focus       Debug uitvoer voor focusafhandeling weergeven\n"
+msgstr "  --debug-focus       Debuguitvoer voor focusafhandeling weergeven\n"
 
 #: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Splits het scherm in nep xinerama schermen\n"
+msgstr "  --debug-xinerama    Het scherm in nep Xinerama-schermen splitsen\n"
 
 #: openbox/openbox.c:548
 #, c-format
@@ -384,11 +386,11 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Gelieve bugs te melden bij %s\n"
+"Rapporteer programmafouten aan %s\n"
 
 #: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr "--config-file vereist een argument\n"
+msgstr "'--config-file' vereist een argument\n"
 
 #: openbox/openbox.c:660
 #, c-format
@@ -398,17 +400,17 @@ msgstr "Onbekende optie \"%s\"\n"
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Er draait al een window manager op scherm %d"
+msgstr "Er draait al een vensterbeheerder op scherm %d"
 
 #: openbox/screen.c:124
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Kon window manager selectie op scherm %d niet verkrijgen"
+msgstr "Kan op scherm %d geen vensterbeheerderselectie verkrijgen"
 
 #: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "De window manager op scherm %d sluit zichzelf niet af"
+msgstr "De vensterbeheerder op scherm %d sluit zichzelf niet af"
 
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
@@ -421,7 +423,7 @@ msgid ""
 "Overriding the Openbox configuration."
 msgstr ""
 "Openbox is geconfigureerd voor %d bureaubladen, maar de huidige sessie heeft "
-"%d.  Overnemen van de Openbox configuratie."
+"er %d.  De Openbox-instelling wordt genegeerd."
 
 #: openbox/screen.c:1180
 #, c-format
@@ -436,21 +438,21 @@ msgstr "Kan map \"%s\" niet aanmaken: %s"
 #: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
-msgstr "Kan de sessie niet opslaan naar \"%s\": %s"
+msgstr "Kan de sessie niet opslaan in \"%s\": %s"
 
 #: openbox/session.c:598
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
-msgstr "Fout tijdens het opslaan van de sessie naar \"%s\": %s"
+msgstr "Fout tijdens het opslaan van de sessie in \"%s\": %s"
 
 #: openbox/session.c:835
 msgid "Not connected to a session manager"
-msgstr "Niet met een sessie manager verbonden"
+msgstr "Niet met een sessiebeheerder verbonden"
 
 #: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s\n"
-msgstr "Starten %s\n"
+msgstr "Starten van %s\n"
 
 #: openbox/translate.c:59
 #, c-format
@@ -470,19 +472,13 @@ msgstr "Ongeldige toetsnaam \"%s\" in toetsenbinding"
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr "Aangevraagde toets \"%s\" bestaat niet op het scherm"
+msgstr "Gevraagde toets \"%s\" bestaat niet op het scherm"
 
 #: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
-msgstr "X Fout: %s"
+msgstr "X-fout: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
 msgstr "OK"
-
-#~ msgid "Failed to execute \"%s\": %s"
-#~ msgstr "Uitvoeren van \"%s\" mislukt: %s"
-
-#~ msgid "Invalid use of action \"%s\". Action will be ignored."
-#~ msgstr "Ongeldig gebruik van actie \"%s\". Actie wordt genegeerd."

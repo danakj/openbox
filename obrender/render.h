@@ -232,6 +232,8 @@ struct _RrImagePic {
     gint sum;
 };
 
+typedef void (*RrImageDestroyFunc)(RrImage *image);
+
 /*! An RrImage is a sort of meta-image.  It can contain multiple versions of
   an image at different sizes, which may or may not be completely different
   pictures */
@@ -250,6 +252,10 @@ struct _RrImage {
       RrImage. */
     RrImagePic **resized;
     gint n_resized;
+ 
+    /* This function (if not NULL) will be called just before destroying
+      RrImage. */
+    RrImageDestroyFunc destroy_func;
 };
 
 /* these are the same on all endian machines because it seems to be dependant

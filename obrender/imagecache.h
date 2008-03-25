@@ -46,6 +46,10 @@ struct _RrImageCache {
     gint max_resized_saved;
 
     GHashTable *table;
+
+    /* Used to find out if an image file has already been loaded.
+       Quick file_name -> RrImage lookup. */
+    GHashTable *file_name_table;
 };
 
 #endif

@@ -325,6 +325,12 @@ RrImage* RrImageNew(RrImageCache *cache)
     return self;
 }
 
+/*! Set function that will be called just before RrImage is destroyed. */
+void RrImageSetDestroyFunc(RrImage *image, RrImageDestroyFunc func)
+{
+    image->destroy_func = func;
+}
+
 void RrImageRef(RrImage *self)
 {
     ++self->ref;
@@ -339,6 +345,8 @@ void RrImageUnref(RrImage *self)
                 "Image 0x%lx", (gulong)self);
 #endif
 */
+        if (self->destroy_func)
+            self->destroy_func(self);
         while (self->n_original > 0)
             RemovePicture(self, &self->original, 0, &self->n_original);
         while (self->n_resized > 0)

@@ -197,6 +197,8 @@ extern guint    config_submenu_hide_delay;
 extern gboolean config_menu_client_list_icons;
 /*! Show manage desktops in client_list_menu */
 extern gboolean config_menu_manage_desktops;
+/*! Load & show icons in user-defined menus */
+extern gboolean config_menu_user_show_icons;
 /*! User-specified menu files */
 extern GSList *config_menu_files;
 /*! Per app settings */

@@ -157,6 +157,33 @@ else
   xcursor_found=no
 fi
 
+AC_ARG_ENABLE(imlib2,
+  AC_HELP_STRING(
+    [--disable-imlib2],
+    [disable use of Imlib2 image library for loading icons. [[default=enabled]]]
+  ),
+  [enable_imlib2=$enableeval],
+  [enable_imlib2=yes]
+)
+
+if test "$enable_imlib2" = yes; then
+PKG_CHECK_MODULES(IMLIB2, [imlib2],
+  [
+    AC_DEFINE(USE_IMLIB2, [1], [Use Imlib2 image library])
+    AC_SUBST(IMLIB2_CFLAGS)
+    AC_SUBST(IMLIB2_LIBS)
+    imlib2_found=yes
+  ],
+  [
+    imlib2_found=no
+  ]
+)
+else
+  imlib2_found=no
+fi
+
+AM_CONDITIONAL(USE_IMLIB2, [test $imlib2_found = yes])
+
 dnl Check for session management
 X11_SM
 
@@ -193,5 +220,6 @@ AC_MSG_RESULT([Compiling with these options:
                Startup Notification... $sn_found
                X Cursor Library... $xcursor_found
                Session Management... $SM
+               Imlib2 library... $imlib2_found
                ])
 AC_MSG_RESULT([configure complete, now type "make"])

@@ -36,6 +36,7 @@
 #include "gettext.h"
 #include "obt/xml.h"
 #include "obt/paths.h"
+#include "imageload.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
 
@@ -269,8 +270,20 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
 {
     ObMenuParseState *state = data;
     gchar *label;
+    #ifdef USE_IMLIB2
+    gchar *icon;
+    #endif
+    ObMenuEntry *e;
 
     if (state->parent) {
+        #ifdef USE_IMLIB2
+        /* Don't try to extract "icon" attribute if icons in user-defined
+	   menus are not enabled. */
+        if (!(config_menu_user_show_icons &&
+            obt_xml_attr_string(node, "icon", &icon)))
+               icon = NULL;
+        #endif
+
         if (obt_xml_attr_string(node, "label", &label)) {
             GSList *acts = NULL;
 
@@ -281,8 +294,19 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
                     acts = g_slist_append(acts, action);
                 node = obt_xml_find_node(node->next, "action");
             }
+            e = menu_add_normal(state->parent, -1, label, acts, TRUE);
+            
+            #ifdef USE_IMLIB2
+            if (icon) { /* Icon will be used. */
+                e->data.normal.icon = RrImageFetchFromFile(ob_rr_icons, icon);
+                if (e->data.normal.icon) {
+                    e->data.normal.icon_alpha = 0xff;
+                }
+                g_free(icon);
+            }
 
             menu_add_normal(state->parent, -1, label, acts, TRUE);
+            #endif
             g_free(label);
         }
     }

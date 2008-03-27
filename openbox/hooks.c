@@ -73,8 +73,8 @@ void hooks_queue(ObHook hook, struct _ObClient *client)
 
     g_assert(hook < OB_NUM_HOOKS && hook > OB_HOOK_INVALID);
 
-    ob_debug("Queing hook %s for client 0x%x", names[hook],
-             (client ? client->window : 0));
+    //ob_debug("Queing hook %s for client 0x%x", names[hook],
+    //         (client ? client->window : 0));
     q = &run_queue[queue_size++];
     q->hook = hook;
     q->client = client;
@@ -106,8 +106,8 @@ void hooks_run_queue(void)
     for (i = 0; i < queue_size; ++i) {
         const ObHookQueue *q = &run_queue[i];
 
-        ob_debug("Running hook %s for client 0x%x", names[q->hook],
-                 (q->client ? q->client->window : 0));
+        //ob_debug("Running hook %s for client 0x%x", names[q->hook],
+        //         (q->client ? q->client->window : 0));
         actions_run_acts(hooks[q->hook],
                          OB_USER_ACTION_HOOK,
                          0, -1, -1, 0,

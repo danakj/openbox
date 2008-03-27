@@ -529,7 +529,8 @@ CLEANFILES = \
 	data/xsession/openbox-kde-session \
 	data/xsession/openbox.desktop \
 	data/xsession/openbox-gnome.desktop \
-	data/xsession/openbox-kde.desktop
+	data/xsession/openbox-kde.desktop \
+	data/autostart.sh
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

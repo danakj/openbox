@@ -933,6 +933,19 @@ static gboolean client_restore_session_stacking(ObClient *self)
     return FALSE;
 }
 
+void client_reconfigure(ObClient *self, gboolean force)
+{
+    int x, y, w, h, lw, lh;
+
+    x = self->area.x;
+    y = self->area.y;
+    w = self->area.width;
+    h = self->area.height;
+    client_try_configure(self, &x, &y, &w, &h, &lw, &lh, FALSE);
+    client_find_onscreen(self, &x, &y, w, h, FALSE);
+    client_configure(self, x, y, w, h, FALSE, TRUE, force);
+}
+
 void client_move_onscreen(ObClient *self, gboolean rude)
 {
     gint x = self->area.x;

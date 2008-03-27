@@ -42,5 +42,4 @@ void tree_assimilate(KeyBindingTree *node);
 KeyBindingTree *tree_find(KeyBindingTree *search, gboolean *conflict);
 gboolean tree_chroot(KeyBindingTree *tree, GList *keylist);
 
-
 #endif

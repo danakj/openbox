@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6.1\n"
+"Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2008-02-17 23:29+0800\n"
+"POT-Creation-Date: 2008-03-05 18:10+0100\n"
+"PO-Revision-Date: 2008-03-06 01:01+0800\n"
 "Last-Translator: 洪任諭 <pcman.tw@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "是"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "執行"
 
 #: openbox/actions/execute.c:142
 #, c-format
@@ -42,37 +42,38 @@ msgstr "轉換路徑「%s」自 utf8 時失敗"
 #: openbox/actions/exit.c:52 openbox/actions/session.c:62
 #: openbox/client.c:3460
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr ""
+msgstr "離開"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "你確定要離開 Openbox？"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "離開 Openbox"
 
 #: openbox/actions/session.c:41
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"SessionLogout 動作無法使用，因為 Openbox 在編譯時沒有使用作業階段管理支援"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
 msgid "Log Out"
-msgstr ""
+msgstr "登出"
 
 #: openbox/actions/session.c:67
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "你確定要登出嗎？"
 
 #: openbox/client.c:2004
 msgid "Unnamed Window"
-msgstr ""
+msgstr "未命名視窗"
 
 #: openbox/client.c:2018 openbox/client.c:2050
 msgid "Killing..."
@@ -91,7 +92,7 @@ msgstr "視窗「%s」似乎已經停止回應。  你想送出 \"%s\" 訊息強
 
 #: openbox/client.c:3451
 msgid "End Process"
-msgstr ""
+msgstr "結束 Process"
 
 #: openbox/client.c:3455
 #, c-format
@@ -102,7 +103,7 @@ msgstr "視窗「%s」似乎已經停止回應。  你想從 X 伺服器將它�
 
 #: openbox/client.c:3457
 msgid "Disconnect"
-msgstr ""
+msgstr "斷線"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -267,10 +268,12 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"解析 Openbox 設定檔 XML 語法時發現一個或多個錯誤。 查看 stdout 以獲得更多資"
+"訊。 最後一個發現的錯誤在檔案 \"%s\" 第 %d 行。訊息：%s"
 
 #: openbox/openbox.c:382
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openbox 語法錯誤"
 
 #: openbox/openbox.c:382
 msgid "Close"
@@ -420,19 +423,19 @@ msgstr "桌面 %i"
 msgid "Unable to make directory \"%s\": %s"
 msgstr "無法製作目錄「%s」：%s"
 
-#: openbox/session.c:452
+#: openbox/session.c:467
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "無法儲存執行階段到「%s」：%s"
 
-#: openbox/session.c:584
+#: openbox/session.c:599
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "當儲存執行階段「%s」時發生錯誤：%s"
 
-#: openbox/session.c:821
+#: openbox/session.c:836
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "沒有連接到作業階段管理員"
 
 #: openbox/startupnotify.c:243
 #, c-format

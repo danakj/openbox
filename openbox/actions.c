@@ -58,7 +58,6 @@ struct _ObActionsAct {
 
 static GSList *registered = NULL;
 
-
 void actions_startup(gboolean reconfig)
 {
     if (reconfig) return;

@@ -96,7 +96,6 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
         list = client_list;
     }
 
-
     if (focus_cycle_target == NULL) {
         focus_cycle_iconic_windows = TRUE;
         focus_cycle_all_desktops = all_desktops;

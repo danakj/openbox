@@ -696,7 +696,6 @@ void menu_frame_render(ObMenuFrame *self)
         XSetWindowBorder(ob_display, e->window,
                          RrColorPixel(ob_rr_theme->menu_border_color));
 
-
         text_a = (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
                   !e->entry->data.normal.enabled ?
                   /* disabled */
@@ -1085,7 +1084,6 @@ void menu_frame_hide_all_client(ObClient *client)
         }
     }
 }
-
 
 ObMenuFrame* menu_frame_under(gint x, gint y)
 {

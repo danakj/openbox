@@ -590,7 +590,6 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                                                  sidebwidth) * 2,
                                   self->bwidth);
 
-
                 if (sidebwidth) {
                     XMoveResizeWindow(ob_display, self->lgripleft,
                                       0,
@@ -1137,15 +1136,37 @@ static gboolean is_button_present(ObFrame *self, const gchar *lc, gint dir) {
     return FALSE;
 }
 
+static void place_button(ObFrame *self, const char *lc, gint bwidth,
+                         gint left, gint i,
+                         gint *x, gint *button_on, gint *button_x)
+{
+  if (!(*button_on = is_button_present(self, lc, i)))
+    return;
+
+  self->label_width -= bwidth;
+  if (i > 0)
+    *button_x = *x;
+  *x += i * bwidth;
+  if (i < 0) {
+    if (self->label_x <= left || *x > self->label_x) {
+      *button_x = *x;
+    } else {
+      /* the button would have been drawn on top of another button */
+      *button_on = FALSE;
+      self->label_width += bwidth;
+    }
+  }
+}
+
 static void layout_title(ObFrame *self)
 {
     gchar *lc;
     gint i;
 
     const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
-    /* position of the left most button */
+    /* position of the leftmost button */
     const gint left = ob_rr_theme->paddingx + 1;
-    /* position of the right most button */
+    /* position of the rightmost button */
     const gint right = self->width;
 
     /* turn them all off */
@@ -1184,53 +1205,23 @@ static void layout_title(ObFrame *self)
                 break; /* break the for loop, do other side of label */
             } else if (*lc == 'N') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICON;
-                if ((self->icon_on = is_button_present(self, lc, i))) {
-                    /* icon is bigger than buttons */
-                    self->label_width -= bwidth + 2;
-                    if (i > 0) self->icon_x = x;
-                    x += i * (bwidth + 2);
-                    if (i < 0) self->icon_x = x;
-                }
+                /* icon is bigger than buttons */
+                place_button(self, lc, bwidth + 2, left, i, &x, &self->icon_on, &self->icon_x);
             } else if (*lc == 'D') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ALLDESKTOPS;
-                if ((self->desk_on = is_button_present(self, lc, i))) {
-                    self->label_width -= bwidth;
-                    if (i > 0) self->desk_x = x;
-                    x += i * bwidth;
-                    if (i < 0) self->desk_x = x;
-                }
+                place_button(self, lc, bwidth, left, i, &x, &self->desk_on, &self->desk_x);
             } else if (*lc == 'S') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_SHADE;
-                if ((self->shade_on = is_button_present(self, lc, i))) {
-                    self->label_width -= bwidth;
-                    if (i > 0) self->shade_x = x;
-                    x += i * bwidth;
-                    if (i < 0) self->shade_x = x;
-                }
+                place_button(self, lc, bwidth, left, i, &x, &self->shade_on, &self->shade_x);
             } else if (*lc == 'I') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICONIFY;
-                if ((self->iconify_on = is_button_present(self, lc, i))) {
-                    self->label_width -= bwidth;
-                    if (i > 0) self->iconify_x = x;
-                    x += i * bwidth;
-                    if (i < 0) self->iconify_x = x;
-                }
+                place_button(self, lc, bwidth, left, i, &x, &self->iconify_on, &self->iconify_x);
             } else if (*lc == 'M') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_MAXIMIZE;
-                if ((self->max_on = is_button_present(self, lc, i))) {
-                    self->label_width -= bwidth;
-                    if (i > 0) self->max_x = x;
-                    x += i * bwidth;
-                    if (i < 0) self->max_x = x;
-                }
+                place_button(self, lc, bwidth, left, i, &x, &self->max_on, &self->max_x);
             } else if (*lc == 'C') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
-                if ((self->close_on = is_button_present(self, lc, i))) {
-                    self->label_width -= bwidth;
-                    if (i > 0) self->close_x = x;
-                    x += i * bwidth;
-                    if (i < 0) self->close_x = x;
-                }
+                place_button(self, lc, bwidth, left, i, &x, &self->close_on, &self->close_x);
             } else
                 continue; /* don't set firstcon */
             firstcon = NULL;
@@ -1280,8 +1271,7 @@ static void layout_title(ObFrame *self)
     } else
         XUnmapWindow(ob_display, self->close);
 
-    if (self->label_on) {
-        self->label_width = MAX(1, self->label_width); /* no lower than 1 */
+    if (self->label_on && self->label_width > 0) {
         XMapWindow(ob_display, self->label);
         XMoveWindow(ob_display, self->label, self->label_x,
                     ob_rr_theme->paddingy);

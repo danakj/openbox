@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.6.1\n"
+"Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2008-02-28 17:26-0500\n"
+"POT-Creation-Date: 2008-03-04 22:06+0100\n"
+"PO-Revision-Date: 2008-03-04 16:07-0500\n"
 "Last-Translator: Og Maciel <ogmaciel@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "MIME-Version: 1.0\n"
@@ -32,7 +32,7 @@ msgstr "Sim"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "Executar"
 
 #: openbox/actions/execute.c:142
 #, c-format
@@ -54,21 +54,23 @@ msgstr "Você tem certeza que deseja sair do Openbox?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Sair do Openbox"
 
 #: openbox/actions/session.c:41
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"A ação SessionLogout não está disponível já que o Openbox foi compilado sem "
+"suporte de gerenciamento de sessões"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68
 msgid "Log Out"
-msgstr ""
+msgstr "Sair"
 
 #: openbox/actions/session.c:67
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Você tem certeza que deseja sair?"
 
 #: openbox/client.c:2004
 msgid "Unnamed Window"
@@ -273,10 +275,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Um ou mais erros de sintaxe de XML foram encontrados ao analisar os arquivos "
+"de configuração do Openbox. Veja a saída padrão para mais informação. O "
+"último erro relatado foi no arquivo \"%s\" linha %d, com a mensagem: %s"
 
 #: openbox/openbox.c:382
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Erro de Sintaxe do Openbox"
 
 #: openbox/openbox.c:382
 msgid "Close"
@@ -434,19 +439,19 @@ msgstr "área de trabalho %i"
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Não foi possível criar o diretório \"%s\": %s"
 
-#: openbox/session.c:452
+#: openbox/session.c:467
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Não foi possível salvar a sessão em \"%s\": %s"
 
-#: openbox/session.c:584
+#: openbox/session.c:599
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Erro enquanto salvando a sessão em \"%s\": %s"
 
-#: openbox/session.c:821
+#: openbox/session.c:836
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "Não está conectado à um gerente de sessões"
 
 #: openbox/startupnotify.c:243
 #, c-format

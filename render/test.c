@@ -90,7 +90,6 @@ gint main()
     exit (0);
 #endif
 
-
     RrPaint(look, win, w, h);
     done = 0;
     while (!done) {

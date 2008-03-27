@@ -294,7 +294,6 @@ static void prompt_layout(ObPrompt *self)
         self->button[i].width = MAX(self->button[i].width, bw);
         self->button[i].height = MAX(self->button[i].height, bh);
 
-
         self->button[i].width += BUTTON_HMARGIN * 2;
         self->button[i].height += BUTTON_VMARGIN * 2;
 

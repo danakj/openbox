@@ -1,6 +1,8 @@
-3.4.7-pre2:
-  * Updated Czech, Chinese, Dutch, Swedish, Finnish, Spanish, Brasilian
-    Portuguese, Japanese and Portuguese translations
+3.4.7-pre3:
+  * Fully updated Czech, Simplified Chinese, Traditional Chinese, German,
+    French, Hungarian, Norwegian, Vietnamese, Dutch, Swedish, Finnish,
+    Brazilian Portuguese, Japanese and Portuguese translations
+  * Partially updated Spanish translation
   * Add an example of the "force" option for the per-app placement options to
     the default rc.xml file
   * Add a new xdg-autostart script.  This will eventually end up in the PyXDG
@@ -67,6 +69,8 @@
   * Show an information dialog when an error occurs for Openbox, such as when
     the Execute action fails or when XML syntax errors are present in the
     configuration files
+  * When making a window very narrow, don't draw buttons to the right of the title
+    on top of the ones on its left.
 
 3.4.6.1:
   * Updated Clearlooks theme

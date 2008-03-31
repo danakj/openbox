@@ -108,10 +108,8 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
                        c->frame->area.y - ob_rr_theme->fbwidth);
     else if (config_resize_popup_pos == OB_RESIZE_POS_CENTER)
         popup_position(popup, CenterGravity,
-                       c->frame->area.x + c->frame->size.left +
-                       c->area.width / 2,
-                       c->frame->area.y + c->frame->size.top +
-                       c->area.height / 2);
+                       c->frame->area.x + c->frame->area.width / 2,
+                       c->frame->area.y + c->frame->area.height / 2);
     else /* Fixed */ {
         Rect *area = screen_physical_area_active();
         gint gravity, x, y;

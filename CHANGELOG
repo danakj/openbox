@@ -1,4 +1,4 @@
-3.4.7-pre3:
+3.4.7:
   * Fully updated Czech, Simplified Chinese, Traditional Chinese, German,
     French, Hungarian, Norwegian, Vietnamese, Dutch, Swedish, Finnish,
     Brazilian Portuguese, Japanese and Portuguese translations
@@ -39,8 +39,6 @@
     of a new icon cache, so that Openbox only needs to keep 1 copy of an icon
     when 100 different windows share it
   * Make Openbox menus have the "menu type" hint for compositors to see and use
-  * Fix actions so that key presses will not be lost between running the
-    ShowMenu action and the menu appearing
   * Fix the MoveResizeTo action for negative coords (opposite edges)
   * Fix key bindings getting lost if multiple bindings at the same level could
     not be translated (Fixes VMWare causing Openbox keybindings to stop

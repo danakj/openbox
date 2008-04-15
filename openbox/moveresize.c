@@ -63,6 +63,8 @@ static gboolean waiting_for_sync;
 
 static ObPopup *popup = NULL;
 
+static void do_move(gboolean keyboard, gint keydist);
+static void do_resize(void);
 static void do_edge_warp(gint x, gint y);
 static void cancel_edge_warp();
 #ifdef SYNC
@@ -108,10 +110,8 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
                        c->frame->area.y - ob_rr_theme->fbwidth);
     else if (config_resize_popup_pos == OB_RESIZE_POS_CENTER)
         popup_position(popup, CenterGravity,
-                       c->frame->area.x + c->frame->size.left +
-                       c->area.width / 2,
-                       c->frame->area.y + c->frame->size.top +
-                       c->area.height / 2);
+                       c->frame->area.x + c->frame->area.width / 2,
+                       c->frame->area.y + c->frame->area.height / 2);
     else /* Fixed */ {
         Rect *area = screen_physical_area_active();
         gint gravity, x, y;
@@ -359,53 +359,52 @@ static void do_resize(void)
     h = cur_h;
     client_try_configure(moveresize_client, &x, &y, &w, &h,
                          &lw, &lh, TRUE);
-    if (w == moveresize_client->area.width &&
-        h == moveresize_client->area.height)
+    if (!w == moveresize_client->area.width &&
+         h == moveresize_client->area.height)
     {
-        return;
-    }
 
 #ifdef SYNC
-    if (config_resize_redraw && extensions_sync &&
-        moveresize_client->sync_request && moveresize_client->sync_counter &&
-        !moveresize_client->not_responding)
-    {
-        XEvent ce;
-        XSyncValue val;
+        if (config_resize_redraw && extensions_sync &&
+            moveresize_client->sync_request &&
+            moveresize_client->sync_counter &&
+            !moveresize_client->not_responding)
+        {
+            XEvent ce;
+            XSyncValue val;
 
-        /* are we already waiting for the sync counter to catch up? */
-        if (waiting_for_sync)
-            return;
+            /* are we already waiting for the sync counter to catch up? */
+            if (waiting_for_sync)
+                return;
 
-        /* increment the value we're waiting for */
-        ++moveresize_client->sync_counter_value;
-        XSyncIntToValue(&val, moveresize_client->sync_counter_value);
+            /* increment the value we're waiting for */
+            ++moveresize_client->sync_counter_value;
+            XSyncIntToValue(&val, moveresize_client->sync_counter_value);
 
-        /* tell the client what we're waiting for */
-        ce.xclient.type = ClientMessage;
-        ce.xclient.message_type = prop_atoms.wm_protocols;
-        ce.xclient.display = ob_display;
-        ce.xclient.window = moveresize_client->window;
-        ce.xclient.format = 32;
-        ce.xclient.data.l[0] = prop_atoms.net_wm_sync_request;
-        ce.xclient.data.l[1] = event_curtime;
-        ce.xclient.data.l[2] = XSyncValueLow32(val);
-        ce.xclient.data.l[3] = XSyncValueHigh32(val);
-        ce.xclient.data.l[4] = 0l;
-        XSendEvent(ob_display, moveresize_client->window, FALSE,
-                   NoEventMask, &ce);
+            /* tell the client what we're waiting for */
+            ce.xclient.type = ClientMessage;
+            ce.xclient.message_type = prop_atoms.wm_protocols;
+            ce.xclient.display = ob_display;
+            ce.xclient.window = moveresize_client->window;
+            ce.xclient.format = 32;
+            ce.xclient.data.l[0] = prop_atoms.net_wm_sync_request;
+            ce.xclient.data.l[1] = event_curtime;
+            ce.xclient.data.l[2] = XSyncValueLow32(val);
+            ce.xclient.data.l[3] = XSyncValueHigh32(val);
+            ce.xclient.data.l[4] = 0l;
+            XSendEvent(ob_display, moveresize_client->window, FALSE,
+                       NoEventMask, &ce);
 
-        waiting_for_sync = TRUE;
+            waiting_for_sync = TRUE;
 
-        ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
-        ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
-                                 sync_timeout_func,
-                                 NULL, NULL, NULL);
-    }
+            ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
+            ob_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
+                                     sync_timeout_func, NULL, NULL, NULL);
+        }
 #endif
 
-    client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
-                     TRUE, FALSE, FALSE);
+        client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
+                TRUE, FALSE, FALSE);
+    }
 
     /* this would be better with a fixed width font ... XXX can do it better
        if there are 2 text boxes */
@@ -413,9 +412,7 @@ static void do_resize(void)
             (config_resize_popup_show == 1 && /* == "Nonpixel" */
              moveresize_client->size_inc.width > 1 &&
              moveresize_client->size_inc.height > 1))
-        popup_coords(moveresize_client, "%d x %d",
-                     moveresize_client->logical_size.width,
-                     moveresize_client->logical_size.height);
+        popup_coords(moveresize_client, "%d x %d", lw, lh);
 }
 
 #ifdef SYNC

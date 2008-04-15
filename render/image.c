@@ -124,6 +124,12 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
     gulong ratioX, ratioY;
     gulong aspectW, aspectH;
 
+    /* XXX should these variables be ensured to not be zero in the callers? */
+    srcW = srcW ? srcW : 1;
+    srcH = srcH ? srcH : 1;
+    dstW = dstW ? dstW : 1;
+    dstH = dstH ? dstH : 1;
+
     /* keep the aspect ratio */
     aspectW = dstW;
     aspectH = (gint)(dstW * ((gdouble)srcH / srcW));
@@ -131,11 +137,11 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
         aspectH = dstH;
         aspectW = (gint)(dstH * ((gdouble)srcW / srcH));
     }
-    dstW = aspectW;
-    dstH = aspectH;
+    dstW = aspectW ? aspectW : 1;
+    dstH = aspectH ? aspectH : 1;
 
     if (srcW == dstW && srcH == dstH)
-        return NULL; /* no scaling needed ! */
+        return NULL; /* no scaling needed! */
 
     dststart = dst = g_new(RrPixel32, dstW * dstH);
 

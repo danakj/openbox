@@ -359,8 +359,8 @@ static void do_resize(void)
     h = cur_h;
     client_try_configure(moveresize_client, &x, &y, &w, &h,
                          &lw, &lh, TRUE);
-    if (!w == moveresize_client->area.width &&
-         h == moveresize_client->area.height)
+    if (!(w == moveresize_client->area.width &&
+          h == moveresize_client->area.height))
     {
 
 #ifdef SYNC

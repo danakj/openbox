@@ -1,3 +1,7 @@
+3.4.7.1:
+  * Not to be outdone by the cairo team, I introduced a bug in the last release
+    which made resizing not give any feedback. This is now fixed.
+
 3.4.7:
   * Fully updated Czech, Simplified Chinese, Traditional Chinese, German,
     French, Hungarian, Norwegian, Vietnamese, Dutch, Swedish, Finnish,

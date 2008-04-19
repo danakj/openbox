@@ -46,7 +46,6 @@ nodist_bin_SCRIPTS = \
 
 render_rendertest_CPPFLAGS = \
 	$(PANGO_CFLAGS) \
-	$(XFT_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
 render_rendertest_LDADD = \
@@ -54,7 +53,6 @@ render_rendertest_LDADD = \
 	render/libobrender.la \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
-	$(XFT_LIBS) \
 	$(XML_LIBS) \
 	$(X_LIBS)
 render_rendertest_SOURCES = render/test.c
@@ -64,7 +62,6 @@ render_libobrender_la_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
-	$(XFT_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 render_libobrender_la_LDFLAGS = \
@@ -73,7 +70,6 @@ render_libobrender_la_LIBADD = \
 	obt/libobt.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
-	$(XFT_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 render_libobrender_la_SOURCES = \

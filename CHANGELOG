@@ -1,3 +1,7 @@
+3.4.7.2:
+  * The system I used to generate the dist tarball didn't have the
+    docbook-to-man command so the manpages were empty.
+
 3.4.7.1:
   * Not to be outdone by the cairo team, I introduced a bug in the last release
     which made resizing not give any feedback. This is now fixed.

@@ -823,25 +823,25 @@ static void parse_dock(xmlNodePtr node, gpointer d)
 static void parse_menu(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
-    for (node = node->children; node; node = node->next) {
-        if (!xmlStrcasecmp(node->name, (const xmlChar*) "file")) {
-            gchar *c;
+    node = node->children;
 
-            c = obt_parse_node_string(node);
+    if ((n = obt_parse_find_node(node, "hideDelay")))
+        config_menu_hide_delay = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "middle")))
+        config_menu_middle = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "submenuShowDelay")))
+        config_submenu_show_delay = obt_parse_node_int(n);
+    if ((n = obt_parse_find_node(node, "applicationIcons")))
+        config_menu_client_list_icons = obt_parse_node_bool(n);
+    if ((n = obt_parse_find_node(node, "manageDesktops")))
+        config_menu_manage_desktops = obt_parse_node_bool(n);
+
+    while ((node = obt_parse_find_node(node, "file"))) {
+            gchar *c = obt_parse_node_string(node);
             config_menu_files = g_slist_append(config_menu_files,
                                                obt_paths_expand_tilde(c));
             g_free(c);
-        }
-        if ((n = obt_parse_find_node(node, "hideDelay")))
-            config_menu_hide_delay = obt_parse_node_int(n);
-        if ((n = obt_parse_find_node(node, "middle")))
-            config_menu_middle = obt_parse_node_bool(n);
-        if ((n = obt_parse_find_node(node, "submenuShowDelay")))
-            config_submenu_show_delay = obt_parse_node_int(n);
-        if ((n = obt_parse_find_node(node, "applicationIcons")))
-            config_menu_client_list_icons = obt_parse_node_bool(n);
-        if ((n = obt_parse_find_node(node, "manageDesktops")))
-            config_menu_manage_desktops = obt_parse_node_bool(n);
+            node = node->next;
     }
 }
 

@@ -61,7 +61,7 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
-"Действие 'Выход из сессии' недоступно так как Openbox был собран без "
+"Действие 'SessionLogout' недоступно так как Openbox был собран без "
 "поддержки управления сессиями"
 
 #: openbox/actions/session.c:63 openbox/actions/session.c:68

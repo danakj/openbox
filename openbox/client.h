@@ -396,13 +396,10 @@ void client_convert_gravity_resize(ObClient *self, gint gravity,
   client_configure(self, self->area.x, self->area.y, w, h, TRUE, TRUE, FALSE)
 #define client_move_resize(self, x, y, w, h) \
   client_configure(self, x, y, w, h, TRUE, TRUE, FALSE)
-
-/*! Make a client reconfigure so that it will honour its current max/min sizes
-  and other bounds.
-  @param force If TRUE, then a ConfigureNotify event will be sent to the client
-               even if nothing has changed.
-*/
-void client_reconfigure(ObClient *self, gboolean force);
+#define client_reconfigure(self, force) \
+  client_configure(self, ((ObClient*)self)->area.x, ((ObClient*)self)->area.y, \
+                   ((ObClient*)self)->area.width, \
+                   ((ObClient*)self)->area.height, FALSE, TRUE, force)
 
 /*! Figure out where a window will end up and what size it will be if you
   told it to move/resize to these coordinates.

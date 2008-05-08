@@ -26,6 +26,12 @@
 #include "imageload.h"
 #include <Imlib2.h>
 
+#ifndef USE_IMLIB2
+RrImage* RrImageFetchFromFile(RrImageCache *cache, const gchar *name)
+{
+    return NULL;
+}
+#else
 
 static void CreateFileNameTable(RrImageCache *self)
 {
@@ -133,3 +139,5 @@ RrImage* RrImageFetchFromFile(RrImageCache *cache, const gchar *name)
 
     return rr_image;
 }
+
+#endif

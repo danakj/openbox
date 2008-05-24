@@ -54,6 +54,8 @@ msgstr "Openbox'tan çıkmak istediğinize emin misiniz?"
 msgid "Exit Openbox"
 msgstr "Openbox'tan Çık"
 
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
 #: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "

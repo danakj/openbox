@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-13 13:29+0100\n"
+"POT-Creation-Date: 2008-05-24 16:33+0200\n"
 "PO-Revision-Date: 2008-03-13 13:37+0100\n"
 "Last-Translator: Michael Kjelbergvik Thung <postlogic@gmail.com>\n"
 "Language-Team: None\n"
@@ -37,7 +37,7 @@ msgstr "Utfør"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Feil ved konvertering av \"%s\" fra utf8 "
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
 msgstr "Avbryt"
@@ -54,7 +54,9 @@ msgstr "Er du sikker på at du vil avslutte Openbox?"
 msgid "Exit Openbox"
 msgstr "Avslutt Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
@@ -62,11 +64,11 @@ msgstr ""
 "SessionLogout er ikke tilgjengelig fordi Openbox ble kompilert uten støtte "
 "for sesjonsbehandling"
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
 msgstr "Logg Ut"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
 msgstr "Er du sikker på at du vil logge ut?"
 

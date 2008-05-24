@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-05 18:10+0100\n"
+"POT-Creation-Date: 2008-05-24 16:33+0200\n"
 "PO-Revision-Date: 2008-03-06 01:01+0800\n"
 "Last-Translator: 洪任諭 <pcman.tw@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/actions.c:150
+#: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "要求的動作「%s」無效。無此類動作存在。"
@@ -39,8 +39,8 @@ msgstr "執行"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "轉換路徑「%s」自 utf8 時失敗"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
-#: openbox/client.c:3460
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
+#: openbox/client.c:3458
 msgid "Cancel"
 msgstr "取消"
 
@@ -56,52 +56,54 @@ msgstr "你確定要離開 Openbox？"
 msgid "Exit Openbox"
 msgstr "離開 Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
 "SessionLogout 動作無法使用，因為 Openbox 在編譯時沒有使用作業階段管理支援"
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
 msgstr "登出"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
 msgstr "你確定要登出嗎？"
 
-#: openbox/client.c:2004
+#: openbox/client.c:2005
 msgid "Unnamed Window"
 msgstr "未命名視窗"
 
-#: openbox/client.c:2018 openbox/client.c:2050
+#: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
 msgstr "正在中止..."
 
-#: openbox/client.c:2020 openbox/client.c:2052
+#: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
 msgstr "沒有回應"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3447
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr "視窗「%s」似乎已經停止回應。  你想送出 \"%s\" 訊息強制結束程式嗎？"
 
-#: openbox/client.c:3451
+#: openbox/client.c:3449
 msgid "End Process"
 msgstr "結束 Process"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3453
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "視窗「%s」似乎已經停止回應。  你想從 X 伺服器將它斷線嗎？"
 
-#: openbox/client.c:3457
+#: openbox/client.c:3455
 msgid "Disconnect"
 msgstr "斷線"
 
@@ -198,27 +200,27 @@ msgstr "在配置檔中指定的按鈕「%s」無效"
 msgid "Conflict with key binding in config file"
 msgstr "與配置檔中的按鍵組合衝突"
 
-#: openbox/menu.c:103 openbox/menu.c:111
+#: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
 msgstr "無法找到有效的選單檔案「%s」"
 
-#: openbox/menu.c:171
+#: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
 msgstr "執行命令於管線選單「%s」時失敗：%s"
 
-#: openbox/menu.c:185
+#: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
 msgstr "從管線選單「%s」的輸出無效"
 
-#: openbox/menu.c:198
+#: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "試圖存取選單「%s」但是它不存在"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
 msgstr "更多…"
 
@@ -232,36 +234,36 @@ msgstr "與滑鼠組合的按鈕「%s」無效"
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "與滑鼠組合的上下文「%s」無效"
 
-#: openbox/openbox.c:134
+#: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "無法變更到主目錄「%s」：%s"
 
-#: openbox/openbox.c:154
+#: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "開啟依 DISPLAY 環境變數所指的顯示時失敗。"
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
 msgstr "初始化 obrender 函式庫時失敗。"
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:194
 msgid "X server does not support locale."
 msgstr "X 伺服器不支援語區。"
 
-#: openbox/openbox.c:198
+#: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
 msgstr "無法設定用於 X 伺服器的語區修飾項。"
 
-#: openbox/openbox.c:266
+#: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "無法找到有效的配置檔案，而使用某些簡單的預設值"
 
-#: openbox/openbox.c:300
+#: openbox/openbox.c:297
 msgid "Unable to load a theme."
 msgstr "無法載入佈景主題。"
 
-#: openbox/openbox.c:380
+#: openbox/openbox.c:377
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -271,28 +273,28 @@ msgstr ""
 "解析 Openbox 設定檔 XML 語法時發現一個或多個錯誤。 查看 stdout 以獲得更多資"
 "訊。 最後一個發現的錯誤在檔案 \"%s\" 第 %d 行。訊息：%s"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
 msgstr "Openbox 語法錯誤"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Close"
 msgstr "關閉"
 
-#: openbox/openbox.c:451
+#: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "重新啟動以執行新的可執行檔「%s」時失敗：%s"
 
-#: openbox/openbox.c:521 openbox/openbox.c:523
+#: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
 msgstr "著作權 (c)"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
 msgstr "語法：openbox [選項]\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:530
 msgid ""
 "\n"
 "Options:\n"
@@ -300,30 +302,30 @@ msgstr ""
 "\n"
 "選項：\n"
 
-#: openbox/openbox.c:534
+#: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              顯示此說明然後離開\n"
 
-#: openbox/openbox.c:535
+#: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           顯示版本然後離開\n"
 
-#: openbox/openbox.c:536
+#: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           替換目前執行的視窗管理員\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:540
+#: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file <檔案>  指定要使用的設定檔路徑\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        停用與執行階段管理程式的連結\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:539
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -331,19 +333,19 @@ msgstr ""
 "\n"
 "傳遞訊息到執行中的 Openbox 實體：\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       重新載入 Openbox 配置\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           重新啟動 Openbox\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              結束 Openbox\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:543
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -351,23 +353,23 @@ msgstr ""
 "\n"
 "偵錯選項：\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              在同步模式中運行\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             顯示偵錯輸出\n"
 
-#: openbox/openbox.c:549
+#: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       顯示焦點處理的偵錯輸出\n"
 
-#: openbox/openbox.c:550
+#: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    分割顯示以進入假造的 xinerama 螢幕\n"
 
-#: openbox/openbox.c:551
+#: openbox/openbox.c:548
 #, c-format
 msgid ""
 "\n"
@@ -376,11 +378,11 @@ msgstr ""
 "\n"
 "請向 %s 報告錯誤\n"
 
-#: openbox/openbox.c:620
+#: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
 msgstr "--config-file 需要一個參數\n"
 
-#: openbox/openbox.c:663
+#: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "無效的命令列引數「%s」\n"
@@ -423,17 +425,17 @@ msgstr "桌面 %i"
 msgid "Unable to make directory \"%s\": %s"
 msgstr "無法製作目錄「%s」：%s"
 
-#: openbox/session.c:467
+#: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "無法儲存執行階段到「%s」：%s"
 
-#: openbox/session.c:599
+#: openbox/session.c:598
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "當儲存執行階段「%s」時發生錯誤：%s"
 
-#: openbox/session.c:836
+#: openbox/session.c:835
 msgid "Not connected to a session manager"
 msgstr "沒有連接到作業階段管理員"
 

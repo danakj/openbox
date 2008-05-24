@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-05-02 10:24+0200\n"
+"POT-Creation-Date: 2008-05-24 16:33+0200\n"
 "PO-Revision-Date: 2008-05-04 21:16+0200\n"
 "Last-Translator: Vytautas <vytautas1987@yahoo.com>\n"
 "Language-Team: Lithuanian <lt@li.ourg>\n"
@@ -37,7 +37,7 @@ msgstr "Vygdyti"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nepavyko išversti \"%s\" iš utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
 msgstr "Atšaukti"
@@ -54,7 +54,9 @@ msgstr "Ar tikrai norite išjungti Openbox?"
 msgid "Exit Openbox"
 msgstr "Išjungti Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
@@ -62,11 +64,11 @@ msgstr ""
 "SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
 "valdymo palaikymo"
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
 msgstr "Išsiregistruoti"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
 msgstr "Ar tikrai norite išsiregistruoti?"
 

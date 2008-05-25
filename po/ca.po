@@ -1,14 +1,14 @@
 # Missatges en català per a openbox.
 # Copyright (C) 2007 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# David Majà Martínez <davidmaja@gmail.com>, 2007.
+# David Majà Martínez <davidmaja@gmail.com>, 2007, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.2\n"
+"Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-05-24 16:33+0200\n"
-"PO-Revision-Date: 2007-05-28 15:54+0200\n"
+"PO-Revision-Date: 2008-05-25 19:23+0200\n"
 "Last-Translator: David Majà Martínez <davidmaja@gmail.com>\n"
 "Language-Team: catalan\n"
 "MIME-Version: 1.0\n"
@@ -22,15 +22,15 @@ msgstr "L'acció sollicitada \"%s\" no és vàlida. Aquesta acció no existeix."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "Executa"
 
 #: openbox/actions/execute.c:142
 #, c-format
@@ -40,19 +40,19 @@ msgstr "No s'ha pogut convertir el camí \"%s\" des de utf8"
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel·la"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr ""
+msgstr "Surt"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Esteu segur de voler sortir de Openbox?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Surt de Openbox"
 
 #. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
 #. name of the action you write in rc.xml
@@ -61,26 +61,28 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"L'acció SessionLogout no està disponible ja que el Openbox s'ha compilat "
+"sense suport per a la gestió de sessions"
 
 #: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
-msgstr ""
+msgstr "Surt"
 
 #: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Esteu segur de voler sortir?"
 
 #: openbox/client.c:2005
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Finestra sense nom"
 
 #: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
-msgstr ""
+msgstr "S'està finalitzant..."
 
 #: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
-msgstr ""
+msgstr "No està responent"
 
 #: openbox/client.c:3447
 #, c-format
@@ -88,10 +90,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Sembla que la finestra \"%s\" no està responent. Voleu forçar-la a "
+"finalitzar enviant el senyal %s?"
 
 #: openbox/client.c:3449
 msgid "End Process"
-msgstr ""
+msgstr "Finalitza el procés"
 
 #: openbox/client.c:3453
 #, c-format
@@ -99,10 +103,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
+"Sembla que la finestra \"%s\" no està responent.  Voleu desconnectar-la del "
+"servidor d'X?"
 
 #: openbox/client.c:3455
 msgid "Disconnect"
-msgstr ""
+msgstr "Desconnecta"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -110,15 +116,15 @@ msgstr "Vés aquí..."
 
 #: openbox/client_list_combined_menu.c:94
 msgid "Manage desktops"
-msgstr ""
+msgstr "Gestiona els escriptoris"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
-msgstr ""
+msgstr "_Afegeix un nou escriptori"
 
 #: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
 msgid "_Remove last desktop"
-msgstr ""
+msgstr "_Suprimeix l'últim escriptori"
 
 #: openbox/client_list_combined_menu.c:149
 msgid "Windows"
@@ -270,10 +276,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"S'han trobat un o mes errors de sintaxi XML en analitzar el fitxer de "
+"configuració de Openbox. Per a més informació visualitza el stdout. L'últim "
+"error trobat estava al fitxer \"%s\" línia %d, amb el missatge: %s"
 
 #: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Error de sintaxi de Openbox"
 
 #: openbox/openbox.c:379
 msgid "Close"
@@ -322,10 +331,13 @@ msgstr ""
 #: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
+"  --config-file FITXER\n"
+"                      Especifica el camí del fitxer de configuració a "
+"utilitzar\n"
 
 #: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Inhabilita la connexió amb gestor de sessió\n"
+msgstr "  --sm-disable        Inhabilita la connexió amb el gestor de sessió\n"
 
 #: openbox/openbox.c:539
 msgid ""
@@ -346,7 +358,7 @@ msgstr "  --restart           Torna a iniciar Openbox\n"
 
 #: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Surt de Openbox\n"
 
 #: openbox/openbox.c:543
 msgid ""
@@ -387,7 +399,7 @@ msgstr ""
 
 #: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file necessita un argument\n"
 
 #: openbox/openbox.c:660
 #, c-format
@@ -420,6 +432,8 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"El Openbox està configurat per a %d escriptoris, però la sessió actual en te "
+"%d.  S'està modificant la configuració del Openbox."
 
 #: openbox/screen.c:1180
 #, c-format
@@ -443,7 +457,7 @@ msgstr "S'ha produït un error mentre es desava la sessió a \"%s\": %s"
 
 #: openbox/session.c:835
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "No esteu connectats al gestor de sessions"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -478,7 +492,7 @@ msgstr "Error d'X: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr ""
+msgstr "D'acord"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "No s'ha pogut executar \"%s\": %s"

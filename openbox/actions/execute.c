@@ -144,7 +144,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (data->client) {
         gchar *c, *before, *expand;
 
-        /* replace occurances of $pid and $wid */
+        /* replace occurrences of $pid and $wid */
 
         expand = NULL;
         before = cmd;
@@ -168,8 +168,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
                 before = c + 4; /* 4 = strlen("$pid") */
             }
-
-            if ((c[1] == 'w' || c[1] == 'W') &&
+            else if ((c[1] == 'w' || c[1] == 'W') &&
                 (c[2] == 'i' || c[2] == 'I') &&
                 (c[3] == 'd' || c[3] == 'D') &&
                 !g_ascii_isalnum(c[4]))
@@ -187,6 +186,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
                 before = c + 4; /* 4 = strlen("$wid") */
             }
+            else
+                before = c + 1; /* no infinite loops plz */
         }
 
         if (expand) {

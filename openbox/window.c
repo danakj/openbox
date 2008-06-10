@@ -162,7 +162,7 @@ void window_manage(Window win)
         XCheckTypedWindowEvent(obt_display, win, UnmapNotify, &e))
     {
         XPutBackEvent(obt_display, &e);
-        ob_debug("Trying to manage unmapped window. Aborting that.\n");
+        ob_debug("Trying to manage unmapped window. Aborting that.");
         no_manage = TRUE;
     }
 
@@ -187,7 +187,7 @@ void window_manage(Window win)
 
     if (!no_manage) {
         if (attrib.override_redirect) {
-            ob_debug("not managing override redirect window 0x%x\n", win);
+            ob_debug("not managing override redirect window 0x%x", win);
             grab_server(FALSE);
         }
         else if (is_dockapp) {
@@ -200,7 +200,7 @@ void window_manage(Window win)
     }
     else {
         grab_server(FALSE);
-        ob_debug("FAILED to manage window 0x%x\n", win);
+        ob_debug("FAILED to manage window 0x%x", win);
     }
 }
 

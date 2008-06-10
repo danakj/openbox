@@ -413,7 +413,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
             (save_type == SmSaveLocal ? "SmSaveLocal" :
              (save_type == SmSaveGlobal ? "SmSaveGlobal" :
               (save_type == SmSaveBoth ? "SmSaveBoth" : "INVALID!!")));
-        ob_debug_type(OB_DEBUG_SM, "Session save requested, type %s\n", sname);
+        ob_debug_type(OB_DEBUG_SM, "Session save requested, type %s", sname);
     }
 #endif
 

@@ -605,7 +605,7 @@ static void parse_args(gint *argc, gchar **argv)
                    what we want */
                 config_file = argv[i+1];
                 ++i; /* skip the argument */
-                ob_debug("--config-file %s\n", config_file);
+                ob_debug("--config-file %s", config_file);
             }
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {

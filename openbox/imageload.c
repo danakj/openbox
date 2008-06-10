@@ -65,12 +65,12 @@ static void RrImageDestroyNotify(RrImage *image)
 {
     gchar *file_name = GetFileName(image);
     g_assert(file_name != NULL);
-    ob_debug("Image \"%s\" no longer needed\n", file_name);
+    ob_debug("Image \"%s\" no longer needed", file_name);
     g_hash_table_remove(image->cache->file_name_table, file_name);
     g_free(file_name);
 
     if (g_hash_table_size(image->cache->file_name_table) == 0) {
-        ob_debug("No RrImage in file_name_table, destroying\n");
+        ob_debug("No RrImage in file_name_table, destroying");
         DestroyFileNameTable(image->cache);
     }
 }
@@ -100,7 +100,7 @@ RrImage* RrImageFetchFromFile(RrImageCache *cache, const gchar *name)
     /* Find out if that image has already been loaded to this cache. */
     rr_image = g_hash_table_lookup(cache->file_name_table, name);
     if (rr_image && rr_image->cache == cache) {
-        ob_debug("\"%s\" already loaded in this image cache.\n", name);
+        ob_debug("\"%s\" already loaded in this image cache.", name);
         RrImageRef(rr_image);
         return rr_image;
     }
@@ -117,14 +117,14 @@ RrImage* RrImageFetchFromFile(RrImageCache *cache, const gchar *name)
     ro_data = imlib_image_get_data_for_reading_only();
     w = imlib_image_get_width();
     h = imlib_image_get_height();
-    ob_debug("Loaded \"%s\", dimensions %dx%d\n", name, w, h);
+    ob_debug("Loaded \"%s\", dimensions %dx%d", name, w, h);
 
     /* There must not be any duplicated pictures in RrImageCache. */
     found_rr_image = RrImageCacheFind(cache, ro_data, w, h);
     if (found_rr_image) {
         rr_image = found_rr_image;
         RrImageRef(rr_image);
-        ob_debug("Image \"%s\" is duplicate\n", name);
+        ob_debug("Image \"%s\" is duplicate", name);
     }
     else {
         /* Create RrImage from the image and add it to file name table. */

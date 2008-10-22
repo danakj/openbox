@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.5\n"
+"Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-05-24 16:33+0200\n"
-"PO-Revision-Date: 2008-01-19 14:34+0100\n"
+"POT-Creation-Date: 2008-08-19 17:44+0200\n"
+"PO-Revision-Date: 2008-10-22 18:06+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -22,15 +22,15 @@ msgstr "Eskatutako \"%s\" ekintza baliogabea. Ez da ekintza hori existitzen."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr ""
+msgstr "Ez"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr ""
+msgstr "Bai"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "Exekutatu"
 
 #: openbox/actions/execute.c:142
 #, c-format
@@ -40,19 +40,19 @@ msgstr "Hutsegitea \"%s\" helbidea utf8-tik bihurtzean"
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
-msgstr ""
+msgstr "Ezeztatu"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr ""
+msgstr "Irten"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Ziur al zaude Openbox-etik irten nahi duzula?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Openbox-etik Irten"
 
 #. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
 #. name of the action you write in rc.xml
@@ -61,18 +61,20 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"SessionLogout ekintza ez dago eskuragarri, Openbox saio kudetzaile gaitasun "
+"gabe konpilatua izan baitzen"
 
 #: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
-msgstr ""
+msgstr "Saioa Itxi"
 
 #: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Ziur al zaude saioa itxi nahi duzula?"
 
 #: openbox/client.c:2005
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Izenik gabeko leihoa"
 
 #: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
@@ -88,10 +90,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Badirudi \"%s\" leihoak ez duela erantzuten. Nahi al duzu istea behartu %s "
+"seinalea bidaliz?"
 
 #: openbox/client.c:3449
 msgid "End Process"
-msgstr ""
+msgstr "Prozesua Amaitu"
 
 #: openbox/client.c:3453
 #, c-format
@@ -99,10 +103,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
+"Badirudi \"%s\" leihoak ez duela erantzuten. Nahi al duzu leihoa X "
+"zerbitzaritik deskonektatu?"
 
 #: openbox/client.c:3455
 msgid "Disconnect"
-msgstr ""
+msgstr "Deskonektatu"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
@@ -269,10 +275,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"XML sintaxi errore bat edo gehiago aurkitu dira Openbox konfigurazio "
+"fitxategiak interpretatzerakoan. Ikusi stdout informazio gehiago jasotzeko. "
+"Azken errorea  \"%s\" fitxategian %d lerroan izan da, mezu honekin: %s"
 
 #: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openbox sintaxi errorea"
 
 #: openbox/openbox.c:379
 msgid "Close"
@@ -318,6 +327,7 @@ msgstr ""
 #: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
+"--config-file FILE  Zehaztu erabiltzeko konfigurazio fitxategirako bidea\n"
 
 #: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -378,7 +388,7 @@ msgstr ""
 
 #: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file argumentu bat behar du\n"
 
 #: openbox/openbox.c:660
 #, c-format
@@ -413,6 +423,8 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
+"Openbox %d idazmahaientzat konfiguratua dago, baina uneko saioak %d dauzka. "
+"Openbox konfigurazioa gainjartzen."
 
 #: openbox/screen.c:1180
 #, c-format
@@ -429,14 +441,14 @@ msgstr "Ezin da \"%s\" direktorioa sortu: %s"
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Ezin da saioa \"%s\"-n gorde: %s"
 
-#: openbox/session.c:598
+#: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Errorea saioa \"%s\"-n gordetzean: %s"
 
-#: openbox/session.c:835
+#: openbox/session.c:842
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "Saio kudeatzaile batera ez konektatua"
 
 #: openbox/startupnotify.c:243
 #, c-format
@@ -470,7 +482,7 @@ msgstr "X errorea: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr ""
+msgstr "Ados"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "Hutsegitea \"%s\" exekutatzean: %s"

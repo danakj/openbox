@@ -1,3 +1,10 @@
+3.4.7.3:
+  * Updated translations: Basque, Catalan, Turkish, Italian, Spanish, Russian.
+  * New translations: Danish, Turkish, Lithuanian.
+  * Set the _MOTIF_WM_INFO atom so urxvt uses motif hints for borderless mode.
+  * Properly escape the xml used in session files.
+  * Correct a 64-bit issue related to comparing timestamps.
+
 3.4.7.2:
   * The system I used to generate the dist tarball didn't have the
     docbook-to-man command so the manpages were empty.

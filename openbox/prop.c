@@ -53,6 +53,7 @@ void prop_startup(void)
     CREATE(wm_client_leader, "WM_CLIENT_LEADER");
     CREATE(wm_transient_for, "WM_TRANSIENT_FOR");
     CREATE(motif_wm_hints, "_MOTIF_WM_HINTS");
+    CREATE(motif_wm_info, "_MOTIF_WM_INFO");
 
     CREATE(sm_client_id, "SM_CLIENT_ID");
 

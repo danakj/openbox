@@ -55,6 +55,7 @@ typedef struct Atoms {
     Atom wm_client_leader;
     Atom wm_transient_for;
     Atom motif_wm_hints;
+    Atom motif_wm_info;
 
     /* SM atoms */
     Atom sm_client_id;

@@ -64,6 +64,7 @@ void obt_prop_startup(void)
     CREATE(WM_CLIENT_LEADER);
     CREATE(WM_TRANSIENT_FOR);
     CREATE_(MOTIF_WM_HINTS);
+    CREATE_(MOTIF_WM_INFO);
 
     CREATE(SM_CLIENT_ID);
 

@@ -232,6 +232,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Window type: %d", self->type);
     ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
+    ob_debug("Window name: %s class: %s", self->name, self->class);
 
     /* now we have all of the window's information so we can set this up.
        do this before creating the frame, so it can tell that we are still

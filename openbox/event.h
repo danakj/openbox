@@ -60,7 +60,7 @@ void event_halt_focus_delay(void);
 
 /*! Compare t1 and t2, taking into account wraparound. True if t1
     comes at the same time or later than t2. */
-gboolean event_time_after(Time t1, Time t2);
+gboolean event_time_after(guint32 t1, guint32 t2);
 
 Time event_get_server_time(void);
 

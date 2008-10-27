@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.7-pre1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2008-03-03 02:10+0100\n"
+"POT-Creation-Date: 2008-05-24 16:33+0200\n"
+"PO-Revision-Date: 2008-05-24 16:33+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -41,7 +41,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:150
+#: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Invalid action “[1m%s[0m” requested. No such action exists."
@@ -63,8 +63,8 @@ msgstr "Execute"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Failed to convert the path “[1m%s[0m” from utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
-#: openbox/client.c:3460
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
+#: openbox/client.c:3458
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -80,7 +80,9 @@ msgstr "Are you sure you want to exit Openbox?"
 msgid "Exit Openbox"
 msgstr "Exit Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
@@ -88,27 +90,27 @@ msgstr ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
 msgstr "Log Out"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
 msgstr "Are you sure you want to log out?"
 
-#: openbox/client.c:2004
+#: openbox/client.c:2005
 msgid "Unnamed Window"
 msgstr "Unnamed Window"
 
-#: openbox/client.c:2018 openbox/client.c:2050
+#: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
 msgstr "Killing..."
 
-#: openbox/client.c:2020 openbox/client.c:2052
+#: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
 msgstr "Not Responding"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3447
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -117,11 +119,11 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to force "
 "it to exit by sending the %s signal?"
 
-#: openbox/client.c:3451
+#: openbox/client.c:3449
 msgid "End Process"
 msgstr "End Process"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3453
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -130,7 +132,7 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to "
 "disconnect it from the X server?"
 
-#: openbox/client.c:3457
+#: openbox/client.c:3455
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -227,27 +229,27 @@ msgstr "Invalid button “[1m%s[0m” specified in config file"
 msgid "Conflict with key binding in config file"
 msgstr "Conflict with key binding in config file"
 
-#: openbox/menu.c:103 openbox/menu.c:111
+#: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
 msgstr "Unable to find a valid menu file “[1m%s[0m”"
 
-#: openbox/menu.c:171
+#: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
 msgstr "Failed to execute command for pipe-menu “[1m%s[0m”: %s"
 
-#: openbox/menu.c:185
+#: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
 msgstr "Invalid output from pipe-menu “[1m%s[0m”"
 
-#: openbox/menu.c:198
+#: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "Attempted to access menu “[1m%s[0m” but it does not exist"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
 msgstr "More..."
 
@@ -261,36 +263,36 @@ msgstr "Invalid button “[1m%s[0m” in mouse binding"
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Invalid context “[1m%s[0m” in mouse binding"
 
-#: openbox/openbox.c:134
+#: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "Unable to change to home directory “[1m%s[0m”: %s"
 
-#: openbox/openbox.c:154
+#: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Failed to open the display from the DISPLAY environment variable."
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
 msgstr "Failed to initialize the obrender library."
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:194
 msgid "X server does not support locale."
 msgstr "X server does not support locale."
 
-#: openbox/openbox.c:198
+#: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Cannot set locale modifiers for the X server."
 
-#: openbox/openbox.c:266
+#: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Unable to find a valid config file, using some simple defaults"
 
-#: openbox/openbox.c:300
+#: openbox/openbox.c:297
 msgid "Unable to load a theme."
 msgstr "Unable to load a theme."
 
-#: openbox/openbox.c:380
+#: openbox/openbox.c:377
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -301,28 +303,28 @@ msgstr ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file “[1m%s[0m” line %d, with message: %s"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
 msgstr "Openbox Syntax Error"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Close"
 msgstr "Close"
 
-#: openbox/openbox.c:451
+#: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "Restart failed to execute new executable “[1m%s[0m”: %s"
 
-#: openbox/openbox.c:521 openbox/openbox.c:523
+#: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntax: openbox [options]\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:530
 msgid ""
 "\n"
 "Options:\n"
@@ -330,30 +332,30 @@ msgstr ""
 "\n"
 "Options:\n"
 
-#: openbox/openbox.c:534
+#: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Display this help and exit\n"
 
-#: openbox/openbox.c:535
+#: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Display the version and exit\n"
 
-#: openbox/openbox.c:536
+#: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Replace the currently running window manager\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:540
+#: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file FILE  Specify the path to the config file to use\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Disable connection to the session manager\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:539
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -361,19 +363,19 @@ msgstr ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Reload Openbox's configuration\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Restart Openbox\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Exit Openbox\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:543
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -381,23 +383,23 @@ msgstr ""
 "\n"
 "Debugging options:\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Run in synchronous mode\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Display debugging output\n"
 
-#: openbox/openbox.c:549
+#: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Display debugging output for focus handling\n"
 
-#: openbox/openbox.c:550
+#: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Split the display into fake xinerama screens\n"
 
-#: openbox/openbox.c:551
+#: openbox/openbox.c:548
 #, c-format
 msgid ""
 "\n"
@@ -406,11 +408,11 @@ msgstr ""
 "\n"
 "Please report bugs at %s\n"
 
-#: openbox/openbox.c:620
+#: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
 msgstr "--config-file requires an argument\n"
 
-#: openbox/openbox.c:663
+#: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Invalid command line argument “[1m%s[0m”\n"
@@ -453,17 +455,17 @@ msgstr "desktop %i"
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Unable to make directory “[1m%s[0m”: %s"
 
-#: openbox/session.c:452
+#: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Unable to save the session to “[1m%s[0m”: %s"
 
-#: openbox/session.c:584
+#: openbox/session.c:598
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Error while saving the session to “[1m%s[0m”: %s"
 
-#: openbox/session.c:821
+#: openbox/session.c:835
 msgid "Not connected to a session manager"
 msgstr "Not connected to a session manager"
 

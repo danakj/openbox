@@ -1999,7 +1999,7 @@ void event_cancel_all_key_grabs(void)
     XSync(ob_display, FALSE);
 }
 
-gboolean event_time_after(Time t1, Time t2)
+gboolean event_time_after(guint32 t1, guint32 t2)
 {
     g_assert(t1 != CurrentTime);
     g_assert(t2 != CurrentTime);
@@ -2012,8 +2012,10 @@ gboolean event_time_after(Time t1, Time t2)
       - http://tronche.com/gui/x/xlib/input/pointer-grabbing.html
     */
 
-    /* TIME_HALF is half of the number space of a Time type variable */
-#define TIME_HALF (Time)(1 << (sizeof(Time)*8-1))
+    /* TIME_HALF is not half of the number space of a Time type variable.
+     * Rather, it is half the number space of a timestamp value, which is
+     * always 32 bits. */
+#define TIME_HALF (guint32)(1 << 31)
 
     if (t2 >= TIME_HALF)
         /* t2 is in the second half so t1 might wrap around and be smaller than

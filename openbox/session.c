@@ -486,10 +486,14 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
 
         if (screen_desktop_names) {
             gint i;
+            gchar *t;
 
             fprintf(f, "<desktopnames>\n");
-            for (i = 0; screen_desktop_names[i]; ++i)
-                fprintf(f, "  <name>%s</name>\n", screen_desktop_names[i]);
+            for (i = 0; screen_desktop_names[i]; ++i){
+                t = g_markup_escape_text(screen_desktop_names[i], -1);
+                fprintf(f, "  <name>%s</name>\n", t);
+                g_free(t);
+            }
             fprintf(f, "</desktopnames>\n");
         }
 
@@ -544,8 +548,11 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
 
             if (c->sm_client_id)
                 fprintf(f, "<window id=\"%s\">\n", c->sm_client_id);
-            else
-                fprintf(f, "<window command=\"%s\">\n", c->wm_command);
+            else {
+                t = g_markup_escape_text(c->wm_command, -1);
+                fprintf(f, "<window command=\"%s\">\n", t);
+                g_free(t);
+            }
 
             t = g_markup_escape_text(c->name, -1);
             fprintf(f, "\t<name>%s</name>\n", t);

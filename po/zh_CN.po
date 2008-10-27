@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-11 02:01+0100\n"
+"POT-Creation-Date: 2008-05-24 16:33+0200\n"
 "PO-Revision-Date: 2008-03-11 22:07+0800\n"
 "Last-Translator: zhou sf <sxzzsf@gmail.com>\n"
 "Language-Team: Simplified Chinese\n"
@@ -39,7 +39,7 @@ msgstr "执行"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "从 utf8 转换路径 \"%s\" 时失败"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
 msgstr "取消"
@@ -56,17 +56,19 @@ msgstr "确认退出 Openbox?"
 msgid "Exit Openbox"
 msgstr "退出 Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr "因为编译 Openbox 时未支持会话管理, 因此 SessionLogout 动作无效."
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
 msgstr "注销"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
 msgstr "确认注销吗?"
 

@@ -1,58 +1,58 @@
-# Vietnamese messages for Openbox.
-# Copyright (C) 2007 Dana Jansens
-# This file is distributed under the same license as the Openbox package.
-# Quan Tran <qeed.quan@gmail.com>, 2007.
+# Lithuanian messages for openbox
+# Copyright (C) 2008 Dana Jansens
+# This file is distributed under the same license as the openbox package.
+# Vytautas (GODhack) <vytautas1987@yahoo.com>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.7\n"
+"Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2008-05-24 16:33+0200\n"
-"PO-Revision-Date: 2008-03-11 02:07+0100\n"
-"Last-Translator: Quan Tran <qeed.quan@gmail.com>\n"
-"Language-Team: None\n"
+"PO-Revision-Date: 2008-05-04 21:16+0200\n"
+"Last-Translator: Vytautas <vytautas1987@yahoo.com>\n"
+"Language-Team: Lithuanian <lt@li.ourg>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr "Hành động \"%s\" làm không được. Hành động đó không có."
+msgstr "Neteisingo veiksmo \"%s\" pareikalauta. Toks veiksmas neegzistuoja."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr "Không"
+msgstr "Ne"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr "Được"
+msgstr "Taip"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr "Hành động"
+msgstr "Vygdyti"
 
 #: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Không thể chuyển chỗ \"%s\" từ utf8"
+msgstr "Nepavyko išversti \"%s\" iš utf8"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3458
 msgid "Cancel"
-msgstr "Bãi bỏ"
+msgstr "Atšaukti"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr "Đi ra"
+msgstr "Išeiti"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr "Có chắc chắn đi ra Openbox?"
+msgstr "Ar tikrai norite išjungti Openbox?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr "Đi ra Openbox"
+msgstr "Išjungti Openbox"
 
 #. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
 #. name of the action you write in rc.xml
@@ -61,28 +61,28 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
-"Không thể làm SessionLogout được bởi vì Openbox không bỏ \"session "
-"management support\" khi compile nó"
+"SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
+"valdymo palaikymo"
 
 #: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
-msgstr "Đi ra"
+msgstr "Išsiregistruoti"
 
 #: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
-msgstr "Có chắc chắn đi ra không?"
+msgstr "Ar tikrai norite išsiregistruoti?"
 
 #: openbox/client.c:2005
 msgid "Unnamed Window"
-msgstr "Cửa sổ không tên"
+msgstr "Bevardis Langas"
 
 #: openbox/client.c:2019 openbox/client.c:2051
 msgid "Killing..."
-msgstr "Đang giết..."
+msgstr "Naikinama..."
 
 #: openbox/client.c:2021 openbox/client.c:2053
 msgid "Not Responding"
-msgstr "Không phản ứng"
+msgstr "Neatsako"
 
 #: openbox/client.c:3447
 #, c-format
@@ -90,180 +90,180 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"Cái cửa sổ \"%s\" không phản ứng được. Có muốn bắt nó đi ra bằng gửi đi %s "
-"tính hiệu?"
+"Langas \"%s\" neatsako.  Ar nori jį priverstinai išjungti nusiūsdamas %s "
+"signalą?"
 
 #: openbox/client.c:3449
 msgid "End Process"
-msgstr "Giết Process"
+msgstr "Baigti procesą"
 
 #: openbox/client.c:3453
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
-msgstr ""
-"Cái cửa sổ \"%s\" không phản ứng được. Có muốn rời nó ra X server không"
+msgstr "Langas \"%s\" neatsako. Ar nori jį atjungti nuo X serverio?"
 
 #: openbox/client.c:3455
 msgid "Disconnect"
-msgstr "Rời ra"
+msgstr "Atsijungti"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
-msgstr "Đi đến chỗ đó"
+msgstr "Eiti ten..."
 
 #: openbox/client_list_combined_menu.c:94
 msgid "Manage desktops"
-msgstr "Quản lý chỗ làm việc"
+msgstr "Valdyti darbastalius"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
-msgstr "_Cộng thêm chỗ làm việc"
+msgstr "_Pridėti darbastalį"
 
 #: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
 msgid "_Remove last desktop"
-msgstr "_Bỏ lát chỗ làm việc"
+msgstr "P_ašalinti paskutinį darbastalį"
 
 #: openbox/client_list_combined_menu.c:149
 msgid "Windows"
-msgstr "Cửa sổ"
+msgstr "Langai"
 
 #: openbox/client_list_menu.c:203
 msgid "Desktops"
-msgstr "Chỗ làm việc"
+msgstr "Darbastaliai"
 
 #: openbox/client_menu.c:258
 msgid "All desktops"
-msgstr "Tất cả chỗ làm việc"
+msgstr "Visi darbastaliai"
 
 #: openbox/client_menu.c:370
 msgid "_Layer"
-msgstr "Lớ_p"
+msgstr "_Sluoksnis"
 
 #: openbox/client_menu.c:375
 msgid "Always on _top"
-msgstr "Luôn luôn ở _trên"
+msgstr "Visada _viršuje"
 
 #: openbox/client_menu.c:376
 msgid "_Normal"
-msgstr "_Bình thường"
+msgstr "_Normalus"
 
 #: openbox/client_menu.c:377
 msgid "Always on _bottom"
-msgstr "Luôn luôn ở _dưới"
+msgstr "Visada _apačioje"
 
 #: openbox/client_menu.c:379
 msgid "_Send to desktop"
-msgstr "Gửi đến chỗ làm _việc"
+msgstr "Siūsti į _darbastalį"
 
 #: openbox/client_menu.c:383
 msgid "Client menu"
-msgstr "Khách thực đơn"
+msgstr "Kliento menu"
 
 #: openbox/client_menu.c:393
 msgid "R_estore"
-msgstr "_Hoàn lại"
+msgstr "_Atstatyti"
 
 #: openbox/client_menu.c:397
 msgid "_Move"
-msgstr "Chu_yển đi"
+msgstr "_Judinti"
 
 #: openbox/client_menu.c:399
 msgid "Resi_ze"
-msgstr "Làm _nhỏ hơn/lớn hơn"
+msgstr "_Pakeisti dydį"
 
 #: openbox/client_menu.c:401
 msgid "Ico_nify"
-msgstr "Biến _xuống"
+msgstr "_Mažinti"
 
 #: openbox/client_menu.c:405
 msgid "Ma_ximize"
-msgstr "Biến _lớn nhất"
+msgstr "D_idinti"
 
 #: openbox/client_menu.c:409
 msgid "_Roll up/down"
-msgstr "_Cuốn lên/xuống"
+msgstr "Apvers_ti aukštyn/žemyn"
 
 #: openbox/client_menu.c:411
 msgid "Un/_Decorate"
-msgstr "_Trang/Không Trang trí"
+msgstr "Ne/D_ekoruoti"
 
 #: openbox/client_menu.c:415
 msgid "_Close"
-msgstr "Đón_g"
+msgstr "_Uždaryti"
 
 #: openbox/config.c:781
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Sai nút \"%s\" ở trong hình thể"
+msgstr "Neteisingas mygtuskas \"%s\" nurodytas nustatymų byloje"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
-msgstr "Xung đột với chữ trói ở trong hình thể"
+msgstr "Konfliktas tarp mygtukų nustatymų byloje"
 
 #: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr "Không có thể tìm vững chắc thực đơn \"%s\""
+msgstr "Nerasta gera menu byla \"%s\""
 
 #: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Không có thể chạy lệnh cho ống-thực đơn \"%s\": %s"
+msgstr "Nepavyko pipe-menu komandos vygdyti \"%s\": %s"
 
 #: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Vô hiệu sản xuất của ống-thực đơn \"%s\""
+msgstr "Neteisinga išvestis iš pipe-menu \"%s\""
 
 #: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Thử mở thực đơn \"%s\" nhưng mà cái đó không có"
+msgstr "Bandoma įeiti į menu \"%s\", bet jis neegzistuoja"
 
 #: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
-msgstr "Thêm nữa"
+msgstr "Dar..."
 
 #: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Vô hiệu nút \"%s\" ở trong máy chuột đặt"
+msgstr "Neteisingas mygtukas \"%s\" pelės nustatymuose"
 
 #: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
-msgstr "Vô hiệu văn cảnh \"%s\" ở trong chuột đặt"
+msgstr "Neteisingas kontekstas \"%s\" pelės nustatymuose"
 
 #: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr "Không thể đổi đến chỗ nhà \"%s\": %s"
+msgstr "Negalima patekti į home direktoriją \"%s\": %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Không mở hình từ DISPLAY được."
+msgstr "Nepavyko atidaryti ekrano pagal DISPLAY aplinkos kintamąjį."
 
 #: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
-msgstr "Không mở được thư viện obrender."
+msgstr "Nepavyko inicijuoti obrender bibliotekos."
 
 #: openbox/openbox.c:194
 msgid "X server does not support locale."
-msgstr "Chương trình X không có locale cho tiếng nay."
+msgstr "X serveris nepalaiko lokalės."
 
 #: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Không thể dùng locale cho chương trình X."
+msgstr "Negalima nustatyti lokalės keitinių X serveriui."
 
 #: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr "Không thể tìm ra hình thể, sẽ dùng bắt đầu hình thể"
+msgstr ""
+"Nepavyksta rasti geros nustatymų bylos, naudojami standartiniai nustatymai"
 
 #: openbox/openbox.c:297
 msgid "Unable to load a theme."
-msgstr "Không thể đọc theme."
+msgstr "Nepavyksta įjunggti temos."
 
 #: openbox/openbox.c:377
 #, c-format
@@ -272,30 +272,30 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
-"Một hay là trên một XML danh từ không đúng tìm thấy ở trong Openbox tài "
-"liệu. Coi stdout cho biết thêm. Cai sai lầm cuối cùng ở trong Openbox tài "
-"liệu \"%s\" ở hàng %d với lời: %s"
+"XML sintaksės klaidos rastos Openbox nustatymų bylose. Žiurėkite stdout dėl "
+"daugiau informacijos.  Paskutinė klaida byloje \"%s\" eilutėje %d, su "
+"pranešimu: %s"
 
 #: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr "Openbox danh từ không đúng"
+msgstr "Openbox Sintaksės Klaida"
 
 #: openbox/openbox.c:379
 msgid "Close"
-msgstr "Đóng"
+msgstr "Uždaryti"
 
 #: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
-msgstr "Bắt đầu lại hỏng mở được executable mới \"%s\": %s"
+msgstr "Restartui nepavyko įjungti \"%s\": %s"
 
 #: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
-msgstr "Bản quyền (c)"
+msgstr "Copyright (c)"
 
 #: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
-msgstr "Cách dùng: openbox [chọn lựa]\n"
+msgstr "Sintaksė: openbox [nustatymai]\n"
 
 #: openbox/openbox.c:530
 msgid ""
@@ -303,31 +303,30 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Chọn lựa:\n"
+"Nustatymai:\n"
 
 #: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Trưng bày giúp đỡ này và đi ra\n"
+msgstr "  --help              Parodyti tai ir išeiti\n"
 
 #: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Trưng bày số của chương trình và đi ra\n"
+msgstr "  --version           Parodyti versiją ir išeiti\n"
 
 #: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
-"  --replace           Thay thế chương trình quản lý cửa sổ cho đến openbox\n"
+msgstr "  --replace           Pakeisti jau veikiantį VM\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr "  --config-file FILE  Chỉ chỗ đường cho tài liệu để dùng\n"
+msgstr "  --config-file FILE  Nurodyti kur yra nustatymų byla\n"
 
 #: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Tắt liên lạc đến session quản lý\n"
+msgstr "  --sm-disable        Atsijungti nuo sesijos tvarkyklės\n"
 
 #: openbox/openbox.c:539
 msgid ""
@@ -335,19 +334,19 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Đưa thông báo cho chương trình Openbox:\n"
+"Perduodamos žinutės į veikiantį Openbox:\n"
 
 #: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Bắt đầu lại Openbox's tài liệu\n"
+msgstr "  --reconfigure       Perkrauti Openbox nustatymus\n"
 
 #: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Bắt đầu lại Openbox\n"
+msgstr "  --restart           Perkrauti Openbox\n"
 
 #: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
-msgstr "  --exit              Đi ra Openbox\n"
+msgstr "  --exit              Išeiti iš Openbox\n"
 
 #: openbox/openbox.c:543
 msgid ""
@@ -355,24 +354,23 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Debugging chọn lựa:\n"
+"Klaidų šalinimo nustatymai:\n"
 
 #: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Chạy trong cách thức synchronous\n"
+msgstr "  --sync              Paleisti synchronous mode\n"
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Trưng bày debugging đoàn chữ\n"
+msgstr "  --debug             Rodyti debugging output\n"
 
 #: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Trưng bày debugging đoàn chữ cho điều khiển tập trung\n"
+msgstr "  --debug-focus       Rodyti debugging output dėl focus handling\n"
 
 #: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Tách trưng bày vào giả xinerama màn\n"
+msgstr "  --debug-xinerama    Skirstyt ekraną į netikrus xinerama ekranus\n"
 
 #: openbox/openbox.c:548
 #, c-format
@@ -381,31 +379,31 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Làm ơn báo cáo bugs ở chỗ %s\n"
+"Praneškite apie vabaliukus %s\n"
 
 #: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr "--config-file cần chọn lựa một tài liệu\n"
+msgstr "--config-file reikalauja argumento\n"
 
 #: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "Mệnh lệnh viết sai \"%s\"\n"
+msgstr "Blogas komandinės eilutės argumentas \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Chương trình quản lý cửa sổ khác đang chạy trên màn hình %d"
+msgstr "WM jau veikia ekrane %d"
 
 #: openbox/screen.c:124
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Không thể lấy được chương trình quản lý cửa sổ ở trên màn hình %d"
+msgstr "Nepavyksta gauti langų tvarkyklės pasirinkimo ekrane %d"
 
 #: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "Chương trình quản lý cửa sổ trên màn hình %d không đi ra"
+msgstr "WM ekrane %d neišsijungia"
 
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
@@ -417,69 +415,64 @@ msgid ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr ""
-"Openbox đặt cho %d chỗ làm việc, nhưng mà session hiện đại có %d. Lật đổ "
-"openbox tài liệu cho cái mới."
+"Openbox yra suderintas %d darbastaliams, bet dabartinė sesija turi %d.  Mes "
+"naudosime kitą, ne Openbox, konfigūraciją."
 
 #: openbox/screen.c:1180
 #, c-format
 msgid "desktop %i"
-msgstr "chỗ làm việc %i"
+msgstr "darbastalis %i"
 
 #: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
-msgstr "Không thể chế directory \"%s\": %s"
+msgstr "Negalima padaryti direktorijos \"%s\": %s"
 
 #: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
-msgstr "Không thể tiết kiệm thời kỳ cho \"%s\": %s"
+msgstr "Negalima išsaugoti sesijos į \"%s\": %s"
 
 #: openbox/session.c:598
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
-msgstr "Bĩ trục chật lúc tiết kiệm thời kỳ cho \"%s\": %s"
+msgstr "Klaida bandant išsaugot sesiją į \"%s\": %s"
 
 #: openbox/session.c:835
 msgid "Not connected to a session manager"
-msgstr "Không hàng với session quản lý"
+msgstr "Neprisijungta prie sesijų sesijos tvarkyklė"
 
 #: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s\n"
-msgstr "Đan Chạy %s\n"
+msgstr "Veikia %s\n"
 
 #: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key \"%s\" in key/mouse binding"
-msgstr "Vô hiệu Modifier key \"%s\" ở chỗ máy keyboard/chuột đặt"
+msgstr ""
+"Neteisingas modifikavimų klavišas \"%s\" klaviatūros/pelės priskyrimuose"
 
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code \"%s\" in key binding"
-msgstr "Vô hiệu key mã \"%s\" ở chỗ key đặt"
+msgstr "Neteisingas klavišo kodas \"%s\" klavišų priskyrimuose"
 
 #: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name \"%s\" in key binding"
-msgstr "Vô hiệu key tên \"%s\" ở chỗ key đặt"
+msgstr "Neteisingas klavišo vardas \"%s\" klavišų priskyrimuose"
 
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr "Yêu cầu key \"%s\" không có ở chỗ màn hình"
+msgstr "Norimas klavišas \"%s\" neegzistuoja ekrane"
 
 #: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
-msgstr "X trục chật: %s"
+msgstr "X Klaida: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr "Đồng ý"
-
-#~ msgid "Failed to execute \"%s\": %s"
-#~ msgstr "Làm không được \"%s\": %s"
-
-#~ msgid "Invalid use of action \"%s\". Action will be ignored."
-#~ msgstr "Sự dùng hành động \"%s\" sai rồi. Không làm hành động đó."
+msgstr "OK"

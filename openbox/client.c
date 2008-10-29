@@ -202,6 +202,7 @@ void client_manage(Window window, ObPrompt *prompt)
     gboolean transient = FALSE;
     Rect place, *monitor;
     Time launch_time, map_time;
+    gint user_time;
 
     ob_debug("Managing window: 0x%lx", window);
 
@@ -264,6 +265,9 @@ void client_manage(Window window, ObPrompt *prompt)
     /* tell startup notification that this app started */
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
+    if (!OBT_PROP_GET32(self->window, NET_WM_USER_TIME, CARDINAL, &user_time))
+        user_time = map_time;
+
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
     client_change_state(self);
@@ -280,6 +284,8 @@ void client_manage(Window window, ObPrompt *prompt)
         /* this means focus=true for window is same as config_focus_new=true */
         ((config_focus_new || (settings && settings->focus == 1)) ||
          client_search_focus_tree_full(self)) &&
+        /* NET_WM_USER_TIME 0 when mapping means don't focus */
+        (user_time != 0) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
         focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE))

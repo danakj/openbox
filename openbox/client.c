@@ -2220,7 +2220,7 @@ void client_update_icons(ObClient *self)
     */
     if (!self->icon_set && !self->parents) {
         RrPixel32 *icon = ob_rr_theme->def_win_icon;
-        gulong *ldata; /* use a long here to satisfy OBT_PROP_SETA32 */
+        gulong *ldata; /* use a long here to satisfy PROP_SETA32 */
 
         w = ob_rr_theme->def_win_icon_w;
         h = ob_rr_theme->def_win_icon_h;

@@ -4,6 +4,12 @@
   * Set the _MOTIF_WM_INFO atom so urxvt uses motif hints for borderless mode.
   * Properly escape the xml used in session files.
   * Correct a 64-bit issue related to comparing timestamps.
+  * There is a sneaky sentence right at the end of a big paragraph in the
+    wm-spec document that says windows mapping with _NET_WM_USER_TIME=0 should
+    not be focused initially, honor this request.
+  * When moving a window to another desktop with following on, bring the
+    window's helper windows (for example gimp image windows with the toolbox
+    set to utility window).
 
 3.4.7.2:
   * The system I used to generate the dist tarball didn't have the

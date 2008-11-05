@@ -10,6 +10,10 @@
   * When moving a window to another desktop with following on, bring the
     window's helper windows (for example gimp image windows with the toolbox
     set to utility window).
+  * Change the _NET_ACTIVE_WINDOW messages again, if they originate from the
+    app and the window is on another desktop, just set the demands_attention
+    flag. If the event came from the user (ie pager/panel), then the window
+    is still moved to the current desktop.
 
 3.4.7.2:
   * The system I used to generate the dist tarball didn't have the

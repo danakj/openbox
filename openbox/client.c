@@ -3904,12 +3904,15 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
     client_focus(self);
 }
 
-/* this function exists to map to the client_activate message in the ewmh,
-   the user arg is unused because nobody uses it correctly anyway. */
+/* this function exists to map to the net_active_window message in the ewmh */
 void client_activate(ObClient *self, gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
-    client_present(self, here, raise, unshade);
+    if (user || (self->desktop == DESKTOP_ALL ||
+                 self->desktop == screen_desktop))
+        client_present(self, here, raise, unshade);
+    else
+        client_hilite(self, TRUE);
 }
 
 static void client_bring_windows_recursive(ObClient *self,

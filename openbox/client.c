@@ -247,7 +247,7 @@ void client_manage(Window window, ObPrompt *prompt)
     gboolean transient = FALSE;
     Rect place, *monitor;
     Time launch_time, map_time;
-    gint user_time;
+    guint32 user_time;
 
     grab_server(TRUE);
 

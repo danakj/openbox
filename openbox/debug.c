@@ -102,11 +102,11 @@ void ob_debug_enable(ObDebugType type, gboolean enable)
 static inline void log_print(FILE *out, const gchar* log_domain,
                              const gchar *level, const gchar *message)
 {
-    fprintf(out, log_domain);
+    fprintf(out, "%s", log_domain);
     fprintf(out, "-");
-    fprintf(out, level);
+    fprintf(out, "%s", level);
     fprintf(out, ": ");
-    fprintf(out, message);
+    fprintf(out, "%s", message);
     fprintf(out, "\n");
     fflush(out);
 }

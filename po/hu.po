@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-05-24 16:33+0200\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
 "PO-Revision-Date: 2008-03-17 19:25+0100\n"
 "Last-Translator: Robert Kuszinger <hiding@freemail.hu>\n"
 "Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
@@ -39,7 +39,7 @@ msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Az útvonalat nem sikerült átalakítani utf8-ból: \"%s\""
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3458
+#: openbox/client.c:3465
 msgid "Cancel"
 msgstr "Mégsem"
 
@@ -73,19 +73,19 @@ msgstr "Kijelentkezés"
 msgid "Are you sure you want to log out?"
 msgstr "Biztos, hogy ki akarsz jelentkezni?"
 
-#: openbox/client.c:2005
+#: openbox/client.c:2012
 msgid "Unnamed Window"
 msgstr "Névtelen Ablak"
 
-#: openbox/client.c:2019 openbox/client.c:2051
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
 msgstr "Kilövés..."
 
-#: openbox/client.c:2021 openbox/client.c:2053
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
 msgstr "Nem Válaszol"
 
-#: openbox/client.c:3447
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,18 +93,18 @@ msgid ""
 msgstr ""
 "A(z) \"%s\" ablak nem válaszol. Erőltessük a kilépést a %s jelzés küldésével?"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3456
 msgid "End Process"
 msgstr "Folyamat Vége"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "A(z) \"%s\" ablak nem válaszol. Lekapcsoljuk az X szerverről?"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3462
 msgid "Disconnect"
 msgstr "Szétkapcsolódás"
 
@@ -412,11 +412,17 @@ msgstr "Ezen a képernyőn: %d az ablakkezelő nem lép ki"
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
 #: openbox/screen.c:412
-#, c-format
+#, fuzzy, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Az Openbox %d munkaasztal használatára lett beállítva, de a jelenlegi "
+"munkamenetnek %d van.  Felülbíráljuk az Openbox beállítását."
+msgstr[1] ""
 "Az Openbox %d munkaasztal használatára lett beállítva, de a jelenlegi "
 "munkamenetnek %d van.  Felülbíráljuk az Openbox beállítását."
 
@@ -435,12 +441,12 @@ msgstr "Nem hozható létre a könyvtár \"%s\": %s"
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Nem tudom elmenti ide a futó környezetet \"%s\": %s"
 
-#: openbox/session.c:598
+#: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Hiba a futási környezet mentése közben \"%s\": %s"
 
-#: openbox/session.c:835
+#: openbox/session.c:842
 msgid "Not connected to a session manager"
 msgstr "Nem kapcsolódunk a szekciókezelőhöz"
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-08-19 17:44+0200\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
 "PO-Revision-Date: 2008-08-19 16:50+0100\n"
 "Last-Translator: Jesper Sander <sander.contrib@gmail.com>\n"
 "Language-Team: None\n"
@@ -38,7 +38,7 @@ msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Fejl ved konvertering af stien \"%s\" fra utf8"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3458
+#: openbox/client.c:3465
 msgid "Cancel"
 msgstr "Afbryd"
 
@@ -72,19 +72,19 @@ msgstr "Log Ud"
 msgid "Are you sure you want to log out?"
 msgstr "Er du sikker på at du vil logge ud?"
 
-#: openbox/client.c:2005
+#: openbox/client.c:2012
 msgid "Unnamed Window"
 msgstr "Unavngivet vindue"
 
-#: openbox/client.c:2019 openbox/client.c:2051
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
 msgstr "Dræber..."
 
-#: openbox/client.c:2021 openbox/client.c:2053
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
 msgstr "Svarer Ikke"
 
-#: openbox/client.c:3447
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,18 +93,18 @@ msgstr ""
 "Vinduet \"%s\" svarer ikke. Vil du udføre tvunget afslutning ved at sende %s "
 "signalet?"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3456
 msgid "End Process"
 msgstr "Afslut proces"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Vinduet \"%s\" svarer ikke. Vil du frakoble vinduet fra X-serveren?"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3462
 msgid "Disconnect"
 msgstr "Frakoble"
 
@@ -409,6 +409,9 @@ msgstr "Kunne ikke hente vindusbehandlerens markering på skærm %d"
 msgid "The WM on screen %d is not exiting"
 msgstr "Vinduesbehandleren på skærm %d vil ikke afslutte"
 
+# TODO Figure out how to handle this case, the second number has the "desktop"
+# on it here, but gettext looks at the first number only. If we split it up in
+# two strings then we can't swap the order from the .po file...
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
@@ -416,9 +419,15 @@ msgstr "Vinduesbehandleren på skærm %d vil ikke afslutte"
 #: openbox/screen.c:412
 #, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Aktiv session har %2$d skriveborde, mens Openbox er konfigureret til %1$d.  "
+"Benytter indstillingerne for den aktive session."
+msgstr[1] ""
 "Aktiv session har %2$d skriveborde, mens Openbox er konfigureret til %1$d.  "
 "Benytter indstillingerne for den aktive session."
 

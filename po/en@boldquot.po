@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.7-pre1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-05-24 16:33+0200\n"
-"PO-Revision-Date: 2008-05-24 16:33+0200\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"PO-Revision-Date: 2008-11-15 22:28+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -64,7 +64,7 @@ msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Failed to convert the path “[1m%s[0m” from utf8"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3458
+#: openbox/client.c:3465
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -98,19 +98,19 @@ msgstr "Log Out"
 msgid "Are you sure you want to log out?"
 msgstr "Are you sure you want to log out?"
 
-#: openbox/client.c:2005
+#: openbox/client.c:2012
 msgid "Unnamed Window"
 msgstr "Unnamed Window"
 
-#: openbox/client.c:2019 openbox/client.c:2051
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
 msgstr "Killing..."
 
-#: openbox/client.c:2021 openbox/client.c:2053
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
 msgstr "Not Responding"
 
-#: openbox/client.c:3447
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -119,11 +119,11 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to force "
 "it to exit by sending the %s signal?"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3456
 msgid "End Process"
 msgstr "End Process"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -132,7 +132,7 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to "
 "disconnect it from the X server?"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3462
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -439,9 +439,15 @@ msgstr "The WM on screen %d is not exiting"
 #: openbox/screen.c:412
 #, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr[1] ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 
@@ -460,12 +466,12 @@ msgstr "Unable to make directory “[1m%s[0m”: %s"
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Unable to save the session to “[1m%s[0m”: %s"
 
-#: openbox/session.c:598
+#: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Error while saving the session to “[1m%s[0m”: %s"
 
-#: openbox/session.c:835
+#: openbox/session.c:842
 msgid "Not connected to a session manager"
 msgstr "Not connected to a session manager"
 

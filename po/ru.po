@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-05-24 16:33+0200\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
 "PO-Revision-Date: 2008-05-02 10:25+0200\n"
 "Last-Translator: Moroz Sergey L. <se.seam@gmail.com>\n"
 "Language-Team: None\n"
@@ -40,7 +40,7 @@ msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Неудачная конвертация пути \"%s\" из utf8"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3458
+#: openbox/client.c:3465
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -74,19 +74,19 @@ msgstr "Выход"
 msgid "Are you sure you want to log out?"
 msgstr "Вы действительно хотите выйти?"
 
-#: openbox/client.c:2005
+#: openbox/client.c:2012
 msgid "Unnamed Window"
 msgstr "Безымянное окно"
 
-#: openbox/client.c:2019 openbox/client.c:2051
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
 msgstr "Завершение..."
 
-#: openbox/client.c:2021 openbox/client.c:2053
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
 msgstr "Нет ответа"
 
-#: openbox/client.c:3447
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -95,18 +95,18 @@ msgstr ""
 "Похоже, окно \"%s\" не отвечает.  Хотите принудительно послать сигнал выхода "
 "%s?"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3456
 msgid "End Process"
 msgstr "Закончить процесс"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Похоже, окно \"%s\" не отвечает.  Хотите отключить его от Х-сервера?"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3462
 msgid "Disconnect"
 msgstr "Отключить"
 
@@ -413,11 +413,17 @@ msgstr "Менеджер окон на экране %d еще запущен"
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
 #: openbox/screen.c:412
-#, c-format
+#, fuzzy, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Openbox сконфигурирован для %d рабочих столов, а в текущей сессии имеется %"
+"d.  Изменены настройки Openbox."
+msgstr[1] ""
 "Openbox сконфигурирован для %d рабочих столов, а в текущей сессии имеется %"
 "d.  Изменены настройки Openbox."
 
@@ -436,12 +442,12 @@ msgstr "Невозможно создать директорию \"%s\": %s"
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Невозможно сохранить сессию в  \"%s\": %s"
 
-#: openbox/session.c:598
+#: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Ошибка при сохранении сессии в \"%s\": %s"
 
-#: openbox/session.c:835
+#: openbox/session.c:842
 msgid "Not connected to a session manager"
 msgstr "Не подключен к менеджеру сессии"
 

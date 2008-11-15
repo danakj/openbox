@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-08-19 17:44+0200\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
 "PO-Revision-Date: 2008-10-22 18:06+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
@@ -38,7 +38,7 @@ msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Hutsegitea \"%s\" helbidea utf8-tik bihurtzean"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3458
+#: openbox/client.c:3465
 msgid "Cancel"
 msgstr "Ezeztatu"
 
@@ -72,19 +72,19 @@ msgstr "Saioa Itxi"
 msgid "Are you sure you want to log out?"
 msgstr "Ziur al zaude saioa itxi nahi duzula?"
 
-#: openbox/client.c:2005
+#: openbox/client.c:2012
 msgid "Unnamed Window"
 msgstr "Izenik gabeko leihoa"
 
-#: openbox/client.c:2019 openbox/client.c:2051
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
 msgstr "Akabatzen..."
 
-#: openbox/client.c:2021 openbox/client.c:2053
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
 msgstr "Erantzunik Ez"
 
-#: openbox/client.c:3447
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,11 +93,11 @@ msgstr ""
 "Badirudi \"%s\" leihoak ez duela erantzuten. Nahi al duzu istea behartu %s "
 "seinalea bidaliz?"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3456
 msgid "End Process"
 msgstr "Prozesua Amaitu"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -106,7 +106,7 @@ msgstr ""
 "Badirudi \"%s\" leihoak ez duela erantzuten. Nahi al duzu leihoa X "
 "zerbitzaritik deskonektatu?"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3462
 msgid "Disconnect"
 msgstr "Deskonektatu"
 
@@ -418,11 +418,17 @@ msgstr "%d bistaratze pantailako leiho-kudeatzailea ez da irteten"
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
 #: openbox/screen.c:412
-#, c-format
+#, fuzzy, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Openbox %d idazmahaientzat konfiguratua dago, baina uneko saioak %d dauzka. "
+"Openbox konfigurazioa gainjartzen."
+msgstr[1] ""
 "Openbox %d idazmahaientzat konfiguratua dago, baina uneko saioak %d dauzka. "
 "Openbox konfigurazioa gainjartzen."
 

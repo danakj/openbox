@@ -399,7 +399,7 @@ void screen_startup(gboolean reconfig)
                arguments, you can use %1$d for the first one and %2$d for the
                second one. For example,
                "The current session has %2$d desktops, but Openbox is configured for %1$d ..." */
-            g_warning(_("Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration."),
+            g_warning(ngettext("Openbox is configured for %d desktop, but the current session has %d.  Overriding the Openbox configuration.", "Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration.", config_desktops_num),
                       config_desktops_num, d);
         }
         screen_set_num_desktops(d);

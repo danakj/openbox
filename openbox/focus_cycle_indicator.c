@@ -133,6 +133,12 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
     XDestroyWindow(ob_display, focus_indicator.bottom.window);
 }
 
+void focus_cycle_update_indicator(ObClient *c)
+{
+        if (visible)
+            focus_cycle_draw_indicator(c);
+}
+
 void focus_cycle_draw_indicator(ObClient *c)
 {
     if (!c && visible) {

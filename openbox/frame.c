@@ -850,7 +850,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* if this occurs while we are focus cycling, the indicator needs to
            match the changes */
         if (focus_cycle_target == self->client)
-            focus_cycle_draw_indicator(self->client);
+            focus_cycle_update_indicator(self->client);
     }
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
         XResizeWindow(obt_display, self->label, self->label_width,

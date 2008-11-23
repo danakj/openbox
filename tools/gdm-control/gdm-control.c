@@ -259,7 +259,7 @@ int main(int argc, char **argv)
         d = XDisplayName(NULL);
         if (!d) {
             fprintf(stderr,
-                    "Unable to fina an X display specified by the DISPLAY "
+                    "Unable to find the X display specified by the DISPLAY "
                     "environment variable. Ensure that it is set correctly.");
             return 1;
         }

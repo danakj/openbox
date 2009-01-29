@@ -246,6 +246,8 @@ struct _ObClient
 
     /*! The window uses shape extension to be non-rectangular? */
     gboolean shaped;
+    /*! The window uses shape extension to have non-rectangular input? */
+    gboolean shaped_input;
 
     /*! The window is modal, so it must be processed before any windows it is
       related to can be focused */

@@ -267,25 +267,26 @@ void frame_adjust_theme(ObFrame *self)
     set_theme_statics(self);
 }
 
-void frame_adjust_shape(ObFrame *self)
-{
 #ifdef SHAPE
+void frame_adjust_shape_kind(ObFrame *self, int kind)
+{
     gint num;
     XRectangle xrect[2];
 
-    if (!self->client->shaped) {
+    if (!((kind == ShapeBounding && self->client->shaped) ||
+          (kind == ShapeInput && self->client->shaped_input))) {
         /* clear the shape on the frame window */
-        XShapeCombineMask(ob_display, self->window, ShapeBounding,
+        XShapeCombineMask(ob_display, self->window, kind,
                           self->size.left,
                           self->size.top,
                           None, ShapeSet);
     } else {
         /* make the frame's shape match the clients */
-        XShapeCombineShape(ob_display, self->window, ShapeBounding,
+        XShapeCombineShape(ob_display, self->window, kind,
                            self->size.left,
                            self->size.top,
                            self->client->window,
-                           ShapeBounding, ShapeSet);
+                           kind, ShapeSet);
 
         num = 0;
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
@@ -308,9 +309,17 @@ void frame_adjust_shape(ObFrame *self)
         }
 
         XShapeCombineRectangles(ob_display, self->window,
-                                ShapeBounding, 0, 0, xrect, num,
+                                kind, 0, 0, xrect, num,
                                 ShapeUnion, Unsorted);
     }
+}
+#endif
+
+void frame_adjust_shape(ObFrame *self)
+{
+#ifdef SHAPE
+  frame_adjust_shape_kind(self, ShapeBounding);
+  frame_adjust_shape_kind(self, ShapeInput);
 #endif
 }
 

@@ -14,6 +14,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: openbox/actions.c:149
 #, c-format
@@ -435,8 +436,8 @@ msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr[0] ""
-"El Openbox està configurat per a %d escriptori, però la sessió actual en te "
-"%d.  S'està modificant la configuració del Openbox."
+"El Openbox està configurat per a %d escriptori, però la sessió actual en te %"
+"d.  S'està modificant la configuració del Openbox."
 msgstr[1] ""
 "El Openbox està configurat per a %d escriptoris, però la sessió actual en te "
 "%d.  S'està modificant la configuració del Openbox."

@@ -1567,9 +1567,22 @@ static void event_handle_client(ObClient *client, XEvent *e)
     default:
         ;
 #ifdef SHAPE
-        if (extensions_shape && e->type == extensions_shape_event_basep) {
-            client->shaped = ((XShapeEvent*)e)->shaped;
-            frame_adjust_shape(client->frame);
+        {
+            int kind;
+            if (extensions_shape && e->type == extensions_shape_event_basep) {
+                switch (((XShapeEvent*)e)->kind) {
+                    case ShapeBounding:
+                    case ShapeClip:
+                        client->shaped = ((XShapeEvent*)e)->shaped;
+                        kind = ShapeBounding;
+                        break;
+                    case ShapeInput:
+                        client->shaped_input = ((XShapeEvent*)e)->shaped;
+                        kind = ShapeInput;
+                        break;
+                }
+                frame_adjust_shape_kind(client->frame, kind);
+            }
         }
 #endif
     }

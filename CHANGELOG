@@ -1,4 +1,4 @@
-3.4.7.3:
+3.4.8-rc2:
   * Updated translations: Basque, Catalan, Turkish, Italian, Spanish, Russian.
   * New translations: Danish, Turkish, Lithuanian.
   * Set the _MOTIF_WM_INFO atom so urxvt uses motif hints for borderless mode.
@@ -14,6 +14,10 @@
     app and the window is on another desktop, just set the demands_attention
     flag. If the event came from the user (ie pager/panel), then the window
     is still moved to the current desktop.
+  * When resizing a window while focus cycling with bar=no, the bar no longer
+    reappears.
+  * Correctly handle shaped windows using the ShapeInput kind, this is used
+    by many composited apps to pass through clicks in their transparent areas.
 
 3.4.7.2:
   * The system I used to generate the dist tarball didn't have the

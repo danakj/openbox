@@ -205,6 +205,9 @@ void frame_free(ObFrame *self);
 void frame_show(ObFrame *self);
 void frame_hide(ObFrame *self);
 void frame_adjust_theme(ObFrame *self);
+#ifdef SHAPE
+void frame_adjust_shape_kind(ObFrame *self, int kind);
+#endif
 void frame_adjust_shape(ObFrame *self);
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake);

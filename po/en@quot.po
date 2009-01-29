@@ -1,7 +1,7 @@
 # English translations for openbox package.
-# Copyright (C) 2008 Dana Jansens
+# Copyright (C) 2009 Dana Jansens
 # This file is distributed under the same license as the openbox package.
-# Automatically generated, 2008.
+# Automatically generated, 2009.
 #
 # All this catalog "translates" are quotation characters.
 # The msgids must be ASCII and therefore cannot contain real quotation

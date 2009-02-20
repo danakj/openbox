@@ -18,6 +18,7 @@
     reappears.
   * Correctly handle shaped windows using the ShapeInput kind, this is used
     by many composited apps to pass through clicks in their transparent areas.
+  * Fix the <monitor> per-app setting.
 
 3.4.7.2:
   * The system I used to generate the dist tarball didn't have the

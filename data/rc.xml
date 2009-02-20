@@ -682,7 +682,7 @@
       <y>200</y>
       <monitor>1</monitor>
       # specifies the monitor in a xinerama setup.
-      # 0 is the first head, or 'mouse' for wherever the mouse is
+      # 1 is the first head, or 'mouse' for wherever the mouse is
     </position>
 
     <focus>yes</focus>

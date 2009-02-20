@@ -129,6 +129,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     copy_if(type, (ObClientType)-1);
     copy_if(decor, -1);
     copy_if(shade, -1);
+    copy_if(monitor, -1);
     copy_if(focus, -1);
     copy_if(desktop, 0);
     copy_if(layer, -2);
@@ -264,7 +265,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                         if (!g_ascii_strcasecmp(s, "mouse"))
                             settings->monitor = 0;
                         else
-                            settings->monitor = obt_parse_node_int(c) + 1;
+                            settings->monitor = obt_parse_node_int(c);
                         g_free(s);
                     }
 

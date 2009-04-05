@@ -1,133 +1,135 @@
 # Croatian messages for openbox.
-# Copyright (C) 2006 Mikael Magnusson
+# Copyright (C) 2009 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
-# Daniel Radetic <drade@boobah.info>, 2006.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.3\n"
+"Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-03-03 02:10+0100\n"
-"PO-Revision-Date: 2006-09-05 16:45+0100\n"
-"Last-Translator: Daniel Radetic <drade@boobah.info>\n"
-"Language-Team: None\n"
+"POT-Creation-Date: 2009-03-31 19:16+0200\n"
+"PO-Revision-Date: 2009-04-05 16:53+0200\n"
+"Last-Translator: boljsa <asjlob AT vip.hr>\n"
+"Language-Team:  <asjlob AT vip.hr>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions.c:150
+#: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr ""
+msgstr "Nevažeća akcija \"%s\" zatražena. Takva akcija ne postoji."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr ""
+msgstr "Ne"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr ""
+msgstr "Da"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr ""
+msgstr "Izvrši"
 
 #: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr ""
+msgstr "Neuspio pokušaj pretvorbe putanje \"%s\" iz utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:62
-#: openbox/client.c:3460
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
+#: openbox/client.c:3465
 msgid "Cancel"
-msgstr ""
+msgstr "Odustani"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr ""
+msgstr "Izađi"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Jeste li sigurni da želite zatvoriti Openbox?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Zatvori Openbox"
 
-#: openbox/actions/session.c:41
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
 msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
+"Akcija SessionLogout nije dostupna otkad je Openbox izgrađen bez podrške "
+"upravljanja sesijama"
 
-#: openbox/actions/session.c:63 openbox/actions/session.c:68
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
-msgstr ""
+msgstr "Odjava"
 
-#: openbox/actions/session.c:67
+#: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Jeste li sigurni da se želite odjaviti?"
 
-#: openbox/client.c:2004
+#: openbox/client.c:2012
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Neimenovan Prozor"
 
-#: openbox/client.c:2018 openbox/client.c:2050
+#: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
-msgstr ""
+msgstr "Ubijanje..."
 
-#: openbox/client.c:2020 openbox/client.c:2052
+#: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
-msgstr ""
+msgstr "Ne Odgovara"
 
-#: openbox/client.c:3449
+#: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Prozor \"%s\" ne reagira. Želite li forsirati izlaženje šaljući %s signal?"
 
-#: openbox/client.c:3451
+#: openbox/client.c:3456
 msgid "End Process"
-msgstr ""
+msgstr "Završetak Procesa"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
+"Prozor \"%s\" ne reagira. Želite li prekinuti njegovu vezu sa X serverom?"
 
-#: openbox/client.c:3457
+#: openbox/client.c:3462
 msgid "Disconnect"
-msgstr ""
+msgstr "Prekid veze"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
-msgstr "Odi na..."
+msgstr "Idi tamo..."
 
 #: openbox/client_list_combined_menu.c:94
-#, fuzzy
 msgid "Manage desktops"
-msgstr "Sve radne površine"
+msgstr "Upravljanje radnim površinama"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
-#, fuzzy
 msgid "_Add new desktop"
-msgstr "_Pošalji na radnu površinu"
+msgstr "_Dodaj novu radnu površinu"
 
 #: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
-#, fuzzy
 msgid "_Remove last desktop"
-msgstr "_Pošalji na radnu površinu"
+msgstr "_Ukloni zadnju radnu površinu"
 
 #: openbox/client_list_combined_menu.c:149
 msgid "Windows"
-msgstr ""
+msgstr "Prozori"
 
 #: openbox/client_list_menu.c:203
 msgid "Desktops"
-msgstr "Radne površine"
+msgstr "Radne Površine"
 
 #: openbox/client_menu.c:258
 msgid "All desktops"
@@ -135,7 +137,7 @@ msgstr "Sve radne površine"
 
 #: openbox/client_menu.c:370
 msgid "_Layer"
-msgstr ""
+msgstr "_Sloj"
 
 #: openbox/client_menu.c:375
 msgid "Always on _top"
@@ -151,311 +153,336 @@ msgstr "Uvijek na _dnu"
 
 #: openbox/client_menu.c:379
 msgid "_Send to desktop"
-msgstr "_Pošalji na radnu površinu"
+msgstr "Pošalji na _radnu površinu"
 
 #: openbox/client_menu.c:383
 msgid "Client menu"
-msgstr "Meni klijenta"
+msgstr "Izbornik klijenta"
 
 #: openbox/client_menu.c:393
 msgid "R_estore"
-msgstr "Ponovno uspostav_i"
+msgstr "O_bnovi"
 
 #: openbox/client_menu.c:397
 msgid "_Move"
-msgstr "Po_makni"
+msgstr "_Pomicanje"
 
 #: openbox/client_menu.c:399
 msgid "Resi_ze"
-msgstr "Prom_jeni veličinu"
+msgstr "Prom_jena veličine"
 
 #: openbox/client_menu.c:401
 msgid "Ico_nify"
-msgstr "Iko_nificiraj"
+msgstr "Mi_nimizacija"
 
 #: openbox/client_menu.c:405
 msgid "Ma_ximize"
-msgstr "M_aksimiziraj"
+msgstr "M_aksimizacija"
 
 #: openbox/client_menu.c:409
 msgid "_Roll up/down"
-msgstr ""
+msgstr "_Okretanje gore/dolje"
 
 #: openbox/client_menu.c:411
 msgid "Un/_Decorate"
-msgstr ""
+msgstr "Ne/_Dekoriranje"
 
 #: openbox/client_menu.c:415
 msgid "_Close"
 msgstr "_Zatvori"
 
-#: openbox/config.c:781
+#: openbox/config.c:782
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr ""
+msgstr "Nevažeće dugme \"%s\" specificirano u konfiguracijskoj datoteci"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
-msgstr ""
+msgstr "Konflikt sa povezivanjem tipki u konfiguracijskoj datoteci"
 
-#: openbox/menu.c:103 openbox/menu.c:111
+#: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr ""
+msgstr "Ne mogu pronaći važeću datoteku izbornika \"%s\""
 
-#: openbox/menu.c:171
+#: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr ""
+msgstr "Neuspio pokušaj izvršavanja naredbe za cijev-izbornik \"%s\": %s"
 
-#: openbox/menu.c:185
+#: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
-msgstr ""
+msgstr "Nevažeći izlaz za cijev-izbornik \"%s\""
 
-#: openbox/menu.c:198
+#: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr ""
+msgstr "Pokušavam pristupiti izborniku \"%s\" ali on ne postoji"
 
-#: openbox/menu.c:368 openbox/menu.c:369
+#: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
-msgstr ""
+msgstr "Više..."
 
 #: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
-msgstr ""
+msgstr "Nevažeće dugme \"%s\" u povezivanju miša"
 
 #: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
-msgstr ""
+msgstr "Nevažeći kontekst \"%s\" u povezivanju miša"
 
-#: openbox/openbox.c:134
+#: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr ""
+msgstr "Ne mogu doći u home direktorij \"%s\": %s"
 
-#: openbox/openbox.c:154
+#: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr ""
+msgstr "Neuspio pokušaj otvaranja zaslona iz DISPLAY varijable okruženja."
 
-#: openbox/openbox.c:185
+#: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
-msgstr ""
+msgstr "Neuspio pokušaj inicijalizacije obrender biblioteke."
+
+#: openbox/openbox.c:194
+msgid "X server does not support locale."
+msgstr "X server ne podržava lokalno."
 
 #: openbox/openbox.c:196
-msgid "X server does not support locale."
-msgstr ""
-
-#: openbox/openbox.c:198
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
+msgstr "Ne mogu postaviti lokalne modifikatore za X server."
 
-#: openbox/openbox.c:266
+#: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
+"Ne mogu pronaći važeću konfiguracijsku datoteku, koriteći neke jednostavne "
+"standarde"
 
-#: openbox/openbox.c:300
+#: openbox/openbox.c:297
 msgid "Unable to load a theme."
-msgstr ""
+msgstr "Ne mogu pokrenuti temu."
 
-#: openbox/openbox.c:380
+#: openbox/openbox.c:377
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Jedna ili više XML pogreški u sintaksi su pronađene prilikom analize Openbox "
+"konfiguracijskih datoteka. Pogledajte stdout za više informacija. Zadnja "
+"pogreška je u datoteci \"%s\" u liniji %d, sa porukom: %s"
 
-#: openbox/openbox.c:382
+#: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openbox Pogreška u Sintaksi"
 
-#: openbox/openbox.c:382
-#, fuzzy
+#: openbox/openbox.c:379
 msgid "Close"
-msgstr "_Zatvori"
+msgstr "Zatvori"
 
-#: openbox/openbox.c:451
+#: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
-msgstr ""
+msgstr "Restart je bio neusješan za izvršenje novog izvršnog \"%s\": %s"
 
-#: openbox/openbox.c:521 openbox/openbox.c:523
+#: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
-msgstr ""
+msgstr "Copyright (c)"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
-msgstr ""
+msgstr "Sintaksa: openbox [opcije]\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:530
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
+"\n"
+"Opcije:\n"
 
-#: openbox/openbox.c:534
+#: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
-msgstr ""
+msgstr "  --help              Prikazuje ovu pomoć i izlazi\n"
 
-#: openbox/openbox.c:535
+#: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
-msgstr ""
+msgstr "  --version           Prikazuje verziju i izlazi\n"
 
-#: openbox/openbox.c:536
+#: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
+"  --replace           Zamjenjuje trenutno pokrenut upravitelj prozora\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:540
+#: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
+"  --config-file FILE  Specificira putanju do konfiguracijske datoteke koja "
+"se koristi\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
+msgstr "  --sm-disable        Onemogućuje vezu sa upraviteljom sesija\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:539
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
+"\n"
+"Prosljeđuje poruke pokrenutoj Openbox instanci:\n"
+
+#: openbox/openbox.c:540
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Osvježava Openbox konfiguraciju\n"
+
+#: openbox/openbox.c:541
+msgid "  --restart           Restart Openbox\n"
+msgstr "  --restart           Restartira Openbox\n"
+
+#: openbox/openbox.c:542
+msgid "  --exit              Exit Openbox\n"
+msgstr "  --exit              Izlazi iz Openbox-a\n"
 
 #: openbox/openbox.c:543
-msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr ""
-
-#: openbox/openbox.c:544
-msgid "  --restart           Restart Openbox\n"
-msgstr ""
-
-#: openbox/openbox.c:545
-msgid "  --exit              Exit Openbox\n"
-msgstr ""
-
-#: openbox/openbox.c:546
 msgid ""
 "\n"
 "Debugging options:\n"
 msgstr ""
+"\n"
+"Opcije traženja pogrešaka:\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
-msgstr ""
+msgstr "  --sync              Pokretanje u sinkronizacijskom modu\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
-msgstr ""
+msgstr "  --debug             Prikazuje izlaz traženja pogrešaka\n"
 
-#: openbox/openbox.c:549
+#: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
+"  --debug-focus       Prikazuje izlaz traženja pogrešaka za rukovanje "
+"fokusom\n"
 
-#: openbox/openbox.c:550
+#: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr ""
+msgstr "  --debug-xinerama    Podijeli zaslon u lažne xinerama zaslone\n"
 
-#: openbox/openbox.c:551
+#: openbox/openbox.c:548
 #, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
 msgstr ""
+"\n"
+"Molimo prijavite pogrešku na %s\n"
 
-#: openbox/openbox.c:620
+#: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr ""
+msgstr "--config-file zahtjeva argument\n"
 
-#: openbox/openbox.c:663
+#: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr ""
+msgstr "Nevažeći argument komandne linije \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr ""
+msgstr "Upravitelj prozora je već pokrenut na zaslonu %d"
 
 #: openbox/screen.c:124
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr ""
+msgstr "Ne mogu ostvariti odabir upravitelja prozora na zaslonu %d"
 
 #: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr ""
+msgstr "Upravitelj prozora na zaslonu %d ne izlazi"
 
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
 #: openbox/screen.c:412
-#, c-format
+#, fuzzy, c-format
 msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
-msgstr ""
+msgstr[0] ""
+"Openbox je konfiguriran za %d radnu površinu, ali trenutna sesija ima %d. "
+"Prepisujem preko Openbox konfiguracije."
+msgstr[1] ""
+"Openbox je konfiguriran za %d radnu površinu, ali trenutna sesija ima %d. "
+"Prepisujem preko Openbox konfiguracije."
 
 #: openbox/screen.c:1180
 #, c-format
 msgid "desktop %i"
-msgstr ""
+msgstr "radna površina %i"
 
 #: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
-msgstr "Nemogu napraviti direktorij \"%s\": %s"
+msgstr "Ne mogu stvoriti direktorij \"%s\": %s"
 
-#: openbox/session.c:452
+#: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
-msgstr ""
+msgstr "Ne mogu spremiti sesiju u \"%s\": %s"
 
-#: openbox/session.c:584
+#: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
-msgstr ""
+msgstr "Pogreška prilokom spremanja sesije u \"%s\": %s"
 
-#: openbox/session.c:821
+#: openbox/session.c:842
 msgid "Not connected to a session manager"
-msgstr ""
+msgstr "Nije povezan sa upraviteljem sesija"
 
 #: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s\n"
-msgstr ""
+msgstr "Pokrenuto %s\n"
 
 #: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key \"%s\" in key/mouse binding"
-msgstr ""
+msgstr "Nevažeći modifikacijski ključ \"%s\" u povezivanju tipke/miš"
 
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code \"%s\" in key binding"
-msgstr ""
+msgstr "Nevažeći kod ključa \"%s\" u povezivanju tipki"
 
 #: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name \"%s\" in key binding"
-msgstr ""
+msgstr "Nevažeće ime tipke \"%s\" u povezivanju tipki"
 
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr ""
+msgstr "Traženi ključ \"%s\" ne postoji na zaslonu"
 
 #: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
-msgstr ""
+msgstr "X Pogreška: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr ""
+msgstr "OK"

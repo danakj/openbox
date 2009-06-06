@@ -143,6 +143,28 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
             }
         } else im->data = (gchar*) data;
         break;
+    case 24:
+    {
+        /* reverse the ordering, shifting left 16bit should be the first byte
+           out of three, etc */
+        const guint roff = (16 - RrRedOffset(inst)) / 8;
+        const guint goff = (16 - RrGreenOffset(inst)) / 8;
+        const guint boff = (16 - RrBlueOffset(inst)) / 8;
+        gint outx;
+        for (y = 0; y < im->height; y++) {
+            for (x = 0, outx = 0; x < im->width; x++, outx += 3) {
+                r = (data[x] >> RrDefaultRedOffset) & 0xFF;
+                g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
+                b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
+                p8[outx+roff] = r;
+                p8[outx+goff] = g;
+                p8[outx+boff] = b;
+            }
+            data += im->width;
+            p8 += im->bytes_per_line;
+        }
+        break;
+    }
     case 16:
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
@@ -191,7 +213,7 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         }
         break;
     default:
-        g_error("Your bit depth is currently unhandled\n");
+        g_error("This image bit depth (%i) is currently unhandled", im->bits_per_pixel);
 
     }
 }

@@ -443,8 +443,8 @@ msgstr ""
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "تشغيل %s\n"
+msgid "Running %s"
+msgstr "تشغيل %s"
 
 #: openbox/translate.c:59
 #, c-format

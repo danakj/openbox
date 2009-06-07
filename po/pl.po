@@ -445,8 +445,8 @@ msgstr ""
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Uruchamianie %s\n"
+msgid "Running %s"
+msgstr "Uruchamianie %s"
 
 #: openbox/translate.c:59
 #, c-format

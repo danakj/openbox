@@ -459,8 +459,8 @@ msgstr "Niet met een sessiebeheerder verbonden"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Starten van %s\n"
+msgid "Running %s"
+msgstr "Starten van %s"
 
 #: openbox/translate.c:59
 #, c-format

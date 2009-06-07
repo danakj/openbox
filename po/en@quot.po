@@ -474,8 +474,8 @@ msgstr "Not connected to a session manager"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Running %s\n"
+msgid "Running %s"
+msgstr "Running %s"
 
 #: openbox/translate.c:59
 #, c-format

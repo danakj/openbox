@@ -450,8 +450,8 @@ msgstr "Nepřipojen k session manageru"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Spouštím %s\n"
+msgid "Running %s"
+msgstr "Spouštím %s"
 
 #: openbox/translate.c:59
 #, c-format

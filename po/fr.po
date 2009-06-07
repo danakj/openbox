@@ -474,8 +474,8 @@ msgstr "Non connecté à un gestionnaire de session"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Exécution de %s\n"
+msgid "Running %s"
+msgstr "Exécution de %s"
 
 #: openbox/translate.c:59
 #, c-format

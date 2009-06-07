@@ -457,8 +457,8 @@ msgstr "Ei yhteyttä istunnon hallintaan"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Suoritetaan %s\n"
+msgid "Running %s"
+msgstr "Suoritetaan %s"
 
 #: openbox/translate.c:59
 #, c-format

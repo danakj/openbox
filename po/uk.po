@@ -453,8 +453,8 @@ msgstr "Не під'єднано до керівника сесіями"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Виконується %s\n"
+msgid "Running %s"
+msgstr "Виконується %s"
 
 #: openbox/translate.c:59
 #, c-format

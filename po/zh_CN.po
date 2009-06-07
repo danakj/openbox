@@ -444,8 +444,8 @@ msgstr "未连接到会话管理器"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "运行 %s\n"
+msgid "Running %s"
+msgstr "运行 %s"
 
 #: openbox/translate.c:59
 #, c-format

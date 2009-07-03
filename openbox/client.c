@@ -315,6 +315,11 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
     ob_debug("Window name: %s class: %s\n", self->name, self->class);
 
+    /* per-app settings override stuff from client_get_all, and return the
+       settings for other uses too. the returned settings is a shallow copy,
+       that needs to be freed with g_free(). */
+    settings = client_get_settings_state(self);
+
     /* now we have all of the window's information so we can set this up.
        do this before creating the frame, so it can tell that we are still
        mapping and doesn't go applying things right away */
@@ -335,10 +340,6 @@ void client_manage(Window window, ObPrompt *prompt)
        time now */
     grab_server(FALSE);
 
-    /* per-app settings override stuff from client_get_all, and return the
-       settings for other uses too. the returned settings is a shallow copy,
-       that needs to be freed with g_free(). */
-    settings = client_get_settings_state(self);
     /* the session should get the last say though */
     client_restore_session_state(self);
 

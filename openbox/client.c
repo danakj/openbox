@@ -313,7 +313,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Window type: %d\n", self->type);
     ob_debug("Window group: 0x%x\n", self->group?self->group->leader:0);
-    ob_debug("Window name: %s class: %s\n", self->name, self->class);
+    ob_debug("Window name: %s class: %s role: %s\n", self->name, self->class, self->role);
 
     /* per-app settings override stuff from client_get_all, and return the
        settings for other uses too. the returned settings is a shallow copy,

@@ -3591,17 +3591,37 @@ ObClient *client_search_modal_child(ObClient *self)
     return NULL;
 }
 
+static gboolean client_validate_unmap(ObClient *self, int n)
+{
+    XEvent e;
+    gboolean ret = TRUE;
+
+    if (XCheckTypedWindowEvent(ob_display, self->window, UnmapNotify, &e)) {
+        if (n < self->ignore_unmaps) // ignore this one, but look for more
+            ret = client_validate_unmap(self, n+1);
+        else
+            ret = FALSE; // the window is going to become unmanaged
+
+        /* put them back on the event stack so they end up in the same order */
+        XPutBackEvent(ob_display, &e);
+    }
+
+    return ret;
+}
+
 gboolean client_validate(ObClient *self)
 {
     XEvent e;
 
     XSync(ob_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(ob_display, self->window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(ob_display, self->window, UnmapNotify, &e)) {
+    if (XCheckTypedWindowEvent(ob_display, self->window, DestroyNotify, &e)) {
         XPutBackEvent(ob_display, &e);
         return FALSE;
     }
+
+    if (!client_validate_unmap(self, 0))
+        return FALSE;
 
     return TRUE;
 }

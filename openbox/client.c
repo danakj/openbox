@@ -439,7 +439,7 @@ void client_manage(Window window, ObPrompt *prompt)
                       "Current focus_client: %s",
                       (focus_client ? focus_client->title : "(none)"));
         ob_debug_type(OB_DEBUG_FOCUS,
-                      "parent focuesed: %d  relative focused: %d",
+                      "parent focused: %d  relative focused: %d",
                       parent_focused, relative_focused);
 
         if (menu_frame_visible || moveresize_in_progress) {

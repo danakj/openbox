@@ -77,7 +77,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup *desktop_popup;
+static ObPagerPopup **desktop_popup;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -353,15 +353,22 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_popup = pager_popup_new();
-    pager_popup_height(desktop_popup, POPUP_HEIGHT);
-
     if (reconfig) {
-        /* update the pager popup's width */
-        pager_popup_text_width_to_strings(desktop_popup,
-                                          screen_desktop_names,
-                                          screen_num_desktops);
+        guint i;
+        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
+        for (i = 0; i < screen_num_monitors; i++) {
+            desktop_popup[i] = pager_popup_new();
+            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
+
+            /* update the pager popup's width */
+            pager_popup_text_width_to_strings(desktop_popup[i],
+                                              screen_desktop_names,
+                                              screen_num_desktops);
+        }
+
         return;
+    } else {
+        desktop_popup = NULL;
     }
 
     /* get the initial size */
@@ -451,7 +458,12 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    pager_popup_free(desktop_popup);
+    guint i;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_free(desktop_popup[i]);
+    }
+    g_free(desktop_popup);
 
     if (reconfig)
         return;
@@ -922,39 +934,52 @@ static guint translate_row_col(guint r, guint c)
 
 static gboolean hide_desktop_popup_func(gpointer data)
 {
-    pager_popup_hide(desktop_popup);
+    guint i;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_hide(desktop_popup[i]);
+    }
     return FALSE; /* don't repeat */
 }
 
 void screen_show_desktop_popup(guint d)
 {
     Rect *a;
+    guint i;
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    a = screen_physical_area_active();
-    pager_popup_position(desktop_popup, CenterGravity,
-                         a->x + a->width / 2, a->y + a->height / 2);
-    pager_popup_icon_size_multiplier(desktop_popup,
-                                     (screen_desktop_layout.columns /
-                                      screen_desktop_layout.rows) / 2,
-                                     (screen_desktop_layout.rows/
-                                      screen_desktop_layout.columns) / 2);
-    pager_popup_max_width(desktop_popup,
-                          MAX(a->width/3, POPUP_WIDTH));
-    pager_popup_show(desktop_popup, screen_desktop_names[d], d);
+    for (i = 0; i < screen_num_monitors; i++) {
+        a = screen_physical_area_monitor(i);
+        pager_popup_position(desktop_popup[i], CenterGravity,
+                             a->x + a->width / 2, a->y + a->height / 2);
+        pager_popup_icon_size_multiplier(desktop_popup[i],
+                                         (screen_desktop_layout.columns /
+                                          screen_desktop_layout.rows) / 2,
+                                         (screen_desktop_layout.rows/
+                                          screen_desktop_layout.columns) / 2);
+        pager_popup_max_width(desktop_popup[i],
+                              MAX(a->width/3, POPUP_WIDTH));
+        pager_popup_show(desktop_popup[i], screen_desktop_names[d], d);
 
-    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
-    ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
-                             hide_desktop_popup_func, NULL, NULL, NULL);
-    g_free(a);
+        ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+        ob_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
+                                 hide_desktop_popup_func, desktop_popup[i],
+                                 g_direct_equal, NULL);
+        g_free(a);
+    }
 }
 
 void screen_hide_desktop_popup(void)
 {
-    ob_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
-    pager_popup_hide(desktop_popup);
+    guint i;
+
+    for (i = 0; i < screen_num_monitors; i++) {
+        ob_main_loop_timeout_remove_data(ob_main_loop, hide_desktop_popup_func,
+                                         desktop_popup[i], FALSE);
+        pager_popup_hide(desktop_popup[i]);
+    }
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -1189,9 +1214,11 @@ void screen_update_desktop_names(void)
     }
 
     /* resize the pager for these names */
-    pager_popup_text_width_to_strings(desktop_popup,
-                                      screen_desktop_names,
-                                      screen_num_desktops);
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_text_width_to_strings(desktop_popup[i],
+                                          screen_desktop_names,
+                                          screen_num_desktops);
+    }
 }
 
 void screen_show_desktop(gboolean show, ObClient *show_only)
@@ -1320,6 +1347,20 @@ void screen_update_areas(void)
 
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
+
+    if (!desktop_popup) {
+        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
+        for (i = 0; i < screen_num_monitors; i++) {
+            desktop_popup[i] = pager_popup_new();
+            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
+
+            if (screen_desktop_names)
+                /* update the pager popup's width */
+                pager_popup_text_width_to_strings(desktop_popup[i],
+                                                  screen_desktop_names,
+                                                  screen_num_desktops);
+        }
+    }
 
     /* set up the user-specified margins */
     config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);

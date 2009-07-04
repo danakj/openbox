@@ -6,7 +6,9 @@
 
 enum {
     CURRENT_MONITOR = -1,
-    ALL_MONITORS = -2
+    ALL_MONITORS = -2,
+    NEXT_MONITOR = -3,
+    PREV_MONITOR = -4
 };
 
 typedef struct {
@@ -89,6 +91,10 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
+            else if(!g_ascii_strcasecmp(s, "next"))
+                o->monitor = NEXT_MONITOR;
+            else if(!g_ascii_strcasecmp(s, "prev"))
+                o->monitor = PREV_MONITOR;
             else
                 o->monitor = parse_int(doc, n) - 1;
         }
@@ -121,6 +127,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         cmon = client_monitor(c);
         if (mon == CURRENT_MONITOR) mon = cmon;
         else if (mon == ALL_MONITORS) mon = SCREEN_AREA_ALL_MONITORS;
+        else if (mon == NEXT_MONITOR) mon = (cmon + 1 > screen_num_monitors - 1) ? 0 : (cmon + 1);
+        else if (mon == PREV_MONITOR) mon = (cmon == 0) ? (screen_num_monitors - 1) : (cmon - 1);
+
         area = screen_area(c->desktop, mon, NULL);
         carea = screen_area(c->desktop, cmon, NULL);
 

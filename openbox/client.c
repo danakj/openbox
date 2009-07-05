@@ -233,7 +233,12 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Window type: %d", self->type);
     ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
-    ob_debug("Window name: %s class: %s", self->name, self->class);
+    ob_debug("Window name: %s class: %s role: %s", self->name, self->class, self->role);
+
+    /* per-app settings override stuff from client_get_all, and return the
+       settings for other uses too. the returned settings is a shallow copy,
+       that needs to be freed with g_free(). */
+    settings = client_get_settings_state(self);
 
     /* now we have all of the window's information so we can set this up.
        do this before creating the frame, so it can tell that we are still
@@ -255,10 +260,6 @@ void client_manage(Window window, ObPrompt *prompt)
        time now */
     grab_server(FALSE);
 
-    /* per-app settings override stuff from client_get_all, and return the
-       settings for other uses too. the returned settings is a shallow copy,
-       that needs to be freed with g_free(). */
-    settings = client_get_settings_state(self);
     /* the session should get the last say though */
     client_restore_session_state(self);
 
@@ -3538,18 +3539,37 @@ ObClient *client_search_modal_child(ObClient *self)
     return NULL;
 }
 
+static gboolean client_validate_unmap(ObClient *self, int n)
+{
+    XEvent e;
+    gboolean ret = TRUE;
+
+    if (XCheckTypedWindowEvent(obt_display, self->window, UnmapNotify, &e)) {
+        if (n < self->ignore_unmaps) // ignore this one, but look for more
+            ret = client_validate_unmap(self, n+1);
+        else
+            ret = FALSE; // the window is going to become unmanaged
+
+        /* put them back on the event stack so they end up in the same order */
+        XPutBackEvent(obt_display, &e);
+    }
+
+    return ret;
+}
+
 gboolean client_validate(ObClient *self)
 {
     XEvent e;
 
     XSync(obt_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(obt_display, self->window, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(obt_display, self->window, UnmapNotify, &e))
-    {
+    if (XCheckTypedWindowEvent(obt_display, self->window, DestroyNotify, &e)) {
         XPutBackEvent(obt_display, &e);
         return FALSE;
     }
+
+    if (!client_validate_unmap(self, 0))
+        return FALSE;
 
     return TRUE;
 }

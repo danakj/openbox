@@ -94,7 +94,7 @@ if test "$SED" = "no"; then
   AC_MSG_ERROR([The program "sed" is not available. This program is required to build Openbox.])
 fi
 
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.6.0])
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.14.0])
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
 

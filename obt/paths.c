@@ -169,14 +169,16 @@ void obt_paths_unref(ObtPaths *p)
 
 gchar *obt_paths_expand_tilde(const gchar *f)
 {
-    gchar **spl;
     gchar *ret;
+    GRegex *regex;
 
     if (!f)
         return NULL;
-    spl = g_strsplit(f, "~", 0);
-    ret = g_strjoinv(g_get_home_dir(), spl);
-    g_strfreev(spl);
+
+    regex = g_regex_new("(?:^|(?<=[ \\t]))~(?=[/ \\t$])", G_REGEX_MULTILINE | G_REGEX_RAW, 0, NULL);
+    ret = g_regex_replace_literal(regex, f, -1, 0, g_get_home_dir(), 0, NULL);
+    g_regex_unref(regex);
+
     return ret;
 }
 

@@ -1,63 +1,60 @@
-# French translation of Openbox.
-# Copyright (C) 2004 Mikael Magnusson
-# This file is distributed under the same license as the Openbox package.
-#
-# tioui <leonptitlouis@wanadoo.fr>, 2004.
-# Cyrille Bagard <nocbos@gmail.com>, 2007-2008.
-# Jacques BON <jbon@cafcom.net>, 2007.
-# Éric Lassauge <lassauge@users.sf.net>, 2008
+# Latvian translations for openbox.
+# Copyright (C) 2009 Dana Jansens
+# This file is distributed under the same license as the openbox package.
+# Einars Sprugis  <einars8@gmail.com>, 2009.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
-"PO-Revision-Date: 2008-03-02 02:06+0100\n"
-"Last-Translator: Cyrille Bagard <nocbos@gmail.com>\n"
-"Language-Team: français <fr@li.org>\n"
+"POT-Creation-Date: 2009-03-31 19:16+0200\n"
+"PO-Revision-Date: 2009-03-30 19:14+0300\n"
+"Last-Translator: Einars Sprugis <einars8@gmail.com>\n"
+"Language-Team: Latvian <lv@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 
 #: openbox/actions.c:149
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr "Action demandée invalide \"%s\". Une telle action n'existe pas."
+msgstr "NeatÄ¼auta darbÄ«ba \"%s\". Å Äda darbÄ«ba neeksistÄ“."
 
 #: openbox/actions/execute.c:128
 msgid "No"
-msgstr "Non"
+msgstr "NÄ“"
 
 #: openbox/actions/execute.c:129
 msgid "Yes"
-msgstr "Oui"
+msgstr "JÄ"
 
 #: openbox/actions/execute.c:133
 msgid "Execute"
-msgstr "Exécuter"
+msgstr "IzpildÄ«t"
 
 #: openbox/actions/execute.c:142
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Échec de la conversion du chemin « %s » depuis l'UTF-8"
+msgstr "NeizdevÄs pÄrveidot ceÄ¼u \"%s\" no utf8"
 
 #: openbox/actions/exit.c:52 openbox/actions/session.c:64
 #: openbox/client.c:3465
 msgid "Cancel"
-msgstr "Annuler"
+msgstr "Atcelt"
 
 #: openbox/actions/exit.c:53
 msgid "Exit"
-msgstr "Quitter"
+msgstr "Iziet"
 
 #: openbox/actions/exit.c:56
 msgid "Are you sure you want to exit Openbox?"
-msgstr "Etes vous certain de vouloir quitter Openbox ?"
+msgstr "Vai tieÅ¡Äm vÄ“laties iziet no Openbox?"
 
 #: openbox/actions/exit.c:57
 msgid "Exit Openbox"
-msgstr "Quitter Openbox"
+msgstr "Iziet no Openbox"
 
 #. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
 #. name of the action you write in rc.xml
@@ -66,215 +63,207 @@ msgid ""
 "The SessionLogout action is not available since Openbox was built without "
 "session management support"
 msgstr ""
-"L'action SessionLogout n'est pas disponible comme Openbox a été construit "
-"sans support de gestion de session"
+"SessionLogout darbÄ«ba nav pieejama, jo Openbox tika kompilÄ“ts bez sesijas "
+"pÄrvaldes atbalsta"
 
 #: openbox/actions/session.c:65 openbox/actions/session.c:70
 msgid "Log Out"
-msgstr "Déconnexion"
+msgstr "Atteikties"
 
 #: openbox/actions/session.c:69
 msgid "Are you sure you want to log out?"
-msgstr "Etes vous certain de vouloir vous déconnecter ?"
+msgstr "Vai tieÅ¡Äm vÄ“laties atteikties?"
 
 #: openbox/client.c:2012
 msgid "Unnamed Window"
-msgstr "Fenêtre sans nom"
+msgstr "Logs bez nosaukuma"
 
 #: openbox/client.c:2026 openbox/client.c:2058
 msgid "Killing..."
-msgstr "Tue..."
+msgstr "Nogalina..."
 
 #: openbox/client.c:2028 openbox/client.c:2060
 msgid "Not Responding"
-msgstr "Ne répond pas"
+msgstr "Neatbild"
 
 #: openbox/client.c:3454
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
-msgstr ""
-"La fenêtre \"%s\" semble ne pas répondre. Voulez vous la forcer à se "
-"terminer en envoyant un signal %s ?"
+msgstr "Logs \"%s\" neatbild. Vai vÄ“lieties to piespiest, nosÅ«tot signÄlu %s?"
 
 #: openbox/client.c:3456
 msgid "End Process"
-msgstr "Fin de processus"
+msgstr "Nobeigt procesu"
 
 #: openbox/client.c:3460
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
-msgstr ""
-"La fenêtre \"%s\" semble ne pas répondre. Voulez vous la déconnecter du "
-"serveur X ?"
+msgstr "Logs \"%s\" neatbild. Vai vÄ“laties to atvienot no X servera?"
 
 #: openbox/client.c:3462
 msgid "Disconnect"
-msgstr "Déconnexion"
+msgstr "Atvienot"
 
 #: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
 msgid "Go there..."
-msgstr "Aller là..."
+msgstr "Iet uz turieni..."
 
 #: openbox/client_list_combined_menu.c:94
 msgid "Manage desktops"
-msgstr "Gérer les bureaux"
+msgstr "PÄrvaldÄ«t darbvirsmas"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
-msgstr "_Ajouter un bureau"
+msgstr "Pievienot j_aunu darbvirsmu"
 
 #: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
 msgid "_Remove last desktop"
-msgstr "_Supprimer le dernier bureau"
+msgstr "AizvÄkt pÄ“dÄ“jo da_rbvirsmu"
 
 #: openbox/client_list_combined_menu.c:149
 msgid "Windows"
-msgstr "Fenêtres"
+msgstr "Logi"
 
 #: openbox/client_list_menu.c:203
 msgid "Desktops"
-msgstr "Bureaux"
+msgstr "Darbvirsmas"
 
 #: openbox/client_menu.c:258
 msgid "All desktops"
-msgstr "Tous les bureaux"
+msgstr "Visas darbvirsmas"
 
 #: openbox/client_menu.c:370
 msgid "_Layer"
-msgstr "_Disposition"
+msgstr "S_lÄnis"
 
 #: openbox/client_menu.c:375
 msgid "Always on _top"
-msgstr "_Toujours au premier plan"
+msgstr "VienmÄ“r augÅ¡Ä"
 
 #: openbox/client_menu.c:376
 msgid "_Normal"
-msgstr "_Normal"
+msgstr "_NormÄli"
 
 #: openbox/client_menu.c:377
 msgid "Always on _bottom"
-msgstr "Toujours en _arrière plan"
+msgstr "VienmÄ“r a_pakÅ¡Ä"
 
 #: openbox/client_menu.c:379
 msgid "_Send to desktop"
-msgstr "En_voyer vers le bureau"
+msgstr "No_sÅ«tÄ«t uz darbvirsmu"
 
 #: openbox/client_menu.c:383
 msgid "Client menu"
-msgstr "Menu de la fenêtre"
+msgstr "KlientizvÄ“lne"
 
 #: openbox/client_menu.c:393
 msgid "R_estore"
-msgstr "R_estaurer"
+msgstr "Atja_unot"
 
 #: openbox/client_menu.c:397
 msgid "_Move"
-msgstr "Dé_placer"
+msgstr "PÄrviet_ot"
 
 #: openbox/client_menu.c:399
 msgid "Resi_ze"
-msgstr "Red_imensionner"
+msgstr "MainÄ«t i_zmÄ“ru"
 
 #: openbox/client_menu.c:401
 msgid "Ico_nify"
-msgstr "Ico_nifier"
+msgstr "Mi_nimizÄ“t"
 
 #: openbox/client_menu.c:405
 msgid "Ma_ximize"
-msgstr "Ma_ximiser"
+msgstr "MaksimizÄ“_t"
 
 #: openbox/client_menu.c:409
 msgid "_Roll up/down"
-msgstr "En/Dé_rouler"
+msgstr "Sa_ritinÄt/AtritinÄt"
 
 #: openbox/client_menu.c:411
 msgid "Un/_Decorate"
-msgstr "Ne pas/Dé_corer"
+msgstr "Bez/Ar _dekorÄcijÄm"
 
 #: openbox/client_menu.c:415
 msgid "_Close"
-msgstr "_Fermer"
+msgstr "Ai_zvÄ“rt"
 
-#: openbox/config.c:781
+#: openbox/config.c:782
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Bouton « %s » indiqué dans le fichier de configuration invalide"
+msgstr "KonfigurÄcijas failÄ \"%s\" norÄdÄ«ts neatÄ¼auts taustiÅ†Å¡"
 
 #: openbox/keyboard.c:157
 msgid "Conflict with key binding in config file"
-msgstr "Conflit entre les raccourcis clavier dans le fichier de configuration"
+msgstr "KonfliktÄ“ ar tastatÅ«ras saÄ«snÄ“m konfigurÄcijas failÄ"
 
 #: openbox/menu.c:102 openbox/menu.c:110
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr "Impossible de trouver un fichier de menus valide  « %s »"
+msgstr "Nav atrasts atÄ¼auts izvÄ“lnes fails \"%s\""
 
 #: openbox/menu.c:170
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Échec lors de l'exécution de la commande pour un pipe-menu « %s » : %s"
+msgstr "NevarÄ“ja izpildÄ«t skriptÄ“tÄs izvÄ“lnes komandu \"%s\": %s"
 
 #: openbox/menu.c:184
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Sortie du pipe-menu invalide « %s »"
+msgstr "NeatÄ¼auta izvade no skriptÄ“tÄs izvÄ“lnes \"%s\""
 
 #: openbox/menu.c:197
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Tentative d'accès au menu « %s » qui n'existe pas"
+msgstr "MÄ“Ä£inÄja piekÄ¼Å«t izvÄ“lnei \"%s\", bet tÄ neeksistÄ“"
 
 #: openbox/menu.c:367 openbox/menu.c:368
 msgid "More..."
-msgstr "Plus..."
+msgstr "VairÄk..."
 
 #: openbox/mouse.c:373
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Bouton « %s » invalide dans le paramétrage de la souris"
+msgstr "NeatÄ¼auts taustiÅ†Å¡ \"%s\" peles saÄ«snÄ“"
 
 #: openbox/mouse.c:379
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
-msgstr "Contexte « %s » invalide dans le paramétrage de la souris"
+msgstr "NeatÄ¼auts konteksts \"%s\" peles saÄ«snÄ“"
 
 #: openbox/openbox.c:133
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr "Impossible de changer vers le répertoire de l'utilisateur « %s » : %s"
+msgstr "NevarÄ“ja pÄriet uz mÄjas mapi \"%s\": %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr ""
-"Échec de l'ouverture de l'affichage depuis la variable d'environnement "
-"DISPLAY."
+msgstr "NeizdevÄs atvÄ“Å—t displeju no DISPLAY vides mainÄ«gÄ."
 
 #: openbox/openbox.c:183
 msgid "Failed to initialize the obrender library."
-msgstr "Échec de l'initialisation de la bibliothèque obrender."
+msgstr "NeizdevÄs inicializÄ“t obrender bibliotÄ“ku."
 
 #: openbox/openbox.c:194
 msgid "X server does not support locale."
-msgstr "Le serveur X ne supporte pas la localisation."
+msgstr "X serveris neatbalsta lokÄli."
 
 #: openbox/openbox.c:196
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
-"Impossible d'appliquer les modifications de localisation pour le serveur X."
+msgstr "Nevar uzstÄdÄ«t lokÄles modificÄ“tÄjus X serverim."
 
 #: openbox/openbox.c:263
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Impossible de trouver un fichier de configuration valide, utilisation de "
-"défauts simples"
+"NevarÄ“ja atrast atÄ¼autu konfigurÄcijas failu, tiek izmantoti noklusÄ“jumi"
 
 #: openbox/openbox.c:297
 msgid "Unable to load a theme."
-msgstr "Impossible de charger un thème."
+msgstr "Nebija iespÄ“jams ielÄdÄ“t tÄ“mu."
 
 #: openbox/openbox.c:377
 #, c-format
@@ -283,24 +272,22 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
-"Une ou plusieurs erreurs de syntaxe XML ont été trouvées lors de l'analyse "
-"des fichiers de configuration d'Openbox.  Voir stdout pour plus "
-"d'information.  La dernière erreur vue était dans le fichier \"%s\", ligne %"
-"d, avec le message : %s"
+"AnalizÄ“jot Openbox konfigurÄcijas datnes, tika atrastas viena vai vairÄkas "
+"XML sintakses kÄ¼Å«das. AplÅ«kojiet standarta izvadi, lai noskaidrotu vairÄk. "
+"PÄ“dÄ“jÄ kÄ¼Å«da bija failÄ \"%s\" - %d rinda, kÄ¼Å«das ziÅ†ojums: %s"
 
 #: openbox/openbox.c:379
 msgid "Openbox Syntax Error"
-msgstr "Erreur de syntaxe Openbox"
+msgstr "Openbox sintakses kÄ¼Å«da"
 
 #: openbox/openbox.c:379
 msgid "Close"
-msgstr "Fermer"
+msgstr "AizvÄ“rt"
 
 #: openbox/openbox.c:448
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
-"Le redémarrage n'a pas réussi à exécuter le nouvel exécutable « %s » : %s"
 
 #: openbox/openbox.c:518 openbox/openbox.c:520
 msgid "Copyright (c)"
@@ -308,7 +295,7 @@ msgstr "Copyright (c)"
 
 #: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
-msgstr "Syntaxe : openbox [options]\n"
+msgstr "Sintakse: openbox [iespÄ“jas]\n"
 
 #: openbox/openbox.c:530
 msgid ""
@@ -316,21 +303,19 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Options :\n"
+"IespÄ“jas:\n"
 
 #: openbox/openbox.c:531
 msgid "  --help              Display this help and exit\n"
-msgstr "  --help              Affiche cette aide et quitte\n"
+msgstr "  --help              ParÄda Å¡o palÄ«dzÄ«bas tekstu un iziet\n"
 
 #: openbox/openbox.c:532
 msgid "  --version           Display the version and exit\n"
-msgstr "  --version           Affiche la version et quitte\n"
+msgstr "  --version           ParÄda versiju un iziet\n"
 
 #: openbox/openbox.c:533
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
-"  --replace           Remplace le gestionnaire de fenêtres actuellement en "
-"usage\n"
+msgstr "  --replace           Aizvieto paÅ¡reiz palaisto logu pÄrvaldnieku\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
@@ -338,13 +323,11 @@ msgstr ""
 #: openbox/openbox.c:537
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
-"  --config-file FILE  Spécifie le chemin du fichier de configuration à "
-"utiliser\n"
+"  --config-file FAILS NorÄda ceÄ¼u uz izmantojamo konfigurÄcijas failu\n"
 
 #: openbox/openbox.c:538
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr ""
-"  --sm-disable        Désactive la connexion au gestionnaire de sessions\n"
+msgstr "  --sm-disable        AtspÄ“jo savienojumu ar sesiju pÄrvaldnieku\n"
 
 #: openbox/openbox.c:539
 msgid ""
@@ -352,19 +335,19 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Passage de messages à l'instance d'Openbox en cours :\n"
+"Nodod ziÅ†ojumus esoÅ¡ai Openbox instancei:\n"
 
 #: openbox/openbox.c:540
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Recharge la configuration d'Openbox\n"
+msgstr "  --reconfigure       PÄrlÄdÄ“ Openbox konfigurÄcijas failus\n"
 
 #: openbox/openbox.c:541
 msgid "  --restart           Restart Openbox\n"
-msgstr "  --restart           Redémarre Openbox\n"
+msgstr "  --restart           PÄrstartÄ“ Openbox\n"
 
 #: openbox/openbox.c:542
 msgid "  --exit              Exit Openbox\n"
-msgstr "  --exit              Sortir d'Openbox\n"
+msgstr "  --exit              Iziet no Openbox\n"
 
 #: openbox/openbox.c:543
 msgid ""
@@ -372,26 +355,24 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Options de déboguage :\n"
+"AtkÄ¼Å«doÅ¡anas iespÄ“jas:\n"
 
 #: openbox/openbox.c:544
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Exécute en mode synchrone\n"
+msgstr "  --sync              Palaist sinhronajÄ reÅ¾Ä«mÄ\n"
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Affiche la sortie de déboguage\n"
+msgstr "  --debug             RÄdÄ«t atkÄ¼Å«doÅ¡anas izvadi\n"
 
 #: openbox/openbox.c:546
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Affiche la sortie de déboguage pour la gestion du "
-"focus\n"
+msgstr "  --debug-focus       RÄdÄ«t atkÄ¼Å«doÅ¡anas izvadi fokusÄ“Å¡anas darbÄ«bÄm\n"
 
 #: openbox/openbox.c:547
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
-"  --debug-xinerama    Découpe l'affichage en écrans xinerama factices\n"
+"  --debug-xinerama    SadalÄ«t displeju vairÄkos viltus xinerama ekrÄnos\n"
 
 #: openbox/openbox.c:548
 #, c-format
@@ -400,34 +381,31 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Veuillez soumettre les rapports de bogues à %s\n"
+"LÅ«dzu, ziÅ†ojiet kÄ¼Å«das %s\n"
 
 #: openbox/openbox.c:617
 msgid "--config-file requires an argument\n"
-msgstr "--config-file requiert un argument\n"
+msgstr "--config-file vajadzÄ«gs arguments\n"
 
 #: openbox/openbox.c:660
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "Argument de la ligne de commande invalide « %s »\n"
+msgstr "NeatÄ¼auts komandrindas arguments \"%s\"\n"
 
 #: openbox/screen.c:102 openbox/screen.c:190
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Un gestionnaire de fenêtres est déjà lancé sur l'écran %d"
+msgstr "Logu pÄrvaldnieks jau eksistÄ“ uz %d. ekrÄna"
 
 #: openbox/screen.c:124
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr ""
-"Impossible d'acquérir la sélection du gestionnaire de fenêtres pour l'écran %"
-"d"
+msgstr "NevarÄ“ja iegÅ«t logu pÄrvaldnieka izvÄ“li uz %d. ekrÄna"
 
 #: openbox/screen.c:145
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr ""
-"Le gestionnaire de fenêtres sur l'écran %d n'est pas en train de se terminer"
+msgstr "Logu pÄrvaldnieks uz %d. ekrÄna nebeidz darbÄ«bu"
 
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
@@ -442,71 +420,69 @@ msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr[0] ""
-"Openbox est configuré pour %d bureau, mais la session en a %d.  Ceci "
-"supplante la configuration d'Openbox."
+"Openbox ir konfigurÄ“ts %d darbvirsmai, bet paÅ¡reizÄ“jai sesijai tÄdu ir %d.  "
+"Å Ä« Openbox konfigurÄcijas opcija tiks ignorÄ“ta."
 msgstr[1] ""
-"Openbox est configuré pour %d bureaux, mais la session en a %d.  Ceci "
-"supplante la configuration d'Openbox."
+"Openbox ir konfigurÄ“ts %d darbvirsmÄm, bet paÅ¡reizÄ“jai sesijai tÄdu ir %d.  "
+"Å Ä« Openbox konfigurÄcijas opcija tiks ignorÄ“ta."
+msgstr[2] ""
+"Openbox ir konfigurÄ“ts %d darbvirsmÄm, bet paÅ¡reizÄ“jai sesijai tÄdu ir %d.  "
+"Å Ä« Openbox konfigurÄcijas opcija tiks ignorÄ“ta."
 
 #: openbox/screen.c:1180
 #, c-format
 msgid "desktop %i"
-msgstr "bureau %i"
+msgstr "darbvirsma %i"
 
 #: openbox/session.c:104
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
-msgstr "Impossible de créer le répertoire « %s » : %s"
+msgstr "Nav iespÄ“jams izveidot mapi \"%s\": %s"
 
 #: openbox/session.c:466
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
-msgstr "Impossible de sauvegarder la session dans « %s » : %s"
+msgstr "Nav iespÄ“jams saglabÄt sesiju \"%s\": %s"
 
 #: openbox/session.c:605
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
-msgstr "Erreur lors de la sauvegarde de la session depuis « %s » : %s"
+msgstr "KÄ¼Å«da saglabÄjot sesiju \"%s\": %s"
 
 #: openbox/session.c:842
 msgid "Not connected to a session manager"
-msgstr "Non connecté à un gestionnaire de session"
+msgstr "Nav savienots ar sesiju pÄrvaldnieku"
 
 #: openbox/startupnotify.c:243
 #, c-format
 msgid "Running %s"
-msgstr "Exécution de %s"
+msgstr "PalaiÅ¾ %s"
 
 #: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key \"%s\" in key/mouse binding"
-msgstr ""
-"Touche de modification « %s » invalide dans le paramétrage du clavier / de la "
-"souris"
+msgstr "NeatÄ¼auts modificÄ“tÄjtaustiÅ†Å¡ \"%s\" tastatÅ«ras/peles saÄ«snÄ“"
 
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code \"%s\" in key binding"
-msgstr "Code de touche « %s » invalide dans le raccourci clavier"
+msgstr "NeatÄ¼auts taustiÅ†a kods \"%s\" tastatÅ«ras saÄ«snÄ“"
 
 #: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name \"%s\" in key binding"
-msgstr "Nom de touche « %s » invalide dans le raccourci clavier"
+msgstr "NeatÄ¼auts taustiÅ†a nosaukums \"%s\" tastatÅ«ras saÄ«snÄ“"
 
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr "La touche demandée « %s » n'existe pas pour l'affichage"
+msgstr "PieprasÄ«tais taustiÅ†Å¡ \"%s\" uz displeja neeksistÄ“"
 
 #: openbox/xerror.c:40
 #, c-format
 msgid "X Error: %s"
-msgstr "Erreur X : %s"
+msgstr "X kÄ¼Å«da: %s"
 
 #: openbox/prompt.c:200
 msgid "OK"
-msgstr "OK"
-
-#~ msgid "Failed to execute \"%s\": %s"
-#~ msgstr "Échec de l'exécution de « %s » : %s"
+msgstr "Labi"

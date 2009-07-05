@@ -452,8 +452,8 @@ msgstr "Không hàng với session quản lý"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Đan Chạy %s\n"
+msgid "Running %s"
+msgstr "Đan Chạy %s"
 
 #: openbox/translate.c:59
 #, c-format

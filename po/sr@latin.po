@@ -463,8 +463,8 @@ msgstr "Nije povezan sa upravnikom sesija"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Izvršavam %s\n"
+msgid "Running %s"
+msgstr "Izvršavam %s"
 
 #: openbox/translate.c:59
 #, c-format

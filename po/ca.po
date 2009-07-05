@@ -468,8 +468,8 @@ msgstr "No esteu connectats al gestor de sessions"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Executant %s\n"
+msgid "Running %s"
+msgstr "Executant %s"
 
 #: openbox/translate.c:59
 #, c-format

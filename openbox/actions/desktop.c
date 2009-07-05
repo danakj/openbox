@@ -21,7 +21,7 @@ typedef struct {
             gboolean wrap;
             ObDirection dir;
         } rel;
-    };
+    } u;
     gboolean send;
     gboolean follow;
 } Options;
@@ -46,9 +46,9 @@ static gpointer setup_go_func(xmlNodePtr node)
     o = g_new0(Options, 1);
     /* don't go anywhere if theres no options given */
     o->type = ABSOLUTE;
-    o->abs.desktop = screen_desktop;
+    o->u.abs.desktop = screen_desktop;
     /* wrap by default - it's handy! */
-    o->rel.wrap = TRUE;
+    o->u.rel.wrap = TRUE;
 
     if ((n = obt_parse_find_node(node, "to"))) {
         gchar *s = obt_parse_node_string(n);
@@ -56,43 +56,43 @@ static gpointer setup_go_func(xmlNodePtr node)
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "next")) {
             o->type = RELATIVE;
-            o->rel.linear = TRUE;
-            o->rel.dir = OB_DIRECTION_EAST;
+            o->u.rel.linear = TRUE;
+            o->u.rel.dir = OB_DIRECTION_EAST;
         }
         else if (!g_ascii_strcasecmp(s, "previous")) {
             o->type = RELATIVE;
-            o->rel.linear = TRUE;
-            o->rel.dir = OB_DIRECTION_WEST;
+            o->u.rel.linear = TRUE;
+            o->u.rel.dir = OB_DIRECTION_WEST;
         }
         else if (!g_ascii_strcasecmp(s, "north") ||
                  !g_ascii_strcasecmp(s, "up")) {
             o->type = RELATIVE;
-            o->rel.dir = OB_DIRECTION_NORTH;
+            o->u.rel.dir = OB_DIRECTION_NORTH;
         }
         else if (!g_ascii_strcasecmp(s, "south") ||
                  !g_ascii_strcasecmp(s, "down")) {
             o->type = RELATIVE;
-            o->rel.dir = OB_DIRECTION_SOUTH;
+            o->u.rel.dir = OB_DIRECTION_SOUTH;
         }
         else if (!g_ascii_strcasecmp(s, "west") ||
                  !g_ascii_strcasecmp(s, "left")) {
             o->type = RELATIVE;
-            o->rel.dir = OB_DIRECTION_WEST;
+            o->u.rel.dir = OB_DIRECTION_WEST;
         }
         else if (!g_ascii_strcasecmp(s, "east") ||
                  !g_ascii_strcasecmp(s, "right")) {
             o->type = RELATIVE;
-            o->rel.dir = OB_DIRECTION_EAST;
+            o->u.rel.dir = OB_DIRECTION_EAST;
         }
         else {
             o->type = ABSOLUTE;
-            o->abs.desktop = atoi(s) - 1;
+            o->u.abs.desktop = atoi(s) - 1;
         }
         g_free(s);
     }
 
     if ((n = obt_parse_find_node(node, "wrap")))
-        o->rel.wrap = obt_parse_node_bool(n);
+        o->u.rel.wrap = obt_parse_node_bool(n);
 
     return o;
 }
@@ -123,11 +123,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         d = screen_last_desktop;
         break;
     case ABSOLUTE:
-        d = o->abs.desktop;
+        d = o->u.abs.desktop;
         break;
     case RELATIVE:
         d = screen_find_desktop(screen_desktop,
-                                o->rel.dir, o->rel.wrap, o->rel.linear);
+                                o->u.rel.dir, o->u.rel.wrap, o->u.rel.linear);
         break;
     }
 

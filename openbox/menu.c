@@ -232,10 +232,13 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
             /* you have to use a printable ascii character for shortcuts
                don't allow space either, so you can have like "a _ b"
             */
-            if (VALID_SHORTCUT(*(i+1))) {
-                shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
-                *position = i - *strippedlabel;
-                *always_show = TRUE;
+            if (VALID_SHORTCUT(*(i+1)) || *(i+1) == '_') {
+                /* Allow you to escape the first _ by putting __ */
+                if (*(i+1) != '_') {
+                    shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
+                    *position = i - *strippedlabel;
+                    *always_show = TRUE;
+                }
 
                 /* remove the '_' from the string */
                 for (; *i != '\0'; ++i)

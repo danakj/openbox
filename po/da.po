@@ -458,8 +458,8 @@ msgstr "Ikke forbundet til en sessionsbehandler"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Kører %s\n"
+msgid "Running %s"
+msgstr "Kører %s"
 
 #: openbox/translate.c:59
 #, c-format

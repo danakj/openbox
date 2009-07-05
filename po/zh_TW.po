@@ -444,8 +444,8 @@ msgstr "沒有連接到作業階段管理員"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "正在運行 %s\n"
+msgid "Running %s"
+msgstr "正在運行 %s"
 
 #: openbox/translate.c:59
 #, c-format

@@ -463,8 +463,8 @@ msgstr "Nicht mit einem Sitzungsmanager verbunden"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Starte %s\n"
+msgid "Running %s"
+msgstr "Starte %s"
 
 #: openbox/translate.c:59
 #, c-format

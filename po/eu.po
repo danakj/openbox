@@ -458,8 +458,8 @@ msgstr "Saio kudeatzaile batera ez konektatua"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Egikaritzen %s\n"
+msgid "Running %s"
+msgstr "Egikaritzen %s"
 
 #: openbox/translate.c:59
 #, c-format

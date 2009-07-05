@@ -320,7 +320,7 @@ void popup_hide(ObPopup *self)
 
         event_end_ignore_all_enters(ignore_start);
     } else if (self->delay_mapped) {
-        ob_main_loop_timeout_remove(ob_main_loop, popup_show_timeout);
+        ob_main_loop_timeout_remove_data(ob_main_loop, popup_show_timeout, self, FALSE);
         self->delay_mapped = FALSE;
     }
 }

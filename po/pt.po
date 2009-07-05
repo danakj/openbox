@@ -460,8 +460,8 @@ msgstr "Desligado do gestor de sessão"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Executando %s\n"
+msgid "Running %s"
+msgstr "Executando %s"
 
 #: openbox/translate.c:59
 #, c-format

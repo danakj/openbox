@@ -21,7 +21,7 @@ typedef struct {
             gboolean wrap;
             ObDirection dir;
         } rel;
-    };
+    } u;
     gboolean send;
     gboolean follow;
 } Options;
@@ -130,9 +130,9 @@ static gpointer setup_go_abs_func(ObParseInst *i, xmlDocPtr doc,
     Options *o = g_new0(Options, 1);
     o->type = ABSOLUTE;
     if ((n = parse_find_node("desktop", node)))
-        o->abs.desktop = parse_int(doc, n) - 1;
+        o->u.abs.desktop = parse_int(doc, n) - 1;
     else
-        o->abs.desktop = screen_desktop;
+        o->u.abs.desktop = screen_desktop;
     return o;
 }
 
@@ -143,9 +143,9 @@ static gpointer setup_send_abs_func(ObParseInst *i, xmlDocPtr doc,
     Options *o = setup_follow(i, doc, node);
     o->type = ABSOLUTE;
     if ((n = parse_find_node("desktop", node)))
-        o->abs.desktop = parse_int(doc, n) - 1;
+        o->u.abs.desktop = parse_int(doc, n) - 1;
     else
-        o->abs.desktop = screen_desktop;
+        o->u.abs.desktop = screen_desktop;
     return o;
 }
 
@@ -155,12 +155,12 @@ static void setup_rel(Options *o, ObParseInst *i, xmlDocPtr doc,
     xmlNodePtr n;
 
     o->type = RELATIVE;
-    o->rel.linear = lin;
-    o->rel.dir = dir;
-    o->rel.wrap = TRUE;
+    o->u.rel.linear = lin;
+    o->u.rel.dir = dir;
+    o->u.rel.wrap = TRUE;
 
     if ((n = parse_find_node("wrap", node)))
-        o->rel.wrap = parse_bool(doc, n);
+        o->u.rel.wrap = parse_bool(doc, n);
 }
 
 static gpointer setup_go_next_func(ObParseInst *i, xmlDocPtr doc,
@@ -270,11 +270,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         d = screen_last_desktop;
         break;
     case ABSOLUTE:
-        d = o->abs.desktop;
+        d = o->u.abs.desktop;
         break;
     case RELATIVE:
         d = screen_find_desktop(screen_desktop,
-                                o->rel.dir, o->rel.wrap, o->rel.linear);
+                                o->u.rel.dir, o->u.rel.wrap, o->u.rel.linear);
         break;
     }
 

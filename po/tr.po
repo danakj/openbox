@@ -458,8 +458,8 @@ msgstr "Oturum yöneticisine bağlı değil"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "%s çalışıyor\n"
+msgid "Running %s"
+msgstr "%s çalışıyor"
 
 #: openbox/translate.c:59
 #, c-format

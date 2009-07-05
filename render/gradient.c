@@ -507,11 +507,11 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     */
     if (h <= 5) {
         y1sz = MAX(h/2, 0);
-        y2sz = (h < 3 ? 0 : h % 2);
+        y2sz = (h < 3) ? 0 : (h & 1);
         y3sz = MAX(h/2, 1);
     }
     else {
-        y1sz = h/2 - (1 - (h % 2));
+        y1sz = h/2 - (1 - (h & 1));
         y2sz = 1;
         y3sz = h/2;
     }
@@ -534,13 +534,15 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     }
     *data = COLOR(y1);
     data += w;
-    for (y2 = y2sz-1; y2 > 0; --y2) {
+    if (y2sz) {
+        for (y2 = y2sz-1; y2 > 0; --y2) {
+            *data = COLOR(y2);
+            data += w;
+            NEXT(y2);
+        }
         *data = COLOR(y2);
         data += w;
-        NEXT(y2);
     }
-    *data = COLOR(y2);
-    data += w;
     for (y3 = y3sz-1; y3 > 0; --y3) {
         *data = COLOR(y3);
         data += w;

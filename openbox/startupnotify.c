@@ -240,7 +240,7 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
     gchar *desc;
     const char *id;
 
-    desc = g_strdup_printf(_("Running %s\n"), program);
+    desc = g_strdup_printf(_("Running %s"), program);
 
     if (sn_launcher_context_get_initiated(sn_launcher)) {
         sn_launcher_context_unref(sn_launcher);

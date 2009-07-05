@@ -46,6 +46,22 @@ static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
+static RrFont *get_font(RrFont *target, RrFont **default_font, const RrInstance *inst)
+{
+    if (target) {
+        RrFontRef(target);
+        return target;
+    } else {
+        /* Only load the default font once */
+        if (*default_font) {
+            RrFontRef(*default_font);
+        } else {
+            *default_font = RrFontOpenDefault(inst);
+        }
+        return *default_font;
+    }
+}
+
 RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
@@ -56,6 +72,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     RrJustify winjust, mtitlejust;
     gchar *str;
     RrTheme *theme;
+    RrFont *default_font = NULL;
     gchar *path;
     gboolean userdef;
 
@@ -130,17 +147,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_unhilite_fg = RrAppearanceNew(inst, 0);
 
     /* load the font stuff */
-    if (active_window_font) {
-        theme->win_font_focused = active_window_font;
-        RrFontRef(active_window_font);
-    } else
-        theme->win_font_focused = RrFontOpenDefault(inst);
-
-    if (inactive_window_font) {
-        theme->win_font_unfocused = inactive_window_font;
-        RrFontRef(inactive_window_font);
-    } else
-        theme->win_font_unfocused = RrFontOpenDefault(inst);
+    theme->win_font_focused = get_font(active_window_font, &default_font, inst);
+    theme->win_font_unfocused = get_font(inactive_window_font, &default_font, inst);
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.label.text.justify", &str)) {
@@ -150,11 +158,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             winjust = RR_JUSTIFY_CENTER;
     }
 
-    if (menu_title_font) {
-        theme->menu_title_font = menu_title_font;
-        RrFontRef(menu_title_font);
-    } else
-        theme->menu_title_font = RrFontOpenDefault(inst);
+    theme->menu_title_font = get_font(menu_title_font, &default_font, inst);
 
     mtitlejust = RR_JUSTIFY_LEFT;
     if (read_string(db, "menu.title.text.justify", &str)) {
@@ -164,17 +168,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             mtitlejust = RR_JUSTIFY_CENTER;
     }
 
-    if (menu_item_font) {
-        theme->menu_font = menu_item_font;
-        RrFontRef(menu_item_font);
-    } else
-        theme->menu_font = RrFontOpenDefault(inst);
+    theme->menu_font = get_font(menu_item_font, &default_font, inst);
 
-    if (osd_font) {
-        theme->osd_font = osd_font;
-        RrFontRef(osd_font);
-    } else
-        theme->osd_font = RrFontOpenDefault(inst);
+    theme->osd_font = get_font(osd_font, &default_font, inst);
 
     /* load direct dimensions */
     if ((!read_int(db, "menu.overlap.x", &theme->menu_overlap_x) &&

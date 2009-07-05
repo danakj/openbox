@@ -452,8 +452,8 @@ msgstr "Nem kapcsolódunk a szekciókezelőhöz"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Futtatás %s\n"
+msgid "Running %s"
+msgstr "Futtatás %s"
 
 #: openbox/translate.c:59
 #, c-format

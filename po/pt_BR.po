@@ -463,8 +463,8 @@ msgstr "Não está conectado à um gerente de sessões"
 
 #: openbox/startupnotify.c:243
 #, c-format
-msgid "Running %s\n"
-msgstr "Executando %s\n"
+msgid "Running %s"
+msgstr "Executando %s"
 
 #: openbox/translate.c:59
 #, c-format

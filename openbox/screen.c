@@ -1459,6 +1459,15 @@ void screen_update_areas(void)
                     b = MAX(b, s->strut->bottom);
             }
 
+            if (l) l += RECT_LEFT  (monitor_area[screen_num_monitors])
+                        - RECT_LEFT  (monitor_area[i]);
+            if (t) t += RECT_TOP   (monitor_area[screen_num_monitors])
+                        - RECT_TOP   (monitor_area[i]);
+            if (r) r -= RECT_RIGHT (monitor_area[screen_num_monitors])
+                        - RECT_RIGHT (monitor_area[i]);
+            if (b) b -= RECT_BOTTOM(monitor_area[screen_num_monitors])
+                        - RECT_BOTTOM(monitor_area[i]);
+
             /* based on these margins, set the work area for the
                monitor/desktop */
             dims[(i * screen_num_desktops + j) * 4 + 0] += l;
@@ -1599,28 +1608,32 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
                 if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_LEFT_IN_SEARCH(s->strut, search) &&
                     !STRUT_LEFT_IGNORE(s->strut, us, search))
-                    l = MAX(l, al + s->strut->left);
+                    l = MAX(l, RECT_LEFT(monitor_area[screen_num_monitors])
+                               + s->strut->left);
             }
             for (it = struts_top; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
                 if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_TOP_IN_SEARCH(s->strut, search) &&
                     !STRUT_TOP_IGNORE(s->strut, us, search))
-                    t = MAX(t, at + s->strut->top);
+                    t = MAX(t, RECT_TOP(monitor_area[screen_num_monitors])
+                               + s->strut->top);
             }
             for (it = struts_right; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
                 if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_RIGHT_IN_SEARCH(s->strut, search) &&
                     !STRUT_RIGHT_IGNORE(s->strut, us, search))
-                    r = MIN(r, ar - s->strut->right);
+                    r = MIN(r, RECT_RIGHT(monitor_area[screen_num_monitors])
+                               - s->strut->right);
             }
             for (it = struts_bottom; it; it = g_slist_next(it)) {
                 ObScreenStrut *s = it->data;
                 if ((s->desktop == d || s->desktop == DESKTOP_ALL) &&
                     STRUT_BOTTOM_IN_SEARCH(s->strut, search) &&
                     !STRUT_BOTTOM_IGNORE(s->strut, us, search))
-                    b = MIN(b, ab - s->strut->bottom);
+                    b = MIN(b, RECT_BOTTOM(monitor_area[screen_num_monitors])
+                               - s->strut->bottom);
             }
 
             /* limit to this monitor */

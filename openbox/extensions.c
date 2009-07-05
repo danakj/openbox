@@ -85,7 +85,11 @@ void extensions_query_all(void)
 void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
 {
     guint i;
-    gint l, r, t, b;
+    gint n, l, r, t, b;
+#ifdef XINERAMA
+    XineramaScreenInfo *info;
+#endif
+
     if (ob_debug_xinerama) {
         gint w = WidthOfScreen(ScreenOfDisplay(ob_display, ob_screen));
         gint h = HeightOfScreen(ScreenOfDisplay(ob_display, ob_screen));
@@ -94,12 +98,9 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
         RECT_SET((*xin_areas)[0], 0, 0, w/2, h);
         RECT_SET((*xin_areas)[1], w/2, 0, w-(w/2), h);
     }
-    else
 #ifdef XINERAMA
-    if (extensions_xinerama) {
-        guint i;
-        gint n;
-        XineramaScreenInfo *info = XineramaQueryScreens(ob_display, &n);
+    else if (extensions_xinerama &&
+             (info = XineramaQueryScreens(ob_display, &n))) {
         *nxin = n;
         *xin_areas = g_new(Rect, *nxin + 1);
         for (i = 0; i < *nxin; ++i)
@@ -107,8 +108,8 @@ void extensions_xinerama_screens(Rect **xin_areas, guint *nxin)
                      info[i].width, info[i].height);
         XFree(info);
     }
-    else
 #endif
+    else
     {
         *nxin = 1;
         *xin_areas = g_new(Rect, *nxin + 1);

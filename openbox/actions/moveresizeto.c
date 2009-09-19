@@ -25,10 +25,15 @@ typedef struct {
 
 static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
+/* 3.4-compatibility */
+static gpointer setup_center_func(xmlNodePtr node);
 
 void action_moveresizeto_startup(void)
 {
     actions_register("MoveResizeTo", setup_func, g_free, run_func, NULL, NULL);
+/* 3.4-compatibility */
+    actions_register("MoveToCenter", setup_center_func, g_free, run_func,
+                     NULL, NULL);
 }
 
 static void parse_coord(xmlNodePtr n, gint *pos,
@@ -167,4 +172,20 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     }
 
     return FALSE;
+}
+
+/* 3.4-compatibility */
+static gpointer setup_center_func(xmlNodePtr node)
+{
+    Options *o;
+
+    o = g_new0(Options, 1);
+    o->x = G_MININT;
+    o->y = G_MININT;
+    o->w = G_MININT;
+    o->h = G_MININT;
+    o->monitor = -1;
+    o->xcenter = TRUE;
+    o->ycenter = TRUE;
+    return o;
 }

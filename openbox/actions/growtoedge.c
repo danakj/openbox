@@ -13,6 +13,11 @@ typedef struct {
 static gpointer setup_func(xmlNodePtr node);
 static gpointer setup_shrink_func(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
+/* 3.4-compatibility */
+static gpointer setup_north_func(xmlNodePtr node);
+static gpointer setup_south_func(xmlNodePtr node);
+static gpointer setup_east_func(xmlNodePtr node);
+static gpointer setup_west_func(xmlNodePtr node);
 
 void action_growtoedge_startup(void)
 {
@@ -20,6 +25,15 @@ void action_growtoedge_startup(void)
                      g_free, run_func, NULL, NULL);
     actions_register("ShrinkToEdge", setup_shrink_func,
                      g_free, run_func, NULL, NULL);
+    /* 3.4-compatibility */
+    actions_register("GrowToEdgeNorth", setup_north_func, g_free, run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeSouth", setup_south_func, g_free, run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeEast", setup_east_func, g_free, run_func,
+                     NULL, NULL);
+    actions_register("GrowToEdgeWest", setup_west_func, g_free, run_func,
+                     NULL, NULL);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -148,4 +162,37 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         return FALSE;
 
     return FALSE;
+}
+
+/* 3.4-compatibility */
+static gpointer setup_north_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->shrink = FALSE;
+    o->dir = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_south_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->shrink = FALSE;
+    o->dir = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_east_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->shrink = FALSE;
+    o->dir = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_west_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->shrink = FALSE;
+    o->dir = OB_DIRECTION_WEST;
+    return o;
 }

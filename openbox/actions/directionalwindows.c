@@ -33,12 +33,63 @@ static void     i_cancel_func(gpointer options);
 
 static void     end_cycle(gboolean cancel, guint state, Options *o);
 
+/* 3.4-compatibility */
+static gpointer setup_north_cycle_func(xmlNodePtr node);
+static gpointer setup_south_cycle_func(xmlNodePtr node);
+static gpointer setup_east_cycle_func(xmlNodePtr node);
+static gpointer setup_west_cycle_func(xmlNodePtr node);
+static gpointer setup_northwest_cycle_func(xmlNodePtr node);
+static gpointer setup_northeast_cycle_func(xmlNodePtr node);
+static gpointer setup_southwest_cycle_func(xmlNodePtr node);
+static gpointer setup_southeast_cycle_func(xmlNodePtr node);
+static gpointer setup_north_target_func(xmlNodePtr node);
+static gpointer setup_south_target_func(xmlNodePtr node);
+static gpointer setup_east_target_func(xmlNodePtr node);
+static gpointer setup_west_target_func(xmlNodePtr node);
+static gpointer setup_northwest_target_func(xmlNodePtr node);
+static gpointer setup_northeast_target_func(xmlNodePtr node);
+static gpointer setup_southwest_target_func(xmlNodePtr node);
+static gpointer setup_southeast_target_func(xmlNodePtr node);
+
 void action_directionalwindows_startup(void)
 {
     actions_register("DirectionalCycleWindows", setup_cycle_func, free_func,
                      run_func, i_input_func, i_cancel_func);
     actions_register("DirectionalTargetWindow", setup_target_func, free_func,
                      run_func, NULL, NULL);
+    /* 3.4-compatibility */
+    actions_register("DirectionalFocusNorth", setup_north_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusSouth", setup_south_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusWest", setup_west_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusEast", setup_east_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusNorthWest", setup_northwest_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusNorthEast", setup_northeast_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusSouthWest", setup_southwest_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalFocusSouthEast", setup_southeast_cycle_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetNorth", setup_north_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetSouth", setup_south_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetWest", setup_west_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetEast", setup_east_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetNorthWest", setup_northwest_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetNorthEast", setup_northeast_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetSouthWest", setup_southwest_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
+    actions_register("DirectionalTargetSouthEast", setup_southeast_target_func,
+                     free_func, run_func, i_input_func, i_cancel_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -216,3 +267,117 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
 
     stacking_restore();
 }
+
+/* 3.4-compatibility */
+static gpointer setup_north_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_south_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_east_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_west_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_WEST;
+    return o;
+}
+
+static gpointer setup_northwest_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_NORTHWEST;
+    return o;
+}
+
+static gpointer setup_northeast_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_southwest_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_SOUTHWEST;
+    return o;
+}
+
+static gpointer setup_southeast_cycle_func(xmlNodePtr node)
+{
+    Options *o = setup_cycle_func(node);
+    o->direction = OB_DIRECTION_SOUTHEAST;
+    return o;
+}
+
+static gpointer setup_north_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_NORTH;
+    return o;
+}
+
+static gpointer setup_south_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_SOUTH;
+    return o;
+}
+
+static gpointer setup_east_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_EAST;
+    return o;
+}
+
+static gpointer setup_west_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_WEST;
+    return o;
+}
+
+static gpointer setup_northwest_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_NORTHWEST;
+    return o;
+}
+
+static gpointer setup_northeast_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_NORTHEAST;
+    return o;
+}
+
+static gpointer setup_southwest_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_SOUTHWEST;
+    return o;
+}
+
+static gpointer setup_southeast_target_func(xmlNodePtr node)
+{
+    Options *o = setup_target_func(node);
+    o->direction = OB_DIRECTION_SOUTHEAST;
+    return o;
+}
+

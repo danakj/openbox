@@ -10,6 +10,10 @@ static gpointer setup_func_top(xmlNodePtr node);
 static gpointer setup_func_bottom(xmlNodePtr node);
 static gpointer setup_func_send(xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
+/* 3.4-compatibility */
+static gpointer setup_sendtop_func(xmlNodePtr node);
+static gpointer setup_sendbottom_func(xmlNodePtr node);
+static gpointer setup_sendnormal_func(xmlNodePtr node);
 
 void action_layer_startup(void)
 {
@@ -18,6 +22,13 @@ void action_layer_startup(void)
     actions_register("ToggleAlwaysOnBottom", setup_func_bottom, g_free,
                      run_func, NULL, NULL);
     actions_register("SendToLayer", setup_func_send, g_free,
+                     run_func, NULL, NULL);
+    /* 3.4-compatibility */
+    actions_register("SendToTopLayer", setup_sendtop_func, g_free,
+                     run_func, NULL, NULL);
+    actions_register("SendToBottomLayer", setup_sendbottom_func, g_free,
+                     run_func, NULL, NULL);
+    actions_register("SendToNormalLayer", setup_sendnormal_func, g_free,
                      run_func, NULL, NULL);
 }
 
@@ -87,3 +98,29 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     return FALSE;
 }
+
+/* 3.4-compatibility */
+static gpointer setup_sendtop_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->layer = 1;
+    o->toggle = FALSE;
+    return o;
+}
+
+static gpointer setup_sendbottom_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->layer = -1;
+    o->toggle = FALSE;
+    return o;
+}
+
+static gpointer setup_sendnormal_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->layer = 0;
+    o->toggle = FALSE;
+    return o;
+}
+

@@ -16,6 +16,10 @@ static gpointer setup_func(xmlNodePtr node);
 static gboolean run_func_on(ObActionsData *data, gpointer options);
 static gboolean run_func_off(ObActionsData *data, gpointer options);
 static gboolean run_func_toggle(ObActionsData *data, gpointer options);
+/* 3.4-compatibility */
+static gpointer setup_both_func(xmlNodePtr node);
+static gpointer setup_horz_func(xmlNodePtr node);
+static gpointer setup_vert_func(xmlNodePtr node);
 
 void action_maximize_startup(void)
 {
@@ -25,6 +29,25 @@ void action_maximize_startup(void)
                      NULL, NULL);
     actions_register("ToggleMaximize", setup_func, g_free, run_func_toggle,
                      NULL, NULL);
+    /* 3.4-compatibility */
+    actions_register("MaximizeFull", setup_both_func, g_free,
+                     run_func_on, NULL, NULL);
+    actions_register("UnmaximizeFull", setup_both_func, g_free,
+                     run_func_off, NULL, NULL);
+    actions_register("ToggleMaximizeFull", setup_both_func, g_free,
+                     run_func_toggle, NULL, NULL);
+    actions_register("MaximizeHorz", setup_horz_func, g_free,
+                     run_func_on, NULL, NULL);
+    actions_register("UnmaximizeHorz", setup_horz_func, g_free,
+                     run_func_off, NULL, NULL);
+    actions_register("ToggleMaximizeHorz", setup_horz_func, g_free,
+                     run_func_toggle, NULL, NULL);
+    actions_register("MaximizeVert", setup_vert_func, g_free,
+                     run_func_on, NULL, NULL);
+    actions_register("UnmaximizeVert", setup_vert_func, g_free,
+                     run_func_off, NULL, NULL);
+    actions_register("ToggleMaximizeVert", setup_vert_func, g_free,
+                     run_func_toggle, NULL, NULL);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -89,3 +112,26 @@ static gboolean run_func_toggle(ObActionsData *data, gpointer options)
     }
     return FALSE;
 }
+
+/* 3.4-compatibility */
+static gpointer setup_both_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = BOTH;
+    return o;
+}
+
+static gpointer setup_horz_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = HORZ;
+    return o;
+}
+
+static gpointer setup_vert_func(xmlNodePtr node)
+{
+    Options *o = g_new0(Options, 1);
+    o->dir = VERT;
+    return o;
+}
+

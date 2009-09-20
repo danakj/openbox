@@ -80,7 +80,6 @@ static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
-static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
 static void client_set_desktop_recursive(ObClient *self,
                                          guint target,
@@ -1409,7 +1408,7 @@ static void client_update_transient_tree(ObClient *self,
     }
 }
 
-static void client_get_mwm_hints(ObClient *self)
+void client_get_mwm_hints(ObClient *self)
 {
     guint num;
     guint32 *hints;

@@ -1517,6 +1517,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
                reconfigure the window if it needs to. emacs will update its
                normal hints every time it receives a conigurenotify */
             client_reconfigure(client, FALSE);
+        } else if (msgtype == prop_atoms.motif_wm_hints) {
+            client_get_mwm_hints(client);
+            /* This can override some mwm hints */
+            client_get_type_and_transientness(client);
+
+            /* Apply the changes to the window */
+            client_setup_decor_and_functions(client, TRUE);
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {

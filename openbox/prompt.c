@@ -95,7 +95,7 @@ void prompt_startup(gboolean reconfig)
     prompt_a_button->texture[0].data.text.color = c_button;
     prompt_a_focus->texture[0].data.text.color = c_focus;
     prompt_a_press->texture[0].data.text.color = c_press;
-    prompt_a_pfocus->texture[0].data.text.color = c_press;
+    prompt_a_pfocus->texture[0].data.text.color = c_pfocus;
 
     prompt_a_focus->texture[1].data.lineart.color = c_focus;
     prompt_a_focus->texture[2].data.lineart.color = c_focus;

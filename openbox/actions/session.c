@@ -33,9 +33,9 @@ static gpointer setup_func(xmlNodePtr node)
 
 static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
-    Options *o = data;
     if (result) {
 #ifdef USE_SM
+        Options *o = data;
         session_request_logout(o->silent);
 #else
         /* TRANSLATORS: Don't translate the word "SessionLogout" as it's the

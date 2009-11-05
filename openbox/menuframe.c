@@ -396,7 +396,7 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                   ob_rr_theme->a_menu_text_normal);
         sub = self->entry->data.submenu.submenu;
         text_a->texture[0].data.text.string = sub ? sub->title : "";
-        if (sub->shortcut && (self->frame->menu->show_all_shortcuts ||
+        if (sub && sub->shortcut && (self->frame->menu->show_all_shortcuts ||
                               sub->shortcut_always_show ||
                               sub->shortcut_position > 0))
         {
@@ -414,6 +414,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         else
             text_a = ob_rr_theme->a_menu_text_normal;
         break;
+    default:
+        g_assert_not_reached();
     }
 
     switch (self->entry->type) {
@@ -482,6 +484,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
                     2*ob_rr_theme->menu_sep_paddingy);
         }
         break;
+    default:
+        g_assert_not_reached();
     }
 
     if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
@@ -750,6 +754,8 @@ void menu_frame_render(ObMenuFrame *self)
                     2*ob_rr_theme->menu_sep_paddingy - 2*PADDING;
             }
             break;
+        default:
+            g_assert_not_reached();
         }
         tw += 2*PADDING;
         th += 2*PADDING;

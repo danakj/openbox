@@ -2378,7 +2378,7 @@ ObClient *client_search_focus_tree_full(ObClient *self)
 
         for (it = self->parents; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
-            if ((c = client_search_focus_tree_full(it->data))) return c;
+            if ((c = client_search_focus_tree_full(c))) return c;
         }
 
         return NULL;
@@ -3639,6 +3639,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
                 value = self->demands_attention;
             else if (state == OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED))
                 value = undecorated;
+            else
+                g_assert_not_reached();
             action = value ? OBT_PROP_ATOM(NET_WM_STATE_REMOVE) :
                              OBT_PROP_ATOM(NET_WM_STATE_ADD);
         }

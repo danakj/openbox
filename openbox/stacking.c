@@ -69,6 +69,8 @@ static void do_restack(GList *wins, GList *before)
 
 #ifdef DEBUG
     GList *next;
+
+    g_assert(wins);
     /* pls only restack stuff in the same layer at a time */
     for (it = wins; it; it = next) {
         next = g_list_next(it);

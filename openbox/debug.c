@@ -161,7 +161,7 @@ static inline void log_argv(ObDebugType type,
         g_free(a);
     }
 
-    g_debug(message);
+    g_debug("%s", message);
     g_free(message);
 }
 

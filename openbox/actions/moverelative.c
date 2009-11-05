@@ -42,15 +42,15 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         gint x, y, lw, lh, w, h;
 
         c = data->client;
-        x = data->client->area.x + o->x;
-        y = data->client->area.y + o->y;
-        w = data->client->area.width;
-        h = data->client->area.height;
-        client_try_configure(data->client, &x, &y, &w, &h, &lw, &lh, TRUE);
-        client_find_onscreen(data->client, &x, &y, w, h, FALSE);
+        x = c->area.x + o->x;
+        y = c->area.y + o->y;
+        w = c->area.width;
+        h = c->area.height;
+        client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
+        client_find_onscreen(c, &x, &y, w, h, FALSE);
 
         actions_client_move(data, TRUE);
-        client_configure(data->client, x, y, w, h, TRUE, TRUE, FALSE);
+        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
         actions_client_move(data, FALSE);
     }
 

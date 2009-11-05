@@ -99,7 +99,7 @@ void obt_parse_register(ObtParseInst *i, const gchar *tag,
 {
     struct Callback *c;
 
-    if ((c = g_hash_table_lookup(i->callbacks, tag))) {
+    if (g_hash_table_lookup(i->callbacks, tag)) {
         g_error("Tag '%s' already registered", tag);
         return;
     }

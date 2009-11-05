@@ -328,7 +328,6 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     Rect *area, *parea;
     gint al, at, ar, ab; /* screen boundaries */
     gint pl, pt, pr, pb; /* physical screen boundaries */
-    gint incw, inch;
     guint i;
     Rect desired_area;
 
@@ -338,9 +337,6 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     r = RECT_RIGHT(c->frame->area);
     t = RECT_TOP(c->frame->area);
     b = RECT_BOTTOM(c->frame->area);
-
-    incw = c->size_inc.width;
-    inch = c->size_inc.height;
 
     RECT_SET(desired_area, c->area.x, c->area.y, *w, *h);
 

@@ -326,10 +326,10 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint l, t, r, b;
     gint x, y, w, h;
     Rect *screen_area = NULL;
-    gint rgbax, rgbay, rgbaw, rgbah;
     gint i;
     GList *it;
     const ObFocusCyclePopupTarget *newtarget;
+    ObFocusCyclePopupMode mode = p->mode;
     gint icons_per_row;
     gint icon_rows;
     gint textw, texth;
@@ -347,8 +347,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint up_arrow_y, down_arrow_y;
     gboolean showing_arrows = FALSE;
 
-    g_assert(p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
-             p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
+    g_assert(mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ||
+             mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST);
 
     screen_area = screen_physical_area_active();
 
@@ -363,7 +363,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* get the width from the text and keep it within limits */
     w = l + r + p->maxtextw;
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         /* when in list mode, there are icons down the side */
         w += list_mode_icon_column_w;
     w = MIN(w, MAX(screen_area->width/3, POPUP_WIDTH)); /* max width */
@@ -371,12 +371,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* get the text height */
     texth = RrMinHeight(p->a_hilite_text);
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         texth = MAX(MAX(texth, RrMinHeight(p->a_text)), HILITE_SIZE);
     else
         texth += TEXT_BORDER * 2;
 
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* how many icons will fit in that row? make the width fit that */
         w -= l + r;
         icons_per_row = (w + HILITE_SIZE - 1) / HILITE_SIZE;
@@ -398,7 +398,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* get the text width */
     textw = w - l - r;
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
         /* leave space on the side for the icons */
         textw -= list_mode_icon_column_w;
 
@@ -408,7 +408,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* find the height of the dialog */
     h = t + b + (icon_rows * MAX(HILITE_SIZE, texth));
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS)
         /* in icon mode the text sits below the icons, so make some space */
         h += OUTSIDE_BORDER + texth;
 
@@ -427,7 +427,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     /* scroll the list if needed */
     last_scroll = p->scroll;
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
         const gint top = p->scroll + SCROLL_MARGIN;
         const gint bottom = p->scroll + icon_rows - SCROLL_MARGIN;
         const gint min_scroll = 0;
@@ -443,14 +443,14 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     }
 
     /* show the scroll arrows when appropriate */
-    if (p->scroll && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+    if (p->scroll && mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
         XMapWindow(obt_display, p->list_mode_up);
         showing_arrows = TRUE;
     } else
         XUnmapWindow(obt_display, p->list_mode_up);
 
     if (p->scroll < p->n_targets - icon_rows &&
-        p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+        mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
     {
         XMapWindow(obt_display, p->list_mode_down);
         showing_arrows = TRUE;
@@ -463,12 +463,12 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             + ob_rr_theme->down_arrow_mask->height + OUTSIDE_BORDER;
 
     /* center the icons if there is less than one row */
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS && icon_rows == 1)
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS && icon_rows == 1)
         icons_center_x = (w - p->n_targets * HILITE_SIZE) / 2;
     else
         icons_center_x = 0;
 
-    if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+    if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
         /* get the position of the text */
         icon_mode_textx = l;
         icon_mode_texty = h - texth - b;
@@ -480,17 +480,11 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     y = screen_area->y + (screen_area->height -
                           (h + ob_rr_theme->obwidth * 2)) / 2;
 
-    /* get the dimensions of the target hilite texture */
-    rgbax = ml;
-    rgbay = mt;
-    rgbaw = w - ml - mr;
-    rgbah = h - mt - mb;
-
     if (!p->mapped) {
         /* position the background but don't draw it */
         XMoveResizeWindow(obt_display, p->bg, x, y, w, h);
 
-        if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
+        if (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) {
             /* position the text */
             XMoveResizeWindow(obt_display, p->icon_mode_text,
                               icon_mode_textx, icon_mode_texty, textw, texth);
@@ -523,7 +517,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         RrPaint(p->a_bg, p->bg, w, h);
 
     /* draw the scroll arrows */
-    if (!p->mapped && p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
+    if (!p->mapped && mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST) {
         p->a_arrow->texture[0].data.mask.mask =
             ob_rr_theme->up_arrow_mask;
         p->a_arrow->surface.parent = p->a_bg;
@@ -576,7 +570,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                               iconx, icony, HILITE_SIZE, HILITE_SIZE);
 
             /* position the text */
-            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
                 XMoveResizeWindow(obt_display, target->textwin,
                                   list_mode_textx, list_mode_texty,
                                   textw, texth);
@@ -584,13 +578,13 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             /* show/hide the right windows */
             if (row >= 0 && row < icon_rows) {
                 XMapWindow(obt_display, target->iconwin);
-                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+                if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
                     XMapWindow(obt_display, target->textwin);
                 else
                     XUnmapWindow(obt_display, target->textwin);
             } else {
                 XUnmapWindow(obt_display, target->textwin);
-                if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+                if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
                     XUnmapWindow(obt_display, target->iconwin);
                 else
                     XMapWindow(obt_display, target->iconwin);
@@ -615,19 +609,19 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             RrPaint(p->a_icon, target->iconwin, HILITE_SIZE, HILITE_SIZE);
 
             /* draw the text */
-            if (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
+            if (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST ||
                 target == newtarget)
             {
                 text = (target == newtarget) ? p->a_hilite_text : p->a_text;
                 text->texture[0].data.text.string = target->text;
                 text->surface.parentx =
-                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                     icon_mode_textx : list_mode_textx;
                 text->surface.parenty =
-                    p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                    mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                     icon_mode_texty : list_mode_texty;
                 RrPaint(text,
-                        (p->mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
+                        (mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?
                          p->icon_mode_text : target->textwin),
                         textw, texth);
             }

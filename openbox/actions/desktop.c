@@ -179,6 +179,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         d = screen_find_desktop(screen_desktop,
                                 o->u.rel.dir, o->u.rel.wrap, o->u.rel.linear);
         break;
+    default:
+        g_assert_not_reached();
     }
 
     if (d < screen_num_desktops && d != screen_desktop) {

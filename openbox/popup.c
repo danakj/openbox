@@ -157,11 +157,12 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
     Rect *area, mon;
+    gboolean hasicon = self->hasicon;
 
     /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
     */
-    if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
+    if (hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
         RrMargins(self->a_bg, &l, &t, &r, &b);
     else
         l = t = r = b = 0;
@@ -189,7 +190,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     iconx = textx = l + ob_rr_theme->paddingx;
 
     emptyx = l + r + ob_rr_theme->paddingx * 2;
-    if (self->hasicon) {
+    if (hasicon) {
         iconw = texth * self->iconwm;
         iconh = texth * self->iconhm;
         textx += iconw + ob_rr_theme->paddingx;
@@ -204,7 +205,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     /* when there is no icon, then fill the whole dialog with the text
        appearance
     */
-    if (!self->hasicon)
+    if (!hasicon)
     {
         textx = texty = 0;
         texth += emptyy;
@@ -276,7 +277,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     /* when there is no icon and the text is not parent relative, then
        fill the whole dialog with the text appearance, don't use the bg at all
     */
-    if (self->hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
+    if (hasicon || self->a_text->surface.grad == RR_SURFACE_PARENTREL)
         RrPaint(self->a_bg, self->bg, w, h);
 
     if (textw) {
@@ -287,7 +288,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
         RrPaint(self->a_text, self->text, textw, texth);
     }
 
-    if (self->hasicon)
+    if (hasicon)
         self->draw_icon(iconx, icony, iconw, iconh, self->draw_icon_data);
 
     /* do the actual showing */

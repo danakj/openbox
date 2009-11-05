@@ -417,6 +417,7 @@ static void print_focusevent(XEvent *e)
     case NotifyGrab:         modestr="NotifyGrab";         break;
     case NotifyUngrab:       modestr="NotifyUngrab";       break;
     case NotifyWhileGrabbed: modestr="NotifyWhileGrabbed"; break;
+    default:                 g_assert_not_reached();
     }
     switch (detail) {
     case NotifyAncestor:    detailstr="NotifyAncestor";    break;
@@ -427,6 +428,7 @@ static void print_focusevent(XEvent *e)
     case NotifyPointer:     detailstr="NotifyPointer";     break;
     case NotifyPointerRoot: detailstr="NotifyPointerRoot"; break;
     case NotifyDetailNone:  detailstr="NotifyDetailNone";  break;
+    default:                g_assert_not_reached();
     }
 
     if (mode == NotifyGrab || mode == NotifyUngrab)
@@ -1598,6 +1600,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                         client->shaped_input = ((XShapeEvent*)e)->shaped;
                         kind = ShapeInput;
                         break;
+                    default:
+                        g_assert_not_reached();
                 }
                 frame_adjust_shape_kind(client->frame, kind);
             }

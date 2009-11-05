@@ -200,7 +200,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
     gboolean x_pos_given;
 
     while (app) {
-        name_set = class_set = type_set = x_pos_given = FALSE;
+        x_pos_given = FALSE;
 
         class_set = obt_parse_attr_string(app, "class", &class);
         name_set = obt_parse_attr_string(app, "name", &name);

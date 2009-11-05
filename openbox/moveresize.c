@@ -662,7 +662,7 @@ static void move_with_keys(gint keycode, gint state)
 static void resize_with_keys(gint keycode, gint state)
 {
     gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
-    gint dist = 0, resist = 0;
+    gint resist = 0;
     ObDirection dir;
 
     /* pick the edge if it needs to move */
@@ -674,8 +674,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_EAST;
             return;
         }
-    }
-    if (keycode == ob_keycode(OB_KEY_LEFT)) {
+    } else if (keycode == ob_keycode(OB_KEY_LEFT)) {
         dir = OB_DIRECTION_WEST;
         if (key_resize_edge != OB_DIRECTION_WEST &&
             key_resize_edge != OB_DIRECTION_EAST)
@@ -683,8 +682,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_WEST;
             return;
         }
-    }
-    if (keycode == ob_keycode(OB_KEY_UP)) {
+    } else if (keycode == ob_keycode(OB_KEY_UP)) {
         dir = OB_DIRECTION_NORTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -692,8 +690,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_NORTH;
             return;
         }
-    }
-    if (keycode == ob_keycode(OB_KEY_DOWN)) {
+    } else /* if (keycode == ob_keycode(OB_KEY_DOWN)) */ {
         dir = OB_DIRECTION_SOUTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -756,27 +753,27 @@ static void resize_with_keys(gint keycode, gint state)
 
         if (key_resize_edge == OB_DIRECTION_WEST) {
             if (dir == OB_DIRECTION_WEST)
-                dw = (dist = distw);
+                dw = distw;
             else
-                dw = -(dist = distw);
+                dw = -distw;
         }
         else if (key_resize_edge == OB_DIRECTION_EAST) {
             if (dir == OB_DIRECTION_EAST)
-                dw = (dist = distw);
+                dw = distw;
             else
-                dw = -(dist = distw);
+                dw = -distw;
         }
         else if (key_resize_edge == OB_DIRECTION_NORTH) {
             if (dir == OB_DIRECTION_NORTH)
-                dh = (dist = disth);
+                dh = disth;
             else
-                dh = -(dist = disth);
+                dh = -disth;
         }
         else /*if (key_resize_edge == OB_DIRECTION_SOUTH)*/ {
             if (dir == OB_DIRECTION_SOUTH)
-                dh = (dist = disth);
+                dh = disth;
             else
-                dh = -(dist = disth);
+                dh = -disth;
         }
     }
 

@@ -72,7 +72,7 @@ static gboolean logout_func(ObActionsData *data, gpointer options)
         prompt_show(p, NULL, FALSE);
     }
     else
-        prompt_cb(NULL, 1, NULL);
+        prompt_cb(NULL, 1, o);
 
     return FALSE;
 }

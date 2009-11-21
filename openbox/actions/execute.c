@@ -169,9 +169,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                 before = c + 4; /* 4 = strlen("$pid") */
             }
             else if ((c[1] == 'w' || c[1] == 'W') &&
-                (c[2] == 'i' || c[2] == 'I') &&
-                (c[3] == 'd' || c[3] == 'D') &&
-                !g_ascii_isalnum(c[4]))
+                     (c[2] == 'i' || c[2] == 'I') &&
+                     (c[3] == 'd' || c[3] == 'D') &&
+                     !g_ascii_isalnum(c[4]))
             {
                 /* found $wid */
                 gchar *tmp;

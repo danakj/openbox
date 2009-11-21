@@ -1513,15 +1513,30 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xproperty.atom;
         if (msgtype == XA_WM_NORMAL_HINTS) {
+            int x, y, w, h, lw, lh;
+
             ob_debug("Update NORMAL hints");
             client_update_normal_hints(client);
             /* normal hints can make a window non-resizable */
             client_setup_decor_and_functions(client, FALSE);
 
-            /* make sure the client's sizes are within its bounds, but only
-               reconfigure the window if it needs to. emacs will update its
-               normal hints every time it receives a conigurenotify */
-            client_reconfigure(client, FALSE);
+            x = client->area.x;
+            y = client->area.y;
+            w = client->area.width;
+            h = client->area.height;
+
+            /* apply the new normal hints */
+            client_try_configure(client, &x, &y, &w, &h, &lw, &lh, FALSE);
+            /* make sure the window is visible, and if the window is resized
+               off-screen due to the normal hints changing then this will push
+               it back onto the screen. */
+            client_find_onscreen(client, &x, &y, w, h, FALSE);
+
+            /* make sure the client's sizes are within its bounds, but don't
+               make it reply with a configurenotify unless something changed.
+               emacs will update its normal hints every time it receives a
+               configurenotify */
+            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
         } else if (msgtype == OBT_PROP_ATOM(MOTIF_WM_HINTS)) {
             client_get_mwm_hints(client);
             /* This can override some mwm hints */

@@ -32,7 +32,7 @@
 #include <glib.h>
 
 /* Size of the icons, which can appear inside or outside of a hilite box */
-#define ICON_SIZE config_theme_window_list_icon_size
+#define ICON_SIZE (gint)config_theme_window_list_icon_size
 /* Size of the hilite box around a window's icon */
 #define HILITE_SIZE (ICON_SIZE + 2*HILITE_OFFSET)
 /* Width of the outer ring around the hilite box */

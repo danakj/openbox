@@ -119,16 +119,24 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (data->client) {
         Rect *area, *carea;
         ObClient *c;
-        gint mon, cmon;
+        guint mon, cmon;
         gint x, y, lw, lh, w, h;
 
         c = data->client;
         mon = o->monitor;
         cmon = client_monitor(c);
-        if (mon == CURRENT_MONITOR) mon = cmon;
-        else if (mon == ALL_MONITORS) mon = SCREEN_AREA_ALL_MONITORS;
-        else if (mon == NEXT_MONITOR) mon = (cmon + 1 > screen_num_monitors - 1) ? 0 : (cmon + 1);
-        else if (mon == PREV_MONITOR) mon = (cmon == 0) ? (screen_num_monitors - 1) : (cmon - 1);
+        switch (mon) {
+        case CURRENT_MONITOR:
+            mon = cmon; break;
+        case ALL_MONITORS:
+            mon = SCREEN_AREA_ALL_MONITORS; break;
+        case NEXT_MONITOR:
+            mon = (cmon + 1 > screen_num_monitors - 1) ? 0 : (cmon + 1); break;
+        case PREV_MONITOR:
+            mon = (cmon == 0) ? (screen_num_monitors - 1) : (cmon - 1); break;
+        default:
+            g_assert_not_reached();
+        }
 
         area = screen_area(c->desktop, mon, NULL);
         carea = screen_area(c->desktop, cmon, NULL);

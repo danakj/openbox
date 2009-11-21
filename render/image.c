@@ -75,9 +75,9 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
 
 #ifdef DEBUG
     g_debug("Adding %s picture to the cache:\n    "
-            "Image 0x%x, w %d h %d Hash %u",
+            "Image 0x%lx, w %d h %d Hash %u",
             (*list == self->original ? "ORIGINAL" : "RESIZED"),
-            (guint)self, pic->width, pic->height, RrImagePicHash(pic));
+            (gulong)self, pic->width, pic->height, RrImagePicHash(pic));
 #endif
 }
 
@@ -90,9 +90,9 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
 
 #ifdef DEBUG
     g_debug("Removing %s picture from the cache:\n    "
-            "Image 0x%x, w %d h %d Hash %u",
+            "Image 0x%lx, w %d h %d Hash %u",
             (*list == self->original ? "ORIGINAL" : "RESIZED"),
-            (guint)self, (*list)[i]->width, (*list)[i]->height,
+            (gulong)self, (*list)[i]->width, (*list)[i]->height,
             RrImagePicHash((*list)[i]));
 #endif
 
@@ -331,7 +331,7 @@ void RrImageUnref(RrImage *self)
     if (self && --self->ref == 0) {
 #ifdef DEBUG
         g_debug("Refcount to 0, removing ALL pictures from the cache:\n    "
-                "Image 0x%x", (guint)self);
+                "Image 0x%lx", (gulong)self);
 #endif
         while (self->n_original > 0)
             RemovePicture(self, &self->original, 0, &self->n_original);
@@ -354,7 +354,7 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
         if (self->original[i]->width == w && self->original[i]->height == h) {
 #ifdef DEBUG
             g_debug("Found duplicate ORIGINAL image:\n    "
-                    "Image 0x%x, w %d h %d", (guint)self, w, h);
+                    "Image 0x%lx, w %d h %d", (gulong)self, w, h);
 #endif
             return;
         }

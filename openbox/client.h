@@ -634,6 +634,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig);
 
 /*! Sets the window's type and transient flag */
 void client_get_type_and_transientness(ObClient *self);
+/*! Gets the motif wm hints */
+void client_get_mwm_hints(ObClient *self);
 
 /*! Returns a client's icon set, or its parents (recursively) if it doesn't
   have one

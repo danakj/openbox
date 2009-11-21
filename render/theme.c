@@ -46,7 +46,8 @@ static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
 
-static RrFont *get_font(RrFont *target, RrFont **default_font, const RrInstance *inst)
+static RrFont *get_font(RrFont *target, RrFont **default_font,
+                        const RrInstance *inst)
 {
     if (target) {
         RrFontRef(target);
@@ -147,8 +148,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_unhilite_fg = RrAppearanceNew(inst, 0);
 
     /* load the font stuff */
-    theme->win_font_focused = get_font(active_window_font, &default_font, inst);
-    theme->win_font_unfocused = get_font(inactive_window_font, &default_font, inst);
+    theme->win_font_focused = get_font(active_window_font,
+                                       &default_font, inst);
+    theme->win_font_unfocused = get_font(inactive_window_font,
+                                         &default_font, inst);
 
     winjust = RR_JUSTIFY_LEFT;
     if (read_string(db, "window.label.text.justify", &str)) {

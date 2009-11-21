@@ -80,7 +80,6 @@ static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
-static void client_get_mwm_hints(ObClient *self);
 static void client_get_colormap(ObClient *self);
 static void client_set_desktop_recursive(ObClient *self,
                                          guint target,
@@ -1479,7 +1478,7 @@ static void client_update_transient_tree(ObClient *self,
     }
 }
 
-static void client_get_mwm_hints(ObClient *self)
+void client_get_mwm_hints(ObClient *self)
 {
     guint num;
     guint32 *hints;
@@ -1827,7 +1826,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */
     if (self->undecorated)
-        self->decorations = 0;
+        self->decorations &= (config_theme_keepborder ?
+                              OB_FRAME_DECOR_BORDER : 0);
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))

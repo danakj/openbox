@@ -1469,6 +1469,9 @@ void screen_update_areas(void)
                     b = MAX(b, s->strut->bottom);
             }
 
+            /* if the monitor is not against the edge of the root window,
+               the struts will include the distance from the root window's edge
+               to the monitor, so add that back into the monitor's work area */
             if (l) l += RECT_LEFT  (monitor_area[screen_num_monitors])
                         - RECT_LEFT  (monitor_area[i]);
             if (t) t += RECT_TOP   (monitor_area[screen_num_monitors])

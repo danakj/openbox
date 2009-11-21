@@ -1752,7 +1752,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */
     if (self->undecorated)
-        self->decorations = 0;
+        self->decorations &= (config_theme_keepborder ?
+                              OB_FRAME_DECOR_BORDER : 0);
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))

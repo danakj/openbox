@@ -64,8 +64,4 @@ gboolean event_time_after(guint32 t1, guint32 t2);
 
 Time event_get_server_time(void);
 
-/*! Given a possible target client, returns what the target client really
-  should be for actions */
-struct _ObClient* event_target_client(struct _ObClient *client);
-
 #endif

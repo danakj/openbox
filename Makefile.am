@@ -241,8 +241,6 @@ openbox_openbox_SOURCES = \
 	openbox/grab.h \
 	openbox/group.c \
 	openbox/group.h \
-	openbox/hooks.c \
-	openbox/hooks.h \
 	openbox/keyboard.c \
 	openbox/keyboard.h \
 	openbox/keytree.c \

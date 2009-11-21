@@ -33,7 +33,6 @@
 #include "focus.h"
 #include "stacking.h"
 #include "openbox.h"
-#include "hooks.h"
 #include "group.h"
 #include "config.h"
 #include "menuframe.h"
@@ -585,8 +584,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
-
-    hooks_queue(OB_HOOK_WIN_NEW, self);
 }
 
 ObClient *client_fake_manage(Window window)
@@ -660,9 +657,6 @@ void client_unmanage(ObClient *self)
        ObPrompt window */
     if (!self->prompt)
         XChangeSaveSet(obt_display, self->window, SetModeDelete);
-
-    /* this can't be queued to run later */
-    hooks_run(OB_HOOK_WIN_CLOSE, self);
 
     /* update the focus lists */
     focus_order_remove(self);
@@ -2546,8 +2540,6 @@ gboolean client_show(ObClient *self)
            desktop!
         */
         client_change_wm_state(self);
-
-        hooks_queue(OB_HOOK_WIN_VISIBLE, self);
     }
     return show;
 }
@@ -2586,8 +2578,6 @@ gboolean client_hide(ObClient *self)
            desktop!
         */
         client_change_wm_state(self);
-
-        hooks_queue(OB_HOOK_WIN_INVISIBLE, self);
     }
     return hide;
 }
@@ -3181,9 +3171,6 @@ static void client_iconify_recursive(ObClient *self,
             frame_begin_iconify_animation(self->frame, iconic);
         /* do this after starting the animation so it doesn't flash */
         client_showhide(self);
-
-        hooks_queue((iconic ? OB_HOOK_WIN_ICONIC : OB_HOOK_WIN_UNICONIC),
-                    self);
     }
 
     /* iconify all direct transients, and deiconify all transients
@@ -3271,8 +3258,6 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
     client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
-
-    hooks_queue((max ? OB_HOOK_WIN_MAX : OB_HOOK_WIN_UNMAX), self);
 }
 
 void client_shade(ObClient *self, gboolean shade)
@@ -3286,8 +3271,6 @@ void client_shade(ObClient *self, gboolean shade)
     client_change_wm_state(self); /* the window is being hidden/shown */
     /* resize the frame to just the titlebar */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
-
-    hooks_queue((shade ? OB_HOOK_WIN_SHADE : OB_HOOK_WIN_UNSHADE), self);
 }
 
 static void client_ping_event(ObClient *self, gboolean dead)
@@ -3499,9 +3482,6 @@ static void client_set_desktop_recursive(ObClient *self,
             /* the new desktop's geometry may be different, so we may need to
                resize, for example if we are maximized */
             client_reconfigure(self, FALSE);
-
-        if (old != self->desktop)
-            hooks_queue(OB_HOOK_WIN_DESK_CHANGE, self);
     }
 
     /* move all transients */
@@ -3928,9 +3908,6 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
         self->undecorated = undecorated;
         client_setup_decor_and_functions(self, TRUE);
         client_change_state(self); /* reflect this in the state hints */
-
-        hooks_queue((undecorated ?
-                     OB_HOOK_WIN_UNDECORATED : OB_HOOK_WIN_DECORATED), self);
     }
 }
 

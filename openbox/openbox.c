@@ -42,7 +42,6 @@
 #include "config.h"
 #include "ping.h"
 #include "prompt.h"
-#include "hooks.h"
 #include "gettext.h"
 #include "render/render.h"
 #include "render/theme.h"
@@ -235,7 +234,6 @@ gint main(gint argc, gchar **argv)
 
                 /* register all the available actions */
                 actions_startup(reconfigure);
-                hooks_startup(reconfigure);
                 /* start up config which sets up with the parser */
                 config_startup(i);
 
@@ -401,7 +399,6 @@ gint main(gint argc, gchar **argv)
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
-            hooks_shutdown(reconfigure);
             actions_shutdown(reconfigure);
         } while (reconfigure);
     }

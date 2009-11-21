@@ -33,7 +33,6 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "hooks.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "moveresize.h"
@@ -742,11 +741,6 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
         event_handle_user_input(client, e);
-
-    XFlush(obt_display);
-
-    /* run all the hooks at once */
-    hooks_run_queue();
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
@@ -1916,14 +1910,9 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
             if (!client || !frame_iconify_animating(client->frame))
                 mouse_event(client, e);
         } else
-            keyboard_event(event_target_client(client), e);
+            keyboard_event((focus_cycle_target ? focus_cycle_target :
+                            (client ? client : focus_client)), e);
     }
-}
-
-ObClient* event_target_client(ObClient *client)
-{
-    return (focus_cycle_target ? focus_cycle_target :
-            (client ? client : focus_client));
 }
 
 static void focus_delay_dest(gpointer data)

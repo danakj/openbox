@@ -307,7 +307,9 @@ void obt_parse_tree_from_root(ObtParseInst *i)
 gchar *obt_parse_node_string(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
-    gchar *s = g_strdup(c ? (gchar*)c : "");
+    gchar *s;
+    if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
+    s = g_strdup(c ? (gchar*)c : "");
     xmlFree(c);
     return s;
 }
@@ -315,7 +317,9 @@ gchar *obt_parse_node_string(xmlNodePtr node)
 gint obt_parse_node_int(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
-    gint i = c ? atoi((gchar*)c) : 0;
+    gint i;
+    if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
+    i = c ? atoi((gchar*)c) : 0;
     xmlFree(c);
     return i;
 }
@@ -324,6 +328,7 @@ gboolean obt_parse_node_bool(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gboolean b = FALSE;
+    if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
     if (c && !xmlStrcasecmp(c, (const xmlChar*) "true"))
         b = TRUE;
     else if (c && !xmlStrcasecmp(c, (const xmlChar*) "yes"))
@@ -338,6 +343,7 @@ gboolean obt_parse_node_contains(xmlNodePtr node, const gchar *val)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gboolean r;
+    if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
     r = !xmlStrcasecmp(c, (const xmlChar*) val);
     xmlFree(c);
     return r;
@@ -359,6 +365,7 @@ gboolean obt_parse_attr_bool(xmlNodePtr node, const gchar *name,
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
     if (c) {
+        g_strstrip((char*)c); /* strip leading/trailing whitespace */
         if (!xmlStrcasecmp(c, (const xmlChar*) "true"))
             *value = TRUE, r = TRUE;
         else if (!xmlStrcasecmp(c, (const xmlChar*) "yes"))
@@ -381,6 +388,7 @@ gboolean obt_parse_attr_int(xmlNodePtr node, const gchar *name, gint *value)
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
     if (c) {
+        g_strstrip((char*)c); /* strip leading/trailing whitespace */
         *value = atoi((gchar*)c);
         r = TRUE;
     }
@@ -394,6 +402,7 @@ gboolean obt_parse_attr_string(xmlNodePtr node, const gchar *name,
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
     if (c) {
+        g_strstrip((char*)c); /* strip leading/trailing whitespace */
         *value = g_strdup((gchar*)c);
         r = TRUE;
     }
@@ -406,8 +415,10 @@ gboolean obt_parse_attr_contains(xmlNodePtr node, const gchar *name,
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
-    if (c)
+    if (c) {
+        g_strstrip((char*)c); /* strip leading/trailing whitespace */
         r = !xmlStrcasecmp(c, (const xmlChar*) val);
+    }
     xmlFree(c);
     return r;
 }

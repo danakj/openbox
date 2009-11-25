@@ -176,7 +176,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/if.c \
 	openbox/actions/kill.c \
 	openbox/actions/layer.c \
-	openbox/actions/session.c \
 	openbox/actions/lower.c \
 	openbox/actions/maximize.c \
 	openbox/actions/move.c \

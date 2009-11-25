@@ -1,6 +1,7 @@
 #include "openbox/actions.h"
 #include "openbox/openbox.h"
 #include "openbox/prompt.h"
+#include "openbox/session.h"
 #include "gettext.h"
 
 typedef struct {
@@ -13,6 +14,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 void action_exit_startup(void)
 {
     actions_register("Exit", setup_func, NULL, run_func, NULL, NULL);
+    actions_register("SessionLogout", setup_func, NULL, run_func, NULL, NULL);
 }
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
@@ -29,10 +31,18 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
+static void do_exit(void)
+{
+    if (session_connected())
+        session_request_logout(FALSE);
+    else
+        ob_exit(0);
+}
+
 static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
 {
     if (result)
-        ob_exit(0);
+        do_exit();
     return TRUE; /* call the cleanup func */
 }
 
@@ -53,13 +63,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             { _("Exit"), 1 }
         };
 
-        p = prompt_new(_("Are you sure you want to exit Openbox?"),
-                       _("Exit Openbox"),
-                       answers, 2, 0, 0, prompt_cb, prompt_cleanup, NULL);
+        if (session_connected())
+            p = prompt_new(_("Are you sure you want to log out?"),
+                           _("Log Out"),
+                           answers, 2, 0, 0, prompt_cb, prompt_cleanup, NULL);
+        else
+            p = prompt_new(_("Are you sure you want to exit Openbox?"),
+                           _("Exit Openbox"),
+                           answers, 2, 0, 0, prompt_cb, prompt_cleanup, NULL);
+
         prompt_show(p, NULL, FALSE);
     }
     else
-        ob_exit(0);
+        do_exit();
 
     return FALSE;
 }

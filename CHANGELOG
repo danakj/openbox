@@ -11,6 +11,7 @@
     logic for focus-stealing as is used when mapping a new window.
   * Don't go out of our way any more to prevent focus from moving while the
     keyboard is grabbed.
+  * Fix openbox-gnome-session when using gnome-session > 2.22.
 
 3.4.8-rc2:
   * Updated translations: Italian, Croatian, Ukrainian.

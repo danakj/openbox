@@ -9,7 +9,6 @@ void action_all_startup(void)
     action_reconfigure_startup();
     action_exit_startup();
     action_restart_startup();
-    action_session_startup();
     action_cyclewindows_startup();
     action_breakchroot_startup();
     action_close_startup();

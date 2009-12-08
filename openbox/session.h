@@ -55,4 +55,6 @@ GList* session_state_find(struct _ObClient *c);
 
 void session_request_logout(gboolean silent);
 
+gboolean session_connected(void);
+
 #endif

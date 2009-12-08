@@ -181,7 +181,7 @@ void grab_button_full(guint button, guint state, Window win, guint mask,
                     pointer_mode, GrabModeAsync, None, ob_cursor(cur));
     xerror_set_ignore(FALSE);
     if (xerror_occured)
-        ob_debug("Failed to grab button %d modifiers %d", button, state);
+        ob_debug("Failed to grab button %d modifiers %d\n", button, state);
 }
 
 void ungrab_button(guint button, guint state, Window win)
@@ -203,7 +203,7 @@ void grab_key(guint keycode, guint state, Window win, gint keyboard_mode)
                  GrabModeAsync, keyboard_mode);
     xerror_set_ignore(FALSE);
     if (xerror_occured)
-        ob_debug("Failed to grab keycode %d modifiers %d", keycode, state);
+        ob_debug("Failed to grab keycode %d modifiers %d\n", keycode, state);
 }
 
 void ungrab_all_keys(Window win)

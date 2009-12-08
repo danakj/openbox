@@ -2621,10 +2621,6 @@ gboolean client_hide(ObClient *self)
     gboolean hide = FALSE;
 
     if (!client_should_show(self)) {
-        if (self == focus_client) {
-            event_cancel_all_key_grabs();
-        }
-
         /* We don't need to ignore enter events here.
            The window can hide/iconify in 3 different ways:
            1 - through an x message. in this case we ignore all enter events
@@ -3874,8 +3870,6 @@ gboolean client_focus(ObClient *self)
     /* if using focus_delay, stop the timer now so that focus doesn't
        go moving on us */
     event_halt_focus_delay();
-
-    event_cancel_all_key_grabs();
 
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;

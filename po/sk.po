@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox-3.4.8\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2009-07-16 21:05+0200\n"
+"POT-Creation-Date: 2009-12-08 14:27-0500\n"
 "PO-Revision-Date: 2009-07-16 17:30+0200\n"
 "Last-Translator: Frantisek Elias <elias.frantisek@gmail.com>\n"
 "Language-Team: Slovak <sk@sk.org>\n"
@@ -39,38 +39,29 @@ msgstr "Spustiť"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nepodarilo sa skonvertovať cestu \"%s\" z utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3466
+#: openbox/actions/exit.c:62 openbox/client.c:3462
 msgid "Cancel"
 msgstr "Zrušiť"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:63
 msgid "Exit"
 msgstr "Ukončiť"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Určite chcete ukončiť Openbox?"
+#: openbox/actions/exit.c:67
+msgid "Are you sure you want to log out?"
+msgstr "Naozaj sa chcete odhlásiť?"
 
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Ukončiť Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
+#: openbox/actions/exit.c:68
 msgid "Log Out"
 msgstr "Odhlásiť sa"
 
-#: openbox/actions/session.c:69
-msgid "Are you sure you want to log out?"
-msgstr "Naozaj sa chcete odhlásiť?"
+#: openbox/actions/exit.c:71
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Určite chcete ukončiť Openbox?"
+
+#: openbox/actions/exit.c:72
+msgid "Exit Openbox"
+msgstr "Ukončiť Openbox"
 
 #: openbox/client.c:2013
 msgid "Unnamed Window"
@@ -84,25 +75,25 @@ msgstr "Ukončujem proces..."
 msgid "Not Responding"
 msgstr "Neodpovedá"
 
-#: openbox/client.c:3455
+#: openbox/client.c:3451
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3457
+#: openbox/client.c:3453
 msgid "End Process"
 msgstr "Ukončiť proces"
 
-#: openbox/client.c:3461
+#: openbox/client.c:3457
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Zdá sa, že okno \"%s\" neodpovedá. Chcete ho odpojiť z X serveru?"
 
-#: openbox/client.c:3463
+#: openbox/client.c:3459
 msgid "Disconnect"
 msgstr "Odpojiť"
 
@@ -407,7 +398,7 @@ msgstr "Okenný manažér na obrazovke %d sa neukončuje"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:419
+#: openbox/screen.c:418
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -423,22 +414,22 @@ msgstr[1] ""
 msgid "desktop %i"
 msgstr "plocha %i"
 
-#: openbox/session.c:104
+#: openbox/session.c:105
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Nebolo možné vytvoriť adresár \"%s\": %s"
 
-#: openbox/session.c:466
+#: openbox/session.c:472
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Nepodarilo sa uložiť sedenie \"%s\": %s"
 
-#: openbox/session.c:605
+#: openbox/session.c:611
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Chyba pri ukladaní sedenia do \"%s\": %s"
 
-#: openbox/session.c:842
+#: openbox/session.c:848
 msgid "Not connected to a session manager"
 msgstr ""
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2009-12-08 14:27-0500\n"
 "PO-Revision-Date: 2008-05-24 15:08+0300\n"
 "Last-Translator: Tutku Dalmaz <mektup@tutkudalmaz.org>\n"
 "Language-Team: Turkish\n"
@@ -37,54 +37,43 @@ msgstr "Çalıştır"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "\"%s\" yolu utf8'e çevrilmesi başarısız oldu"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:62 openbox/client.c:3462
 msgid "Cancel"
 msgstr "İptal"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:63
 msgid "Exit"
 msgstr "Çık"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Openbox'tan çıkmak istediğinize emin misiniz?"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Openbox'tan Çık"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"Openbox oturum yönetim desteği olmaksızın yapılandırıldığı için "
-"SessionLogout eylemi geçerli değildir."
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Oturumu Kapat"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:67
 msgid "Are you sure you want to log out?"
 msgstr "Oturumu kapatmak istediğinizden emin misiniz?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:68
+msgid "Log Out"
+msgstr "Oturumu Kapat"
+
+#: openbox/actions/exit.c:71
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Openbox'tan çıkmak istediğinize emin misiniz?"
+
+#: openbox/actions/exit.c:72
+msgid "Exit Openbox"
+msgstr "Openbox'tan Çık"
+
+#: openbox/client.c:2013
 msgid "Unnamed Window"
 msgstr "İsimsiz Pencere"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2027 openbox/client.c:2059
 msgid "Killing..."
 msgstr "Sonlandırılıyor..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2029 openbox/client.c:2061
 msgid "Not Responding"
 msgstr "Cevap Vermiyor"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3451
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,11 +82,11 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. %s sinyali göndererek zorla "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3453
 msgid "End Process"
 msgstr "Süreci Sonlandır"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3457
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -106,7 +95,7 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. X sunucusu ile bağlantısını "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3459
 msgid "Disconnect"
 msgstr "Bağlantıyı Kes"
 
@@ -194,7 +183,7 @@ msgstr "Geri Al/Kapla"
 msgid "_Close"
 msgstr "_Kapat"
 
-#: openbox/config.c:781
+#: openbox/config.c:782
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Yapılandırılma dosyasında belirtilmiş geçersiz \"%s\" düğmesi"
@@ -223,7 +212,7 @@ msgstr "\"%s\" iletim menüsü için geçersiz çıkış"
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "\"%s\" menüsüne erişilmeye çalışıldı fakat bu menü yok"
 
-#: openbox/menu.c:367 openbox/menu.c:368
+#: openbox/menu.c:370 openbox/menu.c:371
 msgid "More..."
 msgstr "Daha..."
 
@@ -417,7 +406,7 @@ msgstr "%d ekranındaki pencere yöneticisinden çıkılamıyor"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, fuzzy, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -432,27 +421,27 @@ msgstr[1] ""
 "Openbox %d masaüstleri için yapılandırılmıştır fakat güncel oturum %d dir. "
 "Openbox yapılandırmasının üzerien yazılıyor."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "%i masaüstü"
 
-#: openbox/session.c:104
+#: openbox/session.c:105
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "\"%s\": %s dizini oluşturulamadı"
 
-#: openbox/session.c:466
+#: openbox/session.c:472
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "\"%s\": %s oturumu kaydedilemedi"
 
-#: openbox/session.c:605
+#: openbox/session.c:611
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Oturum \"%s\": %s'e kaydedilirken hata"
 
-#: openbox/session.c:842
+#: openbox/session.c:848
 msgid "Not connected to a session manager"
 msgstr "Oturum yöneticisine bağlı değil"
 
@@ -489,3 +478,10 @@ msgstr "%s X Hatası"
 #: openbox/prompt.c:200
 msgid "OK"
 msgstr "Tamam"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "Openbox oturum yönetim desteği olmaksızın yapılandırıldığı için "
+#~ "SessionLogout eylemi geçerli değildir."

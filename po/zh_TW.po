@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2009-12-08 14:27-0500\n"
 "PO-Revision-Date: 2008-03-06 01:01+0800\n"
 "Last-Translator: 洪任諭 <pcman.tw@gmail.com>\n"
 "Language-Team: Chinese (traditional) <zh-l10n@linux.org.tw>\n"
@@ -39,71 +39,61 @@ msgstr "執行"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "轉換路徑「%s」自 utf8 時失敗"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:62 openbox/client.c:3462
 msgid "Cancel"
 msgstr "取消"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:63
 msgid "Exit"
 msgstr "離開"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "你確定要離開 Openbox？"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "離開 Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"SessionLogout 動作無法使用，因為 Openbox 在編譯時沒有使用作業階段管理支援"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "登出"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:67
 msgid "Are you sure you want to log out?"
 msgstr "你確定要登出嗎？"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:68
+msgid "Log Out"
+msgstr "登出"
+
+#: openbox/actions/exit.c:71
+msgid "Are you sure you want to exit Openbox?"
+msgstr "你確定要離開 Openbox？"
+
+#: openbox/actions/exit.c:72
+msgid "Exit Openbox"
+msgstr "離開 Openbox"
+
+#: openbox/client.c:2013
 msgid "Unnamed Window"
 msgstr "未命名視窗"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2027 openbox/client.c:2059
 msgid "Killing..."
 msgstr "正在中止..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2029 openbox/client.c:2061
 msgid "Not Responding"
 msgstr "沒有回應"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3451
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr "視窗「%s」似乎已經停止回應。  你想送出 \"%s\" 訊息強制結束程式嗎？"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3453
 msgid "End Process"
 msgstr "結束 Process"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3457
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "視窗「%s」似乎已經停止回應。  你想從 X 伺服器將它斷線嗎？"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3459
 msgid "Disconnect"
 msgstr "斷線"
 
@@ -191,7 +181,7 @@ msgstr "開/關視窗裝飾(_D)"
 msgid "_Close"
 msgstr "關閉(_C)"
 
-#: openbox/config.c:781
+#: openbox/config.c:782
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "在配置檔中指定的按鈕「%s」無效"
@@ -220,7 +210,7 @@ msgstr "從管線選單「%s」的輸出無效"
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "試圖存取選單「%s」但是它不存在"
 
-#: openbox/menu.c:367 openbox/menu.c:368
+#: openbox/menu.c:370 openbox/menu.c:371
 msgid "More..."
 msgstr "更多…"
 
@@ -406,7 +396,7 @@ msgstr "螢幕 %d 中的視窗管理員並未離開"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, fuzzy, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -418,27 +408,27 @@ msgstr[0] ""
 "Openbox 原先被設定為使用 %d 個桌面，但目前的作業階段有其他程式變更設定為 %d "
 "個，因此忽略 Openbox 的設定"
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "桌面 %i"
 
-#: openbox/session.c:104
+#: openbox/session.c:105
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "無法製作目錄「%s」：%s"
 
-#: openbox/session.c:466
+#: openbox/session.c:472
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "無法儲存執行階段到「%s」：%s"
 
-#: openbox/session.c:605
+#: openbox/session.c:611
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "當儲存執行階段「%s」時發生錯誤：%s"
 
-#: openbox/session.c:842
+#: openbox/session.c:848
 msgid "Not connected to a session manager"
 msgstr "沒有連接到作業階段管理員"
 
@@ -475,6 +465,12 @@ msgstr "X 錯誤：%s"
 #: openbox/prompt.c:200
 msgid "OK"
 msgstr "確定"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout 動作無法使用，因為 Openbox 在編譯時沒有使用作業階段管理支援"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "執行「%s」時失敗：%s"

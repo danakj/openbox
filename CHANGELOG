@@ -1,3 +1,17 @@
+3.4.8:
+  * Updated translations: Slovak.
+  * Allow windows to change their decorations at any time (Fix for
+    Google Chrome).
+  * Make openbox-session to respect the $XDG_CONFIG_HOME environment variable.
+  * Fixed bug #4344 where borders were given to windows that should not have
+    them.
+  * Merge the SessionLogout and Exit actions.  They now test if connected to a
+    session manager and ask it to exit if so, or simply kill Openbox if not.
+  * Further tweaks to the _NET_ACTIVE_WINDOW message handling.  Use the same
+    logic for focus-stealing as is used when mapping a new window.
+  * Don't go out of our way any more to prevent focus from moving while the
+    keyboard is grabbed.
+
 3.4.8-rc2:
   * Updated translations: Italian, Croatian, Ukrainian.
   * When resizing a window while focus cycling with bar=no, the bar no longer

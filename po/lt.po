@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2009-12-08 14:27-0500\n"
 "PO-Revision-Date: 2008-05-04 21:16+0200\n"
 "Last-Translator: Vytautas <vytautas1987@yahoo.com>\n"
 "Language-Team: Lithuanian <lt@li.ourg>\n"
@@ -37,54 +37,43 @@ msgstr "Vygdyti"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nepavyko išversti \"%s\" iš utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:62 openbox/client.c:3462
 msgid "Cancel"
 msgstr "Atšaukti"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:63
 msgid "Exit"
 msgstr "Išeiti"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Ar tikrai norite išjungti Openbox?"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Išjungti Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
-"valdymo palaikymo"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Išsiregistruoti"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:67
 msgid "Are you sure you want to log out?"
 msgstr "Ar tikrai norite išsiregistruoti?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:68
+msgid "Log Out"
+msgstr "Išsiregistruoti"
+
+#: openbox/actions/exit.c:71
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Ar tikrai norite išjungti Openbox?"
+
+#: openbox/actions/exit.c:72
+msgid "Exit Openbox"
+msgstr "Išjungti Openbox"
+
+#: openbox/client.c:2013
 msgid "Unnamed Window"
 msgstr "Bevardis Langas"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2027 openbox/client.c:2059
 msgid "Killing..."
 msgstr "Naikinama..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2029 openbox/client.c:2061
 msgid "Not Responding"
 msgstr "Neatsako"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3451
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,18 +82,18 @@ msgstr ""
 "Langas \"%s\" neatsako.  Ar nori jį priverstinai išjungti nusiūsdamas %s "
 "signalą?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3453
 msgid "End Process"
 msgstr "Baigti procesą"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3457
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Langas \"%s\" neatsako. Ar nori jį atjungti nuo X serverio?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3459
 msgid "Disconnect"
 msgstr "Atsijungti"
 
@@ -192,7 +181,7 @@ msgstr "Ne/D_ekoruoti"
 msgid "_Close"
 msgstr "_Uždaryti"
 
-#: openbox/config.c:781
+#: openbox/config.c:782
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Neteisingas mygtuskas \"%s\" nurodytas nustatymų byloje"
@@ -221,7 +210,7 @@ msgstr "Neteisinga išvestis iš pipe-menu \"%s\""
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "Bandoma įeiti į menu \"%s\", bet jis neegzistuoja"
 
-#: openbox/menu.c:367 openbox/menu.c:368
+#: openbox/menu.c:370 openbox/menu.c:371
 msgid "More..."
 msgstr "Dar..."
 
@@ -409,7 +398,7 @@ msgstr "WM ekrane %d neišsijungia"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, fuzzy, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -424,27 +413,27 @@ msgstr[1] ""
 "Openbox yra suderintas %d darbastaliams, bet dabartinė sesija turi %d.  Mes "
 "naudosime kitą, ne Openbox, konfigūraciją."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "darbastalis %i"
 
-#: openbox/session.c:104
+#: openbox/session.c:105
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Negalima padaryti direktorijos \"%s\": %s"
 
-#: openbox/session.c:466
+#: openbox/session.c:472
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Negalima išsaugoti sesijos į \"%s\": %s"
 
-#: openbox/session.c:605
+#: openbox/session.c:611
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Klaida bandant išsaugot sesiją į \"%s\": %s"
 
-#: openbox/session.c:842
+#: openbox/session.c:848
 msgid "Not connected to a session manager"
 msgstr "Neprisijungta prie sesijų sesijos tvarkyklė"
 
@@ -482,3 +471,10 @@ msgstr "X Klaida: %s"
 #: openbox/prompt.c:200
 msgid "OK"
 msgstr "OK"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
+#~ "valdymo palaikymo"

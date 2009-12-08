@@ -505,9 +505,10 @@ void client_manage(Window window, ObPrompt *prompt)
 
         if (!activate) {
             /* if the client isn't stealing focus, then hilite it so the user
-               knows it is there */
-            /* XXX don't do this if we're restoring from a session */
-            client_hilite(self, TRUE);
+               knows it is there, but don't do this if we're restoring from a
+               session */
+            if (!client_restore_session_stacking(self))
+                client_hilite(self, TRUE);
         }
     }
     else {

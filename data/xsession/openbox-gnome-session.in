@@ -7,6 +7,27 @@ if test -n "$1"; then
   exit
 fi
 
+VER=$(gnome-session --version 2>/dev/null | \
+      sed -e 's/[^0-9.]*\([0-9.]\+\)/\1/')
+
+MAJOR=$(echo $VER | cut -d . -f 1)
+MINOR=$(echo $VER | cut -d . -f 2)
+
 # Run GNOME with Openbox as its window manager
 export WINDOW_MANAGER="@bindir@/openbox"
-exec gnome-session --choose-session=openbox-session "$@"
+
+if test $MAJOR -lt 2 || (test $MAJOR = 2 && test $MINOR -le 22); then
+  # old gnome-session allows multiple sessions to be saved
+  exec gnome-session --choose-session=openbox-session "$@"
+else
+  # make sure the gnome-wm script is being used
+  gconftool-2 -t string \
+      -s /desktop/gnome/session/required_components/windowmanager "gnome-wm" \
+      2> /dev/null
+
+  # new gnome-session does not allow multiple sessions
+  exec gnome-session "$@"
+fi
+
+
+

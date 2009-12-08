@@ -83,10 +83,6 @@ void focus_set_client(ObClient *client)
     screen_install_colormap(focus_client, FALSE);
     screen_install_colormap(client, TRUE);
 
-    /* in the middle of cycling..? kill it. */
-    focus_cycle_stop(focus_client);
-    focus_cycle_stop(client);
-
     focus_client = client;
 
     if (client != NULL) {
@@ -195,8 +191,6 @@ void focus_nothing(void)
 
     /* nothing is focused, update the colormap and _the root property_ */
     focus_set_client(NULL);
-
-    event_cancel_all_key_grabs();
 
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(obt_display, screen_support_win, RevertToPointerRoot,

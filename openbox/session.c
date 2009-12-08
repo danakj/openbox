@@ -34,6 +34,7 @@ void session_startup(gint argc, gchar **argv) {}
 void session_shutdown(gboolean permanent) {}
 GList* session_state_find(struct _ObClient *c) { return NULL; }
 void session_request_logout(gboolean silent) {}
+gboolean session_connected(void) { return FALSE; }
 #else
 
 #include "debug.h"
@@ -157,6 +158,11 @@ void session_shutdown(gboolean permanent)
                                                      session_saved_state);
         }
     }
+}
+
+gboolean session_connected(void)
+{
+    return !!sm_conn;
 }
 
 /*! Connect to the session manager and set up our callback functions */

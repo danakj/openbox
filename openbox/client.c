@@ -106,6 +106,8 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
 static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
+static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
+                                       Time launch_time);
 
 void client_startup(gboolean reconfig)
 {
@@ -499,115 +501,14 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s\n",
                   activate ? "yes" : "no");
     if (activate) {
-        gboolean raise = FALSE;
-        gboolean relative_focused;
-        gboolean parent_focused;
-
-        parent_focused = (focus_client != NULL &&
-                          client_search_focus_parent(self));
-        relative_focused = (focus_client != NULL &&
-                            (client_search_focus_tree_full(self) != NULL ||
-                             client_search_focus_group_full(self) != NULL));
-
-        /* This is focus stealing prevention */
-        ob_debug_type(OB_DEBUG_FOCUS,
-                      "Want to focus new window 0x%x at time %u "
-                      "launched at %u (last user interaction time %u)\n",
-                      self->window, map_time, launch_time,
-                      event_last_user_time);
-
-        if (menu_frame_visible || moveresize_in_progress) {
-            activate = FALSE;
-            raise = TRUE;
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Not focusing the window because the user is inside "
-                          "an Openbox menu or is move/resizing a window and "
-                          "we don't want to interrupt them\n");
-        }
-
-        /* if it's on another desktop */
-        else if (!(self->desktop == screen_desktop ||
-                   self->desktop == DESKTOP_ALL) &&
-                 /* the timestamp is from before you changed desktops */
-                 launch_time && screen_desktop_user_time &&
-                 !event_time_after(launch_time, screen_desktop_user_time))
-        {
-            activate = FALSE;
-            raise = TRUE;
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Not focusing the window because its on another "
-                          "desktop\n");
-        }
-        /* If something is focused... */
-        else if (focus_client) {
-            /* If the user is working in another window right now, then don't
-               steal focus */
-            if (!parent_focused &&
-                event_last_user_time && launch_time &&
-                event_time_after(event_last_user_time, launch_time) &&
-                event_last_user_time != launch_time &&
-                event_time_after(event_last_user_time,
-                                 map_time - OB_EVENT_USER_TIME_DELAY))
-            {
-                activate = FALSE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because the user is "
-                              "working in another window that is not "
-                              "its parent\n");
-            }
-            /* If the new window is a transient (and its relatives aren't
-               focused) */
-            else if (client_has_parent(self) && !relative_focused) {
-                activate = FALSE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because it is a "
-                              "transient, and its relatives aren't focused\n");
-            }
-            /* Don't steal focus from globally active clients.
-               I stole this idea from KWin. It seems nice.
-             */
-            else if (!(focus_client->can_focus ||
-                       focus_client->focus_notify))
-            {
-                activate = FALSE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because a globally "
-                              "active client has focus\n");
-            }
-            /* Don't move focus if it's not going to go to this window
-               anyway */
-            else if (client_focus_target(self) != self) {
-                activate = FALSE;
-                raise = TRUE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because another window "
-                              "would get the focus anyway\n");
-            }
-            /* Don't move focus if the window is not visible on the current
-               desktop and none of its relatives are focused */
-            else if (!(self->desktop == screen_desktop ||
-                       self->desktop == DESKTOP_ALL) &&
-                     !relative_focused)
-            {
-                activate = FALSE;
-                raise = TRUE;
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Not focusing the window because it is on "
-                              "another desktop and no relatives are focused ");
-            }
-        }
+        activate = client_can_steal_focus(self, map_time, launch_time);
 
         if (!activate) {
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus stealing prevention activated for %s at "
-                          "time %u (last user interaction time %u)\n",
-                          self->title, map_time, event_last_user_time);
-            /* if the client isn't focused, then hilite it so the user
-               knows it is there */
-            client_hilite(self, TRUE);
-            /* we may want to raise it even tho we're not activating it */
-            if (raise && !client_restore_session_stacking(self))
-                stacking_raise(CLIENT_AS_WINDOW(self));
+            /* if the client isn't stealing focus, then hilite it so the user
+               knows it is there, but don't do this if we're restoring from a
+               session */
+            if (!client_restore_session_stacking(self))
+                client_hilite(self, TRUE);
         }
     }
     else {
@@ -856,6 +757,105 @@ void client_fake_unmanage(ObClient *self)
 
     frame_free(self->frame);
     g_free(self);
+}
+
+static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
+                                       Time launch_time)
+{
+    gboolean steal;
+    gboolean relative_focused;
+    gboolean parent_focused;
+
+    steal = TRUE;
+
+    parent_focused = (focus_client != NULL &&
+                      client_search_focus_parent(self));
+    relative_focused = (focus_client != NULL &&
+                        (client_search_focus_tree_full(self) != NULL ||
+                         client_search_focus_group_full(self) != NULL));
+
+    /* This is focus stealing prevention */
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Want to focus new window 0x%x at time %u "
+                  "launched at %u (last user interaction time %u)\n",
+                  self->window, steal_time, launch_time,
+                  event_last_user_time);
+
+    /* if it's on another desktop */
+    if (!(self->desktop == screen_desktop ||
+          self->desktop == DESKTOP_ALL) &&
+        /* the timestamp is from before you changed desktops */
+        launch_time && screen_desktop_user_time &&
+        !event_time_after(launch_time, screen_desktop_user_time))
+    {
+        steal = FALSE;
+        ob_debug_type(OB_DEBUG_FOCUS,
+                      "Not focusing the window because its on another "
+                      "desktop\n");
+    }
+    /* If something is focused... */
+    else if (focus_client) {
+        /* If the user is working in another window right now, then don't
+           steal focus */
+        if (!parent_focused &&
+            event_last_user_time && launch_time &&
+            event_time_after(event_last_user_time, launch_time) &&
+            event_last_user_time != launch_time &&
+            event_time_after(event_last_user_time,
+                             steal_time - OB_EVENT_USER_TIME_DELAY))
+        {
+            steal = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because the user is "
+                          "working in another window that is not "
+                          "its parent\n");
+        }
+        /* If the new window is a transient (and its relatives aren't
+           focused) */
+        else if (client_has_parent(self) && !relative_focused) {
+            steal = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because it is a "
+                          "transient, and its relatives aren't focused\n");
+        }
+        /* Don't steal focus from globally active clients.
+           I stole this idea from KWin. It seems nice.
+        */
+        else if (!(focus_client->can_focus ||
+                   focus_client->focus_notify))
+        {
+            steal = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because a globally "
+                          "active client has focus\n");
+        }
+        /* Don't move focus if it's not going to go to this window
+           anyway */
+        else if (client_focus_target(self) != self) {
+            steal = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because another window "
+                          "would get the focus anyway\n");
+        }
+        /* Don't move focus if the window is not visible on the current
+           desktop and none of its relatives are focused */
+        else if (!(self->desktop == screen_desktop ||
+                   self->desktop == DESKTOP_ALL) &&
+                 !relative_focused)
+        {
+            steal = FALSE;
+            ob_debug_type(OB_DEBUG_FOCUS,
+                          "Not focusing the window because it is on "
+                          "another desktop and no relatives are focused ");
+        }
+    }
+
+    if (!steal)
+        ob_debug_type(OB_DEBUG_FOCUS,
+                      "Focus stealing prevention activated for %s at "
+                      "time %u (last user interaction time %u)\n",
+                      self->title, steal_time, event_last_user_time);
+    return steal;
 }
 
 /*! Returns a new structure containing the per-app settings for this client.
@@ -2622,10 +2622,6 @@ gboolean client_hide(ObClient *self)
     gboolean hide = FALSE;
 
     if (!client_should_show(self)) {
-        if (self == focus_client) {
-            event_cancel_all_key_grabs();
-        }
-
         /* We don't need to ignore enter events here.
            The window can hide/iconify in 3 different ways:
            1 - through an x message. in this case we ignore all enter events
@@ -3515,8 +3511,18 @@ void client_hilite(ObClient *self, gboolean hilite)
     /* don't allow focused windows to hilite */
     self->demands_attention = hilite && !client_focused(self);
     if (self->frame != NULL) { /* if we're mapping, just set the state */
-        if (self->demands_attention)
+        if (self->demands_attention) {
             frame_flash_start(self->frame);
+
+            /* if the window is on another desktop then raise it and make it
+               the most recently used window */
+            if (self->desktop != screen_desktop &&
+                self->desktop != DESKTOP_ALL)
+            {
+                stacking_raise(CLIENT_AS_WINDOW(self));
+                focus_order_to_top(self);
+            }
+        }
         else
             frame_flash_stop(self->frame);
         client_change_state(self);
@@ -3866,8 +3872,6 @@ gboolean client_focus(ObClient *self)
        go moving on us */
     event_halt_focus_delay();
 
-    event_cancel_all_key_grabs();
-
     xerror_set_ignore(TRUE);
     xerror_occured = FALSE;
 
@@ -3926,12 +3930,16 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 }
 
 /* this function exists to map to the net_active_window message in the ewmh */
-void client_activate(ObClient *self, gboolean here, gboolean raise,
+void client_activate(ObClient *self, gboolean desktop, gboolean raise,
                      gboolean unshade, gboolean user)
 {
-    if (user || (self->desktop == DESKTOP_ALL ||
-                 self->desktop == screen_desktop))
-        client_present(self, here, raise, unshade);
+    if ((user && (desktop ||
+                  self->desktop == DESKTOP_ALL ||
+                  self->desktop == screen_desktop)) ||
+        client_can_steal_focus(self, event_curtime, CurrentTime))
+    {
+        client_present(self, FALSE, raise, unshade);
+    }
     else
         client_hilite(self, TRUE);
 }

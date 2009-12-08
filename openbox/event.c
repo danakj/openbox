@@ -1332,7 +1332,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "
                               "missing source indication\n", client->title);
-            client_activate(client, TRUE, TRUE, TRUE,
+            client_activate(client, FALSE, TRUE, TRUE,
                             (e->xclient.data.l[0] == 0 ||
                              e->xclient.data.l[0] == 2));
         } else if (msgtype == prop_atoms.net_wm_moveresize) {

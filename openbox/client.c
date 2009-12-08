@@ -3929,14 +3929,15 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 }
 
 /* this function exists to map to the net_active_window message in the ewmh */
-void client_activate(ObClient *self, gboolean here, gboolean raise,
+void client_activate(ObClient *self, gboolean desktop, gboolean raise,
                      gboolean unshade, gboolean user)
 {
-    if ((user && (self->desktop == DESKTOP_ALL ||
+    if ((user && (desktop ||
+                  self->desktop == DESKTOP_ALL ||
                   self->desktop == screen_desktop)) ||
         client_can_steal_focus(self, event_curtime, CurrentTime))
     {
-        client_present(self, here, raise, unshade);
+        client_present(self, FALSE, raise, unshade);
     }
     else
         client_hilite(self, TRUE);

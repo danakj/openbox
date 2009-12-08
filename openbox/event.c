@@ -1323,10 +1323,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             if (e->xclient.data.l[0] == 1 || e->xclient.data.l[0] == 2) {
-                /* don't use the user's timestamp for client_focus, cuz if it's
-                   an old broken timestamp (happens all the time) then focus
-                   won't move even though we're trying to move it
-                  event_curtime = e->xclient.data.l[1];*/
+                event_curtime = e->xclient.data.l[1];
                 if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"

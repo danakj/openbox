@@ -2111,7 +2111,7 @@ void client_update_strut(ObClient *self)
         STRUT_PARTIAL_SET(strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
 
-    if (!STRUT_EQUAL(strut, self->strut)) {
+    if (!PARTIAL_STRUT_EQUAL(strut, self->strut)) {
         self->strut = strut;
 
         /* updating here is pointless while we're being mapped cuz we're not in

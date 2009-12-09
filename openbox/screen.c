@@ -1723,24 +1723,38 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search)
     return RECT_INTERSECTS_RECT(monitor_area[head], *search);
 }
 
+guint screen_monitor_active(void)
+{
+    if (moveresize_client)
+        return client_monitor(moveresize_client);
+    else if (focus_client)
+        return client_monitor(focus_client);
+    else
+        return screen_monitor_pointer();
+}
+
 Rect* screen_physical_area_active(void)
 {
-    Rect *a;
-    gint x, y;
+    return screen_physical_area_monitor(screen_monitor_active());
+}
 
-    if (moveresize_client)
-        a = screen_physical_area_monitor(client_monitor(moveresize_client));
-    else if (focus_client)
-        a = screen_physical_area_monitor(client_monitor(focus_client));
-    else {
-        Rect mon;
-        if (screen_pointer_pos(&x, &y))
-            RECT_SET(mon, x, y, 1, 1);
+guint screen_monitor_primary(void)
+{
+    if (config_primary_monitor_index > 0) {
+        if (config_primary_monitor_index-1 < screen_num_monitors)
+            return config_primary_monitor_index - 1;
         else
-            RECT_SET(mon, 0, 0, 1, 1);
-        a = screen_physical_area_monitor(screen_find_monitor(&mon));
+            return 0;
     }
-    return a;
+    else if (config_primary_monitor == OB_PLACE_MONITOR_ACTIVE)
+        return screen_monitor_active();
+    else /* config_primary_monitor == OB_PLACE_MONITOR_MOUSE */
+        return screen_monitor_pointer();
+}
+
+Rect *screen_physical_area_primary(void)
+{
+    return screen_physical_area_monitor(screen_monitor_primary());
 }
 
 void screen_set_root_cursor(void)
@@ -1751,6 +1765,17 @@ void screen_set_root_cursor(void)
     else
         XDefineCursor(ob_display, RootWindow(ob_display, ob_screen),
                       ob_cursor(OB_CURSOR_POINTER));
+}
+
+guint screen_monitor_pointer()
+{
+    Rect mon;
+    gint x, y;
+    if (screen_pointer_pos(&x, &y))
+        RECT_SET(mon, x, y, 1, 1);
+    else
+        RECT_SET(mon, 0, 0, 1, 1);
+    return screen_find_monitor(&mon);
 }
 
 gboolean screen_pointer_pos(gint *x, gint *y)

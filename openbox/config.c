@@ -40,6 +40,9 @@ ObPlacePolicy  config_place_policy;
 gboolean       config_place_center;
 ObPlaceMonitor config_place_monitor;
 
+guint          config_primary_monitor_index;
+ObPlaceMonitor config_primary_monitor;
+
 StrutPartial config_margins;
 
 gchar   *config_theme;
@@ -529,6 +532,13 @@ static void parse_placement(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         else if (parse_contains("mouse", doc, n))
             config_place_monitor = OB_PLACE_MONITOR_MOUSE;
     }
+    if ((n = parse_find_node("primaryMonitor", node))) {
+        config_primary_monitor_index = parse_int(doc, n);
+        if (!config_primary_monitor_index) {
+            if (parse_contains("mouse", doc, n))
+                config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
+        }
+    }
 }
 
 static void parse_margins(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
@@ -930,6 +940,9 @@ void config_startup(ObParseInst *i)
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
     config_place_monitor = OB_PLACE_MONITOR_ANY;
+
+    config_primary_monitor_index = 1;
+    config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
 
     parse_register(i, "placement", parse_placement, NULL);
 

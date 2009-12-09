@@ -104,7 +104,16 @@ Rect *screen_physical_area_all_monitors();
 
 Rect *screen_physical_area_monitor(guint head);
 
-Rect *screen_physical_area_active();
+/*! Returns the monitor which contains the active window, or the one
+  containing the pointer otherwise. */
+guint screen_monitor_active(void);
+
+Rect *screen_physical_area_active(void);
+
+/*! Returns the primary monitor, as specified by the config */
+guint screen_monitor_primary(void);
+
+Rect *screen_physical_area_primary(void);
 
 /* doesn't include struts which the search area is already outside of when
    'search' is not NULL */
@@ -132,5 +141,8 @@ void screen_set_root_cursor();
 /*! Gives back the pointer's position in x and y. Returns TRUE if the pointer
   is on this screen and FALSE if it is on another screen. */
 gboolean screen_pointer_pos(gint *x, gint *y);
+
+/*! Returns the monitor which contains the pointer device */
+guint screen_monitor_pointer(void);
 
 #endif

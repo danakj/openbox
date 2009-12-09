@@ -57,7 +57,7 @@ static void     screen_tell_ksplash(void);
 static void     screen_fallback_focus(void);
 
 guint           screen_num_desktops;
-guint           screen_num_monitors = 0;
+guint           screen_num_monitors;
 guint           screen_desktop;
 guint           screen_last_desktop;
 gboolean        screen_showing_desktop;
@@ -77,7 +77,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup **desktop_popup = NULL;
+static ObPagerPopup **desktop_popup;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -355,19 +355,20 @@ void screen_startup(gboolean reconfig)
 
     if (reconfig) {
         guint i;
-
-        /* recreate the pager popups to use any new theme stuff. it was
-           freed in screen_shutdown() already. */
         desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
         for (i = 0; i < screen_num_monitors; i++) {
             desktop_popup[i] = pager_popup_new();
             pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
+
+            /* update the pager popup's width */
             pager_popup_text_width_to_strings(desktop_popup[i],
                                               screen_desktop_names,
                                               screen_num_desktops);
         }
 
         return;
+    } else {
+        desktop_popup = NULL;
     }
 
     /* get the initial size */
@@ -459,10 +460,10 @@ void screen_shutdown(gboolean reconfig)
 {
     guint i;
 
-    for (i = 0; i < screen_num_monitors; i++)
+    for (i = 0; i < screen_num_monitors; i++) {
         pager_popup_free(desktop_popup[i]);
+    }
     g_free(desktop_popup);
-    desktop_popup = NULL;
 
     if (reconfig)
         return;
@@ -509,7 +510,6 @@ void screen_resize(void)
     screen_update_areas();
     dock_configure();
 
-    /* make sure all windows are visible */
     for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);
 }
@@ -1349,32 +1349,22 @@ typedef struct {
 
 void screen_update_areas(void)
 {
-    guint i, j, onum;
+    guint i, j;
     gulong *dims;
     GList *it;
     GSList *sit;
 
-    onum = screen_num_monitors;
-
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
 
-    if (screen_num_monitors < onum) {
-        /* free some of the pager popups */
-        for (i = screen_num_monitors; i < onum; ++i)
-            pager_popup_free(desktop_popup[i]);
-        desktop_popup = g_renew(ObPagerPopup*, desktop_popup,
-                                screen_num_monitors);
-    }
-    else {
-        /* add some more pager popups */
-        desktop_popup = g_renew(ObPagerPopup*, desktop_popup,
-                                screen_num_monitors);
-        for (i = onum; i < screen_num_monitors; ++i) {
+    if (!desktop_popup) {
+        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
+        for (i = 0; i < screen_num_monitors; i++) {
             desktop_popup[i] = pager_popup_new();
             pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
-            if (screen_desktop_names) /* the areas are initialized before the
-                                         desktop names */
+
+            if (screen_desktop_names)
+                /* update the pager popup's width */
                 pager_popup_text_width_to_strings(desktop_popup[i],
                                                   screen_desktop_names,
                                                   screen_num_desktops);

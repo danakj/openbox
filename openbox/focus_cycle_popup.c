@@ -185,7 +185,8 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                                iconic_windows,
                                all_desktops,
                                dock_windows,
-                               desktop_windows))
+                               desktop_windows,
+                               FALSE))
         {
             gchar *text = popup_get_name(ft);
 

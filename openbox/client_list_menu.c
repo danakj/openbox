@@ -101,7 +101,7 @@ static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
 {
     ObClient *t = self->data.normal.data;
     if (t) { /* it's set to NULL if its destroyed */
-        client_activate(t, TRUE, TRUE, TRUE, TRUE);
+        client_activate(t, TRUE, FALSE, TRUE, TRUE, TRUE);
         /* if the window is omnipresent then we need to go to its
            desktop */
         if (t->desktop == DESKTOP_ALL)

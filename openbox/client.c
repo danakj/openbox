@@ -4237,39 +4237,26 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
                                   gint *dest, gboolean *near_edge)
 {
     GList *it;
-    Rect *a, *mon;
+    Rect *a;
     Rect dock_area;
     gint edge;
+    guint i;
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
                     &self->frame->area);
-    mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
-                      &self->frame->area);
 
     switch (dir) {
     case OB_DIRECTION_NORTH:
-        if (my_head >= RECT_TOP(*mon) + 1)
-            edge = RECT_TOP(*mon) - 1;
-        else
-            edge = RECT_TOP(*a) - 1;
+        edge = RECT_TOP(*a) - 1;
         break;
     case OB_DIRECTION_SOUTH:
-        if (my_head <= RECT_BOTTOM(*mon) - 1)
-            edge = RECT_BOTTOM(*mon) + 1;
-        else
-            edge = RECT_BOTTOM(*a) + 1;
+        edge = RECT_BOTTOM(*a) + 1;
         break;
     case OB_DIRECTION_EAST:
-        if (my_head <= RECT_RIGHT(*mon) - 1)
-            edge = RECT_RIGHT(*mon) + 1;
-        else
-            edge = RECT_RIGHT(*a) + 1;
+        edge = RECT_RIGHT(*a) + 1;
         break;
     case OB_DIRECTION_WEST:
-        if (my_head >= RECT_LEFT(*mon) + 1)
-            edge = RECT_LEFT(*mon) - 1;
-        else
-            edge = RECT_LEFT(*a) - 1;
+        edge = RECT_LEFT(*a) - 1;
         break;
     default:
         g_assert_not_reached();
@@ -4278,6 +4265,15 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     *dest = edge;
     *near_edge = TRUE;
 
+    /* search for edges of monitors */
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *area = screen_area(self->desktop, i, NULL);
+        detect_edge(*area, dir, my_head, my_size, my_edge_start,
+                    my_edge_size, dest, near_edge);
+        g_free(area);
+    }
+
+    /* search for edges of clients */
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
 
@@ -4299,7 +4295,6 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
                 my_edge_size, dest, near_edge);
     g_free(a);
-    g_free(mon);
 }
 
 void client_find_move_directional(ObClient *self, ObDirection dir,

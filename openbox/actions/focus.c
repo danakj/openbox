@@ -2,6 +2,7 @@
 #include "openbox/event.h"
 #include "openbox/client.h"
 #include "openbox/focus.h"
+#include "openbox/screen.h"
 
 typedef struct {
     gboolean here;
@@ -72,7 +73,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
              data->context != OB_FRAME_CONTEXT_FRAME))
         {
             actions_client_move(data, TRUE);
-            client_activate(data->client, o->here,
+            client_activate(data->client, TRUE, o->here,
                             o->activate, o->activate, TRUE);
             actions_client_move(data, FALSE);
         }

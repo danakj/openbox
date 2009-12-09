@@ -130,7 +130,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            3. it is not shaded
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, FALSE) &&
+            focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE) &&
             !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -150,7 +150,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, TRUE) &&
+        if (focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -184,12 +184,6 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
 
 void focus_nothing(void)
 {
-    /* Install our own colormap */
-    if (focus_client != NULL) {
-        screen_install_colormap(focus_client, FALSE);
-        screen_install_colormap(NULL, TRUE);
-    }
-
     /* nothing is focused, update the colormap and _the root property_ */
     focus_set_client(NULL);
 
@@ -281,7 +275,7 @@ static gboolean focus_target_has_siblings(ObClient *ft,
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
             focus_valid_target(c, TRUE, iconic_windows, all_desktops,
-                               FALSE, FALSE))
+                               FALSE, FALSE, FALSE))
         {
             return TRUE;
         }
@@ -294,7 +288,8 @@ gboolean focus_valid_target(ObClient *ft,
                             gboolean iconic_windows,
                             gboolean all_desktops,
                             gboolean dock_windows,
-                            gboolean desktop_windows)
+                            gboolean desktop_windows,
+                            gboolean user_request)
 {
     gboolean ok = FALSE;
 
@@ -333,9 +328,11 @@ gboolean focus_valid_target(ObClient *ft,
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
     /* it's not set to skip the taskbar (but this only applies to normal typed
-       windows, and is overridden if the window is modal) */
+       windows, and is overridden if the window is modal or if the user asked
+       for this window to be focused) */
     ok = ok && (ft->type != OB_CLIENT_TYPE_NORMAL ||
                 ft->modal ||
+                user_request ||
                 !ft->skip_taskbar);
 
     /* it's not going to just send focus off somewhere else (modal window),
@@ -348,7 +345,8 @@ gboolean focus_valid_target(ObClient *ft,
                                                      iconic_windows,
                                                      all_desktops,
                                                      dock_windows,
-                                                     desktop_windows));
+                                                     desktop_windows,
+                                                     FALSE));
     }
 
     return ok;

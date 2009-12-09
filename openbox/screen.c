@@ -727,6 +727,15 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             client_hide(c);
+            if (c == focus_client) {
+                /* c was focused and we didn't do fallback clearly so make sure
+                   openbox doesnt still consider the window focused.
+                   this happens when using NextWindow with allDesktops, since
+                   it doesnt want to move focus on desktop change, but the
+                   focus is not going to stay with the current window, which
+                   has now disappeared */
+                focus_set_client(NULL);
+            }
         }
     }
 

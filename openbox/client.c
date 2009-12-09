@@ -370,7 +370,8 @@ void client_manage(Window window, ObPrompt *prompt)
         (user_time != 0) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE))
+        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE,
+                           settings->focus == 1))
     {
         activate = TRUE;
     }
@@ -2110,7 +2111,7 @@ void client_update_strut(ObClient *self)
         STRUT_PARTIAL_SET(strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
 
-    if (!STRUT_EQUAL(strut, self->strut)) {
+    if (!PARTIAL_STRUT_EQUAL(strut, self->strut)) {
         self->strut = strut;
 
         /* updating here is pointless while we're being mapped cuz we're not in
@@ -3930,7 +3931,8 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 }
 
 /* this function exists to map to the net_active_window message in the ewmh */
-void client_activate(ObClient *self, gboolean desktop, gboolean raise,
+void client_activate(ObClient *self, gboolean desktop,
+                     gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
     if ((user && (desktop ||
@@ -3938,7 +3940,7 @@ void client_activate(ObClient *self, gboolean desktop, gboolean raise,
                   self->desktop == screen_desktop)) ||
         client_can_steal_focus(self, event_curtime, CurrentTime))
     {
-        client_present(self, FALSE, raise, unshade);
+        client_present(self, here, raise, unshade);
     }
     else
         client_hilite(self, TRUE);

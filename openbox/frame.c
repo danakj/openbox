@@ -23,6 +23,7 @@
 #include "extensions.h"
 #include "prop.h"
 #include "grab.h"
+#include "debug.h"
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
@@ -370,8 +371,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
 
         STRUT_SET(self->size,
                   self->cbwidth_l + (!self->max_horz ? self->bwidth : 0),
-                  self->cbwidth_t +
-                  (!self->max_horz || !self->max_vert ? self->bwidth : 0),
+                  self->cbwidth_t + self->bwidth,
                   self->cbwidth_r + (!self->max_horz ? self->bwidth : 0),
                   self->cbwidth_b +
                   (!self->max_horz || !self->max_vert ? self->bwidth : 0));
@@ -949,6 +949,9 @@ void frame_adjust_state(ObFrame *self)
 
 void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Frame for 0x%x has focus: %d\n",
+                  self->client->window, hilite);
     self->focused = hilite;
     self->need_render = TRUE;
     framerender_frame(self);

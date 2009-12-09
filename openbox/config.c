@@ -444,8 +444,13 @@ static void parse_mouse(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node,
         config_mouse_threshold = parse_int(doc, n);
     if ((n = parse_find_node("doubleClickTime", node)))
         config_mouse_dclicktime = parse_int(doc, n);
-    if ((n = parse_find_node("screenEdgeWarpTime", node)))
+    if ((n = parse_find_node("screenEdgeWarpTime", node))) {
         config_mouse_screenedgetime = parse_int(doc, n);
+        /* minimum value of 25 for this property, when it is 1 and you hit the
+           edge it basically never stops */
+        if (config_mouse_screenedgetime && config_mouse_screenedgetime < 25)
+            config_mouse_screenedgetime = 25;
+    }
 
     n = parse_find_node("context", node);
     while (n) {

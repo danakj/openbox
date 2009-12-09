@@ -23,6 +23,7 @@
 #include "extensions.h"
 #include "prop.h"
 #include "grab.h"
+#include "debug.h"
 #include "config.h"
 #include "framerender.h"
 #include "mainloop.h"
@@ -948,6 +949,9 @@ void frame_adjust_state(ObFrame *self)
 
 void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
+    ob_debug_type(OB_DEBUG_FOCUS,
+                  "Frame for 0x%x has focus: %d\n",
+                  self->client->window, hilite);
     self->focused = hilite;
     self->need_render = TRUE;
     framerender_frame(self);

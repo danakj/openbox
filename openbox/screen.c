@@ -1729,7 +1729,7 @@ Rect* screen_physical_area_active(void)
     gint x, y;
 
     if (moveresize_client)
-        a = screen_physical_area_monitor(client_monitor(focus_client));
+        a = screen_physical_area_monitor(client_monitor(moveresize_client));
     else if (focus_client)
         a = screen_physical_area_monitor(client_monitor(focus_client));
     else {

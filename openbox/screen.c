@@ -942,7 +942,7 @@ void screen_show_desktop_popup(guint d)
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    a = screen_physical_area_active();
+    a = screen_physical_area_primary();
     pager_popup_position(desktop_popup, CenterGravity,
                          a->x + a->width / 2, a->y + a->height / 2);
     pager_popup_icon_size_multiplier(desktop_popup,

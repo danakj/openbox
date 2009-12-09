@@ -10,10 +10,10 @@ fi
 AUTOSTART="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/autostart.sh"
 GLOBALAUTOSTART="@configdir@/openbox/autostart.sh"
 
-if test -e $AUTOSTART; then
+if test -r $AUTOSTART; then
     . $AUTOSTART
 else
-    if test -e $GLOBALAUTOSTART; then
+    if test -r $GLOBALAUTOSTART; then
         . $GLOBALAUTOSTART
     fi
 fi

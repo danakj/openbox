@@ -184,12 +184,6 @@ ObClient* focus_fallback(gboolean allow_refocus, gboolean allow_pointer,
 
 void focus_nothing(void)
 {
-    /* Install our own colormap */
-    if (focus_client != NULL) {
-        screen_install_colormap(focus_client, FALSE);
-        screen_install_colormap(NULL, TRUE);
-    }
-
     /* nothing is focused, update the colormap and _the root property_ */
     focus_set_client(NULL);
 

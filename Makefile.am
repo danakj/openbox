@@ -12,6 +12,7 @@ pubincludedir   = $(includedir)/openbox/@OB_VERSION@/openbox
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 secretbindir    = $(libdir)/openbox
+appsdir         = $(datadir)/applications
 
 theme = Clearlooks
 
@@ -413,6 +414,9 @@ nodist_pkgconfig_DATA = \
 	parser/obparser-3.0.pc
 
 ## data ##
+
+dist_apps_DATA = \
+	data/openbox.desktop
 
 dist_pixmap_DATA = \
 	data/openbox.png

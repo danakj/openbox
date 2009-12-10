@@ -80,7 +80,7 @@ class AutostartFile:
     def __str__(self):
         return self.path + " : " + self.de.getName()
 
-    def _isexecfile(path):
+    def _isexecfile(self, path):
         return os.access(path, os.X_OK)
 
     def _findFile(self, path, search, match_func):

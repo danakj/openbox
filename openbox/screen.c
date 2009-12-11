@@ -302,6 +302,9 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.ob_theme;
     supported[i++] = prop_atoms.ob_config_file;
     supported[i++] = prop_atoms.ob_control;
+    supported[i++] = prop_atoms.ob_role;
+    supported[i++] = prop_atoms.ob_name;
+    supported[i++] = prop_atoms.ob_class;
     g_assert(i == num_support);
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),

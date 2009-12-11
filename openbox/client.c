@@ -76,6 +76,7 @@ static RrImage *client_default_icon     = NULL;
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
+static void client_save_session_ids(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -1159,6 +1160,7 @@ static void client_get_all(ObClient *self, gboolean real)
     /* get the session related properties, these can change decorations
        from per-app settings */
     client_get_session_ids(self);
+    client_save_session_ids(self);
 
     /* now we got everything that can affect the decorations */
     if (!real)
@@ -2365,6 +2367,15 @@ static void client_get_session_ids(ObClient *self)
         if (PROP_GET32(self->window, net_wm_pid, cardinal, &pid))
             self->pid = pid;
     }
+}
+
+/*! Save the session IDs as seen by Openbox when the window mapped, so that
+  users can still access them later if the app changes them */
+static void client_save_session_ids(ObClient *self)
+{
+    PROP_SETS(self->window, ob_role, self->role);
+    PROP_SETS(self->window, ob_name, self->name);
+    PROP_SETS(self->window, ob_class, self->class);
 }
 
 static void client_change_wm_state(ObClient *self)

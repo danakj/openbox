@@ -179,6 +179,9 @@ void prop_startup(void)
     CREATE(ob_wm_action_undecorate, "_OB_WM_ACTION_UNDECORATE");
     CREATE(ob_wm_state_undecorated, "_OB_WM_STATE_UNDECORATED");
     CREATE(ob_control, "_OB_CONTROL");
+    CREATE(ob_role, "_OB_ROLE");
+    CREATE(ob_name, "_OB_NAME");
+    CREATE(ob_class, "_OB_CLASS");
 }
 
 #include <X11/Xutil.h>

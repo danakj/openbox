@@ -82,6 +82,12 @@ extern gboolean config_place_center;
   already on another monitor) */
 extern ObPlaceMonitor config_place_monitor;
 
+/*! Place dialogs and stuff on this monitor.  Index starts at 1.  If this is
+  0, then use the config_primary_monitor instead. */
+extern guint config_primary_monitor_index;
+/*! Where to place dialogs and stuff if it is not specified by index. */
+extern ObPlaceMonitor config_primary_monitor;
+
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;
 

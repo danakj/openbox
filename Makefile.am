@@ -13,6 +13,7 @@ rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 secretbindir    = $(libdir)/openbox
+appsdir         = $(datadir)/applications
 
 theme = Clearlooks
 
@@ -422,6 +423,9 @@ nodist_pkgconfig_DATA = \
 	obt/obt-4.0.pc
 
 ## data ##
+
+dist_apps_DATA = \
+	data/openbox.desktop
 
 dist_pixmap_DATA = \
 	data/openbox.png

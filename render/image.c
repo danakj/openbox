@@ -221,7 +221,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
     return pic;
 }
 
-/*! This drawns an RGBA picture into the target, within the rectangle specified
+/*! This draws an RGBA picture into the target, within the rectangle specified
   by the area parameter.  If the area's size differs from the source's then it
   will be centered within the rectangle */
 void DrawRGBA(RrPixel32 *target, gint target_w, gint target_h,
@@ -405,11 +405,13 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
     pic = NULL;
     free_pic = FALSE;
 
-    /* is there an original of this size? (only w or h has to be right cuz
-       we maintain aspect ratios) */
+    /* is there an original of this size? (only the larger of
+       w or h has to be right cuz we maintain aspect ratios) */
     for (i = 0; i < self->n_original; ++i)
-        if (self->original[i]->width == area->width ||
-            self->original[i]->height == area->height)
+        if ((self->original[i]->width >= self->original[i]->height &&
+             self->original[i]->width == area->width) ||
+            (self->original[i]->width <= self->original[i]->height &&
+             self->original[i]->height == area->height))
         {
             pic = self->original[i];
             break;
@@ -417,8 +419,10 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
 
     /* is there a resize of this size? */
     for (i = 0; i < self->n_resized; ++i)
-        if (self->resized[i]->width == area->width ||
-            self->resized[i]->height == area->height)
+        if ((self->resized[i]->width >= self->resized[i]->height &&
+             self->resized[i]->width == area->width) ||
+            (self->resized[i]->width <= self->resized[i]->height &&
+             self->resized[i]->height == area->height))
         {
             gint j;
             RrImagePic *saved;

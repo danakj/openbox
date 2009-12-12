@@ -135,12 +135,14 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
             {
                 RrRect narea = tarea;
                 RrTextureImage *img = &a->texture[i].data.image;
-                if (img->twidth)
-                    narea.width = MIN(tarea.width, img->twidth);
-                if (img->theight)
-                    narea.height = MIN(tarea.height, img->theight);
                 narea.x += img->tx;
+                narea.width -= img->tx;
                 narea.y += img->ty;
+                narea.height -= img->ty;
+                if (img->twidth)
+                    narea.width = MIN(narea.width, img->twidth);
+                if (img->theight)
+                    narea.height = MIN(narea.height, img->theight);
                 RrImageDrawImage(a->surface.pixel_data,
                                  &a->texture[i].data.image,
                                  a->w, a->h,
@@ -153,12 +155,14 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
             {
                 RrRect narea = tarea;
                 RrTextureRGBA *rgb = &a->texture[i].data.rgba;
-                if (rgb->twidth)
-                    narea.width = MIN(tarea.width, rgb->twidth);
-                if (rgb->theight)
-                    narea.height = MIN(tarea.height, rgb->theight);
                 narea.x += rgb->tx;
+                narea.width -= rgb->tx;
                 narea.y += rgb->ty;
+                narea.height -= rgb->ty;
+                if (rgb->twidth)
+                    narea.width = MIN(narea.width, rgb->twidth);
+                if (rgb->theight)
+                    narea.height = MIN(narea.height, rgb->theight);
                 RrImageDrawRGBA(a->surface.pixel_data,
                                 &a->texture[i].data.rgba,
                                 a->w, a->h,

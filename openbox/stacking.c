@@ -218,6 +218,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     GList *it, *last, *below, *above, *next;
     GList *wins = NULL;
 
+    GList *group_helpers = NULL;
     GList *group_modals = NULL;
     GList *group_trans = NULL;
     GList *modals = NULL;
@@ -248,6 +249,8 @@ static void restack_windows(ObClient *selected, gboolean raise)
 
                 /* only move windows in the same stacking layer */
                 if (ch->layer == selected->layer &&
+                    /* looking for windows that are transients, and so would
+                       remain above the selected window */
                     client_search_transient(selected, ch))
                 {
                     if (client_is_direct_child(selected, ch)) {
@@ -255,6 +258,13 @@ static void restack_windows(ObClient *selected, gboolean raise)
                             modals = g_list_prepend(modals, ch);
                         else
                             trans = g_list_prepend(trans, ch);
+                    }
+                    else if (client_helper(ch)) {
+                        if (selected->transient) {
+                            /* helpers do not stay above transient windows */
+                            continue;
+                        }
+                        group_helpers = g_list_prepend(group_helpers, ch);
                     }
                     else {
                         if (ch->modal)
@@ -268,8 +278,13 @@ static void restack_windows(ObClient *selected, gboolean raise)
         }
     }
 
-    /* put transients of the selected window right above it */
+    /* put modals above other direct transients */
     wins = g_list_concat(modals, trans);
+
+    /* put helpers below direct transients */
+    wins = g_list_concat(wins, group_helpers);
+
+    /* put the selected window right below these children */
     wins = g_list_append(wins, selected);
 
     /* if selected window is transient for group then raise it above others */

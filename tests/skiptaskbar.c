@@ -26,6 +26,7 @@ int main () {
   Window     win;
   XEvent     report;
   Atom       state, skip;
+  XClassHint classhint;
   int        x=10,y=10,h=400,w=400;
 
   display = XOpenDisplay(NULL);
@@ -46,6 +47,10 @@ int main () {
 
   XChangeProperty(display, win, state, XA_ATOM, 32,
 		  PropModeReplace, (unsigned char*)&skip, 1);
+
+  classhint.res_name = "test";
+  classhint.res_class = "Test";
+  XSetClassHint(display, win, &classhint);
 
   XMapWindow(display, win);
   XFlush(display);

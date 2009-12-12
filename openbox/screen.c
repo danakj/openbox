@@ -56,7 +56,7 @@ static void     screen_tell_ksplash(void);
 static void     screen_fallback_focus(void);
 
 guint           screen_num_desktops;
-guint           screen_num_monitors = 0;
+guint           screen_num_monitors;
 guint           screen_desktop;
 guint           screen_last_desktop;
 gboolean        screen_showing_desktop;
@@ -76,7 +76,7 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup **desktop_popup = NULL;
+static ObPagerPopup *desktop_popup;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -292,6 +292,9 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_THEME);
     supported[i++] = OBT_PROP_ATOM(OB_CONFIG_FILE);
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
+    supported[i++] = OBT_PROP_ATOM(OB_ROLE);
+    supported[i++] = OBT_PROP_ATOM(OB_NAME);
+    supported[i++] = OBT_PROP_ATOM(OB_CLASS);
     g_assert(i == num_support);
 
     OBT_PROP_SETA32(obt_root(ob_screen),
@@ -343,20 +346,14 @@ void screen_startup(gboolean reconfig)
     guint32 d;
     gboolean namesexist = FALSE;
 
+    desktop_popup = pager_popup_new();
+    pager_popup_height(desktop_popup, POPUP_HEIGHT);
+
     if (reconfig) {
-        guint i;
-
-        /* recreate the pager popups to use any new theme stuff. it was
-           freed in screen_shutdown() already. */
-        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
-        for (i = 0; i < screen_num_monitors; i++) {
-            desktop_popup[i] = pager_popup_new();
-            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
-            pager_popup_text_width_to_strings(desktop_popup[i],
-                                              screen_desktop_names,
-                                              screen_num_desktops);
-        }
-
+        /* update the pager popup's width */
+        pager_popup_text_width_to_strings(desktop_popup,
+                                          screen_desktop_names,
+                                          screen_num_desktops);
         return;
     }
 
@@ -446,12 +443,7 @@ void screen_startup(gboolean reconfig)
 
 void screen_shutdown(gboolean reconfig)
 {
-    guint i;
-
-    for (i = 0; i < screen_num_monitors; i++)
-        pager_popup_free(desktop_popup[i]);
-    g_free(desktop_popup);
-    desktop_popup = NULL;
+    pager_popup_free(desktop_popup);
 
     if (reconfig)
         return;
@@ -497,7 +489,6 @@ void screen_resize(void)
     screen_update_areas();
     dock_configure();
 
-    /* make sure all windows are visible */
     for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);
 }
@@ -711,6 +702,15 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             client_hide(c);
+            if (c == focus_client) {
+                /* c was focused and we didn't do fallback clearly so make sure
+                   openbox doesnt still consider the window focused.
+                   this happens when using NextWindow with allDesktops, since
+                   it doesnt want to move focus on desktop change, but the
+                   focus is not going to stay with the current window, which
+                   has now disappeared */
+                focus_set_client(NULL);
+            }
         }
     }
 
@@ -918,52 +918,41 @@ static guint translate_row_col(guint r, guint c)
 
 static gboolean hide_desktop_popup_func(gpointer data)
 {
-    guint i;
-
-    for (i = 0; i < screen_num_monitors; i++) {
-        pager_popup_hide(desktop_popup[i]);
-    }
+    pager_popup_hide(desktop_popup);
     return FALSE; /* don't repeat */
 }
 
 void screen_show_desktop_popup(guint d)
 {
     Rect *a;
-    guint i;
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    for (i = 0; i < screen_num_monitors; i++) {
-        a = screen_physical_area_monitor(i);
-        pager_popup_position(desktop_popup[i], CenterGravity,
-                             a->x + a->width / 2, a->y + a->height / 2);
-        pager_popup_icon_size_multiplier(desktop_popup[i],
-                                         (screen_desktop_layout.columns /
-                                          screen_desktop_layout.rows) / 2,
-                                         (screen_desktop_layout.rows/
-                                          screen_desktop_layout.columns) / 2);
-        pager_popup_max_width(desktop_popup[i],
-                              MAX(a->width/3, POPUP_WIDTH));
-        pager_popup_show(desktop_popup[i], screen_desktop_names[d], d);
+    a = screen_physical_area_primary();
+    pager_popup_position(desktop_popup, CenterGravity,
+                         a->x + a->width / 2, a->y + a->height / 2);
+    pager_popup_icon_size_multiplier(desktop_popup,
+                                     (screen_desktop_layout.columns /
+                                      screen_desktop_layout.rows) / 2,
+                                     (screen_desktop_layout.rows/
+                                      screen_desktop_layout.columns) / 2);
+    pager_popup_max_width(desktop_popup,
+                          MAX(a->width/3, POPUP_WIDTH));
+    pager_popup_show(desktop_popup, screen_desktop_names[d], d);
 
-        obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
-        obt_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
-                                  hide_desktop_popup_func, desktop_popup[i],
-                                  g_direct_equal, NULL);
-        g_free(a);
-    }
+    obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    obt_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
+                              hide_desktop_popup_func, desktop_popup,
+                              g_direct_equal, NULL);
+    g_free(a);
 }
 
 void screen_hide_desktop_popup(void)
 {
-    guint i;
-
-    for (i = 0; i < screen_num_monitors; i++) {
-        obt_main_loop_timeout_remove_data(ob_main_loop, hide_desktop_popup_func,
-                                          desktop_popup[i], FALSE);
-        pager_popup_hide(desktop_popup[i]);
-    }
+    obt_main_loop_timeout_remove_data(ob_main_loop, hide_desktop_popup_func,
+                                      desktop_popup, FALSE);
+    pager_popup_hide(desktop_popup);
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,
@@ -1198,11 +1187,9 @@ void screen_update_desktop_names(void)
     }
 
     /* resize the pager for these names */
-    for (i = 0; i < screen_num_monitors; i++) {
-        pager_popup_text_width_to_strings(desktop_popup[i],
-                                          screen_desktop_names,
-                                          screen_num_desktops);
-    }
+    pager_popup_text_width_to_strings(desktop_popup,
+                                      screen_desktop_names,
+                                      screen_num_desktops);
 }
 
 void screen_show_desktop(gboolean show, ObClient *show_only)
@@ -1372,37 +1359,13 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
 
 void screen_update_areas(void)
 {
-    guint i, j, onum;
+    guint i, j;
     gulong *dims;
     GList *it;
     GSList *sit;
 
-    onum = screen_num_monitors;
-
     g_free(monitor_area);
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
-
-    if (screen_num_monitors < onum) {
-        /* free some of the pager popups */
-        for (i = screen_num_monitors; i < onum; ++i)
-            pager_popup_free(desktop_popup[i]);
-        desktop_popup = g_renew(ObPagerPopup*, desktop_popup,
-                                screen_num_monitors);
-    }
-    else {
-        /* add some more pager popups */
-        desktop_popup = g_renew(ObPagerPopup*, desktop_popup,
-                                screen_num_monitors);
-        for (i = onum; i < screen_num_monitors; ++i) {
-            desktop_popup[i] = pager_popup_new();
-            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
-            if (screen_desktop_names) /* the areas are initialized before the
-                                         desktop names */
-                pager_popup_text_width_to_strings(desktop_popup[i],
-                                                  screen_desktop_names,
-                                                  screen_num_desktops);
-        }
-    }
 
     /* set up the user-specified margins */
     config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);
@@ -1746,24 +1709,38 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search)
     return RECT_INTERSECTS_RECT(monitor_area[head], *search);
 }
 
+guint screen_monitor_active(void)
+{
+    if (moveresize_client)
+        return client_monitor(moveresize_client);
+    else if (focus_client)
+        return client_monitor(focus_client);
+    else
+        return screen_monitor_pointer();
+}
+
 Rect* screen_physical_area_active(void)
 {
-    Rect *a;
-    gint x, y;
+    return screen_physical_area_monitor(screen_monitor_active());
+}
 
-    if (moveresize_client)
-        a = screen_physical_area_monitor(client_monitor(focus_client));
-    else if (focus_client)
-        a = screen_physical_area_monitor(client_monitor(focus_client));
-    else {
-        Rect mon;
-        if (screen_pointer_pos(&x, &y))
-            RECT_SET(mon, x, y, 1, 1);
+guint screen_monitor_primary(void)
+{
+    if (config_primary_monitor_index > 0) {
+        if (config_primary_monitor_index-1 < screen_num_monitors)
+            return config_primary_monitor_index - 1;
         else
-            RECT_SET(mon, 0, 0, 1, 1);
-        a = screen_physical_area_monitor(screen_find_monitor(&mon));
+            return 0;
     }
-    return a;
+    else if (config_primary_monitor == OB_PLACE_MONITOR_ACTIVE)
+        return screen_monitor_active();
+    else /* config_primary_monitor == OB_PLACE_MONITOR_MOUSE */
+        return screen_monitor_pointer();
+}
+
+Rect *screen_physical_area_primary(void)
+{
+    return screen_physical_area_monitor(screen_monitor_primary());
 }
 
 void screen_set_root_cursor(void)
@@ -1774,6 +1751,17 @@ void screen_set_root_cursor(void)
     else
         XDefineCursor(obt_display, obt_root(ob_screen),
                       ob_cursor(OB_CURSOR_POINTER));
+}
+
+guint screen_monitor_pointer()
+{
+    Rect mon;
+    gint x, y;
+    if (screen_pointer_pos(&x, &y))
+        RECT_SET(mon, x, y, 1, 1);
+    else
+        RECT_SET(mon, 0, 0, 1, 1);
+    return screen_find_monitor(&mon);
 }
 
 gboolean screen_pointer_pos(gint *x, gint *y)

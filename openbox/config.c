@@ -39,6 +39,9 @@ ObPlacePolicy  config_place_policy;
 gboolean       config_place_center;
 ObPlaceMonitor config_place_monitor;
 
+guint          config_primary_monitor_index;
+ObPlaceMonitor config_primary_monitor;
+
 StrutPartial config_margins;
 
 gchar   *config_theme;
@@ -437,8 +440,13 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
         config_mouse_threshold = obt_parse_node_int(n);
     if ((n = obt_parse_find_node(node, "doubleClickTime")))
         config_mouse_dclicktime = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "screenEdgeWarpTime")))
+    if ((n = obt_parse_find_node(node, "screenEdgeWarpTime"))) {
         config_mouse_screenedgetime = obt_parse_node_int(n);
+        /* minimum value of 25 for this property, when it is 1 and you hit the
+           edge it basically never stops */
+        if (config_mouse_screenedgetime && config_mouse_screenedgetime < 25)
+            config_mouse_screenedgetime = 25;
+    }
 
     n = obt_parse_find_node(node, "context");
     while (n) {
@@ -514,6 +522,13 @@ static void parse_placement(xmlNodePtr node, gpointer d)
             config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
         else if (obt_parse_node_contains(n, "mouse"))
             config_place_monitor = OB_PLACE_MONITOR_MOUSE;
+    }
+    if ((n = obt_parse_find_node(node, "primaryMonitor"))) {
+        config_primary_monitor_index = obt_parse_node_int(n);
+        if (!config_primary_monitor_index) {
+            if (obt_parse_node_contains(n, "mouse"))
+                config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
+        }
     }
 }
 
@@ -917,6 +932,9 @@ void config_startup(ObtParseInst *i)
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
     config_place_monitor = OB_PLACE_MONITOR_ANY;
+
+    config_primary_monitor_index = 1;
+    config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
 
     obt_parse_register(i, "placement", parse_placement, NULL);
 

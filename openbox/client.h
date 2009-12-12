@@ -575,13 +575,16 @@ gboolean client_focus(ObClient *self);
   when the user deliberately selects a window for use.
   @param desktop If true, and the window is on another desktop, it will still
                  be activated.
+  @param here If true, and the window is on another desktop, it will be moved
+              to the current desktop, otherwise the desktop will switch to
+              where the window is.
   @param raise If true, the client is brought to the front.
   @param unshade If true, the client is unshaded (if it is shaded)
   @param user If true, then a user action is what requested the activation;
               otherwise, it means an application requested it on its own
 */
-void client_activate(ObClient *self, gboolean desktop, gboolean raise,
-                     gboolean unshade, gboolean user);
+void client_activate(ObClient *self, gboolean desktop, gboolean here,
+                     gboolean raise, gboolean unshade, gboolean user);
 
 /*! Bring all of its helper windows to its desktop. These are the utility and
   stuff windows. */

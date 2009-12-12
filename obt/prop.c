@@ -190,6 +190,9 @@ void obt_prop_startup(void)
     CREATE_(OB_WM_ACTION_UNDECORATE);
     CREATE_(OB_WM_STATE_UNDECORATED);
     CREATE_(OB_CONTROL);
+    CREATE_(OB_ROLE);
+    CREATE_(OB_NAME);
+    CREATE_(OB_CLASS);
 }
 
 Atom obt_prop_atom(ObtPropAtom a)

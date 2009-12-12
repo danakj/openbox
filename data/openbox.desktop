@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Openbox
+Exec=openbox
+Icon=openbox
+NoDisplay=true
+# name we put on the WM spec check window
+X-GNOME-WMName=Openbox
+X-GNOME-Autostart-Phase=WindowManager
+X-GNOME-Provides=windowmanager
+X-GNOME-Autostart-Notify=true

@@ -7,6 +7,11 @@ if test -n "$1"; then
   exit
 fi
 
+# Clean up after GDM
+xprop -root -remove _NET_NUMBER_OF_DESKTOPS \
+      -remove _NET_DESKTOP_NAMES \
+      -remove _NET_CURRENT_DESKTOP 2> /dev/null
+
 # Run KDE with Openbox as its window manager
 export KDEWM="@bindir@/openbox"
 exec startkde "$@"

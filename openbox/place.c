@@ -43,20 +43,7 @@ static void add_choice(guint *choice, guint mychoice)
 
 static Rect *pick_pointer_head(ObClient *c)
 {
-    guint i;
-    gint px, py;
-
-    if (screen_pointer_pos(&px, &py)) {
-        for (i = 0; i < screen_num_monitors; ++i) {
-            Rect *monitor = screen_physical_area_monitor(i);
-            gboolean contain = RECT_CONTAINS(*monitor, px, py);
-            g_free(monitor);
-            if (contain)
-                return screen_area(c->desktop, i, NULL);
-        }
-        g_assert_not_reached();
-    } else
-        return NULL;
+    return screen_area(c->desktop, screen_monitor_pointer(), NULL);
 }
 
 /*! Pick a monitor to place a window on. */

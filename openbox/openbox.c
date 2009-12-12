@@ -546,8 +546,21 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 
 static void parse_env(void)
 {
+    const gchar *id;
+
     /* unset this so we don't pass it on unknowingly */
     unsetenv("DESKTOP_STARTUP_ID");
+
+    /* this is how gnome-session passes in a session client id */
+    id = g_getenv("DESKTOP_AUTOSTART_ID");
+    if (id) {
+        unsetenv("DESKTOP_AUTOSTART_ID");
+        if (ob_sm_id) g_free(ob_sm_id);
+        ob_sm_id = g_strdup(id);
+        ob_debug_type(OB_DEBUG_SM,
+                      "DESKTOP_AUTOSTART_ID %s supercedes --sm-client-id\n",
+                      ob_sm_id);
+    }
 }
 
 static void parse_args(gint *argc, gchar **argv)

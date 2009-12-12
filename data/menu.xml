@@ -369,11 +369,6 @@
   <item label="Reconfigure Openbox">
     <action name="Reconfigure" />
   </item>
-  <item label="Exit Openbox">
-    <action name="Exit">
-      <prompt>yes</prompt>
-    </action>
-  </item>
 </menu>
 
 <menu id="root-menu" label="Openbox 3">
@@ -390,7 +385,7 @@
   <menu id="system-menu"/>
   <separator />
   <item label="Log Out">
-    <action name="SessionLogout">
+    <action name="Exit">
       <prompt>yes</prompt>
     </action>
   </item>

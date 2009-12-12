@@ -59,7 +59,8 @@ void focus_cycle_stop(ObClient *ifclient)
                            focus_cycle_iconic_windows,
                            focus_cycle_all_desktops,
                            focus_cycle_dock_windows,
-                           focus_cycle_desktop_windows))
+                           focus_cycle_desktop_windows,
+                           FALSE))
     {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
         focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
@@ -121,7 +122,8 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                                focus_cycle_iconic_windows,
                                focus_cycle_all_desktops,
                                focus_cycle_dock_windows,
-                               focus_cycle_desktop_windows))
+                               focus_cycle_desktop_windows,
+                               FALSE))
         {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
@@ -188,7 +190,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         if (cur == c)
             continue;
         if (!focus_valid_target(it->data, TRUE, FALSE, FALSE, dock_windows,
-                                desktop_windows))
+                                desktop_windows, FALSE))
             continue;
 
         /* find the centre coords of this window, from the
@@ -296,7 +298,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
                                    focus_cycle_iconic_windows,
                                    focus_cycle_all_desktops,
                                    focus_cycle_dock_windows,
-                                   focus_cycle_desktop_windows))
+                                   focus_cycle_desktop_windows, FALSE))
                 ft = it->data;
     }
 

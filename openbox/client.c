@@ -75,6 +75,7 @@ static RrImage *client_default_icon     = NULL;
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
+static void client_save_session_ids(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -289,7 +290,8 @@ void client_manage(Window window, ObPrompt *prompt)
         (user_time != 0) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE))
+        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE,
+                           settings->focus == 1))
     {
         activate = TRUE;
     }
@@ -1075,6 +1077,7 @@ static void client_get_all(ObClient *self, gboolean real)
     /* get the session related properties, these can change decorations
        from per-app settings */
     client_get_session_ids(self);
+    client_save_session_ids(self);
 
     /* now we got everything that can affect the decorations */
     if (!real)
@@ -2031,7 +2034,7 @@ void client_update_strut(ObClient *self)
         STRUT_PARTIAL_SET(strut, 0, 0, 0, 0,
                           0, 0, 0, 0, 0, 0, 0, 0);
 
-    if (!STRUT_EQUAL(strut, self->strut)) {
+    if (!PARTIAL_STRUT_EQUAL(strut, self->strut)) {
         self->strut = strut;
 
         /* updating here is pointless while we're being mapped cuz we're not in
@@ -2286,6 +2289,15 @@ static void client_get_session_ids(ObClient *self)
         if (OBT_PROP_GET32(self->window, NET_WM_PID, CARDINAL, &pid))
             self->pid = pid;
     }
+}
+
+/*! Save the session IDs as seen by Openbox when the window mapped, so that
+  users can still access them later if the app changes them */
+static void client_save_session_ids(ObClient *self)
+{
+    OBT_PROP_SETS(self->window, OB_ROLE, utf8, self->role);
+    OBT_PROP_SETS(self->window, OB_NAME, utf8, self->name);
+    OBT_PROP_SETS(self->window, OB_CLASS, utf8, self->class);
 }
 
 static void client_change_wm_state(ObClient *self)
@@ -3817,7 +3829,8 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
 }
 
 /* this function exists to map to the net_active_window message in the ewmh */
-void client_activate(ObClient *self, gboolean desktop, gboolean raise,
+void client_activate(ObClient *self, gboolean desktop,
+                     gboolean here, gboolean raise,
                      gboolean unshade, gboolean user)
 {
     if ((user && (desktop ||
@@ -3825,7 +3838,7 @@ void client_activate(ObClient *self, gboolean desktop, gboolean raise,
                   self->desktop == screen_desktop)) ||
         client_can_steal_focus(self, event_curtime, CurrentTime))
     {
-        client_present(self, FALSE, raise, unshade);
+        client_present(self, here, raise, unshade);
     }
     else
         client_hilite(self, TRUE);
@@ -4122,39 +4135,26 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
                                   gint *dest, gboolean *near_edge)
 {
     GList *it;
-    Rect *a, *mon;
+    Rect *a;
     Rect dock_area;
     gint edge;
+    guint i;
 
     a = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS,
                     &self->frame->area);
-    mon = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR,
-                      &self->frame->area);
 
     switch (dir) {
     case OB_DIRECTION_NORTH:
-        if (my_head >= RECT_TOP(*mon) + 1)
-            edge = RECT_TOP(*mon) - 1;
-        else
-            edge = RECT_TOP(*a) - 1;
+        edge = RECT_TOP(*a) - 1;
         break;
     case OB_DIRECTION_SOUTH:
-        if (my_head <= RECT_BOTTOM(*mon) - 1)
-            edge = RECT_BOTTOM(*mon) + 1;
-        else
-            edge = RECT_BOTTOM(*a) + 1;
+        edge = RECT_BOTTOM(*a) + 1;
         break;
     case OB_DIRECTION_EAST:
-        if (my_head <= RECT_RIGHT(*mon) - 1)
-            edge = RECT_RIGHT(*mon) + 1;
-        else
-            edge = RECT_RIGHT(*a) + 1;
+        edge = RECT_RIGHT(*a) + 1;
         break;
     case OB_DIRECTION_WEST:
-        if (my_head >= RECT_LEFT(*mon) + 1)
-            edge = RECT_LEFT(*mon) - 1;
-        else
-            edge = RECT_LEFT(*a) - 1;
+        edge = RECT_LEFT(*a) - 1;
         break;
     default:
         g_assert_not_reached();
@@ -4163,6 +4163,15 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     *dest = edge;
     *near_edge = TRUE;
 
+    /* search for edges of monitors */
+    for (i = 0; i < screen_num_monitors; ++i) {
+        Rect *area = screen_area(self->desktop, i, NULL);
+        detect_edge(*area, dir, my_head, my_size, my_edge_start,
+                    my_edge_size, dest, near_edge);
+        g_free(area);
+    }
+
+    /* search for edges of clients */
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *cur = it->data;
 
@@ -4184,7 +4193,6 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
                 my_edge_size, dest, near_edge);
     g_free(a);
-    g_free(mon);
 }
 
 void client_find_move_directional(ObClient *self, ObDirection dir,

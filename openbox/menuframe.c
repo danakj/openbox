@@ -192,6 +192,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
 void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 {
     RECT_SET_POINT(self->area, x, y);
+    self->monitor = screen_find_monitor_point(x, y);
     XMoveWindow(ob_display, self->window, self->area.x, self->area.y);
 }
 
@@ -294,7 +295,7 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
 
     *dx = *dy = 0;
 
-    a = screen_physical_area_monitor(self->monitor);
+    a = screen_physical_area_monitor(screen_find_monitor_point(x, y));
 
     half = g_list_length(self->entries) / 2;
     pos = g_list_index(self->entries, self->selected);
@@ -952,17 +953,6 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
         return TRUE;
     if (!menu_frame_show(self))
         return FALSE;
-
-    /* find the monitor the menu is on */
-    for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *a = screen_physical_area_monitor(i);
-        gboolean contains = RECT_CONTAINS(*a, x, y);
-        g_free(a);
-        if (contains) {
-            self->monitor = i;
-            break;
-        }
-    }
 
     if (self->menu->place_func)
         self->menu->place_func(self, &x, &y, mouse, self->menu->data);

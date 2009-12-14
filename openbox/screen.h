@@ -134,6 +134,9 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
 */
 guint screen_find_monitor(Rect *search);
 
+/*! Finds the monitor which contains the point @x, @y */
+guint screen_find_monitor_point(guint x, guint y);
+
 /*! Sets the root cursor. This function decides which cursor to use, but you
   gotta call it to let it know it should change. */
 void screen_set_root_cursor();

@@ -532,23 +532,23 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e)
     if (e->xkey.state != 0 && e->xkey.state != shift_mask)
         return FALSE;
 
-    if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE))
+    if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE))
         prompt_cancel(self);
-    else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN) ||
-             e->xkey.keycode == ob_keycode(OB_KEY_SPACE))
+    else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN) ||
+             ob_keycode_match(e->xkey.keycode, OB_KEY_SPACE))
     {
         prompt_run_callback(self, self->focus->result);
     }
-    else if (e->xkey.keycode == ob_keycode(OB_KEY_TAB) ||
-             e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
-             e->xkey.keycode == ob_keycode(OB_KEY_RIGHT))
+    else if (ob_keycode_match(e->xkey.keycode, OB_KEY_TAB) ||
+             ob_keycode_match(e->xkey.keycode, OB_KEY_LEFT) ||
+             ob_keycode_match(e->xkey.keycode, OB_KEY_RIGHT))
     {
         gint i;
         gboolean left;
         ObPromptElement *oldfocus;
 
-        left = e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
-            (e->xkey.keycode == ob_keycode(OB_KEY_TAB) && shift);
+        left = ob_keycode_match(e->xkey.keycode, OB_KEY_LEFT) ||
+            (ob_keycode_match(e->xkey.keycode, OB_KEY_TAB) && shift);
         oldfocus = self->focus;
 
         for (i = 0; i < self->n_buttons; ++i)

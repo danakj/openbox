@@ -51,6 +51,7 @@ po/remove-potcdate.sed
 render/obrender-3.0.pc
 tools/gnome-panel-control/gnome-panel-control
 tools/gdm-control/gdm-control
+tools/obprop/obprop
 version.h
 .libs
 .deps

@@ -601,13 +601,13 @@ static void move_with_keys(gint keycode, gint state)
         gint x, y;
         ObDirection dir;
 
-        if (keycode == ob_keycode(OB_KEY_RIGHT))
+        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
             dir = OB_DIRECTION_EAST;
-        else if (keycode == ob_keycode(OB_KEY_LEFT))
+        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
             dir = OB_DIRECTION_WEST;
-        else if (keycode == ob_keycode(OB_KEY_DOWN))
+        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
             dir = OB_DIRECTION_SOUTH;
-        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
             dir = OB_DIRECTION_NORTH;
 
         client_find_move_directional(moveresize_client, dir, &x, &y);
@@ -620,13 +620,13 @@ static void move_with_keys(gint keycode, gint state)
         else
             dist = KEY_DIST;
 
-        if (keycode == ob_keycode(OB_KEY_RIGHT))
+        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
             dx = dist;
-        else if (keycode == ob_keycode(OB_KEY_LEFT))
+        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
             dx = -dist;
-        else if (keycode == ob_keycode(OB_KEY_DOWN))
+        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
             dy = dist;
-        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
             dy = -dist;
     }
 
@@ -659,7 +659,7 @@ static void resize_with_keys(gint keycode, gint state)
     ObDirection dir;
 
     /* pick the edge if it needs to move */
-    if (keycode == ob_keycode(OB_KEY_RIGHT)) {
+    if (ob_keycode_match(keycode, OB_KEY_RIGHT)) {
         dir = OB_DIRECTION_EAST;
         if (key_resize_edge != OB_DIRECTION_WEST &&
             key_resize_edge != OB_DIRECTION_EAST)
@@ -668,7 +668,7 @@ static void resize_with_keys(gint keycode, gint state)
             return;
         }
     }
-    if (keycode == ob_keycode(OB_KEY_LEFT)) {
+    if (ob_keycode_match(keycode, OB_KEY_LEFT)) {
         dir = OB_DIRECTION_WEST;
         if (key_resize_edge != OB_DIRECTION_WEST &&
             key_resize_edge != OB_DIRECTION_EAST)
@@ -677,7 +677,7 @@ static void resize_with_keys(gint keycode, gint state)
             return;
         }
     }
-    if (keycode == ob_keycode(OB_KEY_UP)) {
+    if (ob_keycode_match(keycode, OB_KEY_UP)) {
         dir = OB_DIRECTION_NORTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -686,7 +686,7 @@ static void resize_with_keys(gint keycode, gint state)
             return;
         }
     }
-    if (keycode == ob_keycode(OB_KEY_DOWN)) {
+    if (ob_keycode_match(keycode, OB_KEY_DOWN)) {
         dir = OB_DIRECTION_SOUTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -700,13 +700,13 @@ static void resize_with_keys(gint keycode, gint state)
     if (state & modkeys_key_to_mask(OB_MODKEY_KEY_SHIFT)) {
         gint x, y, w, h;
 
-        if (keycode == ob_keycode(OB_KEY_RIGHT))
+        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
             dir = OB_DIRECTION_EAST;
-        else if (keycode == ob_keycode(OB_KEY_LEFT))
+        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
             dir = OB_DIRECTION_WEST;
-        else if (keycode == ob_keycode(OB_KEY_DOWN))
+        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
             dir = OB_DIRECTION_SOUTH;
-        else /* if (keycode == ob_keycode(OB_KEY_UP)) */
+        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
             dir = OB_DIRECTION_NORTH;
 
         client_find_resize_directional(moveresize_client, key_resize_edge,
@@ -901,16 +901,16 @@ gboolean moveresize_event(XEvent *e)
         }
         used = TRUE;
     } else if (e->type == KeyPress) {
-        if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
+        if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
             moveresize_end(TRUE);
             used = TRUE;
-        } else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN)) {
+        } else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN)) {
             moveresize_end(FALSE);
             used = TRUE;
-        } else if (e->xkey.keycode == ob_keycode(OB_KEY_RIGHT) ||
-                   e->xkey.keycode == ob_keycode(OB_KEY_LEFT) ||
-                   e->xkey.keycode == ob_keycode(OB_KEY_DOWN) ||
-                   e->xkey.keycode == ob_keycode(OB_KEY_UP))
+        } else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RIGHT) ||
+                   ob_keycode_match(e->xkey.keycode, OB_KEY_LEFT) ||
+                   ob_keycode_match(e->xkey.keycode, OB_KEY_DOWN) ||
+                   ob_keycode_match(e->xkey.keycode, OB_KEY_UP))
         {
             if (corner == prop_atoms.net_wm_moveresize_size_keyboard) {
                 resize_with_keys(e->xkey.keycode, e->xkey.state);

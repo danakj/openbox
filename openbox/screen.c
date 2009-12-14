@@ -302,6 +302,9 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.ob_theme;
     supported[i++] = prop_atoms.ob_config_file;
     supported[i++] = prop_atoms.ob_control;
+    supported[i++] = prop_atoms.ob_role;
+    supported[i++] = prop_atoms.ob_name;
+    supported[i++] = prop_atoms.ob_class;
     g_assert(i == num_support);
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
@@ -1716,15 +1719,19 @@ void screen_set_root_cursor(void)
                       ob_cursor(OB_CURSOR_POINTER));
 }
 
-guint screen_monitor_pointer()
+guint screen_find_monitor_point(guint x, guint y)
 {
     Rect mon;
-    gint x, y;
-    if (screen_pointer_pos(&x, &y))
-        RECT_SET(mon, x, y, 1, 1);
-    else
-        RECT_SET(mon, 0, 0, 1, 1);
+    RECT_SET(mon, x, y, 1, 1);
     return screen_find_monitor(&mon);
+}
+
+guint screen_monitor_pointer()
+{
+    gint x, y;
+    if (!screen_pointer_pos(&x, &y))
+        x = y = 0;
+    return screen_find_monitor_point(x, y);
 }
 
 gboolean screen_pointer_pos(gint *x, gint *y)

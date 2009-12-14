@@ -53,8 +53,7 @@ guint modkeys_only_modifier_masks(guint mask);
   right keys when there are both. */
 guint modkeys_key_to_mask(ObModkeysKey key);
 
-/*! Convert a KeySym to a KeyCode, because the X function is terrible - says
-  valgrind. */
-KeyCode modkeys_sym_to_code(KeySym sym);
+/*! Convert a KeySym to all the KeyCodes which generate it. */
+KeyCode* modkeys_sym_to_code(KeySym sym);
 
 #endif

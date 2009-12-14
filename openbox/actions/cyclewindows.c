@@ -147,13 +147,13 @@ static gboolean i_input_func(guint initial_state,
 {
     if (e->type == KeyPress) {
         /* Escape cancels no matter what */
-        if (e->xkey.keycode == ob_keycode(OB_KEY_ESCAPE)) {
+        if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
             end_cycle(TRUE, e->xkey.state, options);
             return FALSE;
         }
 
         /* There were no modifiers and they pressed enter */
-        else if (e->xkey.keycode == ob_keycode(OB_KEY_RETURN) &&
+        else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN) &&
                  !initial_state)
         {
             end_cycle(FALSE, e->xkey.state, options);

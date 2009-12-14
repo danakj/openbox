@@ -202,6 +202,9 @@ typedef struct Atoms {
     Atom ob_theme;
     Atom ob_config_file;
     Atom ob_control;
+    Atom ob_role;
+    Atom ob_name;
+    Atom ob_class;
 } Atoms;
 extern Atoms prop_atoms;
 

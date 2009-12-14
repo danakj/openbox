@@ -104,7 +104,7 @@ static gboolean  reconfigure = FALSE;
 static gboolean  restart = FALSE;
 static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
-static KeyCode   keys[OB_NUM_KEYS];
+static KeyCode  *keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
@@ -417,6 +417,17 @@ gint main(gint argc, gchar **argv)
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);
+
+            /* Free the key codes for built in keys */
+            g_free(keys[OB_KEY_RETURN]);
+            g_free(keys[OB_KEY_ESCAPE]);
+            g_free(keys[OB_KEY_LEFT]);
+            g_free(keys[OB_KEY_RIGHT]);
+            g_free(keys[OB_KEY_UP]);
+            g_free(keys[OB_KEY_DOWN]);
+            g_free(keys[OB_KEY_TAB]);
+            g_free(keys[OB_KEY_SPACE]);
+
             modkeys_shutdown(reconfigure);
         } while (reconfigure);
     }
@@ -561,8 +572,21 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
 
 static void parse_env(void)
 {
+    const gchar *id;
+
     /* unset this so we don't pass it on unknowingly */
     unsetenv("DESKTOP_STARTUP_ID");
+
+    /* this is how gnome-session passes in a session client id */
+    id = g_getenv("DESKTOP_AUTOSTART_ID");
+    if (id) {
+        unsetenv("DESKTOP_AUTOSTART_ID");
+        if (ob_sm_id) g_free(ob_sm_id);
+        ob_sm_id = g_strdup(id);
+        ob_debug_type(OB_DEBUG_SM,
+                      "DESKTOP_AUTOSTART_ID %s supercedes --sm-client-id\n",
+                      ob_sm_id);
+    }
 }
 
 static void parse_args(gint *argc, gchar **argv)
@@ -719,10 +743,14 @@ Cursor ob_cursor(ObCursor cursor)
     return cursors[cursor];
 }
 
-KeyCode ob_keycode(ObKey key)
+gboolean ob_keycode_match(KeyCode code, ObKey key)
 {
+    KeyCode *k;
+    
     g_assert(key < OB_NUM_KEYS);
-    return keys[key];
+    for (k = keys[key]; *k; ++k)
+        if (*k == code) return TRUE;
+    return FALSE;
 }
 
 ObState ob_state(void)

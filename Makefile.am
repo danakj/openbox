@@ -32,7 +32,8 @@ lib_LTLIBRARIES = \
 bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gdm-control/gdm-control \
-	tools/gnome-panel-control/gnome-panel-control
+	tools/gnome-panel-control/gnome-panel-control \
+	tools/obprop/obprop
 
 dist_secretbin_SCRIPTS = \
 	tools/xdg-autostart/xdg-autostart
@@ -287,6 +288,17 @@ tools_gnome_panel_control_gnome_panel_control_LDADD = \
 	$(X_LIBS)
 tools_gnome_panel_control_gnome_panel_control_SOURCES = \
 	tools/gnome-panel-control/gnome-panel-control.c
+
+## obprop ##
+
+tools_obprop_obprop_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(X_CFLAGS)
+tools_obprop_obprop_LDADD = \
+	$(GLIB_LIBS) \
+	$(X_LIBS)
+tools_obprop_obprop_SOURCES = \
+	tools/obprop/obprop.c
 
 ## gdm-control ##
 

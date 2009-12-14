@@ -656,11 +656,11 @@
   # this is an example with comments through out. use these to make your
   # own rules, but without the comments of course.
 
-  <application name="first element of window's WM_CLASS property (see xprop)"
-              class="second element of window's WM_CLASS property (see xprop)"
-               role="the window's WM_WINDOW_ROLE property (see xprop)"
-               type="the window's _NET_WM_WINDOW_TYPE (if unspecified, then
-                       it is dialog for child windows)">
+  <application name="the window's _OB_NAME property (see obprop)"
+              class="the window's _OB_CLASS property (see obprop)"
+               role="the window's _OB_ROLE property (see obprop)"
+               type="the window's _NET_WM_WINDOW_TYPE (see obprob)..
+                      (if unspecified, then it is 'dialog' for child windows)">
   # the name or the class can be set, or both. this is used to match
   # windows when they appear. role can optionally be set as well, to
   # further restrict your matches.

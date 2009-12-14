@@ -1841,7 +1841,12 @@ static gboolean event_handle_menu(XEvent *ev)
             (f = find_active_menu()) && f->selected == e &&
             e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
         {
-            menu_frame_select(e->frame, NULL, FALSE);
+            ObMenuEntryFrame *u = menu_entry_frame_under(ev->xcrossing.x_root,
+                                                         ev->xcrossing.y_root);
+            /* if we're just going from one entry in the menu to the next,
+               don't unselect stuff first */
+            if (!u || e->frame != u->frame)
+                menu_frame_select(e->frame, NULL, FALSE);
         }
         break;
     case MotionNotify:

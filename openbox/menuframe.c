@@ -48,7 +48,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
-static gboolean menu_entry_frame_submenu_timeout(gpointer data);
+static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data);
+static gboolean menu_entry_frame_submenu_show_timeout(gpointer data);
 static void menu_frame_hide(ObMenuFrame *self);
 
 static Window createWindow(Window parent, gulong mask,
@@ -94,6 +95,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     self->type = Window_Menu;
     self->menu = menu;
     self->selected = NULL;
+    self->open_submenu = NULL;
     self->client = client;
     self->direction_right = TRUE;
     self->show_from = show_from;
@@ -984,6 +986,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     self->monitor = parent->monitor;
     self->parent = parent;
     self->parent_entry = parent_entry;
+    parent->open_submenu = parent_entry;
 
     /* set up parent's child to be us */
     if (parent->child)
@@ -1028,8 +1031,10 @@ static void menu_frame_hide(ObMenuFrame *self)
     if (self->child)
         menu_frame_hide(self->child);
 
-    if (self->parent)
+    if (self->parent && self->parent->child == self) {
         self->parent->child = NULL;
+        self->parent->open_submenu = NULL;
+    }
     self->parent = NULL;
     self->parent_entry = NULL;
 
@@ -1053,7 +1058,10 @@ void menu_frame_hide_all(void)
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
         ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+                                    menu_entry_frame_submenu_show_timeout);
+        /* remove any submenu close delays */
+        ob_main_loop_timeout_remove(ob_main_loop,
+                                    menu_entry_frame_submenu_hide_timeout);
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
@@ -1067,8 +1075,13 @@ void menu_frame_hide_all_client(ObClient *client)
         if (f->client == client) {
             if (config_submenu_show_delay) {
                 /* remove any submenu open requests */
-                ob_main_loop_timeout_remove(ob_main_loop,
-                                            menu_entry_frame_submenu_timeout);
+                ob_main_loop_timeout_remove
+                    (ob_main_loop,
+                     menu_entry_frame_submenu_show_timeout);
+                /* remove any submenu close delays */
+                ob_main_loop_timeout_remove
+                    (ob_main_loop,
+                     menu_entry_frame_submenu_hide_timeout);
             }
             menu_frame_hide(f);
         }
@@ -1103,7 +1116,6 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
 
         for (it = frame->entries; it; it = g_list_next(it)) {
             ObMenuEntryFrame *e = it->data;
-
             if (RECT_CONTAINS(e->area, x, y)) {
                 ret = e;
                 break;
@@ -1113,7 +1125,15 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
     return ret;
 }
 
-static gboolean menu_entry_frame_submenu_timeout(gpointer data)
+static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data)
+{
+    g_assert(menu_frame_visible);
+    g_assert(((ObMenuFrame*)data)->parent != NULL);
+    menu_frame_hide((ObMenuFrame*)data);
+    return FALSE;
+}
+
+static gboolean menu_entry_frame_submenu_show_timeout(gpointer data)
 {
     g_assert(menu_frame_visible);
     menu_entry_frame_show_submenu((ObMenuEntryFrame*)data);
@@ -1134,25 +1154,57 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
         ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+                                    menu_entry_frame_submenu_show_timeout);
+    }
+
+    if (!entry && self->open_submenu) {
+        entry = self->open_submenu;
+        oldchild = NULL;
+
+        /* remove any submenu close delays */
+        ob_main_loop_timeout_remove(ob_main_loop,
+                                    menu_entry_frame_submenu_hide_timeout);
     }
 
     self->selected = entry;
 
     if (old)
         menu_entry_frame_render(old);
-    if (oldchild)
-        menu_frame_hide(oldchild);
+
+    if (oldchild) {
+        /* there is an open submenu */
+
+        if (config_submenu_show_delay && !immediate) {
+            if (old == self->open_submenu) {
+                /* close the open submenu after a delay if we don't have
+                   it selected */
+                ob_main_loop_timeout_remove
+                    (ob_main_loop,
+                     menu_entry_frame_submenu_hide_timeout);
+                ob_main_loop_timeout_add(ob_main_loop,
+                                         config_submenu_show_delay * 1000,
+                                         menu_entry_frame_submenu_hide_timeout,
+                                         self->child, g_direct_equal,
+                                         NULL);
+            }
+        }
+        else
+            menu_frame_hide(oldchild);
+    }
 
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+        /* if we've selected a submenu and it wasn't always open, then
+           show it */
+        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU &&
+            self->selected != self->open_submenu)
+        {
             if (config_submenu_show_delay && !immediate) {
                 /* initiate a new submenu open request */
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
-                                         menu_entry_frame_submenu_timeout,
+                                         menu_entry_frame_submenu_show_timeout,
                                          self->selected, g_direct_equal,
                                          NULL);
             } else {

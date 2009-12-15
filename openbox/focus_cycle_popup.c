@@ -261,7 +261,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     const ObFocusCyclePopupTarget *newtarget;
     gint newtargetx, newtargety;
 
-    screen_area = screen_physical_area_primary();
+    screen_area = screen_physical_area_primary(FALSE);
 
     /* get the outside margins */
     RrMargins(p->a_bg, &ml, &mt, &mr, &mb);
@@ -515,7 +515,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         g_assert(popup.targets == NULL);
 
         /* position the popup */
-        a = screen_physical_area_primary();
+        a = screen_physical_area_primary(FALSE);
         icon_popup_position(single_popup, CenterGravity,
                             a->x + a->width / 2, a->y + a->height / 2);
         icon_popup_height(single_popup, POPUP_HEIGHT);

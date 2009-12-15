@@ -945,7 +945,7 @@ void screen_show_desktop_popup(guint d)
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    a = screen_physical_area_primary();
+    a = screen_physical_area_primary(FALSE);
     pager_popup_position(desktop_popup, CenterGravity,
                          a->x + a->width / 2, a->y + a->height / 2);
     pager_popup_icon_size_multiplier(desktop_popup,
@@ -1285,19 +1285,6 @@ void screen_install_colormap(ObClient *client, gboolean install)
     }
 }
 
-#define STRUT_LEFT_ON_MONITOR(s, i) \
-    (RANGES_INTERSECT(s->left_start, s->left_end - s->left_start + 1, \
-                      monitor_area[i].y, monitor_area[i].height))
-#define STRUT_RIGHT_ON_MONITOR(s, i) \
-    (RANGES_INTERSECT(s->right_start, s->right_end - s->right_start + 1, \
-                      monitor_area[i].y, monitor_area[i].height))
-#define STRUT_TOP_ON_MONITOR(s, i) \
-    (RANGES_INTERSECT(s->top_start, s->top_end - s->top_start + 1, \
-                      monitor_area[i].x, monitor_area[i].width))
-#define STRUT_BOTTOM_ON_MONITOR(s, i) \
-    (RANGES_INTERSECT(s->bottom_start, s->bottom_end - s->bottom_start + 1, \
-                      monitor_area[i].x, monitor_area[i].width))
-
 typedef struct {
     guint desktop;
     StrutPartial *strut;
@@ -1325,7 +1312,7 @@ typedef struct {
 
 void screen_update_areas(void)
 {
-    guint i, j;
+    guint j;
     gulong *dims;
     GList *it;
     GSList *sit;
@@ -1343,7 +1330,7 @@ void screen_update_areas(void)
     config_margins.right_start = RECT_TOP(monitor_area[screen_num_monitors]);
     config_margins.right_end = RECT_BOTTOM(monitor_area[screen_num_monitors]);
 
-    dims = g_new(gulong, 4 * screen_num_desktops * screen_num_monitors);
+    dims = g_new(gulong, 4 * screen_num_desktops);
 
     RESET_STRUT_LIST(struts_left);
     RESET_STRUT_LIST(struts_top);
@@ -1389,69 +1376,51 @@ void screen_update_areas(void)
     VALIDATE_STRUTS(struts_bottom, bottom,
                     monitor_area[screen_num_monitors].height / 2);
 
-    /* set up the work areas to be full screen */
-    for (i = 0; i < screen_num_monitors; ++i)
-        for (j = 0; j < screen_num_desktops; ++j) {
-            dims[(i * screen_num_desktops + j) * 4+0] = monitor_area[i].x;
-            dims[(i * screen_num_desktops + j) * 4+1] = monitor_area[i].y;
-            dims[(i * screen_num_desktops + j) * 4+2] = monitor_area[i].width;
-            dims[(i * screen_num_desktops + j) * 4+3] = monitor_area[i].height;
+    /* set up the work area to be full screen across all monitors */
+    for (j = 0; j < screen_num_desktops; ++j) {
+        dims[j*4 + 0] =
+            monitor_area[screen_num_monitors].x;
+        dims[j*4 + 1] =
+            monitor_area[screen_num_monitors].y;
+        dims[j*4 + 2] =
+            monitor_area[screen_num_monitors].width;
+        dims[j*4 + 3] =
+            monitor_area[screen_num_monitors].height;
+    }
+
+    /* calculate the work area from the struts */
+    for (j = 0; j < screen_num_desktops; ++j) {
+        gint l = 0, r = 0, t = 0, b = 0;
+
+        for (sit = struts_left; sit; sit = g_slist_next(sit)) {
+            ObScreenStrut *s = sit->data;
+            if (s->desktop == j || s->desktop == DESKTOP_ALL)
+                l = MAX(l, s->strut->left);
+        }
+        for (sit = struts_top; sit; sit = g_slist_next(sit)) {
+            ObScreenStrut *s = sit->data;
+            if (s->desktop == j || s->desktop == DESKTOP_ALL)
+                t = MAX(t, s->strut->top);
+        }
+        for (sit = struts_right; sit; sit = g_slist_next(sit)) {
+            ObScreenStrut *s = sit->data;
+            if (s->desktop == j || s->desktop == DESKTOP_ALL)
+                r = MAX(r, s->strut->right);
+        }
+        for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
+            ObScreenStrut *s = sit->data;
+            if (s->desktop == j || s->desktop == DESKTOP_ALL)
+                b = MAX(b, s->strut->bottom);
         }
 
-    /* calculate the work areas from the struts */
-    for (i = 0; i < screen_num_monitors; ++i)
-        for (j = 0; j < screen_num_desktops; ++j) {
-            gint l = 0, r = 0, t = 0, b = 0;
+        /* based on these margins, set the work area for the desktop */
+        dims[j*4 + 0] += l;
+        dims[j*4 + 1] += t;
+        dims[j*4 + 2] -= l + r;
+        dims[j*4 + 3] -= t + b;
+    }
 
-            /* only add the strut to the area if it touches the monitor */
-
-            for (sit = struts_left; sit; sit = g_slist_next(sit)) {
-                ObScreenStrut *s = sit->data;
-                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
-                    STRUT_LEFT_ON_MONITOR(s->strut, i))
-                    l = MAX(l, s->strut->left);
-            }
-            for (sit = struts_top; sit; sit = g_slist_next(sit)) {
-                ObScreenStrut *s = sit->data;
-                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
-                    STRUT_TOP_ON_MONITOR(s->strut, i))
-                    t = MAX(t, s->strut->top);
-            }
-            for (sit = struts_right; sit; sit = g_slist_next(sit)) {
-                ObScreenStrut *s = sit->data;
-                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
-                    STRUT_RIGHT_ON_MONITOR(s->strut, i))
-                    r = MAX(r, s->strut->right);
-            }
-            for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
-                ObScreenStrut *s = sit->data;
-                if ((s->desktop == j || s->desktop == DESKTOP_ALL) &&
-                    STRUT_BOTTOM_ON_MONITOR(s->strut, i))
-                    b = MAX(b, s->strut->bottom);
-            }
-
-            /* if the monitor is not against the edge of the root window,
-               the struts will include the distance from the root window's edge
-               to the monitor, so add that back into the monitor's work area */
-            if (l) l += RECT_LEFT  (monitor_area[screen_num_monitors])
-                        - RECT_LEFT  (monitor_area[i]);
-            if (t) t += RECT_TOP   (monitor_area[screen_num_monitors])
-                        - RECT_TOP   (monitor_area[i]);
-            if (r) r -= RECT_RIGHT (monitor_area[screen_num_monitors])
-                        - RECT_RIGHT (monitor_area[i]);
-            if (b) b -= RECT_BOTTOM(monitor_area[screen_num_monitors])
-                        - RECT_BOTTOM(monitor_area[i]);
-
-            /* based on these margins, set the work area for the
-               monitor/desktop */
-            dims[(i * screen_num_desktops + j) * 4 + 0] += l;
-            dims[(i * screen_num_desktops + j) * 4 + 1] += t;
-            dims[(i * screen_num_desktops + j) * 4 + 2] -= l + r;
-            dims[(i * screen_num_desktops + j) * 4 + 3] -= t + b;
-        }
-
-    /* all the work areas are not used here, only the ones for the first
-       monitor are */
+    /* set the legacy workarea hint to the union of all the monitors */
     PROP_SETA32(RootWindow(ob_display, ob_screen), net_workarea, cardinal,
                 dims, 4 * screen_num_desktops);
 
@@ -1690,7 +1659,7 @@ Rect* screen_physical_area_active(void)
     return screen_physical_area_monitor(screen_monitor_active());
 }
 
-guint screen_monitor_primary(void)
+guint screen_monitor_primary(gboolean fixed)
 {
     if (config_primary_monitor_index > 0) {
         if (config_primary_monitor_index-1 < screen_num_monitors)
@@ -1698,15 +1667,17 @@ guint screen_monitor_primary(void)
         else
             return 0;
     }
+    else if (fixed)
+        return 0;
     else if (config_primary_monitor == OB_PLACE_MONITOR_ACTIVE)
         return screen_monitor_active();
     else /* config_primary_monitor == OB_PLACE_MONITOR_MOUSE */
         return screen_monitor_pointer();
 }
 
-Rect *screen_physical_area_primary(void)
+Rect *screen_physical_area_primary(gboolean fixed)
 {
-    return screen_physical_area_monitor(screen_monitor_primary());
+    return screen_physical_area_monitor(screen_monitor_primary(fixed));
 }
 
 void screen_set_root_cursor(void)

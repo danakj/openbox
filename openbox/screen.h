@@ -110,10 +110,18 @@ guint screen_monitor_active(void);
 
 Rect *screen_physical_area_active(void);
 
-/*! Returns the primary monitor, as specified by the config */
-guint screen_monitor_primary(void);
+/*! Returns the primary monitor, as specified by the config.
+  @fixed If TRUE, then this will always return a fixed monitor, otherwise
+         it may change based on where focus is, or other heuristics.
+ */
+guint screen_monitor_primary(gboolean fixed);
 
-Rect *screen_physical_area_primary(void);
+/*! Returns physical area for the primary monitor, as specified by the config.
+  @fixed If TRUE, then this will always use a fixed monitor as primary,
+         otherwise it may change based on where focus is, or other heuristics.
+         See screen_monitor_primary().
+*/
+Rect *screen_physical_area_primary(gboolean fixed);
 
 /* doesn't include struts which the search area is already outside of when
    'search' is not NULL */

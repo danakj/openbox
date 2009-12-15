@@ -73,12 +73,14 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
     /* add the picture as a key to point to this image in the cache */
     g_hash_table_insert(self->cache->table, (*list)[0], self);
 
+/*
 #ifdef DEBUG
     g_message("Adding %s picture to the cache:\n    "
               "Image 0x%x, w %d h %d Hash %u",
               (*list == self->original ? "ORIGINAL" : "RESIZED"),
               (guint)self, pic->width, pic->height, RrImagePicHash(pic));
 #endif
+*/
 }
 
 /*! Remove a picture from an Image.  This may remove it from the "originals"
@@ -88,6 +90,7 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
 {
     gint j;
 
+/*
 #ifdef DEBUG
     g_message("Removing %s picture from the cache:\n    "
               "Image 0x%x, w %d h %d Hash %u",
@@ -95,6 +98,7 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
               (guint)self, (*list)[i]->width, (*list)[i]->height,
               RrImagePicHash((*list)[i]));
 #endif
+*/
 
     /* remove the picture as a key in the cache */
     g_hash_table_remove(self->cache->table, (*list)[i]);
@@ -329,10 +333,12 @@ void RrImageRef(RrImage *self)
 void RrImageUnref(RrImage *self)
 {
     if (self && --self->ref == 0) {
+/*
 #ifdef DEBUG
         g_message("Refcount to 0, removing ALL pictures from the cache:\n    "
                   "Image 0x%x", (guint)self);
 #endif
+*/
         while (self->n_original > 0)
             RemovePicture(self, &self->original, 0, &self->n_original);
         while (self->n_resized > 0)
@@ -352,10 +358,12 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
     /* make sure we don't already have this size.. */
     for (i = 0; i < self->n_original; ++i)
         if (self->original[i]->width == w && self->original[i]->height == h) {
+/*
 #ifdef DEBUG
             g_message("Found duplicate ORIGINAL image:\n    "
                       "Image 0x%x, w %d h %d", (guint)self, w, h);
 #endif
+*/
             return;
         }
 

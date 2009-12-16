@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "prop.h"
 #include "actions.h"
+#include "event.h"
 #include "grab.h"
 #include "openbox.h"
 #include "mainloop.h"
@@ -949,7 +950,6 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
                                  gboolean mouse)
 {
     gint px, py;
-    guint i;
 
     if (menu_frame_is_visible(self))
         return TRUE;
@@ -1021,6 +1021,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 static void menu_frame_hide(ObMenuFrame *self)
 {
     GList *it = g_list_find(menu_frame_visible, self);
+    gulong ignore_start;
 
     if (!it)
         return;
@@ -1046,7 +1047,9 @@ static void menu_frame_hide(ObMenuFrame *self)
         ungrab_keyboard();
     }
 
+    ignore_start = event_start_ignore_all_enters();
     XUnmapWindow(ob_display, self->window);
+    event_end_ignore_all_enters(ignore_start);
 
     menu_frame_free(self);
 }

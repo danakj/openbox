@@ -1312,10 +1312,9 @@ typedef struct {
 
 void screen_update_areas(void)
 {
-    guint j;
+    guint i;
     gulong *dims;
     GList *it;
-    GSList *sit;
 
     g_free(monitor_area);
     extensions_xinerama_screens(&monitor_area, &screen_num_monitors);
@@ -1329,8 +1328,6 @@ void screen_update_areas(void)
     config_margins.left_end = RECT_BOTTOM(monitor_area[screen_num_monitors]);
     config_margins.right_start = RECT_TOP(monitor_area[screen_num_monitors]);
     config_margins.right_end = RECT_BOTTOM(monitor_area[screen_num_monitors]);
-
-    dims = g_new(gulong, 4 * screen_num_desktops);
 
     RESET_STRUT_LIST(struts_left);
     RESET_STRUT_LIST(struts_top);
@@ -1376,48 +1373,14 @@ void screen_update_areas(void)
     VALIDATE_STRUTS(struts_bottom, bottom,
                     monitor_area[screen_num_monitors].height / 2);
 
-    /* set up the work area to be full screen across all monitors */
-    for (j = 0; j < screen_num_desktops; ++j) {
-        dims[j*4 + 0] =
-            monitor_area[screen_num_monitors].x;
-        dims[j*4 + 1] =
-            monitor_area[screen_num_monitors].y;
-        dims[j*4 + 2] =
-            monitor_area[screen_num_monitors].width;
-        dims[j*4 + 3] =
-            monitor_area[screen_num_monitors].height;
-    }
-
-    /* calculate the work area from the struts */
-    for (j = 0; j < screen_num_desktops; ++j) {
-        gint l = 0, r = 0, t = 0, b = 0;
-
-        for (sit = struts_left; sit; sit = g_slist_next(sit)) {
-            ObScreenStrut *s = sit->data;
-            if (s->desktop == j || s->desktop == DESKTOP_ALL)
-                l = MAX(l, s->strut->left);
-        }
-        for (sit = struts_top; sit; sit = g_slist_next(sit)) {
-            ObScreenStrut *s = sit->data;
-            if (s->desktop == j || s->desktop == DESKTOP_ALL)
-                t = MAX(t, s->strut->top);
-        }
-        for (sit = struts_right; sit; sit = g_slist_next(sit)) {
-            ObScreenStrut *s = sit->data;
-            if (s->desktop == j || s->desktop == DESKTOP_ALL)
-                r = MAX(r, s->strut->right);
-        }
-        for (sit = struts_bottom; sit; sit = g_slist_next(sit)) {
-            ObScreenStrut *s = sit->data;
-            if (s->desktop == j || s->desktop == DESKTOP_ALL)
-                b = MAX(b, s->strut->bottom);
-        }
-
-        /* based on these margins, set the work area for the desktop */
-        dims[j*4 + 0] += l;
-        dims[j*4 + 1] += t;
-        dims[j*4 + 2] -= l + r;
-        dims[j*4 + 3] -= t + b;
+    dims = g_new(gulong, 4 * screen_num_desktops);
+    for (i = 0; i < screen_num_desktops; ++i) {
+        Rect *area = screen_area(i, SCREEN_AREA_ALL_MONITORS, NULL);
+        dims[i*4+0] = area->x;
+        dims[i*4+1] = area->y;
+        dims[i*4+2] = area->width;
+        dims[i*4+3] = area->height;
+        g_free(area);
     }
 
     /* set the legacy workarea hint to the union of all the monitors */

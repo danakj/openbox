@@ -1751,30 +1751,30 @@ static gboolean event_handle_menu_input(XEvent *ev)
         else if (ev->type == KeyPress && (state & ~ControlMask) == 0) {
             frame->got_press = TRUE;
 
-            if (keycode == ob_keycode(OB_KEY_ESCAPE)) {
+            if (ob_keycode_match(keycode, OB_KEY_ESCAPE)) {
                 menu_frame_hide_all();
                 ret = TRUE;
             }
 
-            else if (keycode == ob_keycode(OB_KEY_LEFT)) {
+            else if (ob_keycode_match(keycode, OB_KEY_LEFT)) {
                 /* Left goes to the parent menu */
                 if (frame->parent)
                     menu_frame_select(frame, NULL, TRUE);
                 ret = TRUE;
             }
 
-            else if (keycode == ob_keycode(OB_KEY_RIGHT)) {
+            else if (ob_keycode_match(keycode, OB_KEY_RIGHT)) {
                 /* Right goes to the selected submenu */
                 if (frame->child) menu_frame_select_next(frame->child);
                 ret = TRUE;
             }
 
-            else if (keycode == ob_keycode(OB_KEY_UP)) {
+            else if (ob_keycode_match(keycode, OB_KEY_UP)) {
                 menu_frame_select_previous(frame);
                 ret = TRUE;
             }
 
-            else if (keycode == ob_keycode(OB_KEY_DOWN)) {
+            else if (ob_keycode_match(keycode, OB_KEY_DOWN)) {
                 menu_frame_select_next(frame);
                 ret = TRUE;
             }
@@ -1787,7 +1787,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
         else if (ev->type == KeyRelease && (state & ~ControlMask) == 0 &&
                  frame->entries && frame->got_press)
         {
-            if (keycode == ob_keycode(OB_KEY_RETURN)) {
+            if (ob_keycode_match(keycode, OB_KEY_RETURN)) {
                 /* Enter runs the active item or goes into the submenu.
                    Control-Enter runs it without closing the menu. */
                 if (frame->child)
@@ -1885,7 +1885,12 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
             (f = find_active_menu()) && f->selected == e &&
             e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
         {
-            menu_frame_select(e->frame, NULL, FALSE);
+            ObMenuEntryFrame *u = menu_entry_frame_under(ev->xcrossing.x_root,
+                                                         ev->xcrossing.y_root);
+            /* if we're just going from one entry in the menu to the next,
+               don't unselect stuff first */
+            if (!u || e->frame != u->frame)
+                menu_frame_select(e->frame, NULL, FALSE);
         }
         break;
     }

@@ -54,9 +54,8 @@ guint obt_keyboard_only_modmasks(guint mask);
   right keys when there are both. */
 guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
 
-/*! Convert a KeySym to a KeyCode, because the X function is terrible - says
-  valgrind. */
-KeyCode obt_keyboard_keysym_to_keycode(KeySym sym);
+/*! Convert a KeySym to all the KeyCodes which generate it. */
+KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 
 /*! Give the string form of a KeyCode */
 gchar *obt_keyboard_keycode_to_string(guint keycode);

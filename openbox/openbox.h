@@ -62,6 +62,6 @@ void ob_exit_with_error(const gchar *msg) G_GNUC_NORETURN;
 
 Cursor ob_cursor(ObCursor cursor);
 
-KeyCode ob_keycode(ObKey key);
+gboolean ob_keycode_match(KeyCode code, ObKey key);
 
 #endif

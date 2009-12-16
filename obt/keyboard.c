@@ -185,16 +185,24 @@ static void set_modkey_mask(guchar mask, KeySym sym)
     /* CapsLock, Shift, and Control are special and hard-coded */
 }
 
-KeyCode obt_keyboard_keysym_to_keycode(KeySym sym)
+KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym)
 {
-    gint i, j;
+    KeyCode *ret;
+    gint i, j, n;
+
+    ret = g_new(KeyCode, 1);
+    n = 0;
+    ret[n] = 0;
 
     /* go through each keycode and look for the keysym */
     for (i = min_keycode; i <= max_keycode; ++i)
         for (j = 0; j < keysyms_per_keycode; ++j)
-            if (sym == keymap[(i-min_keycode) * keysyms_per_keycode + j])
-                return i;
-    return 0;
+            if (sym == keymap[(i-min_keycode) * keysyms_per_keycode + j]) {
+                ret = g_renew(KeyCode, ret, ++n);
+                ret[n-1] = i;
+                ret[n] = 0;
+            }
+    return ret;
 }
 
 gchar *obt_keyboard_keycode_to_string(guint keycode)

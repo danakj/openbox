@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "prop.h"
 #include "actions.h"
+#include "event.h"
 #include "grab.h"
 #include "openbox.h"
 #include "mainloop.h"
@@ -949,7 +950,6 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
                                  gboolean mouse)
 {
     gint px, py;
-    guint i;
 
     if (menu_frame_is_visible(self))
         return TRUE;
@@ -1021,6 +1021,7 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 static void menu_frame_hide(ObMenuFrame *self)
 {
     GList *it = g_list_find(menu_frame_visible, self);
+    gulong ignore_start;
 
     if (!it)
         return;
@@ -1046,7 +1047,9 @@ static void menu_frame_hide(ObMenuFrame *self)
         ungrab_keyboard();
     }
 
+    ignore_start = event_start_ignore_all_enters();
     XUnmapWindow(ob_display, self->window);
+    event_end_ignore_all_enters(ignore_start);
 
     menu_frame_free(self);
 }
@@ -1158,6 +1161,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     }
 
     if (!entry && self->open_submenu) {
+        /* we moved out of the menu, so move the selection back to the open
+           submenu */
         entry = self->open_submenu;
         oldchild = NULL;
 
@@ -1175,12 +1180,16 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         /* there is an open submenu */
 
         if (config_submenu_show_delay && !immediate) {
-            if (old == self->open_submenu) {
-                /* close the open submenu after a delay if we don't have
-                   it selected */
+            if (entry == self->open_submenu) {
+                /* we moved onto the entry that has an open submenu, so stop
+                   trying to close the submenu */
                 ob_main_loop_timeout_remove
                     (ob_main_loop,
                      menu_entry_frame_submenu_hide_timeout);
+            }
+            else if (old == self->open_submenu) {
+                /* we just moved off the entry with an open submenu, so
+                   close the open submenu after a delay */
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
                                          menu_entry_frame_submenu_hide_timeout,
@@ -1195,7 +1204,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        /* if we've selected a submenu and it wasn't always open, then
+        /* if we've selected a submenu and it wasn't already open, then
            show it */
         if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU &&
             self->selected != self->open_submenu)

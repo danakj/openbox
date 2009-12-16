@@ -1161,6 +1161,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     }
 
     if (!entry && self->open_submenu) {
+        /* we moved out of the menu, so move the selection back to the open
+           submenu */
         entry = self->open_submenu;
         oldchild = NULL;
 
@@ -1178,12 +1180,16 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         /* there is an open submenu */
 
         if (config_submenu_show_delay && !immediate) {
-            if (old == self->open_submenu) {
-                /* close the open submenu after a delay if we don't have
-                   it selected */
+            if (entry == self->open_submenu) {
+                /* we moved onto the entry that has an open submenu, so stop
+                   trying to close the submenu */
                 ob_main_loop_timeout_remove
                     (ob_main_loop,
                      menu_entry_frame_submenu_hide_timeout);
+            }
+            else if (old == self->open_submenu) {
+                /* we just moved off the entry with an open submenu, so
+                   close the open submenu after a delay */
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
                                          menu_entry_frame_submenu_hide_timeout,
@@ -1198,7 +1204,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        /* if we've selected a submenu and it wasn't always open, then
+        /* if we've selected a submenu and it wasn't already open, then
            show it */
         if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU &&
             self->selected != self->open_submenu)

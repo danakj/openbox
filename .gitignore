@@ -72,6 +72,7 @@ tests/grouptran
 tests/grouptran2
 tests/grouptrancircular
 tests/grouptrancircular2
+tests/iconifydelay
 tests/icons
 tests/mapiconic
 tests/modal

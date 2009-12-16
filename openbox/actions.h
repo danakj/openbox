@@ -37,7 +37,9 @@ typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
 typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
 
 /* functions for interactive actions */
-typedef void     (*ObActionsIPreFunc)(gpointer options);
+/* return TRUE if the action is going to be interactive, or false to change
+   your mind and make it not */
+typedef gboolean (*ObActionsIPreFunc)(guint initial_state, gpointer options);
 typedef void     (*ObActionsIPostFunc)(gpointer options);
 typedef gboolean (*ObActionsIInputFunc)(guint initial_state,
                                                   XEvent *e,

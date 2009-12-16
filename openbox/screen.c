@@ -77,6 +77,7 @@ static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_popup;
+static gboolean      desktop_popup_perm;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -347,6 +348,7 @@ void screen_startup(gboolean reconfig)
     gboolean namesexist = FALSE;
 
     desktop_popup = pager_popup_new();
+    desktop_popup_perm = FALSE;
     pager_popup_height(desktop_popup, POPUP_HEIGHT);
 
     if (reconfig) {
@@ -677,7 +679,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ob_debug("Moving to desktop %d", num+1);
 
     if (ob_state() == OB_STATE_RUNNING)
-        screen_show_desktop_popup(screen_desktop);
+        screen_show_desktop_popup(screen_desktop, FALSE);
 
     /* ignore enter events caused by the move */
     ignore_start = event_start_ignore_all_enters();
@@ -701,8 +703,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            client_hide(c);
-            if (c == focus_client) {
+            if (client_hide(c) && c == focus_client) {
                 /* c was focused and we didn't do fallback clearly so make sure
                    openbox doesnt still consider the window focused.
                    this happens when using NextWindow with allDesktops, since
@@ -922,7 +923,7 @@ static gboolean hide_desktop_popup_func(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-void screen_show_desktop_popup(guint d)
+void screen_show_desktop_popup(guint d, gboolean perm)
 {
     Rect *a;
 
@@ -942,9 +943,13 @@ void screen_show_desktop_popup(guint d)
     pager_popup_show(desktop_popup, screen_desktop_names[d], d);
 
     obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
-    obt_main_loop_timeout_add(ob_main_loop, config_desktop_popup_time * 1000,
-                              hide_desktop_popup_func, desktop_popup,
-                              g_direct_equal, NULL);
+    if (!perm && !desktop_popup_perm)
+        /* only hide if its not already being show permanently */
+        obt_main_loop_timeout_add(ob_main_loop,
+                                  config_desktop_popup_time * 1000,
+                                  hide_desktop_popup_func, desktop_popup,
+                                  g_direct_equal, NULL);
+
     g_free(a);
 }
 
@@ -953,6 +958,7 @@ void screen_hide_desktop_popup(void)
     obt_main_loop_timeout_remove_data(ob_main_loop, hide_desktop_popup_func,
                                       desktop_popup, FALSE);
     pager_popup_hide(desktop_popup);
+    desktop_popup_perm = FALSE;
 }
 
 guint screen_find_desktop(guint from, ObDirection dir,

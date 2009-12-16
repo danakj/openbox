@@ -304,9 +304,12 @@ void actions_run_acts(GSList *acts,
                 if (interactive_act)
                     actions_interactive_cancel_act();
                 if (act->i_pre)
-                    act->i_pre(act->options);
-                ok = actions_interactive_begin_act(act, state);
+                    if (!act->i_pre(state, act->options))
+                        act->i_input = NULL; /* remove the interactivity */
             }
+            /* check again cuz it might have been cancelled */
+            if (actions_act_is_interactive(act))
+                ok = actions_interactive_begin_act(act, state);
         }
 
         /* fire the action's run function with this data */

@@ -75,8 +75,12 @@ void screen_remove_desktop(gboolean current);
 guint screen_find_desktop(guint from, ObDirection dir,
                           gboolean wrap, gboolean linear);
 
-/*! Show the desktop popup/notification */
-void screen_show_desktop_popup(guint d);
+/*! Show the desktop popup/notification
+  @permanent If TRUE, the popup will stay on the screen until you call
+             screen_hide_desktop_popup().  Otherwise it will hide after a
+             delay.
+ */
+void screen_show_desktop_popup(guint d, gboolean permanent);
 /*! Hide it */
 void screen_hide_desktop_popup(void);
 

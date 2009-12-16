@@ -27,17 +27,17 @@ static gpointer setup_func(xmlNodePtr node,
                            ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *in,
                            ObActionsICancelFunc *c,
-                           ObActionsIPreFunc *post);
+                           ObActionsIPostFunc *post);
 static gpointer setup_forward_func(xmlNodePtr node,
                                    ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *in,
                                    ObActionsICancelFunc *c,
-                                   ObActionsIPreFunc *post);
+                                   ObActionsIPostFunc *post);
 static gpointer setup_backward_func(xmlNodePtr node,
                                     ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *in,
                                     ObActionsICancelFunc *c,
-                                    ObActionsIPreFunc *post);
+                                    ObActionsIPostFunc *post);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -58,7 +58,7 @@ static gpointer setup_func(xmlNodePtr node,
                            ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *input,
                            ObActionsICancelFunc *cancel,
-                           ObActionsIPreFunc *post)
+                           ObActionsIPostFunc *post)
 {
     xmlNodePtr n;
     Options *o;
@@ -115,7 +115,7 @@ static gpointer setup_forward_func(xmlNodePtr node,
                                    ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *input,
                                    ObActionsICancelFunc *cancel,
-                                   ObActionsIPreFunc *post)
+                                   ObActionsIPostFunc *post)
 {
     Options *o = setup_func(node, pre, input, cancel, post);
     o->forward = TRUE;
@@ -126,7 +126,7 @@ static gpointer setup_backward_func(xmlNodePtr node,
                                     ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *input,
                                     ObActionsICancelFunc *cancel,
-                                    ObActionsIPreFunc *post)
+                                    ObActionsIPostFunc *post)
 {
     Options *o = setup_func(node, pre, input, cancel, post);
     o->forward = FALSE;

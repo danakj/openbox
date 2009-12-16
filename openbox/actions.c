@@ -186,14 +186,12 @@ ObActionsAct* actions_parse_string(const gchar *name)
 
     if ((act = actions_build_act_from_string(name))) {
         if (act->def->canbeinteractive) {
-            if (act->def->setup.i) {
+            if (act->def->setup.i)
                 act->options = act->def->setup.i(NULL,
                                                  &act->i_pre,
                                                  &act->i_input,
                                                  &act->i_cancel,
                                                  &act->i_post);
-                g_assert(!!act->i_input == !!act->i_cancel);
-            }
         }
         else {
             if (act->def->setup.n)
@@ -214,14 +212,12 @@ ObActionsAct* actions_parse(xmlNodePtr node)
         if ((act = actions_build_act_from_string(name))) {
             /* there is more stuff to parse here */
             if (act->def->canbeinteractive) {
-                if (act->def->setup.i) {
+                if (act->def->setup.i)
                     act->options = act->def->setup.i(node->children,
                                                      &act->i_pre,
                                                      &act->i_input,
                                                      &act->i_cancel,
                                                      &act->i_post);
-                    g_assert(!!act->i_input == !!act->i_cancel);
-                }
             }
             else {
                 if (act->def->setup.n)
@@ -236,7 +232,7 @@ ObActionsAct* actions_parse(xmlNodePtr node)
 
 gboolean actions_act_is_interactive(ObActionsAct *act)
 {
-    return act->i_cancel != NULL;
+    return act->i_input != NULL;
 }
 
 void actions_act_ref(ObActionsAct *act)
@@ -320,7 +316,7 @@ void actions_run_acts(GSList *acts,
                     actions_interactive_end_act();
             } else {
                 /* make sure its interactive if it returned TRUE */
-                g_assert(act->i_cancel);
+                g_assert(act->i_input);
 
                 /* no actions are run after the interactive one */
                 break;
@@ -337,7 +333,8 @@ gboolean actions_interactive_act_running(void)
 void actions_interactive_cancel_act(void)
 {
     if (interactive_act) {
-        interactive_act->i_cancel(interactive_act->options);
+        if (interactive_act->i_cancel)
+            interactive_act->i_cancel(interactive_act->options);
         actions_interactive_end_act();
     }
 }

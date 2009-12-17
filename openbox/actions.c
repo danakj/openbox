@@ -408,13 +408,19 @@ void actions_client_move(ObActionsData *data, gboolean start)
                are ignored during a grab, so don't force fake ones when they
                should be ignored
             */
-            if ((c = client_under_pointer()) && c != data->client &&
-                !grab_on_pointer())
-            {
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Generating fake enter because we did a "
-                              "mouse-event action");
-                event_enter_client(c);
+            if (!grab_on_pointer()) {
+                if ((c = client_under_pointer()) && c != data->client) {
+                    ob_debug_type(OB_DEBUG_FOCUS,
+                                  "Generating fake enter because we did a "
+                                  "mouse-event action");
+                    event_enter_client(c);
+                }
+                else if (!c && c != data->client) {
+                    ob_debug_type(OB_DEBUG_FOCUS,
+                                  "Generating fake leave because we did a "
+                                  "mouse-event action");
+                    event_enter_client(data->client);
+                }
             }
         }
         else if (!data->button && !config_focus_under_mouse)

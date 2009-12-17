@@ -73,6 +73,9 @@ extern gboolean config_focus_last;
 /*! Try keep focus on the window under the mouse when the mouse is not moving
  */
 extern gboolean config_focus_under_mouse;
+/*! Remove focus from windows when the mouse leaves them
+ */
+extern gboolean config_unfocus_leave;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;

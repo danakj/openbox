@@ -97,6 +97,7 @@ static void event_ignore_enter_range(gulong start, gulong end);
 static void focus_delay_dest(gpointer data);
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
 static gboolean focus_delay_func(gpointer data);
+static gboolean unfocus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
 Time event_curtime = CurrentTime;
@@ -845,6 +846,41 @@ void event_enter_client(ObClient *client)
     }
 }
 
+void event_leave_client(ObClient *client)
+{
+    g_assert(config_focus_follow);
+
+    if (is_enter_focus_event_ignored(event_curserial)) {
+        ob_debug_type(OB_DEBUG_FOCUS, "Ignoring leave event with serial %lu\n"
+                      "on client 0x%x", event_curserial, client->window);
+        return;
+    }
+
+    if (client == focus_client) {
+        if (config_focus_delay) {
+            ObFocusDelayData *data;
+
+            obt_main_loop_timeout_remove(ob_main_loop, unfocus_delay_func);
+
+            data = g_new(ObFocusDelayData, 1);
+            data->client = client;
+            data->time = event_curtime;
+            data->serial = event_curserial;
+
+            obt_main_loop_timeout_add(ob_main_loop,
+                                      config_focus_delay * 1000,
+                                      unfocus_delay_func,
+                                      data, focus_delay_cmp, focus_delay_dest);
+        } else {
+            ObFocusDelayData data;
+            data.client = client;
+            data.time = event_curtime;
+            data.serial = event_curserial;
+            unfocus_delay_func(&data);
+        }
+    }
+}
+
 static gboolean *context_to_button(ObFrame *f, ObFrameContext con, gboolean press)
 {
     if (press) {
@@ -1014,15 +1050,18 @@ static void event_handle_client(ObClient *client, XEvent *e)
                           e->xcrossing.detail, (client?client->window:0));
             if (grab_on_keyboard())
                 break;
-            if (config_focus_follow && config_focus_delay &&
+            if (config_focus_follow &&
                 /* leave inferior events can happen when the mouse goes onto
                    the window's border and then into the window before the
                    delay is up */
                 e->xcrossing.detail != NotifyInferior)
             {
-                obt_main_loop_timeout_remove_data(ob_main_loop,
-                                                  focus_delay_func,
-                                                  client, FALSE);
+                if (config_focus_delay)
+                    obt_main_loop_timeout_remove_data(ob_main_loop,
+                                                      focus_delay_func,
+                                                      client, FALSE);
+                if (config_unfocus_leave)
+                    event_leave_client(client);
             }
             break;
         default:
@@ -1069,8 +1108,13 @@ static void event_handle_client(ObClient *client, XEvent *e)
                               e->xcrossing.detail,
                               e->xcrossing.serial,
                               (client?client->window:0));
-                if (config_focus_follow)
+                if (config_focus_follow) {
+                    if (config_focus_delay)
+                        obt_main_loop_timeout_remove_data(ob_main_loop,
+                                                          unfocus_delay_func,
+                                                          client, FALSE);
                     event_enter_client(client);
+                }
             }
             break;
         default:
@@ -1956,9 +2000,23 @@ static gboolean focus_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
+static gboolean unfocus_delay_func(gpointer data)
+{
+    ObFocusDelayData *d = data;
+    Time old = event_curtime;
+
+    event_curtime = d->time;
+    event_curserial = d->serial;
+    focus_nothing();
+    event_curtime = old;
+    return FALSE; /* no repeat */
+}
+
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
     obt_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
+                                      client, FALSE);
+    obt_main_loop_timeout_remove_data(ob_main_loop, unfocus_delay_func,
                                       client, FALSE);
 }
 
@@ -1967,6 +2025,7 @@ void event_halt_focus_delay(void)
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);
     obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+    obt_main_loop_timeout_remove(ob_main_loop, unfocus_delay_func);
 }
 
 gulong event_start_ignore_all_enters(void)

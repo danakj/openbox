@@ -52,6 +52,11 @@ void stacking_add_nonintrusive(struct _ObWindow *win);
 /*! Raises a window above all others in its stacking layer */
 void stacking_raise(struct _ObWindow *window);
 
+/*! Raises a window above all others in its stacking layer, and raises all
+  other windows belonging to the same application with it (to the best of
+  our abilities) */
+void stacking_raise_app(struct _ObClient *client);
+
 /*! Temporarily raises a window above all others */
 void stacking_temp_raise(struct _ObWindow *window);
 
@@ -60,6 +65,11 @@ void stacking_restore(void);
 
 /*! Lowers a window below all others in its stacking layer */
 void stacking_lower(struct _ObWindow *window);
+
+/*! Lowers a window below all others in its stacking layer, and lowers all
+  other windows belonging tot he same application with it (to the best of
+  our abilities) */
+void stacking_lower_app(struct _ObClient *client);
 
 /*! Moves a window below another if its in the same layer.
   This function does not enforce stacking rules IRT transients n such, and so

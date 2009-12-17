@@ -706,6 +706,10 @@ ObClient *client_direct_parent(ObClient *self);
 */
 ObClient *client_search_top_direct_parent(ObClient *self);
 
+/*! Are the two clients windows belonging to the same application.
+  This checks group members, their children/parents, etc. */
+gboolean client_is_in_application(ObClient *self, ObClient *search);
+
 /*! Is one client a direct child of another (i.e. not through the group.)
   This checks more than one level, so there may be another direct child in
   between */

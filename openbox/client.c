@@ -3512,6 +3512,12 @@ void client_set_desktop(ObClient *self, guint target,
     client_set_desktop_recursive(self, target, donthide, dontraise);
 }
 
+gboolean client_is_in_application(ObClient *self, ObClient *search)
+{
+    /* XXX FIXME make this better */
+    return self->group == search->group;
+}
+
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
 {
     while (child != parent && (child = client_direct_parent(child)));

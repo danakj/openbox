@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "obt/prop.h"
 
+/*! The list of all windows in their stacking order, from top to bottom */
 GList  *stacking_list = NULL;
 /*! When true, stacking changes will not be reflected on the screen.  This is
   to freeze the on-screen stacking order while a window is being temporarily
@@ -61,9 +62,10 @@ void stacking_set_list(void)
     g_free(windows);
 }
 
+/* steals the elements of the wins list, so don't free them */
 static void do_restack(GList *wins, GList *before)
 {
-    GList *it;
+    GList *it, *after;
     Window *win;
     gint i;
 
@@ -94,8 +96,15 @@ static void do_restack(GList *wins, GList *before)
         win[i] = window_top(it->data);
         g_assert(win[i] != None); /* better not call stacking shit before
                                      setting your top level window value */
-        stacking_list = g_list_insert_before(stacking_list, before, it->data);
     }
+
+    /* wins are inserted before @before and after @after
+       stacking_list = after..wins..before */
+    if (before == stacking_list)
+        after = NULL;
+    else
+        after = stacking_list;
+    stacking_list = g_list_concat(g_list_concat(after, wins), before);
 
 #ifdef DEBUG
     /* some debug checking of the stacking list's order */
@@ -181,7 +190,6 @@ static void do_raise(GList *wins)
                     break;
             }
             do_restack(layer[i], it);
-            g_list_free(layer[i]);
         }
     }
 }
@@ -208,15 +216,15 @@ static void do_lower(GList *wins)
                     break;
             }
             do_restack(layer[i], it);
-            g_list_free(layer[i]);
         }
     }
 }
 
-static void restack_windows(ObClient *selected, gboolean raise)
+static GList* get_restack_order(ObClient *selected, gboolean raise)
 {
     GList *it, *last, *below, *above, *next;
     GList *wins = NULL;
+    ObClient *bottom = NULL;
 
     GList *group_helpers = NULL;
     GList *group_modals = NULL;
@@ -365,10 +373,20 @@ static void restack_windows(ObClient *selected, gboolean raise)
     /* group modals go on the very top */
     wins = g_list_concat(group_modals, wins);
 
-    do_restack(wins, below);
-    g_list_free(wins);
+    return wins;
+}
 
-    /* lower our parents after us, so they go below us */
+static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
+{
+    GList *wins;
+    GList *app_members = NULL;
+
+    /* get the restacking order for the selected window and its relatives */
+    wins = get_restack_order(selected, raise);
+
+    /* if we're lowering the window, then the parents will not be included
+       in the above list.  find all the parents and put them below the windows
+       we have so far */
     if (!raise && selected->parents) {
         GSList *parents_copy, *sit;
         GSList *reorder = NULL;
@@ -384,10 +402,42 @@ static void restack_windows(ObClient *selected, gboolean raise)
             }
         g_assert(parents_copy == NULL);
 
-        /* call restack for each of these to lower them */
         for (sit = reorder; sit; sit = g_slist_next(sit))
-            restack_windows(sit->data, raise);
+            wins = g_list_concat(wins, get_restack_order(sit->data, FALSE);
     }
+
+
+    /* collect all other windows in the application in all stacking layers,
+       while preserving their relative stacking order */
+    if (app) {
+
+        /* go thru stacking list backwards so we can use g_list_prepend */
+        for (it = g_list_last(stacking_list); it; it = next) {
+            next = g_list_previous(it);
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = WINDOW_AS_CLIENT(it->data);
+                /* find windows in the same application */
+                if ((c->desktop == selected->desktop ||
+                    c->desktop == DESKTOP_ALL ||
+                    (selected->desktop == DESKTOP_ALL &&
+                     c->desktop == screen_destkop))
+                    client_is_in_application(c, selected) &&
+                    window_layer(w) == selected->layer)
+                {
+                    app_members = g_list_prepend(app_members, w);
+                    stacking_list = g_list_delete_link(stacking_list, it);
+                }
+            }
+        }
+    }
+
+    do_restack(wins, below);
+
+}
+
+void stacking_raise_app(ObClient *client)
+{
+    restack_windows(client, TRUE, TRUE);
 }
 
 void stacking_raise(ObWindow *window)
@@ -395,7 +445,7 @@ void stacking_raise(ObWindow *window)
     if (WINDOW_IS_CLIENT(window)) {
         ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
-        restack_windows(selected, TRUE);
+        restack_windows(selected, TRUE, FALSE);
     } else {
         GList *wins;
         wins = g_list_append(NULL, window);
@@ -405,12 +455,17 @@ void stacking_raise(ObWindow *window)
     }
 }
 
+void stacking_lower_app(struct _ObClient *client)
+{
+    restack_windows(client, FALSE, TRUE);
+}
+
 void stacking_lower(ObWindow *window)
 {
     if (WINDOW_IS_CLIENT(window)) {
         ObClient *selected;
         selected = WINDOW_AS_CLIENT(window);
-        restack_windows(selected, FALSE);
+        restack_windows(selected, FALSE, FALSE);
     } else {
         GList *wins;
         wins = g_list_append(NULL, window);
@@ -431,7 +486,6 @@ void stacking_below(ObWindow *window, ObWindow *below)
     stacking_list = g_list_remove(stacking_list, window);
     before = g_list_next(g_list_find(stacking_list, below));
     do_restack(wins, before);
-    g_list_free(wins);
 }
 
 void stacking_add(ObWindow *win)
@@ -549,7 +603,6 @@ void stacking_add_nonintrusive(ObWindow *win)
 
     wins = g_list_append(NULL, win);
     do_restack(wins, it_below);
-    g_list_free(wins);
 }
 
 /*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it

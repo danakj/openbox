@@ -949,6 +949,8 @@ void screen_show_desktop_popup(guint d, gboolean perm)
                                   config_desktop_popup_time * 1000,
                                   hide_desktop_popup_func, desktop_popup,
                                   g_direct_equal, NULL);
+    if (perm)
+        desktop_popup_perm = TRUE;
 
     g_free(a);
 }

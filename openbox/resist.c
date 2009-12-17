@@ -161,7 +161,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     cr = RECT_RIGHT(c->frame->area);
     cb = RECT_BOTTOM(c->frame->area);
 
-    RECT_SET(desired_area, *x, *y, c->area.width, c->area.height);
+    RECT_SET(desired_area, c->frame->area.x, c->frame->area.y,
+             c->frame->area.width, c->frame->area.height);
 
     for (i = 0; i < screen_num_monitors; ++i) {
         parea = screen_physical_area_monitor(i);

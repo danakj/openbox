@@ -17,7 +17,7 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
 
 void action_resize_startup(void)
 {
-    actions_register("Resize", setup_func, g_free, run_func, NULL, NULL);
+    actions_register("Resize", setup_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

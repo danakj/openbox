@@ -23,31 +23,28 @@ static gpointer setup_vert_func(xmlNodePtr node);
 
 void action_maximize_startup(void)
 {
-    actions_register("Maximize", setup_func, g_free, run_func_on,
-                     NULL, NULL);
-    actions_register("Unmaximize", setup_func, g_free, run_func_off,
-                     NULL, NULL);
-    actions_register("ToggleMaximize", setup_func, g_free, run_func_toggle,
-                     NULL, NULL);
+    actions_register("Maximize", setup_func, g_free, run_func_on);
+    actions_register("Unmaximize", setup_func, g_free, run_func_off);
+    actions_register("ToggleMaximize", setup_func, g_free, run_func_toggle);
     /* 3.4-compatibility */
     actions_register("MaximizeFull", setup_both_func, g_free,
-                     run_func_on, NULL, NULL);
+                     run_func_on);
     actions_register("UnmaximizeFull", setup_both_func, g_free,
-                     run_func_off, NULL, NULL);
+                     run_func_off);
     actions_register("ToggleMaximizeFull", setup_both_func, g_free,
-                     run_func_toggle, NULL, NULL);
+                     run_func_toggle);
     actions_register("MaximizeHorz", setup_horz_func, g_free,
-                     run_func_on, NULL, NULL);
+                     run_func_on);
     actions_register("UnmaximizeHorz", setup_horz_func, g_free,
-                     run_func_off, NULL, NULL);
+                     run_func_off);
     actions_register("ToggleMaximizeHorz", setup_horz_func, g_free,
-                     run_func_toggle, NULL, NULL);
+                     run_func_toggle);
     actions_register("MaximizeVert", setup_vert_func, g_free,
-                     run_func_on, NULL, NULL);
+                     run_func_on);
     actions_register("UnmaximizeVert", setup_vert_func, g_free,
-                     run_func_off, NULL, NULL);
+                     run_func_off);
     actions_register("ToggleMaximizeVert", setup_vert_func, g_free,
-                     run_func_toggle, NULL, NULL);
+                     run_func_toggle);
 }
 
 static gpointer setup_func(xmlNodePtr node)

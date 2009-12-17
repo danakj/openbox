@@ -13,8 +13,8 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_exit_startup(void)
 {
-    actions_register("Exit", setup_func, NULL, run_func, NULL, NULL);
-    actions_register("SessionLogout", setup_func, NULL, run_func, NULL, NULL);
+    actions_register("Exit", setup_func, NULL, run_func);
+    actions_register("SessionLogout", setup_func, NULL, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

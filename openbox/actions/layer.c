@@ -18,18 +18,18 @@ static gpointer setup_sendnormal_func(xmlNodePtr node);
 void action_layer_startup(void)
 {
     actions_register("ToggleAlwaysOnTop", setup_func_top, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
     actions_register("ToggleAlwaysOnBottom", setup_func_bottom, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
     actions_register("SendToLayer", setup_func_send, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
     /* 3.4-compatibility */
     actions_register("SendToTopLayer", setup_sendtop_func, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
     actions_register("SendToBottomLayer", setup_sendbottom_func, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
     actions_register("SendToNormalLayer", setup_sendnormal_func, g_free,
-                     run_func, NULL, NULL);
+                     run_func);
 }
 
 static gpointer setup_func_top(xmlNodePtr node)

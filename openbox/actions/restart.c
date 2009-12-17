@@ -12,7 +12,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_restart_startup(void)
 {
-    actions_register("Restart", setup_func, free_func, run_func, NULL, NULL);
+    actions_register("Restart", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

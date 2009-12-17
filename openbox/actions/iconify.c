@@ -7,8 +7,7 @@ void action_iconify_startup(void)
 {
     actions_register("Iconify",
                      NULL, NULL,
-                     run_func,
-                     NULL, NULL);
+                     run_func);
 }
 
 /* Always return FALSE because its not interactive */

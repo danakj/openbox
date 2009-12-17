@@ -8,8 +8,7 @@ void action_move_startup(void)
 {
     actions_register("Move",
                      NULL, NULL,
-                     run_func,
-                     NULL, NULL);
+                     run_func);
 }
 
 /* Always return FALSE because its not interactive */

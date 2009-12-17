@@ -19,16 +19,12 @@ static gpointer setup_west_func(xmlNodePtr node);
 
 void action_movetoedge_startup(void)
 {
-    actions_register("MoveToEdge", setup_func, g_free, run_func, NULL, NULL);
+    actions_register("MoveToEdge", setup_func, g_free, run_func);
     /* 3.4-compatibility */
-    actions_register("MoveToEdgeNorth", setup_north_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("MoveToEdgeSouth", setup_south_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("MoveToEdgeEast", setup_east_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("MoveToEdgeWest", setup_west_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("MoveToEdgeNorth", setup_north_func, g_free, run_func);
+    actions_register("MoveToEdgeSouth", setup_south_func, g_free, run_func);
+    actions_register("MoveToEdgeEast", setup_east_func, g_free, run_func);
+    actions_register("MoveToEdgeWest", setup_west_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

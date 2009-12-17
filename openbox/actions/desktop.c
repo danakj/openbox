@@ -49,43 +49,31 @@ static gpointer setup_send_down_func(xmlNodePtr node);
 
 void action_desktop_startup(void)
 {
-    actions_register("GoToDesktop", setup_go_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktop", setup_send_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("GoToDesktop", setup_go_func, g_free, run_func);
+    actions_register("SendToDesktop", setup_send_func, g_free, run_func);
     /* 3.4-compatibility */
-    actions_register("DesktopLast", setup_go_last_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopLast", setup_send_last_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("Desktop", setup_go_abs_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktop", setup_send_abs_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopNext", setup_go_next_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopNext", setup_send_next_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopPrevious", setup_go_prev_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopPrevious", setup_send_prev_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopLeft", setup_go_left_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopLeft", setup_send_left_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopRight", setup_go_right_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopRight", setup_send_right_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopUp", setup_go_up_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopUp", setup_send_up_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("DesktopDown", setup_go_down_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("SendToDesktopDown", setup_send_down_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("DesktopLast", setup_go_last_func, g_free, run_func);
+    actions_register("SendToDesktopLast", setup_send_last_func,
+                     g_free, run_func);
+    actions_register("Desktop", setup_go_abs_func, g_free, run_func);
+    actions_register("SendToDesktop", setup_send_abs_func, g_free, run_func);
+    actions_register("DesktopNext", setup_go_next_func, g_free, run_func);
+    actions_register("SendToDesktopNext", setup_send_next_func,
+                     g_free, run_func);
+    actions_register("DesktopPrevious", setup_go_prev_func, g_free, run_func);
+    actions_register("SendToDesktopPrevious", setup_send_prev_func,
+                     g_free, run_func);
+    actions_register("DesktopLeft", setup_go_left_func, g_free, run_func);
+    actions_register("SendToDesktopLeft", setup_send_left_func,
+                     g_free, run_func);
+    actions_register("DesktopRight", setup_go_right_func, g_free, run_func);
+    actions_register("SendToDesktopRight", setup_send_right_func,
+                     g_free, run_func);
+    actions_register("DesktopUp", setup_go_up_func, g_free, run_func);
+    actions_register("SendToDesktopUp", setup_send_up_func, g_free, run_func);
+    actions_register("DesktopDown", setup_go_down_func, g_free, run_func);
+    actions_register("SendToDesktopDown", setup_send_down_func,
+                     g_free, run_func);
 }
 
 static gpointer setup_go_func(xmlNodePtr node)

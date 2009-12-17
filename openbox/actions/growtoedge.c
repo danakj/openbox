@@ -22,18 +22,14 @@ static gpointer setup_west_func(xmlNodePtr node);
 void action_growtoedge_startup(void)
 {
     actions_register("GrowToEdge", setup_func,
-                     g_free, run_func, NULL, NULL);
+                     g_free, run_func);
     actions_register("ShrinkToEdge", setup_shrink_func,
-                     g_free, run_func, NULL, NULL);
+                     g_free, run_func);
     /* 3.4-compatibility */
-    actions_register("GrowToEdgeNorth", setup_north_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("GrowToEdgeSouth", setup_south_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("GrowToEdgeEast", setup_east_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("GrowToEdgeWest", setup_west_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("GrowToEdgeNorth", setup_north_func, g_free, run_func);
+    actions_register("GrowToEdgeSouth", setup_south_func, g_free, run_func);
+    actions_register("GrowToEdgeEast", setup_east_func, g_free, run_func);
+    actions_register("GrowToEdgeWest", setup_west_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

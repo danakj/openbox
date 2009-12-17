@@ -31,15 +31,24 @@ typedef struct _ObActionsGlobalData   ObActionsGlobalData;
 typedef struct _ObActionsClientData   ObActionsClientData;
 typedef struct _ObActionsSelectorData ObActionsSelectorData;
 
-typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
-typedef gboolean (*ObActionsInteractiveInputFunc)(guint initial_state,
+typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
+
+/* functions for interactive actions */
+typedef void     (*ObActionsIPreFunc)(gpointer options);
+typedef void     (*ObActionsIPostFunc)(gpointer options);
+typedef gboolean (*ObActionsIInputFunc)(guint initial_state,
                                                   XEvent *e,
                                                   gpointer options,
                                                   gboolean *used);
-typedef void     (*ObActionsInteractiveCancelFunc)(gpointer options);
+typedef void     (*ObActionsICancelFunc)(gpointer options);
+typedef gpointer (*ObActionsIDataSetupFunc)(xmlNodePtr node,
+                                            ObActionsIPreFunc *pre,
+                                            ObActionsIInputFunc *input,
+                                            ObActionsICancelFunc *cancel,
+                                            ObActionsIPostFunc *post);
 
 struct _ObActionsData {
     ObUserAction uact;
@@ -55,14 +64,16 @@ struct _ObActionsData {
 void actions_startup(gboolean reconfigure);
 void actions_shutdown(gboolean reconfigure);
 
-/*! If the action is interactive, then i_input and i_cancel are not NULL.
-  Otherwise, they should both be NULL. */
+/*! Use this if the actions created from this name may be interactive */
+gboolean actions_register_i(const gchar *name,
+                            ObActionsIDataSetupFunc setup,
+                            ObActionsDataFreeFunc free,
+                            ObActionsRunFunc run);
+
 gboolean actions_register(const gchar *name,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
-                          ObActionsRunFunc run,
-                          ObActionsInteractiveInputFunc i_input,
-                          ObActionsInteractiveCancelFunc i_cancel);
+                          ObActionsRunFunc run);
 
 ObActionsAct* actions_parse(xmlNodePtr node);
 ObActionsAct* actions_parse_string(const gchar *name);

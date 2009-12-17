@@ -14,7 +14,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_moverelative_startup(void)
 {
-    actions_register("MoveRelative", setup_func, g_free, run_func, NULL, NULL);
+    actions_register("MoveRelative", setup_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

@@ -30,10 +30,9 @@ static gpointer setup_center_func(xmlNodePtr node);
 
 void action_moveresizeto_startup(void)
 {
-    actions_register("MoveResizeTo", setup_func, g_free, run_func, NULL, NULL);
-/* 3.4-compatibility */
-    actions_register("MoveToCenter", setup_center_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("MoveResizeTo", setup_func, g_free, run_func);
+    /* 3.4-compatibility */
+    actions_register("MoveToCenter", setup_center_func, g_free, run_func);
 }
 
 static void parse_coord(xmlNodePtr n, gint *pos,

@@ -29,7 +29,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_if_startup(void)
 {
-    actions_register("If", setup_func, free_func, run_func, NULL, NULL);
+    actions_register("If", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

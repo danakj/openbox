@@ -33,7 +33,7 @@ static void     i_cancel_func(gpointer options);
 
 void action_execute_startup(void)
 {
-    actions_register("Execute", setup_func, free_func, run_func, NULL, NULL);
+    actions_register("Execute", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

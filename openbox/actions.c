@@ -42,17 +42,23 @@ struct _ObActionsDefinition {
 
     gchar *name;
 
-    ObActionsDataSetupFunc setup;
+    gboolean canbeinteractive;
+    union {
+        ObActionsIDataSetupFunc i;
+        ObActionsDataSetupFunc n;
+    } setup;
     ObActionsDataFreeFunc free;
     ObActionsRunFunc run;
-    ObActionsInteractiveInputFunc i_input;
-    ObActionsInteractiveCancelFunc i_cancel;
 };
 
 struct _ObActionsAct {
     guint ref;
 
     ObActionsDefinition *def;
+    ObActionsIPreFunc i_pre;
+    ObActionsIInputFunc i_input;
+    ObActionsICancelFunc i_cancel;
+    ObActionsIPostFunc i_post;
     gpointer options;
 };
 
@@ -78,37 +84,55 @@ void actions_shutdown(gboolean reconfig)
     }
 }
 
-gboolean actions_register(const gchar *name,
-                          ObActionsDataSetupFunc setup,
-                          ObActionsDataFreeFunc free,
-                          ObActionsRunFunc run,
-                          ObActionsInteractiveInputFunc i_input,
-                          ObActionsInteractiveCancelFunc i_cancel)
+ObActionsDefinition* do_register(const gchar *name,
+                                 ObActionsDataFreeFunc free,
+                                 ObActionsRunFunc run)
 {
     GSList *it;
     ObActionsDefinition *def;
 
     g_assert(run != NULL);
-    g_assert((i_input == NULL) == (i_cancel == NULL));
 
     for (it = registered; it; it = g_slist_next(it)) {
         def = it->data;
         if (!g_ascii_strcasecmp(name, def->name)) /* already registered */
-            return FALSE;
+            return NULL;
     }
 
     def = g_new(ObActionsDefinition, 1);
     def->ref = 1;
     def->name = g_strdup(name);
-    def->setup = setup;
     def->free = free;
     def->run = run;
-    def->i_input = i_input;
-    def->i_cancel = i_cancel;
 
     registered = g_slist_prepend(registered, def);
+    return def;
+}
 
-    return TRUE;
+gboolean actions_register_i(const gchar *name,
+                            ObActionsIDataSetupFunc setup,
+                            ObActionsDataFreeFunc free,
+                            ObActionsRunFunc run)
+{
+    ObActionsDefinition *def = do_register(name, free, run);
+    if (def) {
+        def->canbeinteractive = TRUE;
+        def->setup.i = setup;
+    }
+    return def != NULL;
+}
+
+gboolean actions_register(const gchar *name,
+                          ObActionsDataSetupFunc setup,
+                          ObActionsDataFreeFunc free,
+                          ObActionsRunFunc run)
+{
+    ObActionsDefinition *def = do_register(name, free, run);
+    if (def) {
+        def->canbeinteractive = FALSE;
+        def->setup.n = setup;
+    }
+    return def != NULL;
 }
 
 static void actions_definition_ref(ObActionsDefinition *def)
@@ -144,6 +168,10 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name)
         act->ref = 1;
         act->def = def;
         actions_definition_ref(act->def);
+        act->i_pre = NULL;
+        act->i_input = NULL;
+        act->i_cancel = NULL;
+        act->i_post = NULL;
         act->options = NULL;
     } else
         g_message(_("Invalid action \"%s\" requested. No such action exists."),
@@ -156,9 +184,23 @@ ObActionsAct* actions_parse_string(const gchar *name)
 {
     ObActionsAct *act = NULL;
 
-    if ((act = actions_build_act_from_string(name)))
-        if (act->def->setup)
-            act->options = act->def->setup(NULL);
+    if ((act = actions_build_act_from_string(name))) {
+        if (act->def->canbeinteractive) {
+            if (act->def->setup.i) {
+                act->options = act->def->setup.i(NULL,
+                                                 &act->i_pre,
+                                                 &act->i_input,
+                                                 &act->i_cancel,
+                                                 &act->i_post);
+                g_assert(!!act->i_input == !!act->i_cancel);
+            }
+        }
+        else {
+            if (act->def->setup.n)
+                act->options = act->def->setup.n(NULL);
+        }
+    }
+                
 
     return act;
 }
@@ -169,11 +211,23 @@ ObActionsAct* actions_parse(xmlNodePtr node)
     ObActionsAct *act = NULL;
 
     if (obt_parse_attr_string(node, "name", &name)) {
-        if ((act = actions_build_act_from_string(name)))
+        if ((act = actions_build_act_from_string(name))) {
             /* there is more stuff to parse here */
-            if (act->def->setup)
-                act->options = act->def->setup(node->children);
-
+            if (act->def->canbeinteractive) {
+                if (act->def->setup.i) {
+                    act->options = act->def->setup.i(node->children,
+                                                     &act->i_pre,
+                                                     &act->i_input,
+                                                     &act->i_cancel,
+                                                     &act->i_post);
+                    g_assert(!!act->i_input == !!act->i_cancel);
+                }
+            }
+            else {
+                if (act->def->setup.n)
+                    act->options = act->def->setup.n(node->children);
+            }
+        }
         g_free(name);
     }
 
@@ -182,7 +236,7 @@ ObActionsAct* actions_parse(xmlNodePtr node)
 
 gboolean actions_act_is_interactive(ObActionsAct *act)
 {
-    return act->def->i_cancel != NULL;
+    return act->i_cancel != NULL;
 }
 
 void actions_act_ref(ObActionsAct *act)
@@ -253,6 +307,8 @@ void actions_run_acts(GSList *acts,
                 /* cancel the old one */
                 if (interactive_act)
                     actions_interactive_cancel_act();
+                if (act->i_pre)
+                    act->i_pre(act->options);
                 ok = actions_interactive_begin_act(act, state);
             }
         }
@@ -264,7 +320,7 @@ void actions_run_acts(GSList *acts,
                     actions_interactive_end_act();
             } else {
                 /* make sure its interactive if it returned TRUE */
-                g_assert(act->def->i_cancel && act->def->i_input);
+                g_assert(act->i_cancel);
 
                 /* no actions are run after the interactive one */
                 break;
@@ -281,7 +337,7 @@ gboolean actions_interactive_act_running(void)
 void actions_interactive_cancel_act(void)
 {
     if (interactive_act) {
-        interactive_act->def->i_cancel(interactive_act->options);
+        interactive_act->i_cancel(interactive_act->options);
         actions_interactive_end_act();
     }
 }
@@ -309,6 +365,9 @@ static void actions_interactive_end_act(void)
     if (interactive_act) {
         ungrab_keyboard();
 
+        if (interactive_act->i_post)
+            interactive_act->i_post(interactive_act->options);
+
         actions_act_unref(interactive_act);
         interactive_act = NULL;
     }
@@ -318,8 +377,8 @@ gboolean actions_interactive_input_event(XEvent *e)
 {
     gboolean used = FALSE;
     if (interactive_act) {
-        if (!interactive_act->def->i_input(interactive_initial_state, e,
-                                           interactive_act->options, &used))
+        if (!interactive_act->i_input(interactive_initial_state, e,
+                                      interactive_act->options, &used))
         {
             used = TRUE; /* if it cancelled the action then it has to of
                             been used */

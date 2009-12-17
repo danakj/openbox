@@ -16,8 +16,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_resizerelative_startup(void)
 {
-    actions_register("ResizeRelative", setup_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("ResizeRelative", setup_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

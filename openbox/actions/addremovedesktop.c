@@ -19,20 +19,17 @@ static gpointer setup_removelast_func(xmlNodePtr node);
 
 void action_addremovedesktop_startup(void)
 {
-    actions_register("AddDesktop", setup_add_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("RemoveDesktop", setup_remove_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("AddDesktop", setup_add_func, g_free, run_func);
+    actions_register("RemoveDesktop", setup_remove_func, g_free, run_func);
 
     /* 3.4-compatibility */
-    actions_register("AddDesktopLast", setup_addlast_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("RemoveDesktopLast", setup_removelast_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("AddDesktopCurrent", setup_addcurrent_func, g_free, run_func,
-                     NULL, NULL);
-    actions_register("RemoveDesktopCurrent", setup_removecurrent_func, g_free, run_func,
-                     NULL, NULL);
+    actions_register("AddDesktopLast", setup_addlast_func, g_free, run_func);
+    actions_register("RemoveDesktopLast", setup_removelast_func,
+                     g_free, run_func);
+    actions_register("AddDesktopCurrent", setup_addcurrent_func,
+                     g_free, run_func);
+    actions_register("RemoveDesktopCurrent", setup_removecurrent_func,
+                     g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

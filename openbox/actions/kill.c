@@ -7,8 +7,7 @@ void action_kill_startup(void)
 {
     actions_register("Kill",
                      NULL, NULL,
-                     run_func,
-                     NULL, NULL);
+                     run_func);
 }
 
 /* Always return FALSE because its not interactive */

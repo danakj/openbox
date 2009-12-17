@@ -13,7 +13,7 @@ static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_focus_startup(void)
 {
-    actions_register("Focus", setup_func, g_free, run_func, NULL, NULL);
+    actions_register("Focus", setup_func, g_free, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)

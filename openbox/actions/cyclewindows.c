@@ -16,13 +16,28 @@ typedef struct {
     gboolean raise;
     ObFocusCyclePopupMode dialog_mode;
     GSList *actions;
+
+
+    /* options for after we're done */
+    gboolean cancel; /* did the user cancel or not */
+    guint state;     /* keyboard state when finished */
 } Options;
 
-static gboolean cycling = FALSE;
-
-static gpointer setup_func(xmlNodePtr node);
-static gpointer setup_forward_func(xmlNodePtr node);
-static gpointer setup_backward_func(xmlNodePtr node);
+static gpointer setup_func(xmlNodePtr node,
+                           ObActionsIPreFunc *pre,
+                           ObActionsIInputFunc *in,
+                           ObActionsICancelFunc *c,
+                           ObActionsIPreFunc *post);
+static gpointer setup_forward_func(xmlNodePtr node,
+                                   ObActionsIPreFunc *pre,
+                                   ObActionsIInputFunc *in,
+                                   ObActionsICancelFunc *c,
+                                   ObActionsIPreFunc *post);
+static gpointer setup_backward_func(xmlNodePtr node,
+                                    ObActionsIPreFunc *pre,
+                                    ObActionsIInputFunc *in,
+                                    ObActionsICancelFunc *c,
+                                    ObActionsIPreFunc *post);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -30,18 +45,20 @@ static gboolean i_input_func(guint initial_state,
                              gpointer options,
                              gboolean *used);
 static void     i_cancel_func(gpointer options);
-
-static void     end_cycle(gboolean cancel, guint state, Options *o);
+static void     i_post_func(gpointer options);
 
 void action_cyclewindows_startup(void)
 {
-    actions_register("NextWindow", setup_forward_func, free_func,
-                     run_func, i_input_func, i_cancel_func);
-    actions_register("PreviousWindow", setup_backward_func, free_func,
-                     run_func, i_input_func, i_cancel_func);
+    actions_register_i("NextWindow", setup_forward_func, free_func, run_func);
+    actions_register_i("PreviousWindow", setup_backward_func, free_func,
+                       run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(xmlNodePtr node,
+                           ObActionsIPreFunc *pre,
+                           ObActionsIInputFunc *input,
+                           ObActionsICancelFunc *cancel,
+                           ObActionsIPreFunc *post)
 {
     xmlNodePtr n;
     Options *o;
@@ -88,19 +105,30 @@ static gpointer setup_func(xmlNodePtr node)
                                      actions_parse_string("Unshade"));
     }
 
+    *input = i_input_func;
+    *cancel = i_cancel_func;
+    *post = i_post_func;
     return o;
 }
 
-static gpointer setup_forward_func(xmlNodePtr node)
+static gpointer setup_forward_func(xmlNodePtr node,
+                                   ObActionsIPreFunc *pre,
+                                   ObActionsIInputFunc *input,
+                                   ObActionsICancelFunc *cancel,
+                                   ObActionsIPreFunc *post)
 {
-    Options *o = setup_func(node);
+    Options *o = setup_func(node, pre, input, cancel, post);
     o->forward = TRUE;
     return o;
 }
 
-static gpointer setup_backward_func(xmlNodePtr node)
+static gpointer setup_backward_func(xmlNodePtr node,
+                                    ObActionsIPreFunc *pre,
+                                    ObActionsIInputFunc *input,
+                                    ObActionsICancelFunc *cancel,
+                                    ObActionsIPreFunc *post)
 {
-    Options *o = setup_func(node);
+    Options *o = setup_func(node, pre, input, cancel, post);
     o->forward = FALSE;
     return o;
 }
@@ -131,7 +159,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                      o->bar,
                      o->dialog_mode,
                      FALSE, FALSE);
-    cycling = TRUE;
 
     stacking_restore();
     if (o->raise && ft) stacking_temp_raise(CLIENT_AS_WINDOW(ft));
@@ -144,10 +171,13 @@ static gboolean i_input_func(guint initial_state,
                              gpointer options,
                              gboolean *used)
 {
+    Options *o = options;
+
     if (e->type == KeyPress) {
         /* Escape cancels no matter what */
         if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
-            end_cycle(TRUE, e->xkey.state, options);
+            o->cancel = TRUE;
+            o->state = e->xkey.state;
             return FALSE;
         }
 
@@ -155,7 +185,8 @@ static gboolean i_input_func(guint initial_state,
         else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN) &&
                  !initial_state)
         {
-            end_cycle(FALSE, e->xkey.state, options);
+            o->cancel = FALSE;
+            o->state = e->xkey.state;
             return FALSE;
         }
     }
@@ -163,7 +194,8 @@ static gboolean i_input_func(guint initial_state,
     else if (e->type == KeyRelease && initial_state &&
              (e->xkey.state & initial_state) == 0)
     {
-        end_cycle(FALSE, e->xkey.state, options);
+        o->cancel = FALSE;
+        o->state = e->xkey.state;
         return FALSE;
     }
 
@@ -172,14 +204,14 @@ static gboolean i_input_func(guint initial_state,
 
 static void i_cancel_func(gpointer options)
 {
-    /* we get cancelled when we move focus, but we're not cycling anymore, so
-       just ignore that */
-    if (cycling)
-        end_cycle(TRUE, 0, options);
+    Options *o = options;
+    o->cancel = TRUE;
+    o->state = 0;
 }
 
-static void end_cycle(gboolean cancel, guint state, Options *o)
+static void i_post_func(gpointer options)
 {
+    Options *o = options;
     struct _ObClient *ft;
 
     ft = focus_cycle(o->forward,
@@ -190,12 +222,11 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
                      TRUE,
                      o->bar,
                      o->dialog_mode,
-                     TRUE, cancel);
-    cycling = FALSE;
+                     TRUE, o->cancel);
 
     if (ft)
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                         state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
+                         o->state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
 
     stacking_restore();
 }

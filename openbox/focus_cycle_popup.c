@@ -535,3 +535,17 @@ void focus_cycle_popup_single_hide(void)
 {
     icon_popup_hide(single_popup);
 }
+
+gboolean focus_cycle_popup_is_showing(ObClient *client)
+{
+    if (popup.mapped) {
+        GList *it;
+
+        for (it = popup.targets; it; it = g_list_next(it)) {
+            ObFocusCyclePopupTarget *t = it->data;
+            if (t->client == client)
+                return TRUE;
+        }
+    }
+    return FALSE;
+}

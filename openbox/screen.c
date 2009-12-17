@@ -33,6 +33,7 @@
 #include "frame.h"
 #include "event.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "popup.h"
 #include "extensions.h"
 #include "render/render.h"
@@ -717,14 +718,21 @@ void screen_set_desktop(guint num, gboolean dofocus)
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (client_hide(c) && c == focus_client) {
-                /* c was focused and we didn't do fallback clearly so make sure
-                   openbox doesnt still consider the window focused.
-                   this happens when using NextWindow with allDesktops, since
-                   it doesnt want to move focus on desktop change, but the
-                   focus is not going to stay with the current window, which
-                   has now disappeared */
-                focus_set_client(NULL);
+            if (client_hide(c)) {
+                /* in the middle of cycling..? kill it. */
+                focus_cycle_stop(c);
+
+                if (c == focus_client) {
+                    /* c was focused and we didn't do fallback clearly so make
+                       sure openbox doesnt still consider the window focused.
+                       this happens when using NextWindow with allDesktops,
+                       since it doesnt want to move focus on desktop change,
+                       but the focus is not going to stay with the current
+                       window, which has now disappeared.
+                       only do this if the client was actually hidden,
+                       otherwise it can keep focus. */
+                    focus_set_client(NULL);
+                }
             }
         }
     }

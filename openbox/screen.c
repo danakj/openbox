@@ -717,8 +717,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            client_hide(c);
-            if (c == focus_client) {
+            if (client_hide(c) && c == focus_client) {
                 /* c was focused and we didn't do fallback clearly so make sure
                    openbox doesnt still consider the window focused.
                    this happens when using NextWindow with allDesktops, since

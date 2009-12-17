@@ -39,4 +39,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
                                    gboolean desktop_windows);
 void focus_cycle_popup_single_hide(void);
 
+/*! Returns TRUE if the popup is showing the client, otherwise FALSE. */
+gboolean focus_cycle_popup_is_showing(struct _ObClient *client);
+
 #endif

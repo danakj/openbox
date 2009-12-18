@@ -1,3 +1,52 @@
+3.4.9:
+  * Allow focus to move while inside an Openbox menu, or during an interactive
+    action such as window cycling.
+  * Fixed bug #3717 (Empty dock interfered with move/grow to edge actions).
+  * Fixed bug #4411 (Crash when switching desktops and window cycling).
+  * Fixed bug #4377 (Window resistance against struts).
+  * Fixed bug #4035 (Prevent focus from moving under the mouse after
+    activating a window with an Openbox menu.
+  * Correct the value provided by the _NET_WORKAREA hint, so desktop icons
+    will place across all monitors.
+  * Don't hide submenus immediately when moving through the parent menu.
+    (Resolves request #3762).
+  * Fix for showing Openbox menus with multiple monitors, don't restrict them
+    to the monitor where the mouse is.
+  * Fixed bug #4023 (Allow the user to have multiple keys which perform the
+    same function in Openbox menus/move/resize.  E.g. two keys which are
+    both bound to Escape.
+  * Add a new obprop tool, which can be used to read the _OB_ROLE, _OB_NAME,
+    and _OB_CLASS (as well as any other UTF-8 window properties) off of a
+    window.
+  * Add _OB_ROLE, _OB_NAME, and _OB_CLASS hints on each window that show the
+    respective values for use in the rc.xml applications section, to modify
+    the window when it appears.
+  * Improve Openbox interoperability with gnome-session >= 2.24.
+  * Fixed bug #4040 (Remove desktop hints set by gdm in the openbox-session
+    scripts, so that Openbox can set the number of desktops (assuming
+    gnome-settings-daemon doesn't first)).
+  * Fix a bug in xdg-autostart preventing some .desktop files from working.
+  * Show the desktop pager popup on the primary monitor instead of on all
+    monitors.
+  * Add a new primaryMonitor config option, which is where Openbox popups
+    will appear.  Defaults to a fixed monitor, but can be made to behave as
+    before with the "active" value for it.
+  * Correct edge detection for move/grow to edge to properly use monitor edges
+    for multi-monitor setups.
+  * Change default window placement policy to stay on the active monitor for
+    multi-monitor setups.
+  * Fixed bug #1149 (Crash with some window icon sizes).
+  * Respond to all strut changes, fixes moving/hiding panels.
+  * Fix internal code to focus windows on other desktops correctly (Fixes
+    bug #4413).
+  * Focus correctness fixups for switching desktops.
+  * Fixed bug #4373 (Decoration bug for shaded maximized windows).
+  * Fixed bug #4350 (Allow a window to be made skip_taskbar but still get
+    focused by the user's rc.xml).
+  * Fixed bug #4307 (Set a minimum time for screenEdgeWarpTime).
+  * Fixed bug #4253 (Support for Solaris in openbox-session scripts).
+  * Fixed bug #3851 (Allow transient windows to be above helper windows).
+
 3.4.8:
   * Updated translations: Slovak.
   * Allow windows to change their decorations at any time (Fix for

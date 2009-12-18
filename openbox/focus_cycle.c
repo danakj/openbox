@@ -55,12 +55,8 @@ void focus_cycle_stop(ObClient *ifclient)
     /* stop focus cycling if the given client is a valid focus target,
        and so the cycling is being disrupted */
     if (focus_cycle_target && ifclient &&
-        focus_valid_target(ifclient, TRUE,
-                           focus_cycle_iconic_windows,
-                           focus_cycle_all_desktops,
-                           focus_cycle_dock_windows,
-                           focus_cycle_desktop_windows,
-                           FALSE))
+        (ifclient == focus_cycle_target ||
+         focus_cycle_popup_is_showing(ifclient)))
     {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
         focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);

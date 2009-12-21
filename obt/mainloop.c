@@ -21,10 +21,21 @@
 #include "obt/display.h"
 #include "obt/util.h"
 
+#ifdef HAVE_STDIO_H
 #include <stdio.h>
+#endif
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+#ifdef HAVE_SYS_SELECT_H
 #include <sys/select.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_SIGNAL_H
 #include <signal.h>
+#endif
 
 typedef struct _ObtMainLoopTimer             ObtMainLoopTimer;
 typedef struct _ObtMainLoopSignal            ObtMainLoopSignal;

@@ -145,11 +145,14 @@ osd.bg.colorTo.splitto: #E7E5E4
 
 osd.bg.border.color: #ffffff
 
-osd.label.bg: parentrelative
-osd.label.bg.color: #efefef
-osd.label.bg.border.color: #9c9e9c
+osd.active.label.bg: parentrelative
+osd.active.label.bg.color: #efefef
+osd.active.label.bg.border.color: #9c9e9c
+osd.active.label.text.color: #444
 
-osd.label.text.color: #444
+osd.inactive.label.bg: parentrelative
+osd.inactive.label.text.color: #70747d
+
 !# yeah whatever, this is fine anyhoo?
 osd.hilight.bg: flat vertical gradient 
 osd.hilight.bg.color: #9ebde5

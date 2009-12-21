@@ -57,7 +57,7 @@ void prompt_startup(gboolean reconfig)
     RrColor *c_button, *c_focus, *c_press, *c_pfocus;
 
     /* note: this is not a copy, don't free it */
-    prompt_a_bg = ob_rr_theme->osd_hilite_bg;
+    prompt_a_bg = ob_rr_theme->osd_bg;
 
     prompt_a_button = RrAppearanceCopy(ob_rr_theme->a_focused_unpressed_close);
     prompt_a_focus = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);

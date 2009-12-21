@@ -96,9 +96,12 @@ struct _RrTheme {
     gchar    title_focused_shadow_alpha;
     RrColor *title_unfocused_shadow_color;
     gchar    title_unfocused_shadow_alpha;
-    RrColor *osd_color;
-    RrColor *osd_shadow_color;
-    gchar    osd_shadow_alpha;
+    RrColor *osd_text_active_color;
+    RrColor *osd_text_inactive_color;
+    RrColor *osd_text_active_shadow_color;
+    RrColor *osd_text_inactive_shadow_color;
+    gchar    osd_text_active_shadow_alpha;
+    gchar    osd_text_inactive_shadow_alpha;
     RrColor *menu_title_shadow_color;
     gchar    menu_title_shadow_alpha;
     RrColor *menu_text_normal_shadow_color;
@@ -239,10 +242,11 @@ struct _RrTheme {
     RrAppearance *a_clear;     /* clear with no texture */
     RrAppearance *a_clear_tex; /* clear with a texture */
 
+    RrAppearance *osd_bg; /* can never be parent relative */
     RrAppearance *osd_hilite_bg; /* can never be parent relative */
-    RrAppearance *osd_hilite_fg; /* can never be parent relative */
     RrAppearance *osd_hilite_label; /* can be parent relative */
-    RrAppearance *osd_unhilite_fg; /* can never be parent relative */
+    RrAppearance *osd_unhilite_bg; /* can never be parent relative */
+    RrAppearance *osd_unhilite_label; /* can be parent relative */
 
     gchar *name;
 };

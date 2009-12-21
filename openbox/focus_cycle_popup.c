@@ -124,9 +124,9 @@ void focus_cycle_popup_startup(gboolean reconfig)
     single_popup = icon_popup_new();
 
     popup.obwin.type = OB_WINDOW_CLASS_INTERNAL;
-    popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+    popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_bg);
     popup.a_hilite_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
-    popup.a_text = RrAppearanceCopy(ob_rr_theme->a_unfocused_label);
+    popup.a_text = RrAppearanceCopy(ob_rr_theme->osd_unhilite_label);
     popup.a_icon = RrAppearanceCopy(ob_rr_theme->a_clear);
     popup.a_arrow = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
 
@@ -147,7 +147,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
     RrAppearanceClearTextures(popup.a_arrow);
     popup.a_arrow->texture[0].type = RR_TEXTURE_MASK;
     popup.a_arrow->texture[0].data.mask.color =
-        ob_rr_theme->osd_color;
+        ob_rr_theme->osd_text_active_color;
 
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
@@ -175,11 +175,13 @@ void focus_cycle_popup_startup(gboolean reconfig)
     /* create the hilite under the target icon */
     {
         RrPixel32 color;
+        RrColor *tc;
         gint x, y, o;
 
-        color = ((ob_rr_theme->osd_color->r & 0xff) << RrDefaultRedOffset) +
-            ((ob_rr_theme->osd_color->g & 0xff) << RrDefaultGreenOffset) +
-            ((ob_rr_theme->osd_color->b & 0xff) << RrDefaultBlueOffset);
+        tc = ob_rr_theme->osd_text_active_color;
+        color = ((tc->r & 0xff) << RrDefaultRedOffset) +
+            ((tc->g & 0xff) << RrDefaultGreenOffset) +
+            ((tc->b & 0xff) << RrDefaultBlueOffset);
 
         o = 0;
         for (x = 0; x < HILITE_SIZE; x++)

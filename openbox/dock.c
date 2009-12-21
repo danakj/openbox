@@ -65,7 +65,7 @@ void dock_startup(gboolean reconfig)
         XSetWindowBorderWidth(obt_display, dock->frame, ob_rr_theme->obwidth);
 
         RrAppearanceFree(dock->a_frame);
-        dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+        dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_bg);
 
         stacking_add(DOCK_AS_WINDOW(dock));
 
@@ -98,7 +98,7 @@ void dock_startup(gboolean reconfig)
                                 CWOverrideRedirect | CWEventMask |
                                 CWDontPropagate,
                                 &attrib);
-    dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+    dock->a_frame = RrAppearanceCopy(ob_rr_theme->osd_bg);
     XSetWindowBorder(obt_display, dock->frame,
                      RrColorPixel(ob_rr_theme->osd_border_color));
     XSetWindowBorderWidth(obt_display, dock->frame, ob_rr_theme->obwidth);

@@ -36,7 +36,7 @@ ObPopup *popup_new(void)
     self->obwin.type = OB_WINDOW_CLASS_INTERNAL;
     self->gravity = NorthWestGravity;
     self->x = self->y = self->textw = self->h = 0;
-    self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+    self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_bg);
     self->a_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
     self->iconwm = self->iconhm = 1;
 
@@ -506,8 +506,8 @@ ObPagerPopup *pager_popup_new(void)
 
     self->desks = 0;
     self->wins = g_new(Window, self->desks);
-    self->hilight = RrAppearanceCopy(ob_rr_theme->osd_hilite_fg);
-    self->unhilight = RrAppearanceCopy(ob_rr_theme->osd_unhilite_fg);
+    self->hilight = RrAppearanceCopy(ob_rr_theme->osd_hilite_bg);
+    self->unhilight = RrAppearanceCopy(ob_rr_theme->osd_unhilite_bg);
 
     self->popup->hasicon = TRUE;
     self->popup->draw_icon = pager_popup_draw_icon;

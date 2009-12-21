@@ -220,10 +220,72 @@ static void do_lower(GList *wins)
     }
 }
 
-static GList* get_restack_order(ObClient *selected, gboolean raise)
+/*! Returns a position in the stacking_list, which is the first window
+  from the top down that is in a layer <= the query layer, or NULL if there
+  are no such windows.
+*/
+GList* find_top_of_layer(ObStackingLayer layer)
+{
+    GList *top;
+
+    *top = NULL;
+    /* start from the bottom of the list and go up */
+    for (it = g_list_last(stacking_list); it; it = g_list_previous(it))
+    {
+        if (window_layer(it->data) > layer)
+            break;
+        *top = it;
+    }
+    return top;
+}
+
+static void find_parents_r(ObClient *client, GHashTable *t)
+{
+    GSList *sit;
+    for (sit = client->parents; sit; sit = g_slist_next(sit)) {
+        g_hash_table_insert(t, sit->data, sit->data);
+        find_parents_r(sit->data, t);
+    }
+}
+
+static GList* get_parents(ObClient *client)
+{
+    GHashTable *parents;
+    GList *it, *next, *ret;
+
+    if (!client->parents) return NULL;
+
+    /* collect all the parents */
+
+    parents = g_hash_table_new(g_direct_hash, g_direct_equal);
+    find_parents_r(client, parents);
+
+    /* go through the stacking list and find all the parents, and put them
+       into a list in order */
+    ret = NULL;
+    for (it = g_list_last(stacking_list); it; it = next) {
+        next = g_list_previous(it);
+        if (g_hash_table_lookup(parents, it->data)) {
+            ret = g_list_prepend(ret, it->data);
+            stacking_list = g_list_delete_link(stacking_list, it);
+        }
+    }
+
+    g_hash_table_destroy(parents);
+    return ret;
+}
+
+/*! reorders the windows from the stacking_list, removing them and placing
+  them into some lists.
+  @direct A list of windows directly related to the @selected window, and
+          will contain @selected, ordered from top to bottom.
+  @group_trans A list of windows indirectly related to the @selected window,
+          which should be placed above @direct, ordered from top to bottom.
+*/
+static GList* get_restack_order(ObClient *selected, gboolean raise,
+                                GList **direct, GList **grouped)
 {
     GList *it, *last, *below, *above, *next;
-    GList *wins = NULL;
     ObClient *bottom = NULL;
 
     GList *group_helpers = NULL;
@@ -287,152 +349,112 @@ static GList* get_restack_order(ObClient *selected, gboolean raise)
     }
 
     /* put modals above other direct transients */
-    wins = g_list_concat(modals, trans);
+    *direct = g_list_concat(modals, trans);
 
     /* put helpers below direct transients */
-    wins = g_list_concat(wins, group_helpers);
+    *direct = g_list_concat(*direct, group_helpers);
 
     /* put the selected window right below these children */
-    wins = g_list_append(wins, selected);
+    *direct = g_list_append(*direct, selected);
 
     /* if selected window is transient for group then raise it above others */
     if (selected->transient_for_group) {
         /* if it's modal, raise it above those also */
         if (selected->modal) {
-            wins = g_list_concat(wins, group_modals);
+            *direct = g_list_concat(*direct, group_modals);
             group_modals = NULL;
         }
-        wins = g_list_concat(wins, group_trans);
+        *direct = g_list_concat(*direct, group_trans);
         group_trans = NULL;
     }
 
-    /* find where to put the selected window, start from bottom of list,
-       this is the window below everything we are re-adding to the list */
-    last = NULL;
-    for (it = g_list_last(stacking_list); it; it = g_list_previous(it))
-    {
-        if (window_layer(it->data) < selected->layer) {
-            last = it;
-            continue;
-        }
-        /* if lowering, stop at the beginning of the layer */
-        if (!raise)
-            break;
-        /* if raising, stop at the end of the layer */
-        if (window_layer(it->data) > selected->layer)
-            break;
+    /* if not raising, the selected window can't go below its parents, so
+       put them all in the direct list below it */
+    if (!raise)
+        *direct = g_list_concat(*direct, get_parents(selected));
 
-        last = it;
-    }
+    /* modal group transients go above other group transients */
+    *grouped = g_list_concat(group_modals, group_trans);
+}
 
-    /* save this position in the stacking list */
-    below = last;
+static GList* get_app_windows(ObClient *selected)
+{
+    GList *it, *next, *app;
 
-    /* find where to put the group transients, start from the top of list */
-    for (it = stacking_list; it; it = g_list_next(it)) {
-        /* skip past higher layers */
-        if (window_layer(it->data) > selected->layer)
-            continue;
-        /* if we reach the end of the layer (how?) then don't go further */
-        if (window_layer(it->data) < selected->layer)
-            break;
-        /* stop when we reach the first window in the group */
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *c = it->data;
-            if (c->group == selected->group)
-                break;
-        }
-        /* if we don't hit any other group members, stop here because this
-           is where we are putting the selected window (and its children) */
-        if (it == below)
-            break;
-    }
-
-    /* save this position, this is the top of the group of windows between the
-       group transient ones we're restacking and the others up above that we're
-       restacking
-
-       we actually want to save 1 position _above_ that, for for loops to work
-       nicely, so move back one position in the list while saving it
-    */
-    above = it ? g_list_previous(it) : g_list_last(stacking_list);
-
-    /* put the windows inside the gap to the other windows we're stacking
-       into the restacking list, go from the bottom up so that we can use
-       g_list_prepend */
-    if (below) it = g_list_previous(below);
-    else       it = g_list_last(stacking_list);
-    for (; it != above; it = next) {
+    app = NULL;
+    for (it = g_list_last(stacking_list); it; it = next) {
         next = g_list_previous(it);
-        wins = g_list_prepend(wins, it->data);
-        stacking_list = g_list_delete_link(stacking_list, it);
+
+        if (WINDOW_IS_CLIENT(it->data) &&
+            client_is_in_application(WINDOW_AS_CLIENT(it->data)))
+        {
+            stacking_list = g_list_remove_link(stacking_list, it);
+            app = g_list_concat(it, app);
+        }
     }
-
-    /* group transients go above the rest of the stuff acquired to now */
-    wins = g_list_concat(group_trans, wins);
-    /* group modals go on the very top */
-    wins = g_list_concat(group_modals, wins);
-
-    return wins;
+    return app;
 }
 
 static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
 {
-    GList *wins;
+    GList *wins, *direct, *app_trans, *parents;
     GList *app_members = NULL;
 
+    GList *it, *next, *direct_below, *group_trans_below, *between;
+
     /* get the restacking order for the selected window and its relatives */
-    wins = get_restack_order(selected, raise);
+    get_restack_order(selected, raise, &direct, &app_trans);
 
-    /* if we're lowering the window, then the parents will not be included
-       in the above list.  find all the parents and put them below the windows
-       we have so far */
-    if (!raise && selected->parents) {
-        GSList *parents_copy, *sit;
-        GSList *reorder = NULL;
+    /* stick the selected window and all its direct-relations above this
+       spot */
+    direct_below = find_top_of_layer(raise ?
+                                     selected->layer : selected->layer - 1);
 
-        parents_copy = g_slist_copy(selected->parents);
+    /* WHERE DO THE APP WINDOWS GO EXACTLY???  AND THE GROUP TRANSIENTS?
 
-        /* go thru stacking list backwards so we can use g_slist_prepend */
-        for (it = g_list_last(stacking_list); it && parents_copy;
-             it = g_list_previous(it))
-            if ((sit = g_slist_find(parents_copy, it->data))) {
-                reorder = g_slist_prepend(reorder, sit->data);
-                parents_copy = g_slist_delete_link(parents_copy, sit);
-            }
-        g_assert(parents_copy == NULL);
+    THE BETWEEN WINDOWS ARE BETWEEN WHICH GROUPS OF WINDOWS ? */
 
-        for (sit = reorder; sit; sit = g_slist_next(sit))
-            wins = g_list_concat(wins, get_restack_order(sit->data, FALSE);
-    }
-
-
-    /* collect all other windows in the application in all stacking layers,
-       while preserving their relative stacking order */
     if (app) {
+        app_members = get_app_windows(selected);
+        app_below = direct_below;
+    }
+    else {
+        app_members = NULL;
+        app_below = direct_below;
 
-        /* go thru stacking list backwards so we can use g_list_prepend */
-        for (it = g_list_last(stacking_list); it; it = next) {
-            next = g_list_previous(it);
+        if (selected->group) {
+            /* find the highest member of @selected's group */
+            it = app_below;
+            for (it = g_list_previous(it); it; it = g_list_previous(it))
+                if (window_layer(it->data) > selected->layer)
+                    break;
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *c = WINDOW_AS_CLIENT(it->data);
-                /* find windows in the same application */
-                if ((c->desktop == selected->desktop ||
-                    c->desktop == DESKTOP_ALL ||
-                    (selected->desktop == DESKTOP_ALL &&
-                     c->desktop == screen_destkop))
-                    client_is_in_application(c, selected) &&
-                    window_layer(w) == selected->layer)
-                {
-                    app_members = g_list_prepend(app_members, w);
-                    stacking_list = g_list_delete_link(stacking_list, it);
-                }
+                if (c->group == selected->group)
+                    app_below = it;
             }
         }
     }
 
-    do_restack(wins, below);
+    /* stick the application transients directly above the other left-over
+       application windows */
+    app_members = g_list_concat(app_trans, app_members);
 
+    /* grab all the stuff between app_below and direct_below */
+    between = NULL;
+    for (it = direct_below; it && it != app_below; it = next) {
+        next = g_list_previous(it);
+        stacking_list = g_list_remove_link(stacking_list, it);
+        between = g_list_concat(it, between);
+    }
+
+    /* stick them all together and restack */
+    if (raise)
+        /* app_members, between, direct, below */
+        do_restack(g_list_concat(app_members, g_list_concat(between, direct)),
+                   below);
+    else
+        do_restack(g_list_concat(
 }
 
 void stacking_raise_app(ObClient *client)

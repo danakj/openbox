@@ -21,14 +21,14 @@
 #ifndef __render_h
 #define __render_h
 
-#include "geom.h"
-#include "render/version.h"
-
 #include <X11/Xlib.h> /* some platforms dont include this as needed for Xft */
 #include <pango/pangoxft.h>
 #include <glib.h>
 
 G_BEGIN_DECLS
+
+#include "obrender/geom.h"
+#include "obrender/version.h"
 
 typedef union  _RrTextureData      RrTextureData;
 typedef struct _RrAppearance       RrAppearance;

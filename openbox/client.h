@@ -25,7 +25,7 @@
 #include "geom.h"
 #include "stacking.h"
 #include "window.h"
-#include "render/color.h"
+#include "obrender/color.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>

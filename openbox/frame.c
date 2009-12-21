@@ -28,7 +28,7 @@
 #include "focus_cycle_indicator.h"
 #include "moveresize.h"
 #include "screen.h"
-#include "render/theme.h"
+#include "obrender/theme.h"
 #include "obt/display.h"
 #include "obt/prop.h"
 

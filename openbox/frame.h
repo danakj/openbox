@@ -21,7 +21,7 @@
 #define __frame_h
 
 #include "geom.h"
-#include "render/render.h"
+#include "obrender/render.h"
 
 typedef struct _ObFrame ObFrame;
 

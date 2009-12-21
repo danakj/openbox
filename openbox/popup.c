@@ -25,8 +25,8 @@
 #include "stacking.h"
 #include "event.h"
 #include "screen.h"
-#include "render/render.h"
-#include "render/theme.h"
+#include "obrender/render.h"
+#include "obrender/theme.h"
 
 ObPopup *popup_new(void)
 {

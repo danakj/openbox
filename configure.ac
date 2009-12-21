@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.999.0], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.5.0-rc1], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
@@ -13,15 +13,15 @@ dnl set RR_BINARY_AGE and RR_INTERFACE_AGE to 0.
 dnl
 dnl if MAJOR or MINOR version changes, be sure to change AC_INIT above to match
 dnl
-RR_MAJOR_VERSION=4
-RR_MINOR_VERSION=0
-RR_MICRO_VERSION=17
+RR_MAJOR_VERSION=3
+RR_MINOR_VERSION=5
+RR_MICRO_VERSION=27
 RR_INTERFACE_AGE=0
 RR_BINARY_AGE=0
 RR_VERSION=$RR_MAJOR_VERSION.$RR_MINOR_VERSION
 
-OBT_MAJOR_VERSION=4
-OBT_MINOR_VERSION=0
+OBT_MAJOR_VERSION=3
+OBT_MINOR_VERSION=5
 OBT_MICRO_VERSION=0
 OBT_INTERFACE_AGE=0
 OBT_BINARY_AGE=0
@@ -174,9 +174,9 @@ AC_CONFIG_FILES([
   Makefile
   m4/Makefile
   po/Makefile.in
-  render/obrender-4.0.pc
-  obt/obt-4.0.pc
-  render/version.h
+  obrender/obrender-3.5.pc
+  obt/obt-3.5.pc
+  obrender/version.h
   obt/version.h
 ])
 AC_CONFIG_COMMANDS([doc],

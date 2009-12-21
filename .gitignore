@@ -48,8 +48,8 @@ po/en@boldquot.insert-header
 po/en@quot.insert-header
 po/remove-potcdate.sed
 *.gmo
-render/obrender-4.0.pc
-obt/obt-4.0.pc
+obrender/obrender-3.5.pc
+obt/obt-3.5.pc
 tools/gnome-panel-control/gnome-panel-control
 tools/gdm-control/gdm-control
 tools/obxprop/obxprop

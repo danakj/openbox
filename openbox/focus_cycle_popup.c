@@ -26,7 +26,7 @@
 #include "config.h"
 #include "window.h"
 #include "event.h"
-#include "render/render.h"
+#include "obrender/render.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>

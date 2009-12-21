@@ -32,7 +32,7 @@
 #include "focus.h"
 #include "focus_cycle.h"
 #include "popup.h"
-#include "render/render.h"
+#include "obrender/render.h"
 #include "gettext.h"
 #include "obt/display.h"
 #include "obt/prop.h"

@@ -9,7 +9,7 @@ xsessionsdir    = $(datadir)/xsessions
 gnomewmfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
-rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/render
+rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/obrender
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
 secretbindir    = $(libdir)/openbox
@@ -24,11 +24,11 @@ ACLOCAL_AMFLAGS = -I m4
 INCLUDES = -I.
 
 check_PROGRAMS = \
-	render/rendertest
+	obrender/rendertest
 
 lib_LTLIBRARIES = \
 	obt/libobt.la \
-	render/libobrender.la
+	obrender/libobrender.la
 
 bin_PROGRAMS = \
 	openbox/openbox \
@@ -44,58 +44,58 @@ nodist_bin_SCRIPTS = \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session
 
-## render ##
+## obrender ##
 
-render_rendertest_CPPFLAGS = \
+obrender_rendertest_CPPFLAGS = \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	-DG_LOG_DOMAIN=\"RenderTest\"
-render_rendertest_LDADD = \
+obrender_rendertest_LDADD = \
 	obt/libobt.la \
-	render/libobrender.la \
+	obrender/libobrender.la \
 	$(GLIB_LIBS) \
 	$(PANGO_LIBS) \
 	$(XML_LIBS) \
 	$(X_LIBS)
-render_rendertest_SOURCES = render/test.c
+obrender_rendertest_SOURCES = obrender/test.c
 
-render_libobrender_la_CPPFLAGS = \
+obrender_libobrender_la_CPPFLAGS = \
 	$(X_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
-render_libobrender_la_LDFLAGS = \
+obrender_libobrender_la_LDFLAGS = \
 	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
-render_libobrender_la_LIBADD = \
+obrender_libobrender_la_LIBADD = \
 	obt/libobt.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
-render_libobrender_la_SOURCES = \
+obrender_libobrender_la_SOURCES = \
 	gettext.h \
-	render/color.h \
-	render/color.c \
-	render/font.h \
-	render/font.c \
-	render/geom.h \
-	render/gradient.h \
-	render/gradient.c \
-	render/icon.h \
-	render/image.h \
-	render/image.c \
-	render/imagecache.h \
-	render/imagecache.c \
-	render/instance.h \
-	render/instance.c \
-	render/mask.h \
-	render/mask.c \
-	render/render.h \
-	render/render.c \
-	render/theme.h \
-	render/theme.c
+	obrender/color.h \
+	obrender/color.c \
+	obrender/font.h \
+	obrender/font.c \
+	obrender/geom.h \
+	obrender/gradient.h \
+	obrender/gradient.c \
+	obrender/icon.h \
+	obrender/image.h \
+	obrender/image.c \
+	obrender/imagecache.h \
+	obrender/imagecache.c \
+	obrender/instance.h \
+	obrender/instance.c \
+	obrender/mask.h \
+	obrender/mask.c \
+	obrender/render.h \
+	obrender/render.c \
+	obrender/theme.h \
+	obrender/theme.c
 
 ## obt ##
 
@@ -163,7 +163,7 @@ openbox_openbox_LDADD = \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
-	render/libobrender.la \
+	obrender/libobrender.la \
 	obt/libobt.la
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
@@ -408,16 +408,16 @@ dist_syscrash_theme_DATA= \
 ## public headers ##
 
 rrpubinclude_HEADERS = \
-	render/color.h \
-	render/font.h \
-	render/geom.h \
-	render/gradient.h \
-	render/image.h \
-	render/instance.h \
-	render/mask.h \
-	render/render.h \
-	render/theme.h \
-	render/version.h
+	obrender/color.h \
+	obrender/font.h \
+	obrender/geom.h \
+	obrender/gradient.h \
+	obrender/image.h \
+	obrender/instance.h \
+	obrender/mask.h \
+	obrender/render.h \
+	obrender/theme.h \
+	obrender/version.h
 
 obtpubinclude_HEADERS = \
 	obt/display.h \
@@ -431,8 +431,8 @@ obtpubinclude_HEADERS = \
 	obt/xevent.h
 
 nodist_pkgconfig_DATA = \
-	render/obrender-4.0.pc \
-	obt/obt-4.0.pc
+	obrender/obrender-3.5.pc \
+	obt/obt-3.5.pc
 
 ## data ##
 
@@ -501,9 +501,9 @@ dist_noinst_DATA = \
 	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
-	render/version.h.in \
-	render/obrender-4.0.pc.in \
-	obt/obt-4.0.pc.in \
+	obrender/version.h.in \
+	obrender/obrender-3.5.pc.in \
+	obt/obt-3.5.pc.in \
 	obt/version.h.in \
 	tools/themeupdate/themeupdate.py \
 	tests/hideshow.py \
@@ -560,7 +560,7 @@ CLEANFILES = \
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
 
 distclean-local:
-	for d in . m4 po render parser obt openbox; do \
+	for d in . m4 po obrender parser obt openbox; do \
 		for p in core core.* gmon.out *\~ *.orig *.rej .\#*; do \
 			rm -f "$$d/$$p"; \
 		done \

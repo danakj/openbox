@@ -23,7 +23,7 @@
 #include "config.h"
 #include "grab.h"
 #include "openbox.h"
-#include "render/theme.h"
+#include "obrender/theme.h"
 #include "obt/prop.h"
 
 #define DOCK_EVENT_MASK (ButtonPressMask | ButtonReleaseMask | \

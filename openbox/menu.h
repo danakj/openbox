@@ -21,7 +21,7 @@
 
 #include "window.h"
 #include "geom.h"
-#include "render/render.h"
+#include "obrender/render.h"
 
 #include <glib.h>
 

@@ -1,3 +1,276 @@
+3.5.0-rc1:
+
+3.4.9:
+  * Allow focus to move while inside an Openbox menu, or during an interactive
+    action such as window cycling.
+  * Fixed bug #3717 (Empty dock interfered with move/grow to edge actions).
+  * Fixed bug #4411 (Crash when switching desktops and window cycling).
+  * Fixed bug #4377 (Window resistance against struts).
+  * Fixed bug #4035 (Prevent focus from moving under the mouse after
+    activating a window with an Openbox menu.
+  * Correct the value provided by the _NET_WORKAREA hint, so desktop icons
+    will place across all monitors.
+  * Don't hide submenus immediately when moving through the parent menu.
+    (Resolves request #3762).
+  * Fix for showing Openbox menus with multiple monitors, don't restrict them
+    to the monitor where the mouse is.
+  * Fixed bug #4023 (Allow the user to have multiple keys which perform the
+    same function in Openbox menus/move/resize.  E.g. two keys which are
+    both bound to Escape.
+  * Add a new obprop tool, which can be used to read the _OB_ROLE, _OB_NAME,
+    and _OB_CLASS (as well as any other UTF-8 window properties) off of a
+    window.
+  * Add _OB_ROLE, _OB_NAME, and _OB_CLASS hints on each window that show the
+    respective values for use in the rc.xml applications section, to modify
+    the window when it appears.
+  * Improve Openbox interoperability with gnome-session >= 2.24.
+  * Fixed bug #4040 (Remove desktop hints set by gdm in the openbox-session
+    scripts, so that Openbox can set the number of desktops (assuming
+    gnome-settings-daemon doesn't first)).
+  * Fix a bug in xdg-autostart preventing some .desktop files from working.
+  * Show the desktop pager popup on the primary monitor instead of on all
+    monitors.
+  * Add a new primaryMonitor config option, which is where Openbox popups
+    will appear.  Defaults to a fixed monitor, but can be made to behave as
+    before with the "active" value for it.
+  * Correct edge detection for move/grow to edge to properly use monitor edges
+    for multi-monitor setups.
+  * Change default window placement policy to stay on the active monitor for
+    multi-monitor setups.
+  * Fixed bug #1149 (Crash with some window icon sizes).
+  * Respond to all strut changes, fixes moving/hiding panels.
+  * Fix internal code to focus windows on other desktops correctly (Fixes
+    bug #4413).
+  * Focus correctness fixups for switching desktops.
+  * Fixed bug #4373 (Decoration bug for shaded maximized windows).
+  * Fixed bug #4350 (Allow a window to be made skip_taskbar but still get
+    focused by the user's rc.xml).
+  * Fixed bug #4307 (Set a minimum time for screenEdgeWarpTime).
+  * Fixed bug #4253 (Support for Solaris in openbox-session scripts).
+  * Fixed bug #3851 (Allow transient windows to be above helper windows).
+
+3.4.8:
+  * Updated translations: Slovak.
+  * Allow windows to change their decorations at any time (Fix for
+    Google Chrome).
+  * Make openbox-session to respect the $XDG_CONFIG_HOME environment variable.
+  * Fixed bug #4344 where borders were given to windows that should not have
+    them.
+  * Merge the SessionLogout and Exit actions.  They now test if connected to a
+    session manager and ask it to exit if so, or simply kill Openbox if not.
+  * Further tweaks to the _NET_ACTIVE_WINDOW message handling.  Use the same
+    logic for focus-stealing as is used when mapping a new window.
+  * Don't go out of our way any more to prevent focus from moving while the
+    keyboard is grabbed.
+  * Fix openbox-gnome-session when using gnome-session > 2.22.
+
+3.4.8-rc2:
+  * Updated translations: Italian, Croatian, Ukrainian.
+  * When resizing a window while focus cycling with bar=no, the bar no longer
+    reappears.
+  * Correctly handle shaped windows using the ShapeInput kind, this is used
+    by many composited apps to pass through clicks in their transparent areas.
+  * Fix the <monitor> per-app setting.
+  * Avoid using anonymous unions.
+  * Windows that had their decorations removed by per-app settings were still
+    placed as if they still had their decorations.
+  * Fix event handling not to ignore events on a window when they have an unmap
+    event in the queue, if that unmap event doesn't cause the window to be
+    unmanaged.
+  * Show the desktop switch on every monitor in xinerama.
+  * Fix interpretation of struts in xinerama where the screens have different
+    sizes.
+  * Add "next" and "prev" as possible <monitor> targets in the moveto and
+    resizeto actions.
+  * Allow escaping the _ used to mark the shortcut character in menu labels.
+    You can now change the (first) _ in a label to __, this will be displayed
+    as a single underscore. The rest of the _ in the string will be unaffected,
+    so only double the first one.
+  * Only replace ~ with the home directory when it is preceded by whitespace or
+    is at the start of the string, and when it is followed by a space, slash, or
+    the end of the string. This is implemented with GRegex, and so the required
+    glib version has been bumped to 2.14.
+  * Some other small fixes.
+
+3.4.8-rc1:
+  * Updated translations: Basque, Catalan, Turkish, Italian, Spanish, Russian.
+  * New translations: Danish, Turkish, Lithuanian.
+  * Set the _MOTIF_WM_INFO atom so urxvt uses motif hints for borderless mode.
+  * Properly escape the xml used in session files.
+  * Correct a 64-bit issue related to comparing timestamps.
+  * There is a sneaky sentence right at the end of a big paragraph in the
+    wm-spec document that says windows mapping with _NET_WM_USER_TIME=0 should
+    not be focused initially, honor this request.
+  * When moving a window to another desktop with following on, bring the
+    window's helper windows (for example gimp image windows with the toolbox
+    set to utility window).
+  * Change the _NET_ACTIVE_WINDOW messages again, if they originate from the
+    app and the window is on another desktop, just set the demands_attention
+    flag. If the event came from the user (ie pager/panel), then the window
+    is still moved to the current desktop.
+
+3.4.7.2:
+  * The system I used to generate the dist tarball didn't have the
+    docbook-to-man command so the manpages were empty.
+
+3.4.7.1:
+  * Not to be outdone by the cairo team, I introduced a bug in the last release
+    which made resizing not give any feedback. This is now fixed.
+
+3.4.7:
+  * Fully updated Czech, Simplified Chinese, Traditional Chinese, German,
+    French, Hungarian, Norwegian, Vietnamese, Dutch, Swedish, Finnish,
+    Brazilian Portuguese, Japanese and Portuguese translations
+  * Partially updated Spanish translation
+  * Add an example of the "force" option for the per-app placement options to
+    the default rc.xml file
+  * Add a new xdg-autostart script.  This will eventually end up in the PyXDG
+    distribution hopefully, but it is included in Openbox for now.  This script
+    runs things based on the freedesktop.org autostart specification.  You can
+    have it run GNOME, KDE, ROX, or XFCE specific things if you want.  The
+    new default system-wide autostart.sh script runs it automatically
+  * Update the default menu.xml to include a lot of common apps
+  * Fix white font shadows (negative shadowtint)
+  * Update the autostart.sh to find gnome-settings-daemon correctly, as the
+    GNOME people have moved it to libexec
+  * Fix focus possibly getting stolen when using the Focus action
+  * Drastically speed up rendering of Vertical and SplitVertical gradients
+  * Speed improvements also for Horizonal and Pyramid gradients
+  * Add new theme options, menu.overlap.x and menu.overlap.y options, that let
+    you independently control the horizontal and vertical position of submenus
+  * Change _NET_ACTIVE_WINDOW messages to not change the current desktop, but
+    to bring the window to the current desktop instead.  This is the industry
+    standard policy
+  * Use the pretty new openbox.png icon as the default window icon
+  * Allow matching per-application rules to windows by their window type
+    (normal, dialog, splash, etc).  The default rc.xml has more details
+  * Add new Openbox-themed prompt windows.  Use these prompt windows to ask
+    before killing off windows that aren't responding.  This also means we
+    don't need to ping every window constantly forever
+  * Add a new <prompt> option to the Execute action.  If this is set to a
+    string, a dialog will be shown with that string in it and "yes"/"no"
+    buttons.  The command to be executed will only be run if the user selects
+    "yes" in the dialog
+  * Add a new <prompt> option to the Exit action, which is a boolean (not a
+    string).  When true, Openbox will show a dialog confirming if you want to
+    exit.  The default is to show the prompt
+  * Reduce Openbox's memory footprint and speed up rendering through the use
+    of a new icon cache, so that Openbox only needs to keep 1 copy of an icon
+    when 100 different windows share it
+  * Make Openbox menus have the "menu type" hint for compositors to see and use
+  * Fix the MoveResizeTo action for negative coords (opposite edges)
+  * Fix key bindings getting lost if multiple bindings at the same level could
+    not be translated (Fixes VMWare causing Openbox keybindings to stop
+    working)
+  * Fix the resize popup box for terminal windows with a base size of 0 (show
+    the right size values for urxvt terminals)
+  * Fix some off-by-one bugs with the edge growing/shrinking code
+  * Add new theme options for menu line separators: menu.separator.color,
+    menu.separator.width, menu.separator.padding.width,
+    menu.separator.padding.height
+  * Add xfce-mcs-manager to the default autostart.sh, and run it automatically
+    when gnome-settings-daemon is not present to have GTK apps inherit settings
+    from the XFCE configuration tools
+  * Make the send-to-desktop menu in the client-menu indicate which is the current
+    desktop for omnipresent windows, and don't close it if just toggling
+    omni-presence when ctrl-clicking
+  * Add a new SessionLogout action that logs out through the session manager,
+    when running Openbox within a session manager such as within an
+    GNOME/Openbox or KDE/Openbox session.  The action includes a <prompt>
+    option which is similar to the Exit action's
+  * Add a new gdm-control command that lets you control gdm from within an X
+    session.  The gdm-control lets you change GDM's behaviour for when you end
+    the current session.  For instance, you can tell GDM to reboot, and
+    then immediately log out of the current session, and the computer will be
+    rebooted
+  * Show an information dialog when an error occurs for Openbox, such as when
+    the Execute action fails or when XML syntax errors are present in the
+    configuration files
+  * When making a window very narrow, don't draw buttons to the right of the title
+    on top of the ones on its left.
+
+3.4.6.1:
+  * Updated Clearlooks theme
+  * Add the force="yes/no" option for the per-app settings' <position> tag
+  * Raise and focus modal children and their direct parents together, improved
+    usability with direct modal transient windows
+  * Fix crash when using <raise> for NextWindow and there are no windows
+    to move focus to
+  * Add the <manageDesktops> option in the rc.xml <menu> section, which toggles
+    the "Manage Desktops" section appearing in the combined-client-list-menu
+  * Fix for menu headers showing the wrong text
+  * Fix for the <focusLast> behavior
+  * Treat modal direct children as one window with their parent consistently
+
+3.4.6:
+  * Added Basque translation
+  * Updated French, Vietnamese German, Simplified Chinese, Russian, Portuguese,
+    Brasilian Portuguese, Norwegian, and Finnish translations
+  * New Clearlooks theme, updated by David Barr
+  * Updated the previous Clearlooks theme, and renamed it to Clearlooks-3.4
+  * Allow dialog type windows to go fullscreen (Fixes Kpdf)
+  * Remove the extraneous top border for undecorated windows while maximized
+  * Fixes for keyboard modifiers (Alt-tab dialog getting stuck on screen for
+    some users)
+  * Automatically catch changes to the keyboard map and reconfigure the key
+    bindings on the fly
+  * Fix focus moving incorrectly sometimes with focus under mouse enabled
+  * Make default configuration focus the desktop when you right click
+  * Add the <bar> and <raise> options for all window cycling actions, allowing
+    you to have your target window temporarily raised above all others, and to
+    turn the focus target indicator bar off
+  * Improve the LastDesktop action to not remember desktops you skipped across
+  * Ignore mouse clicks that are made on override-redirect (unmanaged) windows
+  * When opening a menu with a key binding, don't use the key binding to run
+    something in the menu
+  * Add a <monitor> option for window placement, which gives you the option
+    to place new windows on the active monitor, or the monitor where the mouse
+    is, instead of on any monitor (for xinerama multihead setups)
+  * Add options for placing the window move/resize coordinate popup window in
+    a fixed position on screen, rather than relative to the window being
+    moved or resized
+  * Prevent the dock from auto-hiding completely offscreen if the theme has
+    no borders for it
+  * New icon
+  * Fix race condition when running things that want to grab the keyboard
+    (e.g. gnome-panel-control --main-menu)
+  * When dialog windows ask to not appear in the taskbar, still give them focus
+    in normal ways (fixes new GNOME session logout dialogs)
+  * Fix bug with resizing corners on certain parts of the window frame
+  * Ping applications to tell when they are running or have become frozen.
+    Show a [Not Responding] message in the title bar of windows which are
+    frozen.
+  * When closing a window which is [Not Responding], kill the window's process
+    if it is running on the same machine as Openbox.  Otherwise, just
+    disconnect
+    the window from the X display.  A second attempt to close a [Not
+    Responding]
+    window will kill it forcefully (kill -9).
+  * Fixes for internal timers
+  * Add a <wmclass> option for the execute action's startup-notification.  This
+    lets you tell Openbox that the application will map a window with the
+    specified class - for applications that do not support startup-notification
+    natively.
+  * Fix for empty dock taking up space onscreen after a reconfigure
+  * Reduce Openbox's additional memory footprint per-window and per-menu
+  * Faster horizontal gradient rendering
+  * Don't deiconify windows that aren't allowed to be directly iconified on
+    restart (eg toolbars), as they can be iconified by other means
+  * Improve support for fullscreen windows in xinerama (TwinView) and
+    multiple-screen setups
+  * Add a --config-file command line option, to specify an alternate
+    configuration file path
+
+3.4.5:
+  * Added Hungarian translation
+  * Updated Finnish, Russian, German and French translations
+  * Fixed some very minor memory leaks
+  * Hide the desktop popup when showing the focus popup
+  * Fix a crash when trying to access the More... menu of
+    client-list-combined-menu
+  * Fix the coordinate popup only showing up on the first monitor in xinerama
+  * Add --exit to exit the currently running openbox instance
+
 3.4.4:
   * Updated Traditional Chinese translation
   * Updated Norwegian translation

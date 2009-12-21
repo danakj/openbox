@@ -21,8 +21,8 @@
 
 #include "misc.h"
 
-#include "render/render.h"
-#include "render/theme.h"
+#include "obrender/render.h"
+#include "obrender/theme.h"
 #include "obt/mainloop.h"
 #include "obt/display.h"
 

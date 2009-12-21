@@ -20,7 +20,7 @@
 #define __popup_h
 
 #include "window.h"
-#include "render/render.h"
+#include "obrender/render.h"
 #include <glib.h>
 
 struct _ObClientIcon;

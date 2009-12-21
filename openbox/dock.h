@@ -22,7 +22,7 @@
 #include "window.h"
 #include "stacking.h"
 #include "geom.h"
-#include "render/render.h"
+#include "obrender/render.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>

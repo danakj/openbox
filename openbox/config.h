@@ -26,7 +26,7 @@
 #include "client.h"
 #include "geom.h"
 #include "moveresize.h"
-#include "render/render.h"
+#include "obrender/render.h"
 #include "obt/parse.h"
 
 #include <glib.h>

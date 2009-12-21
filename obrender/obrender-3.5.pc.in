@@ -9,6 +9,6 @@ xlibs=@X_LIBS@
 Name: ObRender
 Description: Openbox Render Library
 Version: @RR_VERSION@
-Requires: obt-4.0 glib-2.0 xft pangoxft
+Requires: obt-3.5 glib-2.0 xft pangoxft
 Libs: -L${libdir} -lobrender ${xlibs}
 Cflags: -I${includedir}/openbox/@RR_VERSION@ ${xcflags}

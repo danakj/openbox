@@ -22,7 +22,7 @@
 #include "screen.h"
 #include "client.h"
 #include "framerender.h"
-#include "render/theme.h"
+#include "obrender/theme.h"
 
 static void framerender_label(ObFrame *self, RrAppearance *a);
 static void framerender_icon(ObFrame *self, RrAppearance *a);

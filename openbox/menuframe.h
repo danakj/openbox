@@ -22,7 +22,7 @@
 
 #include "geom.h"
 #include "window.h"
-#include "render/render.h"
+#include "obrender/render.h"
 
 #include <glib.h>
 

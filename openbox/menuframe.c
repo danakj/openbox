@@ -27,7 +27,7 @@
 #include "openbox.h"
 #include "config.h"
 #include "obt/prop.h"
-#include "render/theme.h"
+#include "obrender/theme.h"
 
 #define PADDING 2
 #define MAX_MENU_WIDTH 400

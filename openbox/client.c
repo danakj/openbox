@@ -38,7 +38,7 @@
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
-#include "render/render.h"
+#include "obrender/render.h"
 #include "gettext.h"
 #include "obt/display.h"
 #include "obt/prop.h"

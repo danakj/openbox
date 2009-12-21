@@ -52,7 +52,7 @@ render/obrender-4.0.pc
 obt/obt-4.0.pc
 tools/gnome-panel-control/gnome-panel-control
 tools/gdm-control/gdm-control
-tools/obprop/obprop
+tools/obxprop/obxprop
 version.h
 .libs
 .deps

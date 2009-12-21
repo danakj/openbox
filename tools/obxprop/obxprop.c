@@ -12,7 +12,7 @@ gint fail(const gchar *s) {
     else
         fprintf
             (stderr,
-             "Usage: obprop [OPTIONS]\n\n"
+             "Usage: obxprop [OPTIONS]\n\n"
              "Options:\n"
              "    --help              Display this help and exit\n"
              "    --display DISPLAY   Connect to this X display\n"

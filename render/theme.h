@@ -34,7 +34,8 @@ struct _RrTheme {
     RrFont *win_font_unfocused;
     RrFont *menu_title_font;
     RrFont *menu_font;
-    RrFont *osd_font;
+    RrFont *osd_font_hilite;
+    RrFont *osd_font_unhilite;
 
     /* style settings - geometry */
     gint paddingx;
@@ -257,7 +258,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *theme,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,
-                    RrFont *osd_font);
+                    RrFont *active_osd_font, RrFont *inactive_osd_font);
 void RrThemeFree(RrTheme *theme);
 
 G_END_DECLS

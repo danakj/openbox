@@ -67,7 +67,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                     gboolean allow_fallback,
                     RrFont *active_window_font, RrFont *inactive_window_font,
                     RrFont *menu_title_font, RrFont *menu_item_font,
-                    RrFont *osd_font)
+                    RrFont *active_osd_font, RrFont *inactive_osd_font)
 {
     XrmDatabase db = NULL;
     RrJustify winjust, mtitlejust;
@@ -174,7 +174,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     theme->menu_font = get_font(menu_item_font, &default_font, inst);
 
-    theme->osd_font = get_font(osd_font, &default_font, inst);
+    theme->osd_font_hilite = get_font(active_osd_font, &default_font, inst);
+    theme->osd_font_unhilite = get_font(inactive_osd_font, &default_font,inst);
 
     /* load direct dimensions */
     if ((!read_int(db, "menu.overlap.x", &theme->menu_overlap_x) &&
@@ -926,13 +927,15 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     theme->osd_hilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->osd_hilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    theme->osd_hilite_label->texture[0].data.text.font = theme->osd_font;
+    theme->osd_hilite_label->texture[0].data.text.font =
+        theme->osd_font_hilite;
     theme->osd_hilite_label->texture[0].data.text.color =
         theme->osd_text_active_color;
 
     theme->osd_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->osd_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    theme->osd_unhilite_label->texture[0].data.text.font = theme->osd_font;
+    theme->osd_unhilite_label->texture[0].data.text.font =
+        theme->osd_font_unhilite;
     theme->osd_unhilite_label->texture[0].data.text.color =
         theme->osd_text_inactive_color;
 
@@ -1564,7 +1567,8 @@ void RrThemeFree(RrTheme *theme)
         RrFontClose(theme->win_font_unfocused);
         RrFontClose(theme->menu_title_font);
         RrFontClose(theme->menu_font);
-        RrFontClose(theme->osd_font);
+        RrFontClose(theme->osd_font_hilite);
+        RrFontClose(theme->osd_font_unhilite);
 
         RrAppearanceFree(theme->a_disabled_focused_max);
         RrAppearanceFree(theme->a_disabled_unfocused_max);

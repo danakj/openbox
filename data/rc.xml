@@ -98,7 +98,16 @@
     <slant>normal</slant>
     <!-- 'italic' or 'normal' -->
   </font>
-  <font place="OnScreenDisplay">
+  <font place="ActiveOnScreenDisplay">
+    <name>sans</name>
+    <size>9</size>
+    <!-- font size in points -->
+    <weight>bold</weight>
+    <!-- 'bold' or 'normal' -->
+    <slant>normal</slant>
+    <!-- 'italic' or 'normal' -->
+  </font>
+  <font place="InactiveOnScreenDisplay">
     <name>sans</name>
     <size>9</size>
     <!-- font size in points -->

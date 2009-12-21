@@ -57,7 +57,8 @@ RrFont *config_font_activewindow;
 RrFont *config_font_inactivewindow;
 RrFont *config_font_menuitem;
 RrFont *config_font_menutitle;
-RrFont *config_font_osd;
+RrFont *config_font_activeosd;
+RrFont *config_font_inactiveosd;
 
 guint   config_desktops_num;
 GSList *config_desktops_names;
@@ -605,8 +606,12 @@ static void parse_theme(xmlNodePtr node, gpointer d)
             font = &config_font_menutitle;
         else if (obt_parse_attr_contains(n, "place", "MenuItem"))
             font = &config_font_menuitem;
+        else if (obt_parse_attr_contains(n, "place", "ActiveOnScreenDisplay"))
+            font = &config_font_activeosd;
         else if (obt_parse_attr_contains(n, "place", "OnScreenDisplay"))
-            font = &config_font_osd;
+            font = &config_font_activeosd;
+        else if (obt_parse_attr_contains(n, "place","InactiveOnScreenDisplay"))
+            font = &config_font_inactiveosd;
         else
             goto next_font;
 
@@ -1036,7 +1041,8 @@ void config_shutdown(void)
     RrFontClose(config_font_inactivewindow);
     RrFontClose(config_font_menuitem);
     RrFontClose(config_font_menutitle);
-    RrFontClose(config_font_osd);
+    RrFontClose(config_font_activeosd);
+    RrFontClose(config_font_inactiveosd);
 
     for (it = config_desktops_names; it; it = g_slist_next(it))
         g_free(it->data);

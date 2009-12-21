@@ -277,6 +277,13 @@ gboolean obt_parse_load_mem(ObtParseInst *i,
     return r;
 }
 
+gboolean obt_parse_save_file(ObtParseInst *inst,
+                             const gchar *path,
+                             gboolean pretty)
+{
+    return xmlSaveFormatFile(path, inst->doc, pretty) != -1;
+}
+
 void obt_parse_close(ObtParseInst *i)
 {
     if (i && i->doc) {

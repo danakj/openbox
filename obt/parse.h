@@ -51,6 +51,10 @@ gboolean obt_parse_load_theme_file(ObtParseInst *inst,
 gboolean obt_parse_load_mem(ObtParseInst *inst,
                             gpointer data, guint len, const gchar *root_node);
 
+gboolean obt_parse_save_file(ObtParseInst *inst,
+                             const gchar *path,
+                             gboolean pretty);
+
 xmlDocPtr obt_parse_doc(ObtParseInst *inst);
 xmlNodePtr obt_parse_root(ObtParseInst *inst);
 

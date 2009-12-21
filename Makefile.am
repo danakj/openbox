@@ -129,8 +129,8 @@ obt_libobt_la_SOURCES = \
 	obt/keyboard.c \
 	obt/mainloop.h \
 	obt/mainloop.c \
-	obt/parse.h \
-	obt/parse.c \
+	obt/xml.h \
+	obt/xml.c \
 	obt/paths.h \
 	obt/paths.c \
 	obt/prop.h \
@@ -423,7 +423,7 @@ obtpubinclude_HEADERS = \
 	obt/display.h \
 	obt/keyboard.h \
 	obt/mainloop.h \
-	obt/parse.h \
+	obt/xml.h \
 	obt/paths.h \
 	obt/prop.h \
 	obt/util.h \

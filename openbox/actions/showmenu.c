@@ -22,8 +22,8 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_new0(Options, 1);
 
-    if ((n = obt_parse_find_node(node, "menu")))
-        o->name = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "menu")))
+        o->name = obt_xml_node_string(n);
     return o;
 }
 

@@ -48,7 +48,7 @@
 #include "obt/display.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
-#include "obt/parse.h"
+#include "obt/xml.h"
 
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
@@ -226,11 +226,11 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_SPACE] = obt_keyboard_keysym_to_keycode(XK_space);
 
             {
-                ObtParseInst *i;
+                ObtXmlInst *i;
 
                 /* startup the parsing so everything can register sections
                    of the rc */
-                i = obt_parse_instance_new();
+                i = obt_xml_instance_new();
 
                 /* register all the available actions */
                 actions_startup(reconfigure);
@@ -239,12 +239,12 @@ gint main(gint argc, gchar **argv)
 
                 /* parse/load user options */
                 if ((config_file &&
-                     obt_parse_load_file(i, config_file, "openbox_config")) ||
-                    obt_parse_load_config_file(i, "openbox", "rc.xml",
-                                               "openbox_config"))
+                     obt_xml_load_file(i, config_file, "openbox_config")) ||
+                    obt_xml_load_config_file(i, "openbox", "rc.xml",
+                                             "openbox_config"))
                 {
-                    obt_parse_tree_from_root(i);
-                    obt_parse_close(i);
+                    obt_xml_tree_from_root(i);
+                    obt_xml_close(i);
                 }
                 else {
                     g_message(_("Unable to find a valid config file, using some simple defaults"));
@@ -263,7 +263,7 @@ gint main(gint argc, gchar **argv)
                     OBT_PROP_ERASE(obt_root(ob_screen), OB_CONFIG_FILE);
 
                 /* we're done with parsing now, kill it */
-                obt_parse_instance_unref(i);
+                obt_xml_instance_unref(i);
             }
 
             /* load the theme specified in the rc file */

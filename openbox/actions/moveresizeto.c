@@ -38,7 +38,7 @@ void action_moveresizeto_startup(void)
 static void parse_coord(xmlNodePtr n, gint *pos,
                         gboolean *opposite, gboolean *center)
 {
-    gchar *s = obt_parse_node_string(n);
+    gchar *s = obt_xml_node_string(n);
     if (g_ascii_strcasecmp(s, "current") != 0) {
         if (!g_ascii_strcasecmp(s, "center"))
             *center = TRUE;
@@ -66,27 +66,27 @@ static gpointer setup_func(xmlNodePtr node)
     o->h = G_MININT;
     o->monitor = CURRENT_MONITOR;
 
-    if ((n = obt_parse_find_node(node, "x")))
+    if ((n = obt_xml_find_node(node, "x")))
         parse_coord(n, &o->x, &o->xopposite, &o->xcenter);
 
-    if ((n = obt_parse_find_node(node, "y")))
+    if ((n = obt_xml_find_node(node, "y")))
         parse_coord(n, &o->y, &o->yopposite, &o->ycenter);
 
-    if ((n = obt_parse_find_node(node, "width"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "width"))) {
+        gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->w = obt_parse_node_int(n);
+            o->w = obt_xml_node_int(n);
         g_free(s);
     }
-    if ((n = obt_parse_find_node(node, "height"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "height"))) {
+        gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->h = obt_parse_node_int(n);
+            o->h = obt_xml_node_int(n);
         g_free(s);
     }
 
-    if ((n = obt_parse_find_node(node, "monitor"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "monitor"))) {
+        gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
@@ -95,7 +95,7 @@ static gpointer setup_func(xmlNodePtr node)
             else if(!g_ascii_strcasecmp(s, "prev"))
                 o->monitor = PREV_MONITOR;
             else
-                o->monitor = obt_parse_node_int(n) - 1;
+                o->monitor = obt_xml_node_int(n) - 1;
         }
         g_free(s);
     }

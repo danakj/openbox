@@ -25,8 +25,8 @@ static gpointer setup_func(xmlNodePtr node)
     o = g_new0(Options, 1);
     o->prompt = TRUE;
 
-    if ((n = obt_parse_find_node(node, "prompt")))
-        o->prompt = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "prompt")))
+        o->prompt = obt_xml_node_bool(n);
 
     return o;
 }

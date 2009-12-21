@@ -67,33 +67,33 @@ static gpointer setup_func(xmlNodePtr node,
     o->bar = TRUE;
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
 
-    if ((n = obt_parse_find_node(node, "linear")))
-        o->linear = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "dialog"))) {
-        if (obt_parse_node_contains(n, "none"))
+    if ((n = obt_xml_find_node(node, "linear")))
+        o->linear = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "dialog"))) {
+        if (obt_xml_node_contains(n, "none"))
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
-        else if (obt_parse_node_contains(n, "icons"))
+        else if (obt_xml_node_contains(n, "icons"))
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }
-    if ((n = obt_parse_find_node(node, "bar")))
-        o->bar = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "raise")))
-        o->raise = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "panels")))
-        o->dock_windows = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "desktop")))
-        o->desktop_windows = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "allDesktops")))
-        o->all_desktops = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "bar")))
+        o->bar = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "raise")))
+        o->raise = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "panels")))
+        o->dock_windows = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "desktop")))
+        o->desktop_windows = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "allDesktops")))
+        o->all_desktops = obt_xml_node_bool(n);
 
-    if ((n = obt_parse_find_node(node, "finalactions"))) {
+    if ((n = obt_xml_find_node(node, "finalactions"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->children, "action");
+        m = obt_xml_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->actions = g_slist_append(o->actions, action);
-            m = obt_parse_find_node(m->next, "action");
+            m = obt_xml_find_node(m->next, "action");
         }
     }
     else {

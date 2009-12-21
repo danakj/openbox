@@ -43,27 +43,27 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_new0(Options, 1);
 
-    if ((n = obt_parse_find_node(node, "command")) ||
-        (n = obt_parse_find_node(node, "execute")))
+    if ((n = obt_xml_find_node(node, "command")) ||
+        (n = obt_xml_find_node(node, "execute")))
     {
-        gchar *s = obt_parse_node_string(n);
+        gchar *s = obt_xml_node_string(n);
         o->cmd = obt_paths_expand_tilde(s);
         g_free(s);
     }
 
-    if ((n = obt_parse_find_node(node, "prompt")))
-        o->prompt = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "prompt")))
+        o->prompt = obt_xml_node_string(n);
 
-    if ((n = obt_parse_find_node(node, "startupnotify"))) {
+    if ((n = obt_xml_find_node(node, "startupnotify"))) {
         xmlNodePtr m;
-        if ((m = obt_parse_find_node(n->children, "enabled")))
-            o->sn = obt_parse_node_bool(m);
-        if ((m = obt_parse_find_node(n->children, "name")))
-            o->sn_name = obt_parse_node_string(m);
-        if ((m = obt_parse_find_node(n->children, "icon")))
-            o->sn_icon = obt_parse_node_string(m);
-        if ((m = obt_parse_find_node(n->children, "wmclass")))
-            o->sn_wmclass = obt_parse_node_string(m);
+        if ((m = obt_xml_find_node(n->children, "enabled")))
+            o->sn = obt_xml_node_bool(m);
+        if ((m = obt_xml_find_node(n->children, "name")))
+            o->sn_name = obt_xml_node_string(m);
+        if ((m = obt_xml_find_node(n->children, "icon")))
+            o->sn_icon = obt_xml_node_string(m);
+        if ((m = obt_xml_find_node(n->children, "wmclass")))
+            o->sn_wmclass = obt_xml_node_string(m);
     }
     return o;
 }

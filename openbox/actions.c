@@ -208,7 +208,7 @@ ObActionsAct* actions_parse(xmlNodePtr node)
     gchar *name;
     ObActionsAct *act = NULL;
 
-    if (obt_parse_attr_string(node, "name", &name)) {
+    if (obt_xml_attr_string(node, "name", &name)) {
         if ((act = actions_build_act_from_string(name))) {
             /* there is more stuff to parse here */
             if (act->def->canbeinteractive) {

@@ -41,8 +41,8 @@ static gpointer setup_func(xmlNodePtr node)
     o->dir = OB_DIRECTION_NORTH;
     o->shrink = FALSE;
 
-    if ((n = obt_parse_find_node(node, "direction"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "direction"))) {
+        gchar *s = obt_xml_node_string(n);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->dir = OB_DIRECTION_NORTH;

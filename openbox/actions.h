@@ -18,7 +18,7 @@
 
 #include "misc.h"
 #include "frame.h"
-#include "obt/parse.h"
+#include "obt/xml.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>

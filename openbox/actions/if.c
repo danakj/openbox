@@ -39,61 +39,61 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_new0(Options, 1);
 
-    if ((n = obt_parse_find_node(node, "shaded"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "shaded"))) {
+        if (obt_xml_node_bool(n))
             o->shaded_on = TRUE;
         else
             o->shaded_off = TRUE;
     }
-    if ((n = obt_parse_find_node(node, "maximized"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "maximized"))) {
+        if (obt_xml_node_bool(n))
             o->maxfull_on = TRUE;
         else
             o->maxfull_off = TRUE;
     }
-    if ((n = obt_parse_find_node(node, "maximizedhorizontal"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "maximizedhorizontal"))) {
+        if (obt_xml_node_bool(n))
             o->maxhorz_on = TRUE;
         else
             o->maxhorz_off = TRUE;
     }
-    if ((n = obt_parse_find_node(node, "maximizedvertical"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "maximizedvertical"))) {
+        if (obt_xml_node_bool(n))
             o->maxvert_on = TRUE;
         else
             o->maxvert_off = TRUE;
     }
-    if ((n = obt_parse_find_node(node, "iconified"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "iconified"))) {
+        if (obt_xml_node_bool(n))
             o->iconic_on = TRUE;
         else
             o->iconic_off = TRUE;
     }
-    if ((n = obt_parse_find_node(node, "focused"))) {
-        if (obt_parse_node_bool(n))
+    if ((n = obt_xml_find_node(node, "focused"))) {
+        if (obt_xml_node_bool(n))
             o->focused = TRUE;
         else
             o->unfocused = TRUE;
     }
 
-    if ((n = obt_parse_find_node(node, "then"))) {
+    if ((n = obt_xml_find_node(node, "then"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->children, "action");
+        m = obt_xml_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->thenacts = g_slist_append(o->thenacts, action);
-            m = obt_parse_find_node(m->next, "action");
+            m = obt_xml_find_node(m->next, "action");
         }
     }
-    if ((n = obt_parse_find_node(node, "else"))) {
+    if ((n = obt_xml_find_node(node, "else"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->children, "action");
+        m = obt_xml_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->elseacts = g_slist_append(o->elseacts, action);
-            m = obt_parse_find_node(m->next, "action");
+            m = obt_xml_find_node(m->next, "action");
         }
     }
 

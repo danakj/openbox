@@ -27,7 +27,7 @@
 #include "geom.h"
 #include "moveresize.h"
 #include "obrender/render.h"
-#include "obt/parse.h"
+#include "obt/xml.h"
 
 #include <glib.h>
 
@@ -200,7 +200,7 @@ extern GSList *config_menu_files;
 /*! Per app settings */
 extern GSList *config_per_app_settings;
 
-void config_startup(ObtParseInst *i);
+void config_startup(ObtXmlInst *i);
 void config_shutdown(void);
 
 /*! Create an ObAppSettings structure with the default values */

@@ -154,7 +154,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
 
 static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 {
-    gchar *s = obt_parse_node_string(node);
+    gchar *s = obt_xml_node_string(node);
     if (!g_ascii_strcasecmp(s, "center"))
         c->center = TRUE;
     else {
@@ -198,7 +198,7 @@ static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 */
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
-    xmlNodePtr app = obt_parse_find_node(node->children, "application");
+    xmlNodePtr app = obt_xml_find_node(node->children, "application");
     gchar *name = NULL, *class = NULL, *role = NULL, *type = NULL;
     gboolean name_set, class_set, type_set;
     gboolean x_pos_given;
@@ -206,9 +206,9 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
     while (app) {
         x_pos_given = FALSE;
 
-        class_set = obt_parse_attr_string(app, "class", &class);
-        name_set = obt_parse_attr_string(app, "name", &name);
-        type_set = obt_parse_attr_string(app, "type", &type);
+        class_set = obt_xml_attr_string(app, "class", &class);
+        name_set = obt_xml_attr_string(app, "name", &name);
+        type_set = obt_xml_attr_string(app, "type", &type);
         if (class_set || name_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
@@ -238,55 +238,55 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     settings->type = OB_CLIENT_TYPE_DESKTOP;
             }
 
-            if (obt_parse_attr_string(app, "role", &role))
+            if (obt_xml_attr_string(app, "role", &role))
                 settings->role = g_pattern_spec_new(role);
 
-            if ((n = obt_parse_find_node(app->children, "decor")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->decor = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "decor")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->decor = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "shade")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->shade = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "shade")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->shade = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "position"))) {
-                if ((c = obt_parse_find_node(n->children, "x")))
-                    if (!obt_parse_node_contains(c, "default")) {
+            if ((n = obt_xml_find_node(app->children, "position"))) {
+                if ((c = obt_xml_find_node(n->children, "x")))
+                    if (!obt_xml_node_contains(c, "default")) {
                         config_parse_gravity_coord(c, &settings->position.x);
                         x_pos_given = TRUE;
                     }
 
-                if (x_pos_given && (c = obt_parse_find_node(n->children, "y")))
-                    if (!obt_parse_node_contains(c, "default")) {
+                if (x_pos_given && (c = obt_xml_find_node(n->children, "y")))
+                    if (!obt_xml_node_contains(c, "default")) {
                         config_parse_gravity_coord(c, &settings->position.y);
                         settings->pos_given = TRUE;
                     }
 
                 if (settings->pos_given &&
-                    (c = obt_parse_find_node(n->children, "monitor")))
-                    if (!obt_parse_node_contains(c, "default")) {
-                        gchar *s = obt_parse_node_string(c);
+                    (c = obt_xml_find_node(n->children, "monitor")))
+                    if (!obt_xml_node_contains(c, "default")) {
+                        gchar *s = obt_xml_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))
                             settings->monitor = 0;
                         else
-                            settings->monitor = obt_parse_node_int(c);
+                            settings->monitor = obt_xml_node_int(c);
                         g_free(s);
                     }
 
-                obt_parse_attr_bool(n, "force", &settings->pos_force);
+                obt_xml_attr_bool(n, "force", &settings->pos_force);
             }
 
-            if ((n = obt_parse_find_node(app->children, "focus")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->focus = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "focus")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->focus = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "desktop"))) {
-                if (!obt_parse_node_contains(n, "default")) {
-                    gchar *s = obt_parse_node_string(n);
+            if ((n = obt_xml_find_node(app->children, "desktop"))) {
+                if (!obt_xml_node_contains(n, "default")) {
+                    gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "all"))
                         settings->desktop = DESKTOP_ALL;
                     else {
-                        gint i = obt_parse_node_int(n);
+                        gint i = obt_xml_node_int(n);
                         if (i > 0)
                             settings->desktop = i;
                     }
@@ -294,9 +294,9 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 }
             }
 
-            if ((n = obt_parse_find_node(app->children, "layer")))
-                if (!obt_parse_node_contains(n, "default")) {
-                    gchar *s = obt_parse_node_string(n);
+            if ((n = obt_xml_find_node(app->children, "layer")))
+                if (!obt_xml_node_contains(n, "default")) {
+                    gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "above"))
                         settings->layer = 1;
                     else if (!g_ascii_strcasecmp(s, "below"))
@@ -306,25 +306,25 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     g_free(s);
                 }
 
-            if ((n = obt_parse_find_node(app->children, "iconic")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->iconic = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "iconic")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->iconic = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "skip_pager")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->skip_pager = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "skip_pager")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->skip_pager = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "skip_taskbar")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->skip_taskbar = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "skip_taskbar")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->skip_taskbar = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "fullscreen")))
-                if (!obt_parse_node_contains(n, "default"))
-                    settings->fullscreen = obt_parse_node_bool(n);
+            if ((n = obt_xml_find_node(app->children, "fullscreen")))
+                if (!obt_xml_node_contains(n, "default"))
+                    settings->fullscreen = obt_xml_node_bool(n);
 
-            if ((n = obt_parse_find_node(app->children, "maximized")))
-                if (!obt_parse_node_contains(n, "default")) {
-                    gchar *s = obt_parse_node_string(n);
+            if ((n = obt_xml_find_node(app->children, "maximized")))
+                if (!obt_xml_node_contains(n, "default")) {
+                    gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "horizontal")) {
                         settings->max_horz = TRUE;
                         settings->max_vert = FALSE;
@@ -333,7 +333,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                         settings->max_vert = TRUE;
                     } else
                         settings->max_horz = settings->max_vert =
-                            obt_parse_node_bool(n);
+                            obt_xml_node_bool(n);
                     g_free(s);
                 }
 
@@ -345,7 +345,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             name = class = role = NULL;
         }
 
-        app = obt_parse_find_node(app->next, "application");
+        app = obt_xml_find_node(app->next, "application");
     }
 }
 
@@ -365,27 +365,27 @@ static void parse_key(xmlNodePtr node, GList *keylist)
     xmlNodePtr n;
     gboolean is_chroot = FALSE;
 
-    if (!obt_parse_attr_string(node, "key", &key))
+    if (!obt_xml_attr_string(node, "key", &key))
         return;
 
-    obt_parse_attr_bool(node, "chroot", &is_chroot);
+    obt_xml_attr_bool(node, "chroot", &is_chroot);
 
     keylist = g_list_append(keylist, key);
 
-    if ((n = obt_parse_find_node(node->children, "keybind"))) {
+    if ((n = obt_xml_find_node(node->children, "keybind"))) {
         while (n) {
             parse_key(n, keylist);
-            n = obt_parse_find_node(n->next, "keybind");
+            n = obt_xml_find_node(n->next, "keybind");
         }
     }
-    else if ((n = obt_parse_find_node(node->children, "action"))) {
+    else if ((n = obt_xml_find_node(node->children, "action"))) {
         while (n) {
             ObActionsAct *action;
 
             action = actions_parse(n);
             if (action)
                 keyboard_bind(keylist, action);
-            n = obt_parse_find_node(n->next, "action");
+            n = obt_xml_find_node(n->next, "action");
         }
     }
 
@@ -403,17 +403,17 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
     keyboard_unbind_all();
 
-    if ((n = obt_parse_find_node(node->children, "chainQuitKey"))) {
-        key = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node->children, "chainQuitKey"))) {
+        key = obt_xml_node_string(n);
         translate_key(key, &config_keyboard_reset_state,
                       &config_keyboard_reset_keycode);
         g_free(key);
     }
 
-    if ((n = obt_parse_find_node(node->children, "keybind")))
+    if ((n = obt_xml_find_node(node->children, "keybind")))
         while (n) {
             parse_key(n, NULL);
-            n = obt_parse_find_node(n->next, "keybind");
+            n = obt_xml_find_node(n->next, "keybind");
         }
 }
 
@@ -438,53 +438,53 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "dragThreshold")))
-        config_mouse_threshold = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "doubleClickTime")))
-        config_mouse_dclicktime = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "screenEdgeWarpTime"))) {
-        config_mouse_screenedgetime = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "dragThreshold")))
+        config_mouse_threshold = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "doubleClickTime")))
+        config_mouse_dclicktime = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "screenEdgeWarpTime"))) {
+        config_mouse_screenedgetime = obt_xml_node_int(n);
         /* minimum value of 25 for this property, when it is 1 and you hit the
            edge it basically never stops */
         if (config_mouse_screenedgetime && config_mouse_screenedgetime < 25)
             config_mouse_screenedgetime = 25;
     }
 
-    n = obt_parse_find_node(node, "context");
+    n = obt_xml_find_node(node, "context");
     while (n) {
-        if (!obt_parse_attr_string(n, "name", &contextstr))
+        if (!obt_xml_attr_string(n, "name", &contextstr))
             goto next_n;
-        nbut = obt_parse_find_node(n->children, "mousebind");
+        nbut = obt_xml_find_node(n->children, "mousebind");
         while (nbut) {
-            if (!obt_parse_attr_string(nbut, "button", &buttonstr))
+            if (!obt_xml_attr_string(nbut, "button", &buttonstr))
                 goto next_nbut;
-            if (obt_parse_attr_contains(nbut, "action", "press")) {
+            if (obt_xml_attr_contains(nbut, "action", "press")) {
                 mact = OB_MOUSE_ACTION_PRESS;
-            } else if (obt_parse_attr_contains(nbut, "action", "release")) {
+            } else if (obt_xml_attr_contains(nbut, "action", "release")) {
                 mact = OB_MOUSE_ACTION_RELEASE;
-            } else if (obt_parse_attr_contains(nbut, "action", "click")) {
+            } else if (obt_xml_attr_contains(nbut, "action", "click")) {
                 mact = OB_MOUSE_ACTION_CLICK;
-            } else if (obt_parse_attr_contains(nbut, "action","doubleclick")) {
+            } else if (obt_xml_attr_contains(nbut, "action","doubleclick")) {
                 mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
-            } else if (obt_parse_attr_contains(nbut, "action", "drag")) {
+            } else if (obt_xml_attr_contains(nbut, "action", "drag")) {
                 mact = OB_MOUSE_ACTION_MOTION;
             } else
                 goto next_nbut;
-            nact = obt_parse_find_node(nbut->children, "action");
+            nact = obt_xml_find_node(nbut->children, "action");
             while (nact) {
                 ObActionsAct *action;
 
                 if ((action = actions_parse(nact)))
                     mouse_bind(buttonstr, contextstr, mact, action);
-                nact = obt_parse_find_node(nact->next, "action");
+                nact = obt_xml_find_node(nact->next, "action");
             }
             g_free(buttonstr);
         next_nbut:
-            nbut = obt_parse_find_node(nbut->next, "mousebind");
+            nbut = obt_xml_find_node(nbut->next, "mousebind");
         }
         g_free(contextstr);
     next_n:
-        n = obt_parse_find_node(n->next, "context");
+        n = obt_xml_find_node(n->next, "context");
     }
 }
 
@@ -494,20 +494,20 @@ static void parse_focus(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "focusNew")))
-        config_focus_new = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "followMouse")))
-        config_focus_follow = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "focusDelay")))
-        config_focus_delay = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "raiseOnFocus")))
-        config_focus_raise = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "focusLast")))
-        config_focus_last = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "underMouse")))
-        config_focus_under_mouse = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "unfocusOnLeave")))
-        config_unfocus_leave = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "focusNew")))
+        config_focus_new = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "followMouse")))
+        config_focus_follow = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "focusDelay")))
+        config_focus_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "raiseOnFocus")))
+        config_focus_raise = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "focusLast")))
+        config_focus_last = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "underMouse")))
+        config_focus_under_mouse = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "unfocusOnLeave")))
+        config_unfocus_leave = obt_xml_node_bool(n);
 }
 
 static void parse_placement(xmlNodePtr node, gpointer d)
@@ -516,21 +516,21 @@ static void parse_placement(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "policy")))
-        if (obt_parse_node_contains(n, "UnderMouse"))
+    if ((n = obt_xml_find_node(node, "policy")))
+        if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
-    if ((n = obt_parse_find_node(node, "center")))
-        config_place_center = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "monitor"))) {
-        if (obt_parse_node_contains(n, "active"))
+    if ((n = obt_xml_find_node(node, "center")))
+        config_place_center = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "monitor"))) {
+        if (obt_xml_node_contains(n, "active"))
             config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
-        else if (obt_parse_node_contains(n, "mouse"))
+        else if (obt_xml_node_contains(n, "mouse"))
             config_place_monitor = OB_PLACE_MONITOR_MOUSE;
     }
-    if ((n = obt_parse_find_node(node, "primaryMonitor"))) {
-        config_primary_monitor_index = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "primaryMonitor"))) {
+        config_primary_monitor_index = obt_xml_node_int(n);
         if (!config_primary_monitor_index) {
-            if (obt_parse_node_contains(n, "mouse"))
+            if (obt_xml_node_contains(n, "mouse"))
                 config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
         }
     }
@@ -542,14 +542,14 @@ static void parse_margins(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "top")))
-        config_margins.top = MAX(0, obt_parse_node_int(n));
-    if ((n = obt_parse_find_node(node, "left")))
-        config_margins.left = MAX(0, obt_parse_node_int(n));
-    if ((n = obt_parse_find_node(node, "right")))
-        config_margins.right = MAX(0, obt_parse_node_int(n));
-    if ((n = obt_parse_find_node(node, "bottom")))
-        config_margins.bottom = MAX(0, obt_parse_node_int(n));
+    if ((n = obt_xml_find_node(node, "top")))
+        config_margins.top = MAX(0, obt_xml_node_int(n));
+    if ((n = obt_xml_find_node(node, "left")))
+        config_margins.left = MAX(0, obt_xml_node_int(n));
+    if ((n = obt_xml_find_node(node, "right")))
+        config_margins.right = MAX(0, obt_xml_node_int(n));
+    if ((n = obt_xml_find_node(node, "bottom")))
+        config_margins.bottom = MAX(0, obt_xml_node_int(n));
 }
 
 static void parse_theme(xmlNodePtr node, gpointer d)
@@ -558,38 +558,38 @@ static void parse_theme(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "name"))) {
+    if ((n = obt_xml_find_node(node, "name"))) {
         gchar *c;
 
         g_free(config_theme);
-        c = obt_parse_node_string(n);
+        c = obt_xml_node_string(n);
         config_theme = obt_paths_expand_tilde(c);
         g_free(c);
     }
-    if ((n = obt_parse_find_node(node, "titleLayout"))) {
+    if ((n = obt_xml_find_node(node, "titleLayout"))) {
         gchar *c, *d;
 
         g_free(config_title_layout);
-        config_title_layout = obt_parse_node_string(n);
+        config_title_layout = obt_xml_node_string(n);
 
         /* replace duplicates with spaces */
         for (c = config_title_layout; *c != '\0'; ++c)
             for (d = c+1; *d != '\0'; ++d)
                 if (*c == *d) *d = ' ';
     }
-    if ((n = obt_parse_find_node(node, "keepBorder")))
-        config_theme_keepborder = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "animateIconify")))
-        config_animate_iconify = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "windowListIconSize"))) {
-        config_theme_window_list_icon_size = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "keepBorder")))
+        config_theme_keepborder = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "animateIconify")))
+        config_animate_iconify = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "windowListIconSize"))) {
+        config_theme_window_list_icon_size = obt_xml_node_int(n);
         if (config_theme_window_list_icon_size < 16)
             config_theme_window_list_icon_size = 16;
         else if (config_theme_window_list_icon_size > 96)
             config_theme_window_list_icon_size = 96;
     }
 
-    n = obt_parse_find_node(node, "font");
+    n = obt_xml_find_node(node, "font");
     while (n) {
         xmlNodePtr   fnode;
         RrFont     **font;
@@ -598,39 +598,39 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         RrFontWeight weight = RrDefaultFontWeight;
         RrFontSlant  slant = RrDefaultFontSlant;
 
-        if (obt_parse_attr_contains(n, "place", "ActiveWindow"))
+        if (obt_xml_attr_contains(n, "place", "ActiveWindow"))
             font = &config_font_activewindow;
-        else if (obt_parse_attr_contains(n, "place", "InactiveWindow"))
+        else if (obt_xml_attr_contains(n, "place", "InactiveWindow"))
             font = &config_font_inactivewindow;
-        else if (obt_parse_attr_contains(n, "place", "MenuHeader"))
+        else if (obt_xml_attr_contains(n, "place", "MenuHeader"))
             font = &config_font_menutitle;
-        else if (obt_parse_attr_contains(n, "place", "MenuItem"))
+        else if (obt_xml_attr_contains(n, "place", "MenuItem"))
             font = &config_font_menuitem;
-        else if (obt_parse_attr_contains(n, "place", "ActiveOnScreenDisplay"))
+        else if (obt_xml_attr_contains(n, "place", "ActiveOnScreenDisplay"))
             font = &config_font_activeosd;
-        else if (obt_parse_attr_contains(n, "place", "OnScreenDisplay"))
+        else if (obt_xml_attr_contains(n, "place", "OnScreenDisplay"))
             font = &config_font_activeosd;
-        else if (obt_parse_attr_contains(n, "place","InactiveOnScreenDisplay"))
+        else if (obt_xml_attr_contains(n, "place","InactiveOnScreenDisplay"))
             font = &config_font_inactiveosd;
         else
             goto next_font;
 
-        if ((fnode = obt_parse_find_node(n->children, "name"))) {
+        if ((fnode = obt_xml_find_node(n->children, "name"))) {
             g_free(name);
-            name = obt_parse_node_string(fnode);
+            name = obt_xml_node_string(fnode);
         }
-        if ((fnode = obt_parse_find_node(n->children, "size"))) {
-            int s = obt_parse_node_int(fnode);
+        if ((fnode = obt_xml_find_node(n->children, "size"))) {
+            int s = obt_xml_node_int(fnode);
             if (s > 0) size = s;
         }
-        if ((fnode = obt_parse_find_node(n->children, "weight"))) {
-            gchar *w = obt_parse_node_string(fnode);
+        if ((fnode = obt_xml_find_node(n->children, "weight"))) {
+            gchar *w = obt_xml_node_string(fnode);
             if (!g_ascii_strcasecmp(w, "Bold"))
                 weight = RR_FONTWEIGHT_BOLD;
             g_free(w);
         }
-        if ((fnode = obt_parse_find_node(n->children, "slant"))) {
-            gchar *s = obt_parse_node_string(fnode);
+        if ((fnode = obt_xml_find_node(n->children, "slant"))) {
+            gchar *s = obt_xml_node_string(fnode);
             if (!g_ascii_strcasecmp(s, "Italic"))
                 slant = RR_FONTSLANT_ITALIC;
             if (!g_ascii_strcasecmp(s, "Oblique"))
@@ -641,7 +641,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
         g_free(name);
     next_font:
-        n = obt_parse_find_node(n->next, "font");
+        n = obt_xml_find_node(n->next, "font");
     }
 }
 
@@ -651,17 +651,17 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "number"))) {
-        gint d = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "number"))) {
+        gint d = obt_xml_node_int(n);
         if (d > 0)
             config_desktops_num = (unsigned) d;
     }
-    if ((n = obt_parse_find_node(node, "firstdesk"))) {
-        gint d = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "firstdesk"))) {
+        gint d = obt_xml_node_int(n);
         if (d > 0)
             config_screen_firstdesk = (unsigned) d;
     }
-    if ((n = obt_parse_find_node(node, "names"))) {
+    if ((n = obt_xml_find_node(node, "names"))) {
         GSList *it;
         xmlNodePtr nname;
 
@@ -670,16 +670,16 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
         g_slist_free(config_desktops_names);
         config_desktops_names = NULL;
 
-        nname = obt_parse_find_node(n->children, "name");
+        nname = obt_xml_find_node(n->children, "name");
         while (nname) {
             config_desktops_names =
                 g_slist_append(config_desktops_names,
-                               obt_parse_node_string(nname));
-            nname = obt_parse_find_node(nname->next, "name");
+                               obt_xml_node_string(nname));
+            nname = obt_xml_find_node(nname->next, "name");
         }
     }
-    if ((n = obt_parse_find_node(node, "popupTime")))
-        config_desktop_popup_time = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "popupTime")))
+        config_desktop_popup_time = obt_xml_node_int(n);
 }
 
 static void parse_resize(xmlNodePtr node, gpointer d)
@@ -688,32 +688,32 @@ static void parse_resize(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "drawContents")))
-        config_resize_redraw = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "popupShow"))) {
-        config_resize_popup_show = obt_parse_node_int(n);
-        if (obt_parse_node_contains(n, "Always"))
+    if ((n = obt_xml_find_node(node, "drawContents")))
+        config_resize_redraw = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "popupShow"))) {
+        config_resize_popup_show = obt_xml_node_int(n);
+        if (obt_xml_node_contains(n, "Always"))
             config_resize_popup_show = 2;
-        else if (obt_parse_node_contains(n, "Never"))
+        else if (obt_xml_node_contains(n, "Never"))
             config_resize_popup_show = 0;
-        else if (obt_parse_node_contains(n, "Nonpixel"))
+        else if (obt_xml_node_contains(n, "Nonpixel"))
             config_resize_popup_show = 1;
     }
-    if ((n = obt_parse_find_node(node, "popupPosition"))) {
-        if (obt_parse_node_contains(n, "Top"))
+    if ((n = obt_xml_find_node(node, "popupPosition"))) {
+        if (obt_xml_node_contains(n, "Top"))
             config_resize_popup_pos = OB_RESIZE_POS_TOP;
-        else if (obt_parse_node_contains(n, "Center"))
+        else if (obt_xml_node_contains(n, "Center"))
             config_resize_popup_pos = OB_RESIZE_POS_CENTER;
-        else if (obt_parse_node_contains(n, "Fixed")) {
+        else if (obt_xml_node_contains(n, "Fixed")) {
             config_resize_popup_pos = OB_RESIZE_POS_FIXED;
 
-            if ((n = obt_parse_find_node(node, "popupFixedPosition"))) {
+            if ((n = obt_xml_find_node(node, "popupFixedPosition"))) {
                 xmlNodePtr n2;
 
-                if ((n2 = obt_parse_find_node(n->children, "x")))
+                if ((n2 = obt_xml_find_node(n->children, "x")))
                     config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.x);
-                if ((n2 = obt_parse_find_node(n->children, "y")))
+                if ((n2 = obt_xml_find_node(n->children, "y")))
                     config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.y);
 
@@ -732,65 +732,65 @@ static void parse_dock(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "position"))) {
-        if (obt_parse_node_contains(n, "TopLeft"))
+    if ((n = obt_xml_find_node(node, "position"))) {
+        if (obt_xml_node_contains(n, "TopLeft"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTHWEST;
-        else if (obt_parse_node_contains(n, "Top"))
+        else if (obt_xml_node_contains(n, "Top"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTH;
-        else if (obt_parse_node_contains(n, "TopRight"))
+        else if (obt_xml_node_contains(n, "TopRight"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTHEAST;
-        else if (obt_parse_node_contains(n, "Right"))
+        else if (obt_xml_node_contains(n, "Right"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_EAST;
-        else if (obt_parse_node_contains(n, "BottomRight"))
+        else if (obt_xml_node_contains(n, "BottomRight"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTHEAST;
-        else if (obt_parse_node_contains(n, "Bottom"))
+        else if (obt_xml_node_contains(n, "Bottom"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTH;
-        else if (obt_parse_node_contains(n, "BottomLeft"))
+        else if (obt_xml_node_contains(n, "BottomLeft"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_SOUTHWEST;
-        else if (obt_parse_node_contains(n, "Left"))
+        else if (obt_xml_node_contains(n, "Left"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_WEST;
-        else if (obt_parse_node_contains(n, "Floating"))
+        else if (obt_xml_node_contains(n, "Floating"))
             config_dock_floating = TRUE;
     }
     if (config_dock_floating) {
-        if ((n = obt_parse_find_node(node, "floatingX")))
-            config_dock_x = obt_parse_node_int(n);
-        if ((n = obt_parse_find_node(node, "floatingY")))
-            config_dock_y = obt_parse_node_int(n);
+        if ((n = obt_xml_find_node(node, "floatingX")))
+            config_dock_x = obt_xml_node_int(n);
+        if ((n = obt_xml_find_node(node, "floatingY")))
+            config_dock_y = obt_xml_node_int(n);
     } else {
-        if ((n = obt_parse_find_node(node, "noStrut")))
-            config_dock_nostrut = obt_parse_node_bool(n);
+        if ((n = obt_xml_find_node(node, "noStrut")))
+            config_dock_nostrut = obt_xml_node_bool(n);
     }
-    if ((n = obt_parse_find_node(node, "stacking"))) {
-        if (obt_parse_node_contains(n, "normal"))
+    if ((n = obt_xml_find_node(node, "stacking"))) {
+        if (obt_xml_node_contains(n, "normal"))
             config_dock_layer = OB_STACKING_LAYER_NORMAL;
-        else if (obt_parse_node_contains(n, "below"))
+        else if (obt_xml_node_contains(n, "below"))
             config_dock_layer = OB_STACKING_LAYER_BELOW;
-        else if (obt_parse_node_contains(n, "above"))
+        else if (obt_xml_node_contains(n, "above"))
             config_dock_layer = OB_STACKING_LAYER_ABOVE;
     }
-    if ((n = obt_parse_find_node(node, "direction"))) {
-        if (obt_parse_node_contains(n, "horizontal"))
+    if ((n = obt_xml_find_node(node, "direction"))) {
+        if (obt_xml_node_contains(n, "horizontal"))
             config_dock_orient = OB_ORIENTATION_HORZ;
-        else if (obt_parse_node_contains(n, "vertical"))
+        else if (obt_xml_node_contains(n, "vertical"))
             config_dock_orient = OB_ORIENTATION_VERT;
     }
-    if ((n = obt_parse_find_node(node, "autoHide")))
-        config_dock_hide = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "hideDelay")))
-        config_dock_hide_delay = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "showDelay")))
-        config_dock_show_delay = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "moveButton"))) {
-        gchar *str = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "autoHide")))
+        config_dock_hide = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "hideDelay")))
+        config_dock_hide_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "showDelay")))
+        config_dock_show_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "moveButton"))) {
+        gchar *str = obt_xml_node_string(n);
         guint b, s;
         if (translate_button(str, &s, &b)) {
             config_dock_app_move_button = b;
@@ -807,19 +807,19 @@ static void parse_menu(xmlNodePtr node, gpointer d)
     xmlNodePtr n;
     node = node->children;
 
-    if ((n = obt_parse_find_node(node, "hideDelay")))
-        config_menu_hide_delay = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "middle")))
-        config_menu_middle = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "submenuShowDelay")))
-        config_submenu_show_delay = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "applicationIcons")))
-        config_menu_client_list_icons = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "manageDesktops")))
-        config_menu_manage_desktops = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "hideDelay")))
+        config_menu_hide_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "middle")))
+        config_menu_middle = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "submenuShowDelay")))
+        config_submenu_show_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "applicationIcons")))
+        config_menu_client_list_icons = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "manageDesktops")))
+        config_menu_manage_desktops = obt_xml_node_bool(n);
 
-    while ((node = obt_parse_find_node(node, "file"))) {
-            gchar *c = obt_parse_node_string(node);
+    while ((node = obt_xml_find_node(node, "file"))) {
+            gchar *c = obt_xml_node_string(node);
             config_menu_files = g_slist_append(config_menu_files,
                                                obt_paths_expand_tilde(c));
             g_free(c);
@@ -832,10 +832,10 @@ static void parse_resistance(xmlNodePtr node, gpointer d)
     xmlNodePtr n;
 
     node = node->children;
-    if ((n = obt_parse_find_node(node, "strength")))
-        config_resist_win = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "screen_edge_strength")))
-        config_resist_edge = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "strength")))
+        config_resist_win = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "screen_edge_strength")))
+        config_resist_edge = obt_xml_node_int(n);
 }
 
 typedef struct
@@ -926,7 +926,7 @@ static void bind_default_mouse(void)
                    actions_parse_string(it->actname));
 }
 
-void config_startup(ObtParseInst *i)
+void config_startup(ObtXmlInst *i)
 {
     config_focus_new = TRUE;
     config_focus_follow = FALSE;
@@ -936,7 +936,7 @@ void config_startup(ObtParseInst *i)
     config_focus_under_mouse = FALSE;
     config_unfocus_leave = FALSE;
 
-    obt_parse_register(i, "focus", parse_focus, NULL);
+    obt_xml_register(i, "focus", parse_focus, NULL);
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
@@ -945,11 +945,11 @@ void config_startup(ObtParseInst *i)
     config_primary_monitor_index = 1;
     config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
 
-    obt_parse_register(i, "placement", parse_placement, NULL);
+    obt_xml_register(i, "placement", parse_placement, NULL);
 
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    obt_parse_register(i, "margins", parse_margins, NULL);
+    obt_xml_register(i, "margins", parse_margins, NULL);
 
     config_theme = NULL;
 
@@ -963,14 +963,14 @@ void config_startup(ObtParseInst *i)
     config_font_menuitem = NULL;
     config_font_menutitle = NULL;
 
-    obt_parse_register(i, "theme", parse_theme, NULL);
+    obt_xml_register(i, "theme", parse_theme, NULL);
 
     config_desktops_num = 4;
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
 
-    obt_parse_register(i, "desktops", parse_desktops, NULL);
+    obt_xml_register(i, "desktops", parse_desktops, NULL);
 
     config_resize_redraw = TRUE;
     config_resize_popup_show = 1; /* nonpixel increments */
@@ -978,7 +978,7 @@ void config_startup(ObtParseInst *i)
     GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);
     GRAVITY_COORD_SET(config_resize_popup_fixed.y, 0, FALSE, FALSE);
 
-    obt_parse_register(i, "resize", parse_resize, NULL);
+    obt_xml_register(i, "resize", parse_resize, NULL);
 
     config_dock_layer = OB_STACKING_LAYER_ABOVE;
     config_dock_pos = OB_DIRECTION_NORTHEAST;
@@ -993,14 +993,14 @@ void config_startup(ObtParseInst *i)
     config_dock_app_move_button = 2; /* middle */
     config_dock_app_move_modifiers = 0;
 
-    obt_parse_register(i, "dock", parse_dock, NULL);
+    obt_xml_register(i, "dock", parse_dock, NULL);
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
     bind_default_keyboard();
 
-    obt_parse_register(i, "keyboard", parse_keyboard, NULL);
+    obt_xml_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
@@ -1008,12 +1008,12 @@ void config_startup(ObtParseInst *i)
 
     bind_default_mouse();
 
-    obt_parse_register(i, "mouse", parse_mouse, NULL);
+    obt_xml_register(i, "mouse", parse_mouse, NULL);
 
     config_resist_win = 10;
     config_resist_edge = 20;
 
-    obt_parse_register(i, "resistance", parse_resistance, NULL);
+    obt_xml_register(i, "resistance", parse_resistance, NULL);
 
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
@@ -1022,11 +1022,11 @@ void config_startup(ObtParseInst *i)
     config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;
 
-    obt_parse_register(i, "menu", parse_menu, NULL);
+    obt_xml_register(i, "menu", parse_menu, NULL);
 
     config_per_app_settings = NULL;
 
-    obt_parse_register(i, "applications", parse_per_app_settings, NULL);
+    obt_xml_register(i, "applications", parse_per_app_settings, NULL);
 }
 
 void config_shutdown(void)

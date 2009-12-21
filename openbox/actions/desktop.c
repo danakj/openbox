@@ -160,8 +160,8 @@ static gpointer setup_func(xmlNodePtr node,
     /* wrap by default - it's handy! */
     o->u.rel.wrap = TRUE;
 
-    if ((n = obt_parse_find_node(node, "to"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "to"))) {
+        gchar *s = obt_xml_node_string(n);
         if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "next")) {
@@ -201,8 +201,8 @@ static gpointer setup_func(xmlNodePtr node,
         g_free(s);
     }
 
-    if ((n = obt_parse_find_node(node, "wrap")))
-        o->u.rel.wrap = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "wrap")))
+        o->u.rel.wrap = obt_xml_node_bool(n);
 
     return o;
 }
@@ -240,8 +240,8 @@ static gpointer setup_send_func(xmlNodePtr node,
     o->send = TRUE;
     o->follow = TRUE;
 
-    if ((n = obt_parse_find_node(node, "follow")))
-        o->follow = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "follow")))
+        o->follow = obt_xml_node_bool(n);
 
     if (o->type == RELATIVE && o->follow) {
         o->interactive = TRUE;
@@ -348,8 +348,8 @@ static gpointer setup_follow(xmlNodePtr node)
     Options *o = g_new0(Options, 1);
     o->send = TRUE;
     o->follow = TRUE;
-    if ((n = obt_parse_find_node(node, "follow")))
-        o->follow = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "follow")))
+        o->follow = obt_xml_node_bool(n);
     return o;
 }
 
@@ -372,8 +372,8 @@ static gpointer setup_go_abs_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o = g_new0(Options, 1);
     o->type = ABSOLUTE;
-    if ((n = obt_parse_find_node(node, "desktop")))
-        o->u.abs.desktop = obt_parse_node_int(n) - 1;
+    if ((n = obt_xml_find_node(node, "desktop")))
+        o->u.abs.desktop = obt_xml_node_int(n) - 1;
     else
         o->u.abs.desktop = screen_desktop;
     return o;
@@ -384,8 +384,8 @@ static gpointer setup_send_abs_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o = setup_follow(node);
     o->type = ABSOLUTE;
-    if ((n = obt_parse_find_node(node, "desktop")))
-        o->u.abs.desktop = obt_parse_node_int(n) - 1;
+    if ((n = obt_xml_find_node(node, "desktop")))
+        o->u.abs.desktop = obt_xml_node_int(n) - 1;
     else
         o->u.abs.desktop = screen_desktop;
     return o;
@@ -404,8 +404,8 @@ static void setup_rel(Options *o, xmlNodePtr node, gboolean lin,
     o->u.rel.dir = dir;
     o->u.rel.wrap = TRUE;
 
-    if ((n = obt_parse_find_node(node, "wrap")))
-        o->u.rel.wrap = obt_parse_node_bool(n);
+    if ((n = obt_xml_find_node(node, "wrap")))
+        o->u.rel.wrap = obt_xml_node_bool(n);
 
     if (input) {
         o->interactive = TRUE;

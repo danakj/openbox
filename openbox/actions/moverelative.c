@@ -24,10 +24,10 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_new0(Options, 1);
 
-    if ((n = obt_parse_find_node(node, "x")))
-        o->x = obt_parse_node_int(n);
-    if ((n = obt_parse_find_node(node, "y")))
-        o->y = obt_parse_node_int(n);
+    if ((n = obt_xml_find_node(node, "x")))
+        o->x = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "y")))
+        o->y = obt_xml_node_int(n);
 
     return o;
 }

@@ -16,7 +16,7 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "obt/parse.h"
+#include "obt/xml.h"
 #include "obt/paths.h"
 
 #include <glib.h>
@@ -36,11 +36,11 @@
 
 struct Callback {
     gchar *tag;
-    ObtParseCallback func;
+    ObtXmlCallback func;
     gpointer data;
 };
 
-struct _ObtParseInst {
+struct _ObtXmlInst {
     gint ref;
     ObtPaths *xdg_paths;
     GHashTable *callbacks;
@@ -55,9 +55,9 @@ static void destfunc(struct Callback *c)
     g_free(c);
 }
 
-ObtParseInst* obt_parse_instance_new(void)
+ObtXmlInst* obt_xml_instance_new(void)
 {
-    ObtParseInst *i = g_new(ObtParseInst, 1);
+    ObtXmlInst *i = g_new(ObtXmlInst, 1);
     i->ref = 1;
     i->xdg_paths = obt_paths_new();
     i->callbacks = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
@@ -68,12 +68,12 @@ ObtParseInst* obt_parse_instance_new(void)
     return i;
 }
 
-void obt_parse_instance_ref(ObtParseInst *i)
+void obt_xml_instance_ref(ObtXmlInst *i)
 {
     ++i->ref;
 }
 
-void obt_parse_instance_unref(ObtParseInst *i)
+void obt_xml_instance_unref(ObtXmlInst *i)
 {
     if (i && --i->ref == 0) {
         obt_paths_unref(i->xdg_paths);
@@ -82,20 +82,20 @@ void obt_parse_instance_unref(ObtParseInst *i)
     }
 }
 
-xmlDocPtr obt_parse_doc(ObtParseInst *i)
+xmlDocPtr obt_xml_doc(ObtXmlInst *i)
 {
     g_assert(i->doc); /* a doc is open? */
     return i->doc;
 }
 
-xmlNodePtr obt_parse_root(ObtParseInst *i)
+xmlNodePtr obt_xml_root(ObtXmlInst *i)
 {
     g_assert(i->doc); /* a doc is open? */
     return i->root;
 }
 
-void obt_parse_register(ObtParseInst *i, const gchar *tag,
-                        ObtParseCallback func, gpointer data)
+void obt_xml_register(ObtXmlInst *i, const gchar *tag,
+                      ObtXmlCallback func, gpointer data)
 {
     struct Callback *c;
 
@@ -111,7 +111,7 @@ void obt_parse_register(ObtParseInst *i, const gchar *tag,
     g_hash_table_insert(i->callbacks, c->tag, c);
 }
 
-static gboolean load_file(ObtParseInst *i,
+static gboolean load_file(ObtXmlInst *i,
                           const gchar *domain,
                           const gchar *filename,
                           const gchar *root_node,
@@ -164,9 +164,9 @@ static gboolean load_file(ObtParseInst *i,
     return r;
 }
 
-gboolean obt_parse_load_file(ObtParseInst *i,
-                             const gchar *path,
-                             const gchar *root_node)
+gboolean obt_xml_load_file(ObtXmlInst *i,
+                           const gchar *path,
+                           const gchar *root_node)
 {
     GSList *paths;
     gboolean r;
@@ -182,10 +182,10 @@ gboolean obt_parse_load_file(ObtParseInst *i,
     return r;
 }
 
-gboolean obt_parse_load_config_file(ObtParseInst *i,
-                                    const gchar *domain,
-                                    const gchar *filename,
-                                    const gchar *root_node)
+gboolean obt_xml_load_config_file(ObtXmlInst *i,
+                                  const gchar *domain,
+                                  const gchar *filename,
+                                  const gchar *root_node)
 {
     GSList *it, *paths = NULL;
     gboolean r;
@@ -202,10 +202,10 @@ gboolean obt_parse_load_config_file(ObtParseInst *i,
     return r;
 }
 
-gboolean obt_parse_load_data_file(ObtParseInst *i,
-                                  const gchar *domain,
-                                  const gchar *filename,
-                                  const gchar *root_node)
+gboolean obt_xml_load_data_file(ObtXmlInst *i,
+                                const gchar *domain,
+                                const gchar *filename,
+                                const gchar *root_node)
 {
     GSList *it, *paths = NULL;
     gboolean r;
@@ -222,11 +222,11 @@ gboolean obt_parse_load_data_file(ObtParseInst *i,
     return r;
 }
 
-gboolean obt_parse_load_theme_file(ObtParseInst *i,
-                                   const gchar *theme,
-                                   const gchar *domain,
-                                   const gchar *filename,
-                                   const gchar *root_node)
+gboolean obt_xml_load_theme_file(ObtXmlInst *i,
+                                 const gchar *theme,
+                                 const gchar *domain,
+                                 const gchar *filename,
+                                 const gchar *root_node)
 {
     GSList *it, *paths = NULL;
     gboolean r;
@@ -249,8 +249,8 @@ gboolean obt_parse_load_theme_file(ObtParseInst *i,
 }
 
 
-gboolean obt_parse_load_mem(ObtParseInst *i,
-                            gpointer data, guint len, const gchar *root_node)
+gboolean obt_xml_load_mem(ObtXmlInst *i,
+                          gpointer data, guint len, const gchar *root_node)
 {
     gboolean r = FALSE;
 
@@ -277,14 +277,14 @@ gboolean obt_parse_load_mem(ObtParseInst *i,
     return r;
 }
 
-gboolean obt_parse_save_file(ObtParseInst *inst,
-                             const gchar *path,
-                             gboolean pretty)
+gboolean obt_xml_save_file(ObtXmlInst *inst,
+                           const gchar *path,
+                           gboolean pretty)
 {
     return xmlSaveFormatFile(path, inst->doc, pretty) != -1;
 }
 
-void obt_parse_close(ObtParseInst *i)
+void obt_xml_close(ObtXmlInst *i)
 {
     if (i && i->doc) {
         xmlFreeDoc(i->doc);
@@ -295,7 +295,7 @@ void obt_parse_close(ObtParseInst *i)
     }
 }
 
-void obt_parse_tree(ObtParseInst *i, xmlNodePtr node)
+void obt_xml_tree(ObtXmlInst *i, xmlNodePtr node)
 {
     g_assert(i->doc); /* a doc is open? */
 
@@ -306,12 +306,12 @@ void obt_parse_tree(ObtParseInst *i, xmlNodePtr node)
     }
 }
 
-void obt_parse_tree_from_root(ObtParseInst *i)
+void obt_xml_tree_from_root(ObtXmlInst *i)
 {
-    obt_parse_tree(i, i->root->children);
+    obt_xml_tree(i, i->root->children);
 }
 
-gchar *obt_parse_node_string(xmlNodePtr node)
+gchar *obt_xml_node_string(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gchar *s;
@@ -321,7 +321,7 @@ gchar *obt_parse_node_string(xmlNodePtr node)
     return s;
 }
 
-gint obt_parse_node_int(xmlNodePtr node)
+gint obt_xml_node_int(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gint i;
@@ -331,7 +331,7 @@ gint obt_parse_node_int(xmlNodePtr node)
     return i;
 }
 
-gboolean obt_parse_node_bool(xmlNodePtr node)
+gboolean obt_xml_node_bool(xmlNodePtr node)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gboolean b = FALSE;
@@ -346,7 +346,7 @@ gboolean obt_parse_node_bool(xmlNodePtr node)
     return b;
 }
 
-gboolean obt_parse_node_contains(xmlNodePtr node, const gchar *val)
+gboolean obt_xml_node_contains(xmlNodePtr node, const gchar *val)
 {
     xmlChar *c = xmlNodeGetContent(node);
     gboolean r;
@@ -356,7 +356,7 @@ gboolean obt_parse_node_contains(xmlNodePtr node, const gchar *val)
     return r;
 }
 
-xmlNodePtr obt_parse_find_node(xmlNodePtr node, const gchar *tag)
+xmlNodePtr obt_xml_find_node(xmlNodePtr node, const gchar *tag)
 {
     while (node) {
         if (!xmlStrcmp(node->name, (const xmlChar*) tag))
@@ -366,8 +366,8 @@ xmlNodePtr obt_parse_find_node(xmlNodePtr node, const gchar *tag)
     return NULL;
 }
 
-gboolean obt_parse_attr_bool(xmlNodePtr node, const gchar *name,
-                             gboolean *value)
+gboolean obt_xml_attr_bool(xmlNodePtr node, const gchar *name,
+                           gboolean *value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
@@ -390,7 +390,7 @@ gboolean obt_parse_attr_bool(xmlNodePtr node, const gchar *name,
     return r;
 }
 
-gboolean obt_parse_attr_int(xmlNodePtr node, const gchar *name, gint *value)
+gboolean obt_xml_attr_int(xmlNodePtr node, const gchar *name, gint *value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
@@ -403,8 +403,8 @@ gboolean obt_parse_attr_int(xmlNodePtr node, const gchar *name, gint *value)
     return r;
 }
 
-gboolean obt_parse_attr_string(xmlNodePtr node, const gchar *name,
-                               gchar **value)
+gboolean obt_xml_attr_string(xmlNodePtr node, const gchar *name,
+                             gchar **value)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;
@@ -417,8 +417,8 @@ gboolean obt_parse_attr_string(xmlNodePtr node, const gchar *name,
     return r;
 }
 
-gboolean obt_parse_attr_contains(xmlNodePtr node, const gchar *name,
-                                 const gchar *val)
+gboolean obt_xml_attr_contains(xmlNodePtr node, const gchar *name,
+                               const gchar *val)
 {
     xmlChar *c = xmlGetProp(node, (const xmlChar*) name);
     gboolean r = FALSE;

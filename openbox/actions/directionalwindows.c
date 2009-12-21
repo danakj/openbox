@@ -137,18 +137,18 @@ static gpointer setup_func(xmlNodePtr node)
     o->dialog = TRUE;
     o->bar = TRUE;
 
-    if ((n = obt_parse_find_node(node, "dialog")))
-        o->dialog = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "bar")))
-        o->bar = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "raise")))
-        o->raise = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "panels")))
-        o->dock_windows = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "desktop")))
-        o->desktop_windows = obt_parse_node_bool(n);
-    if ((n = obt_parse_find_node(node, "direction"))) {
-        gchar *s = obt_parse_node_string(n);
+    if ((n = obt_xml_find_node(node, "dialog")))
+        o->dialog = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "bar")))
+        o->bar = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "raise")))
+        o->raise = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "panels")))
+        o->dock_windows = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "desktop")))
+        o->desktop_windows = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "direction"))) {
+        gchar *s = obt_xml_node_string(n);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->direction = OB_DIRECTION_NORTH;
@@ -172,14 +172,14 @@ static gpointer setup_func(xmlNodePtr node)
         g_free(s);
     }
 
-    if ((n = obt_parse_find_node(node, "finalactions"))) {
+    if ((n = obt_xml_find_node(node, "finalactions"))) {
         xmlNodePtr m;
 
-        m = obt_parse_find_node(n->children, "action");
+        m = obt_xml_find_node(n->children, "action");
         while (m) {
             ObActionsAct *action = actions_parse(m);
             if (action) o->actions = g_slist_append(o->actions, action);
-            m = obt_parse_find_node(m->next, "action");
+            m = obt_xml_find_node(m->next, "action");
         }
     }
     else {

@@ -62,7 +62,8 @@ static void push_to_top(ObClient *client)
     /* if it is modal for a single window, then put that window at the top
        of the focus order first, so it will be right after ours. the same is
        done with stacking */
-    if (client->modal && (p = client_direct_parent(client)))
+    if (client->modal && (p = client_direct_parent(client)) &&
+        p->layer == client->layer)
         push_to_top(p);
 
     focus_order = g_list_remove(focus_order, client);

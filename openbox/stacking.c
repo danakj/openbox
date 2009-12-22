@@ -302,9 +302,10 @@ static void get_restack_order(ObClient *selected, gboolean raise,
         ObClient *p;
 
         /* if a window is modal for another single window, then raise it to the
-           top too, the same is done with the focus order */
-        while (selected->modal && (p = client_direct_parent(selected)) &&
-               p->layer == selected->layer)
+           top too, the same is done with the focus order
+           (transients are always in the same layer)
+        */
+        while (selected->modal && (p = client_direct_parent(selected)))
             selected = p;
     }
 

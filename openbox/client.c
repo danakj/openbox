@@ -3512,10 +3512,15 @@ void client_set_desktop(ObClient *self, guint target,
     client_set_desktop_recursive(self, target, donthide, dontraise);
 }
 
-gboolean client_is_in_application(ObClient *self, ObClient *search)
+gboolean client_is_in_application(ObClient *self, ObClient *app)
 {
     /* XXX FIXME make this better */
-    return self->group && self->group == search->group;
+    return self->group && self->group == app->group &&
+        (self->desktop == app->desktop ||
+         (self->desktop == DESKTOP_ALL &&
+          app->desktop == screen_desktop) ||
+         (app->desktop == DESKTOP_ALL &&
+          self->desktop == screen_desktop));
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)

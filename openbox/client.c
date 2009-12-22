@@ -3520,7 +3520,8 @@ gboolean client_is_in_application(ObClient *self, ObClient *app)
          (self->desktop == DESKTOP_ALL &&
           app->desktop == screen_desktop) ||
          (app->desktop == DESKTOP_ALL &&
-          self->desktop == screen_desktop));
+          self->desktop == screen_desktop)) &&
+        self->layer == app->layer;
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)

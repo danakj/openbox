@@ -456,7 +456,6 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
                                          g_list_concat(direct, app_members) :
                                          /* if lowering it goes below */
                                          g_list_concat(app_members, direct)));
-    group_trans = between = app_members = NULL;
 
     /* restack them */
     do_restack(direct, direct_below);

@@ -102,8 +102,14 @@ static void do_restack(GList *wins, GList *before)
        stacking_list = after..wins..before */
     if (before == stacking_list)
         after = NULL;
-    else
+    else {
         after = stacking_list;
+        /* split the list at before */
+        if (before) {
+            before->prev->next = NULL;
+            before->prev = NULL;
+        }
+    }
     stacking_list = g_list_concat(g_list_concat(after, wins), before);
 
 #ifdef DEBUG
@@ -282,12 +288,10 @@ static GList* get_parents(ObClient *client)
   @group_trans A list of windows indirectly related to the @selected window,
           which should be placed above @direct, ordered from top to bottom.
 */
-static GList* get_restack_order(ObClient *selected, gboolean raise,
-                                GList **direct, GList **grouped)
+static void get_restack_order(ObClient *selected, gboolean raise,
+                              GList **direct, GList **grouped)
 {
-    GList *it, *last, *below, *above, *next;
-    ObClient *bottom = NULL;
-
+    GList *it, *next;
     GList *group_helpers = NULL;
     GList *group_modals = NULL;
     GList *group_trans = NULL;
@@ -397,8 +401,7 @@ static GList* get_app_windows(ObClient *selected)
 
 static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
 {
-    GList *wins, *direct, *group_trans, *parents;
-    GList *app_members = NULL;
+    GList *direct, *group_trans, *app_members;
 
     GList *it, *next, *direct_below, *group_trans_below, *between;
 
@@ -416,13 +419,14 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
     if (selected->group) {
         /* find the highest member of @selected's group */
         it = group_trans_below;
-        for (it = g_list_previous(it); it; it = g_list_previous(it))
+        for (it = g_list_previous(it); it; it = g_list_previous(it)) {
             if (window_layer(it->data) > selected->layer)
                 break;
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *c = WINDOW_AS_CLIENT(it->data);
-            if (c->group == selected->group)
-                group_trans_below = it;
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = WINDOW_AS_CLIENT(it->data);
+                if (c->group == selected->group)
+                    group_trans_below = it;
+            }
         }
     }
     else
@@ -445,7 +449,11 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
     /* stick them all together (group_trans, between, direct, app_members) */
     direct = g_list_concat(group_trans,
                            g_list_concat(between,
-                                         g_list_concat(direct, app_members)));
+                                         raise ?
+                                         /* if raising it goes above app */
+                                         g_list_concat(direct, app_members) :
+                                         /* if lowering it goes below */
+                                         g_list_concat(app_members, direct)));
     group_trans = between = app_members = NULL;
 
     /* restack them */

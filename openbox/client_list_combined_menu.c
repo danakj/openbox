@@ -114,10 +114,12 @@ static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
     else {
         ObClient *t = self->data.normal.data;
         if (t) { /* it's set to NULL if its destroyed */
-            client_activate(t, TRUE, FALSE, TRUE, TRUE, TRUE);
+            gboolean here = state & ShiftMask;
+
+            client_activate(t, TRUE, here, TRUE, TRUE, TRUE);
             /* if the window is omnipresent then we need to go to its
                desktop */
-            if (t->desktop == DESKTOP_ALL)
+            if (!here && t->desktop == DESKTOP_ALL)
                 screen_set_desktop(self->id, FALSE);
         }
         else

@@ -303,7 +303,8 @@ static void get_restack_order(ObClient *selected, gboolean raise,
 
         /* if a window is modal for another single window, then raise it to the
            top too, the same is done with the focus order */
-        while (selected->modal && (p = client_direct_parent(selected)))
+        while (selected->modal && (p = client_direct_parent(selected)) &&
+               p->layer == selected->layer)
             selected = p;
     }
 
@@ -390,6 +391,7 @@ static GList* get_app_windows(ObClient *selected)
         next = g_list_previous(it);
 
         if (WINDOW_IS_CLIENT(it->data) &&
+            window_layer(it->data) == selected->layer &&
             client_is_in_application(WINDOW_AS_CLIENT(it->data), selected))
         {
             stacking_list = g_list_remove_link(stacking_list, it);
@@ -408,6 +410,12 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
     /* get the restacking order for the selected window and its relatives */
     get_restack_order(selected, raise, &direct, &group_trans);
 
+    /* find any remaining app windows */
+    if (app)
+        app_members = get_app_windows(selected);
+    else
+        app_members = NULL;
+
     /* stick the selected window and all its direct-relations above this
        spot */
     direct_below = find_top_of_layer(raise ?
@@ -416,7 +424,7 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
     /* stick the group transients just above the highest group member left
        in the stacking order (or else just above the direct windows */
     group_trans_below = direct_below;
-    if (selected->group) {
+    if (selected->group && group_trans) {
         /* find the highest member of @selected's group */
         it = group_trans_below;
         for (it = g_list_previous(it); it; it = g_list_previous(it)) {
@@ -439,12 +447,6 @@ static void restack_windows(ObClient *selected, gboolean raise, gboolean app)
         stacking_list = g_list_remove_link(stacking_list, it);
         between = g_list_concat(it, between);
     }
-
-    /* find any remaining app windows */
-    if (app)
-        app_members = get_app_windows(selected);
-    else
-        app_members = NULL;
 
     /* stick them all together (group_trans, between, direct, app_members) */
     direct = g_list_concat(group_trans,

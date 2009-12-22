@@ -1838,8 +1838,7 @@ static gboolean event_handle_menu(XEvent *ev)
             break;
 
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
-            (f = find_active_menu()) && f->selected == e &&
-            e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
+            (f = find_active_menu()) && f->selected == e)
         {
             ObMenuEntryFrame *u = menu_entry_frame_under(ev->xcrossing.x_root,
                                                          ev->xcrossing.y_root);

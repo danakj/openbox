@@ -629,10 +629,10 @@
   # this is an example with comments through out. use these to make your
   # own rules, but without the comments of course.
 
-  <application name="the window's _OB_NAME property (see obprop)"
-              class="the window's _OB_CLASS property (see obprop)"
-               role="the window's _OB_ROLE property (see obprop)"
-               type="the window's _NET_WM_WINDOW_TYPE (see obprob)..
+  <application name="the window's _OB_NAME property (see obxprop)"
+              class="the window's _OB_CLASS property (see obxprop)"
+               role="the window's _OB_ROLE property (see obxprop)"
+               type="the window's _NET_WM_WINDOW_TYPE (see obxprob)..
                       (if unspecified, then it is 'dialog' for child windows)">
   # the name or the class can be set, or both. this is used to match
   # windows when they appear. role can optionally be set as well, to

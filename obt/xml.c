@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   obt/parse.c for the Openbox window manager
+   obt/xml.c for the Openbox window manager
    Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify

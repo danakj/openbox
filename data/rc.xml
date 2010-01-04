@@ -635,6 +635,9 @@
   <submenuShowDelay>100</submenuShowDelay>
   <!-- this one is easy, time to delay before showing a submenu after hovering
        over the parent entry -->
+  <submenuHideDelay>400</submenuHideDelay>
+  <!-- time to delay before hiding a submenu when selecting another
+       entry in parent menu -->
   <applicationIcons>yes</applicationIcons>
   <!-- controls if icons appear in the client-list-(combined-)menu -->
   <manageDesktops>yes</manageDesktops>

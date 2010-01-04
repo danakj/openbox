@@ -52,6 +52,8 @@ static void menu_frame_update(ObMenuFrame *self);
 static gboolean menu_entry_frame_submenu_timeout(gpointer data);
 static void menu_frame_hide(ObMenuFrame *self);
 
+static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data);
+
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
 {
@@ -972,6 +974,14 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
     return TRUE;
 }
 
+static void remove_submenu_hide_timeout(ObMenuFrame *self /* parent of submenu to hide  */)
+{
+     ob_main_loop_timeout_remove(ob_main_loop,
+                                     menu_entry_frame_submenu_hide_timeout);
+     if (self)
+            self->submenu_to_hide = NULL;
+}
+
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
                                  ObMenuEntryFrame *parent_entry)
 {
@@ -985,10 +995,14 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     self->parent = parent;
     self->parent_entry = parent_entry;
 
+    remove_submenu_hide_timeout(parent);
+
     /* set up parent's child to be us */
-    if (parent->child)
-        menu_frame_hide(parent->child);
-    parent->child = self;
+    if ((parent->child) != self) {
+        if (parent->child)
+            menu_frame_hide(parent->child);
+        parent->child = self;
+    }
 
     if (!menu_frame_show(self))
         return FALSE;
@@ -1019,6 +1033,8 @@ static void menu_frame_hide(ObMenuFrame *self)
 {
     GList *it = g_list_find(menu_frame_visible, self);
     gulong ignore_start;
+
+    remove_submenu_hide_timeout(self->parent);
 
     if (!it)
         return;
@@ -1123,11 +1139,50 @@ static gboolean menu_entry_frame_submenu_timeout(gpointer data)
     return FALSE;
 }
 
+static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data)
+{
+    menu_frame_hide((ObMenuFrame*)data);
+    return FALSE;
+}
+
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                        gboolean immediate)
 {
     ObMenuEntryFrame *old = self->selected;
     ObMenuFrame *oldchild = self->child;
+    ObMenuEntryFrame *temp;
+    gboolean reselection;
+
+
+    if (!oldchild) {
+        /* self is the last visible (sub)menu */
+        if (self->parent && self->parent_entry != self->parent->selected) {
+            /* Legend:
+               (config_submenu_hide_delay != 0)
+               In the parent menu corresponding entry "A" selected,
+               this submenu ('self') shown, cursor moved in the parent
+               menu to another entry "B", then cursor moved for the
+               first time into this submenu.
+             Results:
+               parent menu selection is "B" instead of "A",
+            */
+            temp = self->parent->selected;
+            self->parent->selected = self->parent_entry;
+            if (temp)
+                menu_entry_frame_render(temp);
+            menu_entry_frame_render(self->parent_entry);
+        }
+        remove_submenu_hide_timeout(self->parent);
+    }
+    else if (oldchild->child) {
+        /* self is the (at least) grandparent of the last visible submenu */
+        menu_frame_hide(oldchild->child);
+        if (temp = oldchild->selected) {
+            oldchild->selected = NULL;
+            menu_entry_frame_render(temp);
+        }
+    }
+
 
     if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
         entry = old;
@@ -1144,13 +1199,40 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
 
     if (old)
         menu_entry_frame_render(old);
-    if (oldchild)
-        menu_frame_hide(oldchild);
+
+    reselection = FALSE;
+    if (oldchild) {
+        if (self->submenu_to_hide == entry) {
+          /* Legend:
+             (config_submenu_hide_delay != 0)
+             Some entry "A" selected; corresponding submenu shown;
+             cursor moved to another entry "B" and  moved back
+             to the entry "A", when submenu hide request added,
+             but submenu not hided.
+          */
+            reselection = TRUE;
+            remove_submenu_hide_timeout(self);
+        }
+        else if (!immediate && config_submenu_hide_delay) {
+            if (self->submenu_to_hide == NULL) {
+                ob_main_loop_timeout_add(ob_main_loop,
+                                config_submenu_hide_delay * 1000,
+                                menu_entry_frame_submenu_hide_timeout,
+                                oldchild, g_direct_equal,
+                                NULL);
+                self->submenu_to_hide = old;
+            }
+        }
+        else
+            menu_frame_hide(oldchild);
+    }
 
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+        if (!reselection &&
+            (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU))
+        {
             if (config_submenu_show_delay && !immediate) {
                 /* initiate a new submenu open request */
                 ob_main_loop_timeout_add(ob_main_loop,

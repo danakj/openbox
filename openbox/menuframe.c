@@ -1160,7 +1160,9 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
         entry = old;
 
-    if (old == entry) return;
+    if (old == entry && (old->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU ||
+                         old == oldchild_entry))
+        return;
 
     /* if the user left this menu but we have a submenu open, move the
        selection back to that submenu */
@@ -1187,15 +1189,14 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         else if (oldchild_entry == old) {
             /* The open submenu was selected and is no longer, so hide the
                submenu */
-            if (!immediate && config_submenu_hide_delay) {
+            if (immediate || config_submenu_hide_delay == 0)
+                menu_frame_hide(oldchild);
+            else if (config_submenu_hide_delay > 0)
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_hide_delay * 1000,
                                          submenu_hide_timeout,
                                          oldchild, g_direct_equal,
                                          NULL);
-            }
-            else
-                menu_frame_hide(oldchild);
         }
     }
 
@@ -1206,15 +1207,14 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         if (oldchild_entry != self->selected &&
             self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
         {
-            if (config_submenu_show_delay && !immediate) {
-                /* initiate a new submenu open request */
+            if (immediate || config_submenu_hide_delay == 0)
+                menu_entry_frame_show_submenu(self->selected);
+            else if (config_submenu_hide_delay > 0)
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
                                          submenu_show_timeout,
                                          self->selected, g_direct_equal,
                                          NULL);
-            } else
-                menu_entry_frame_show_submenu(self->selected);
         }
     }
 }

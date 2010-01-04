@@ -632,7 +632,7 @@
        menu is hidden again -->
   <middle>no</middle>
   <!-- center submenus vertically about the parent entry -->
-  <submenuShowDelay>100</submenuShowDelay>
+  <submenuShowDelay>200</submenuShowDelay>
   <!-- this one is easy, time to delay before showing a submenu after hovering
        over the parent entry -->
   <submenuHideDelay>400</submenuHideDelay>

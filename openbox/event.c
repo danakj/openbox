@@ -1800,6 +1800,15 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
     return ret;
 }
 
+static Bool event_look_for_menu_enter(Display *d, XEvent *ev, XPointer arg)
+{
+    ObMenuFrame *f = (ObMenuFrame*)arg;
+    ObMenuEntryFrame *e;
+    return ev->type == EnterNotify &&
+        (e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
+        !e->ignore_enters && e->frame == f;
+}
+
 static gboolean event_handle_menu(XEvent *ev)
 {
     ObMenuFrame *f;
@@ -1837,11 +1846,17 @@ static gboolean event_handle_menu(XEvent *ev)
         if (ev->xcrossing.detail == NotifyInferior)
             break;
 
-        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
-            (f = find_active_menu()) && f->selected == e &&
-            e->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU)
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)))
         {
-            menu_frame_select(e->frame, NULL, FALSE);
+            XEvent ce;
+
+            /* check if an EnterNotify event is coming, and if not, then select
+               nothing in the menu */
+            if (XCheckIfEvent(ob_display, &ce, event_look_for_menu_enter,
+                              (XPointer)e->frame))
+                XPutBackEvent(ob_display, &ce);
+            else
+                menu_frame_select(e->frame, NULL, FALSE);
         }
         break;
     case MotionNotify:

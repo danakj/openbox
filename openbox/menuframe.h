@@ -50,6 +50,7 @@ struct _ObMenuFrame
     ObMenuFrame *parent;
     ObMenuEntryFrame *parent_entry;
     ObMenuFrame *child;
+    ObMenuEntryFrame *child_entry;
 
     GList *entries;
     ObMenuEntryFrame *selected;
@@ -80,9 +81,6 @@ struct _ObMenuFrame
                            menu until it has seen a KeyPress.  this is to
                            avoid having the keybinding used to show the menu
                            end up running something inside the menu */
-    ObMenuEntryFrame * submenu_to_hide;  /* if exist (single!) submenu hide request
-               then this variable hold a copy of 'selected' field of the parent menu,
-               otherwice NULL */
 };
 
 struct _ObMenuEntryFrame

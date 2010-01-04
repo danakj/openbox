@@ -1018,8 +1018,8 @@ void config_startup(ObParseInst *i)
 
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
-    config_submenu_show_delay = 0;
-    config_submenu_hide_delay = 750;
+    config_submenu_show_delay = 200;
+    config_submenu_hide_delay = 400;
     config_menu_client_list_icons = TRUE;
     config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;

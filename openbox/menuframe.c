@@ -49,10 +49,10 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
 static void menu_entry_frame_free(ObMenuEntryFrame *self);
 static void menu_frame_update(ObMenuFrame *self);
-static gboolean menu_entry_frame_submenu_timeout(gpointer data);
+static gboolean submenu_show_timeout(gpointer data);
 static void menu_frame_hide(ObMenuFrame *self);
 
-static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data);
+static gboolean submenu_hide_timeout(gpointer data);
 
 static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
@@ -974,12 +974,13 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
     return TRUE;
 }
 
-static void remove_submenu_hide_timeout(ObMenuFrame *self /* parent of submenu to hide  */)
+/*! Stop hiding an open submenu.
+    @child The OnMenuFrame of the submenu to be hidden
+*/
+static void remove_submenu_hide_timeout(ObMenuFrame *child)
 {
-     ob_main_loop_timeout_remove(ob_main_loop,
-                                     menu_entry_frame_submenu_hide_timeout);
-     if (self)
-            self->submenu_to_hide = NULL;
+    ob_main_loop_timeout_remove_data(ob_main_loop, submenu_hide_timeout,
+                                     child, FALSE);
 }
 
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
@@ -995,13 +996,12 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
     self->parent = parent;
     self->parent_entry = parent_entry;
 
-    remove_submenu_hide_timeout(parent);
-
     /* set up parent's child to be us */
     if ((parent->child) != self) {
         if (parent->child)
             menu_frame_hide(parent->child);
         parent->child = self;
+        parent->child_entry = parent_entry;
     }
 
     if (!menu_frame_show(self))
@@ -1034,8 +1034,6 @@ static void menu_frame_hide(ObMenuFrame *self)
     GList *it = g_list_find(menu_frame_visible, self);
     gulong ignore_start;
 
-    remove_submenu_hide_timeout(self->parent);
-
     if (!it)
         return;
 
@@ -1045,8 +1043,12 @@ static void menu_frame_hide(ObMenuFrame *self)
     if (self->child)
         menu_frame_hide(self->child);
 
-    if (self->parent)
+    if (self->parent) {
+        remove_submenu_hide_timeout(self);
+
         self->parent->child = NULL;
+        self->parent->child_entry = NULL;
+    }
     self->parent = NULL;
     self->parent_entry = NULL;
 
@@ -1071,8 +1073,7 @@ void menu_frame_hide_all(void)
 
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+        ob_main_loop_timeout_remove(ob_main_loop, submenu_show_timeout);
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
@@ -1087,7 +1088,7 @@ void menu_frame_hide_all_client(ObClient *client)
             if (config_submenu_show_delay) {
                 /* remove any submenu open requests */
                 ob_main_loop_timeout_remove(ob_main_loop,
-                                            menu_entry_frame_submenu_timeout);
+                                            submenu_show_timeout);
             }
             menu_frame_hide(f);
         }
@@ -1132,15 +1133,16 @@ ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y)
     return ret;
 }
 
-static gboolean menu_entry_frame_submenu_timeout(gpointer data)
+static gboolean submenu_show_timeout(gpointer data)
 {
     g_assert(menu_frame_visible);
     menu_entry_frame_show_submenu((ObMenuEntryFrame*)data);
     return FALSE;
 }
 
-static gboolean menu_entry_frame_submenu_hide_timeout(gpointer data)
+static gboolean submenu_hide_timeout(gpointer data)
 {
+    g_assert(menu_frame_visible);
     menu_frame_hide((ObMenuFrame*)data);
     return FALSE;
 }
@@ -1150,49 +1152,24 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
 {
     ObMenuEntryFrame *old = self->selected;
     ObMenuFrame *oldchild = self->child;
+    ObMenuEntryFrame *oldchild_entry = self->child_entry;
     ObMenuEntryFrame *temp;
-    gboolean reselection;
 
-
-    if (!oldchild) {
-        /* self is the last visible (sub)menu */
-        if (self->parent && self->parent_entry != self->parent->selected) {
-            /* Legend:
-               (config_submenu_hide_delay != 0)
-               In the parent menu corresponding entry "A" selected,
-               this submenu ('self') shown, cursor moved in the parent
-               menu to another entry "B", then cursor moved for the
-               first time into this submenu.
-             Results:
-               parent menu selection is "B" instead of "A",
-            */
-            temp = self->parent->selected;
-            self->parent->selected = self->parent_entry;
-            if (temp)
-                menu_entry_frame_render(temp);
-            menu_entry_frame_render(self->parent_entry);
-        }
-        remove_submenu_hide_timeout(self->parent);
-    }
-    else if (oldchild->child) {
-        /* self is the (at least) grandparent of the last visible submenu */
-        menu_frame_hide(oldchild->child);
-        if (temp = oldchild->selected) {
-            oldchild->selected = NULL;
-            menu_entry_frame_render(temp);
-        }
-    }
-
-
+    /* if the user selected a separator, ignore it and reselect what we had
+       selected before */
     if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
         entry = old;
 
     if (old == entry) return;
 
+    /* if the user left this menu but we have a submenu open, move the
+       selection back to that submenu */
+    if (!entry && oldchild_entry)
+        entry = oldchild_entry;
+
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        ob_main_loop_timeout_remove(ob_main_loop,
-                                    menu_entry_frame_submenu_timeout);
+        ob_main_loop_timeout_remove(ob_main_loop, submenu_show_timeout);
     }
 
     self->selected = entry;
@@ -1200,49 +1177,44 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (old)
         menu_entry_frame_render(old);
 
-    reselection = FALSE;
-    if (oldchild) {
-        if (self->submenu_to_hide == entry) {
-          /* Legend:
-             (config_submenu_hide_delay != 0)
-             Some entry "A" selected; corresponding submenu shown;
-             cursor moved to another entry "B" and  moved back
-             to the entry "A", when submenu hide request added,
-             but submenu not hided.
-          */
-            reselection = TRUE;
-            remove_submenu_hide_timeout(self);
+    if (oldchild_entry) {
+        /* There is an open submenu */
+        if (oldchild_entry == self->selected) {
+            /* The open submenu has been reselected, so stop hiding the
+               submenu */
+            remove_submenu_hide_timeout(oldchild);
         }
-        else if (!immediate && config_submenu_hide_delay) {
-            if (self->submenu_to_hide == NULL) {
+        else if (oldchild_entry == old) {
+            /* The open submenu was selected and is no longer, so hide the
+               submenu */
+            if (!immediate && config_submenu_hide_delay) {
                 ob_main_loop_timeout_add(ob_main_loop,
-                                config_submenu_hide_delay * 1000,
-                                menu_entry_frame_submenu_hide_timeout,
-                                oldchild, g_direct_equal,
-                                NULL);
-                self->submenu_to_hide = old;
+                                         config_submenu_hide_delay * 1000,
+                                         submenu_hide_timeout,
+                                         oldchild, g_direct_equal,
+                                         NULL);
             }
+            else
+                menu_frame_hide(oldchild);
         }
-        else
-            menu_frame_hide(oldchild);
     }
 
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        if (!reselection &&
-            (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU))
+        /* only show if the submenu isn't already showing */
+        if (oldchild_entry != self->selected &&
+            self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
         {
             if (config_submenu_show_delay && !immediate) {
                 /* initiate a new submenu open request */
                 ob_main_loop_timeout_add(ob_main_loop,
                                          config_submenu_show_delay * 1000,
-                                         menu_entry_frame_submenu_timeout,
+                                         submenu_show_timeout,
                                          self->selected, g_direct_equal,
                                          NULL);
-            } else {
+            } else
                 menu_entry_frame_show_submenu(self->selected);
-            }
         }
     }
 }

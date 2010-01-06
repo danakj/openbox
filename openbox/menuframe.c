@@ -1159,7 +1159,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
         entry = old;
 
-    if (old == entry && (old->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU))
+    if (old == entry &&
+        (!old || old->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU))
         return;
 
     /* if the user left this menu but we have a submenu open, move the

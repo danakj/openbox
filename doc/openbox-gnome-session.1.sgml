@@ -49,7 +49,7 @@ manpage.1: manpage.sgml
       </para>
 
     <para>The program's full documentation is available on the website:
-      <literal>http://icculus.org/openbox/</literal></para>
+      <literal>http://openbox.org/</literal></para>
 
     <para>Please report bugs to: <literal>http://bugzilla.icculus.org/
       </literal></para>

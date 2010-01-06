@@ -1700,8 +1700,13 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
         else if (ob_keycode_match(keycode, OB_KEY_LEFT)) {
             /* Left goes to the parent menu */
-            if (frame->parent)
+            if (frame->parent) {
+                /* remove focus from the child */
                 menu_frame_select(frame, NULL, TRUE);
+                /* and put it in the parent */
+                menu_frame_select(frame->parent, frame->parent->selected,
+                                  TRUE);
+            }
             ret = TRUE;
         }
 

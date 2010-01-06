@@ -1153,15 +1153,13 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     ObMenuEntryFrame *old = self->selected;
     ObMenuFrame *oldchild = self->child;
     ObMenuEntryFrame *oldchild_entry = self->child_entry;
-    ObMenuEntryFrame *temp;
 
     /* if the user selected a separator, ignore it and reselect what we had
        selected before */
     if (entry && entry->entry->type == OB_MENU_ENTRY_TYPE_SEPARATOR)
         entry = old;
 
-    if (old == entry && (old->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU ||
-                         old == oldchild_entry))
+    if (old == entry && (old->entry->type != OB_MENU_ENTRY_TYPE_SUBMENU))
         return;
 
     /* if the user left this menu but we have a submenu open, move the
@@ -1203,18 +1201,24 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (self->selected) {
         menu_entry_frame_render(self->selected);
 
-        /* only show if the submenu isn't already showing */
-        if (oldchild_entry != self->selected &&
-            self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-        {
-            if (immediate || config_submenu_hide_delay == 0)
-                menu_entry_frame_show_submenu(self->selected);
-            else if (config_submenu_hide_delay > 0)
-                ob_main_loop_timeout_add(ob_main_loop,
-                                         config_submenu_show_delay * 1000,
-                                         submenu_show_timeout,
-                                         self->selected, g_direct_equal,
-                                         NULL);
+        if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+            /* only show if the submenu isn't already showing */
+            if (oldchild_entry != self->selected) {
+                if (immediate || config_submenu_hide_delay == 0)
+                    menu_entry_frame_show_submenu(self->selected);
+                else if (config_submenu_hide_delay > 0)
+                    ob_main_loop_timeout_add(ob_main_loop,
+                                             config_submenu_show_delay * 1000,
+                                             submenu_show_timeout,
+                                             self->selected, g_direct_equal,
+                                             NULL);
+            }
+            /* hide the grandchildren of this menu. and move the cursor to
+               the current menu */
+            else if (immediate && self->child && self->child->child) {
+                menu_frame_hide(self->child->child);
+                menu_frame_select(self->child, NULL, TRUE);
+            }
         }
     }
 }

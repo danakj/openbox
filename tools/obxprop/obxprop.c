@@ -16,7 +16,8 @@ gint fail(const gchar *s) {
              "Options:\n"
              "    --help              Display this help and exit\n"
              "    --display DISPLAY   Connect to this X display\n"
-             "    --id ID             Show the properties for this window\n");
+             "    --id ID             Show the properties for this window\n"
+             "    --root              Show the properties for the root window\n");
     return 1;
 }
 
@@ -256,11 +257,14 @@ int main(int argc, char **argv)
     Window id, userid = None;
     int i;
     char *dname = NULL;
+    gboolean root = FALSE;
 
     for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--help")) {
             return fail(0);
         }
+        else if (!strcmp(argv[i], "--root"))
+            root = TRUE;
         else if (!strcmp(argv[i], "--id")) {
             if (++i == argc)
                 return fail(0);
@@ -286,6 +290,9 @@ int main(int argc, char **argv)
         return fail("Unable to find an X display. "
                     "Ensure you have permission to connect to the display.");
     }
+
+    if (root)
+        userid = RootWindow(d, DefaultScreen(d));
 
     if (userid == None) {
         i = XGrabPointer(d, RootWindow(d, DefaultScreen(d)),

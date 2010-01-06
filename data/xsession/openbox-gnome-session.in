@@ -46,7 +46,7 @@ else
   OB_SESSION=$(gconftool-2 -g $SPATH/openbox_session 2> /dev/null)
 
   # update the GNOME/Openbox session if needed
-  if x$OB_SESSION != x$SESSION; then
+  if test x$OB_SESSION != x$SESSION; then
       # the default session changed or we didn't run GNOME/Openbox before
       gconftool-2 -t list --list-type=strings -s $SPATH/openbox_session \
         "$SESSION" 2> /dev/null

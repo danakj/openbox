@@ -185,6 +185,8 @@ extern guint    config_menu_hide_delay;
 extern gboolean config_menu_middle;
 /*! Delay before opening a submenu in milliseconds */
 extern guint    config_submenu_show_delay;
+/*! Delay before closing a submenu in milliseconds */
+extern guint    config_submenu_hide_delay;
 /*! Show icons in client_list_menu */
 extern gboolean config_menu_client_list_icons;
 /*! Show manage desktops in client_list_menu */

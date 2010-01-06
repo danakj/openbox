@@ -50,12 +50,10 @@ struct _ObMenuFrame
     ObMenuFrame *parent;
     ObMenuEntryFrame *parent_entry;
     ObMenuFrame *child;
+    ObMenuEntryFrame *child_entry;
 
     GList *entries;
     ObMenuEntryFrame *selected;
-    /* if a submenu was selected, then this holds the entry for that submenu
-       until it is closed */
-    ObMenuEntryFrame *open_submenu;
 
     /* show entries from the menu starting at this index */
     guint show_from;

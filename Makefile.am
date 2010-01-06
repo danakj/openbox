@@ -493,6 +493,8 @@ dist_noinst_DATA = \
 	doc/openbox-gnome-session.1.in \
 	doc/openbox-kde-session.1.sgml \
 	doc/openbox-kde-session.1.in \
+	doc/obxprop.1.sgml \
+	doc/obxprop.1.in \
 	render/obrender-3.0.pc.in \
 	parser/obparser-3.0.pc.in \
 	tools/themeupdate/themeupdate.py \

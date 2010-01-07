@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2009-12-08 14:27-0500\n"
+"POT-Creation-Date: 2010-01-07 14:19-0500\n"
 "PO-Revision-Date: 2007-07-14 00:43+0200\n"
 "Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -39,7 +39,7 @@ msgstr ""
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nie można przekonwertować ścieżki \"%s\" z UTF-8"
 
-#: openbox/actions/exit.c:62 openbox/client.c:3462
+#: openbox/actions/exit.c:62 openbox/client.c:3474
 msgid "Cancel"
 msgstr ""
 
@@ -63,37 +63,37 @@ msgstr ""
 msgid "Exit Openbox"
 msgstr ""
 
-#: openbox/client.c:2013
+#: openbox/client.c:2016
 msgid "Unnamed Window"
 msgstr ""
 
-#: openbox/client.c:2027 openbox/client.c:2059
+#: openbox/client.c:2030 openbox/client.c:2062
 msgid "Killing..."
 msgstr ""
 
-#: openbox/client.c:2029 openbox/client.c:2061
+#: openbox/client.c:2032 openbox/client.c:2064
 msgid "Not Responding"
 msgstr ""
 
-#: openbox/client.c:3451
+#: openbox/client.c:3463
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
 
-#: openbox/client.c:3453
+#: openbox/client.c:3465
 msgid "End Process"
 msgstr ""
 
-#: openbox/client.c:3457
+#: openbox/client.c:3469
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
 
-#: openbox/client.c:3459
+#: openbox/client.c:3471
 msgid "Disconnect"
 msgstr ""
 
@@ -181,7 +181,7 @@ msgstr "Wyświetl/ukryj _dekoracje"
 msgid "_Close"
 msgstr "Z_amknij"
 
-#: openbox/config.c:782
+#: openbox/config.c:798
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Nieprawidłowy klawisz \"%s\" określony w pliku konfiguracyjnym"
@@ -271,22 +271,22 @@ msgstr ""
 msgid "Close"
 msgstr "Zamknij"
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:459
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "Wykonanie nowego pliku wykonywalnego \"%s\" podczas ponownego "
 "uruchomienianie powiodło się: %s"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:529 openbox/openbox.c:531
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:540
 msgid "Syntax: openbox [options]\n"
 msgstr "Składnia: openbox [opcje]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:541
 msgid ""
 "\n"
 "Options:\n"
@@ -294,30 +294,30 @@ msgstr ""
 "\n"
 "Opcje:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:542
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Wyświetla tę pomoc i kończy\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:543
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Wyświetla wersję i kończy\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:544
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:548
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:549
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Nie tworzy połączenia z menedżerem sesji\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:550
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -325,19 +325,19 @@ msgstr ""
 "\n"
 "Przekazywanie komunikatów do działającej instancji Openboksa:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:551
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Ponownie wczytuje pliki konfiguracyjne\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:552
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:553
 msgid "  --exit              Exit Openbox\n"
 msgstr ""
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:554
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -345,24 +345,24 @@ msgstr ""
 "\n"
 "Opcje debugowania:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:555
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Uruchamia w trybie synchronicznym\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:556
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Wyświetla informacje o debugowaniu\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:557
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
 "  --debug-focus       Wyświetla wyjście debugowania obsługi aktywacji\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:558
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Dzieli ekran na sztuczne ekrany xineramy\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:559
 #, c-format
 msgid ""
 "\n"
@@ -371,26 +371,26 @@ msgstr ""
 "\n"
 "Proszę zgłaszać błędy (w języku angielskim) pod adresem %s\n"
 
-#: openbox/openbox.c:617
+#: openbox/openbox.c:641
 msgid "--config-file requires an argument\n"
 msgstr ""
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:684
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Nieprawidłowy argument wiersza poleceń \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:103 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Menedżer okien jest już uruchomiony na ekranie %d"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nie można uzyskać wyboru menedżera okien na ekranie %d"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Menedżer okien na ekranie %d nie kończy działania"
@@ -399,7 +399,7 @@ msgstr "Menedżer okien na ekranie %d nie kończy działania"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:418
+#: openbox/screen.c:416
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -410,7 +410,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: openbox/screen.c:1205
+#: openbox/screen.c:1199
 #, c-format
 msgid "desktop %i"
 msgstr "pulpit %i"

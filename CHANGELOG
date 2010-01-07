@@ -1,3 +1,15 @@
+3.4.10:
+  * Improve keyboard navigation in Openbox menus.
+  * Add a --root option and a manpage for obxprop.
+  * Use a negative value for submenuShowDelay and submenuHideDelay to cause
+    an infinite delay.  This means you have to click to show a submenu, rather
+    than just hover over it.
+  * Improved code for submenu show/hide delay.  Added the submenuHideDelay
+    config file option, under the "menu" section.
+  * Fixed bug #4464 (Typo in openbox-gnome-session script).
+  * Fixed bug #4436 (Focusing a window used to stop focus cycling).
+  * Renamed obprop to obxprop due to collision with Open Babel (See bug #4419).
+
 3.4.9:
   * Allow focus to move while inside an Openbox menu, or during an interactive
     action such as window cycling.

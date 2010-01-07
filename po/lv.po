@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2009-12-08 14:27-0500\n"
+"POT-Creation-Date: 2010-01-07 14:19-0500\n"
 "PO-Revision-Date: 2009-03-30 19:14+0300\n"
 "Last-Translator: Einars Sprugis <einars8@gmail.com>\n"
 "Language-Team: Latvian <lv@li.org>\n"
@@ -39,7 +39,7 @@ msgstr "Izpildīt"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Neizdevās pārveidot ceļu \"%s\" no utf8"
 
-#: openbox/actions/exit.c:62 openbox/client.c:3462
+#: openbox/actions/exit.c:62 openbox/client.c:3474
 msgid "Cancel"
 msgstr "Atcelt"
 
@@ -63,37 +63,37 @@ msgstr "Vai tiešām vēlaties iziet no Openbox?"
 msgid "Exit Openbox"
 msgstr "Iziet no Openbox"
 
-#: openbox/client.c:2013
+#: openbox/client.c:2016
 msgid "Unnamed Window"
 msgstr "Logs bez nosaukuma"
 
-#: openbox/client.c:2027 openbox/client.c:2059
+#: openbox/client.c:2030 openbox/client.c:2062
 msgid "Killing..."
 msgstr "Nogalina..."
 
-#: openbox/client.c:2029 openbox/client.c:2061
+#: openbox/client.c:2032 openbox/client.c:2064
 msgid "Not Responding"
 msgstr "Neatbild"
 
-#: openbox/client.c:3451
+#: openbox/client.c:3463
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr "Logs \"%s\" neatbild. Vai vēlieties to piespiest, nosūtot signālu %s?"
 
-#: openbox/client.c:3453
+#: openbox/client.c:3465
 msgid "End Process"
 msgstr "Nobeigt procesu"
 
-#: openbox/client.c:3457
+#: openbox/client.c:3469
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Logs \"%s\" neatbild. Vai vēlaties to atvienot no X servera?"
 
-#: openbox/client.c:3459
+#: openbox/client.c:3471
 msgid "Disconnect"
 msgstr "Atvienot"
 
@@ -181,7 +181,7 @@ msgstr "Bez/Ar _dekorācijām"
 msgid "_Close"
 msgstr "Ai_zvērt"
 
-#: openbox/config.c:782
+#: openbox/config.c:798
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Konfigurācijas failā \"%s\" norādīts neatļauts taustiņš"
@@ -273,20 +273,20 @@ msgstr "Openbox sintakses kļūda"
 msgid "Close"
 msgstr "Aizvērt"
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:459
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:529 openbox/openbox.c:531
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:540
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintakse: openbox [iespējas]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:541
 msgid ""
 "\n"
 "Options:\n"
@@ -294,31 +294,31 @@ msgstr ""
 "\n"
 "Iespējas:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:542
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Parāda šo palīdzības tekstu un iziet\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:543
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Parāda versiju un iziet\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:544
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Aizvieto pašreiz palaisto logu pārvaldnieku\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:548
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 "  --config-file FAILS Norāda ceļu uz izmantojamo konfigurācijas failu\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:549
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Atspējo savienojumu ar sesiju pārvaldnieku\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:550
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -326,19 +326,19 @@ msgstr ""
 "\n"
 "Nodod ziņojumus esošai Openbox instancei:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:551
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Pārlādē Openbox konfigurācijas failus\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:552
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Pārstartē Openbox\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:553
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Iziet no Openbox\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:554
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -346,24 +346,24 @@ msgstr ""
 "\n"
 "Atkļūdošanas iespējas:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:555
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Palaist sinhronajā režīmā\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:556
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Rādīt atkļūdošanas izvadi\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:557
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Rādīt atkļūdošanas izvadi fokusēšanas darbībām\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:558
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
 "  --debug-xinerama    Sadalīt displeju vairākos viltus xinerama ekrānos\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:559
 #, c-format
 msgid ""
 "\n"
@@ -372,26 +372,26 @@ msgstr ""
 "\n"
 "Lūdzu, ziņojiet kļūdas %s\n"
 
-#: openbox/openbox.c:617
+#: openbox/openbox.c:641
 msgid "--config-file requires an argument\n"
 msgstr "--config-file vajadzīgs arguments\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:684
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Neatļauts komandrindas arguments \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:103 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Logu pārvaldnieks jau eksistē uz %d. ekrāna"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nevarēja iegūt logu pārvaldnieka izvēli uz %d. ekrāna"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Logu pārvaldnieks uz %d. ekrāna nebeidz darbību"
@@ -400,7 +400,7 @@ msgstr "Logu pārvaldnieks uz %d. ekrāna nebeidz darbību"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:418
+#: openbox/screen.c:416
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -418,7 +418,7 @@ msgstr[2] ""
 "Openbox ir konfigurēts %d darbvirsmām, bet pašreizējai sesijai tādu ir %d.  "
 "Šī Openbox konfigurācijas opcija tiks ignorēta."
 
-#: openbox/screen.c:1205
+#: openbox/screen.c:1199
 #, c-format
 msgid "desktop %i"
 msgstr "darbvirsma %i"

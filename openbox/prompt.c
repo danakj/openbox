@@ -411,10 +411,10 @@ static void render_button(ObPrompt *self, ObPromptElement *e)
 {
     RrAppearance *a;
 
-    if (e->pressed && self->focus == e) a = prompt_a_pfocus;
-    else if (self->focus == e)          a = prompt_a_focus;
-    else if (e->pressed)                a = prompt_a_press;
-    else                                a = prompt_a_button;
+    if (e->hover && self->focus == e) a = prompt_a_pfocus;
+    else if (self->focus == e)        a = prompt_a_focus;
+    else if (e->pressed)              a = prompt_a_press;
+    else                              a = prompt_a_button;
 
     a->surface.parent = prompt_a_bg;
     a->surface.parentx = e->x;
@@ -587,25 +587,28 @@ gboolean prompt_mouse_event(ObPrompt *self, XEvent *e)
 
         oldfocus = self->focus;
 
-        but->pressed = TRUE;
+        but->pressed = but->hover = TRUE;
         self->focus = but;
 
         if (oldfocus != but) render_button(self, oldfocus);
         render_button(self, but);
     }
     else if (e->type == ButtonRelease) {
-        if (but->pressed)
+        if (but->hover)
             prompt_run_callback(self, but->result);
+        but->pressed = FALSE;
     }
     else if (e->type == MotionNotify) {
-        gboolean press;
+        if (but->pressed) {
+            gboolean hover;
 
-        press = (e->xmotion.x >= 0 && e->xmotion.y >= 0 &&
-                 e->xmotion.x < but->width && e->xmotion.y < but->height);
+            hover = (e->xmotion.x >= 0 && e->xmotion.y >= 0 &&
+                     e->xmotion.x < but->width && e->xmotion.y < but->height);
 
-        if (press != but->pressed) {
-            but->pressed = press;
-            render_button(self, but);
+            if (hover != but->hover) {
+                but->hover = hover;
+                render_button(self, but);
+            }
         }
     }
     return TRUE;

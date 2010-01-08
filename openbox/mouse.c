@@ -205,12 +205,13 @@ void mouse_replay_pointer(void)
     }
 }
 
-void mouse_event(ObClient *client, XEvent *e)
+gboolean mouse_event(ObClient *client, XEvent *e)
 {
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
     static Window lwindow = None;
     static gint px, py, pwx = -1, pwy = -1;
+    gboolean used = FALSE;
 
     ObFrameContext context;
     gboolean click = FALSE;
@@ -246,10 +247,10 @@ void mouse_event(ObClient *client, XEvent *e)
         if (CLIENT_CONTEXT(context, client))
             replay_pointer_needed = TRUE;
 
-        fire_binding(OB_MOUSE_ACTION_PRESS, context,
-                     client, e->xbutton.state,
-                     e->xbutton.button,
-                     e->xbutton.x_root, e->xbutton.y_root);
+        used = fire_binding(OB_MOUSE_ACTION_PRESS, context,
+                            client, e->xbutton.state,
+                            e->xbutton.button,
+                            e->xbutton.x_root, e->xbutton.y_root) || used;
 
         /* if the bindings grab the pointer, there won't be a ButtonRelease
            event for us */
@@ -311,23 +312,23 @@ void mouse_event(ObClient *client, XEvent *e)
             state = 0;
             ltime = e->xbutton.time;
         }
-        fire_binding(OB_MOUSE_ACTION_RELEASE, context,
-                     client, e->xbutton.state,
-                     e->xbutton.button,
-                     e->xbutton.x_root,
-                     e->xbutton.y_root);
+        used = fire_binding(OB_MOUSE_ACTION_RELEASE, context,
+                            client, e->xbutton.state,
+                            e->xbutton.button,
+                            e->xbutton.x_root,
+                            e->xbutton.y_root) || used;
         if (click)
-            fire_binding(OB_MOUSE_ACTION_CLICK, context,
-                         client, e->xbutton.state,
-                         e->xbutton.button,
-                         e->xbutton.x_root,
-                         e->xbutton.y_root);
+            used = fire_binding(OB_MOUSE_ACTION_CLICK, context,
+                                client, e->xbutton.state,
+                                e->xbutton.button,
+                                e->xbutton.x_root,
+                                e->xbutton.y_root) || used;
         if (dclick)
-            fire_binding(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
-                         client, e->xbutton.state,
-                         e->xbutton.button,
-                         e->xbutton.x_root,
-                         e->xbutton.y_root);
+            used = fire_binding(OB_MOUSE_ACTION_DOUBLE_CLICK, context,
+                                client, e->xbutton.state,
+                                e->xbutton.button,
+                                e->xbutton.x_root,
+                                e->xbutton.y_root) || used;
         break;
 
     case MotionNotify:
@@ -347,8 +348,8 @@ void mouse_event(ObClient *client, XEvent *e)
                     context == OB_FRAME_CONTEXT_CLOSE)
                     break;
 
-                fire_binding(OB_MOUSE_ACTION_MOTION, context,
-                             client, state, button, px, py);
+                used = fire_binding(OB_MOUSE_ACTION_MOTION, context,
+                                    client, state, button, px, py);
                 button = 0;
                 state = 0;
             }
@@ -358,6 +359,7 @@ void mouse_event(ObClient *client, XEvent *e)
     default:
         g_assert_not_reached();
     }
+    return used;
 }
 
 gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,

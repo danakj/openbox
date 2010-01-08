@@ -90,7 +90,7 @@ static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
-static void event_handle_user_input(ObClient *client, XEvent *e);
+static gboolean event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(gulong serial);
 static void event_ignore_enter_range(gulong start, gulong end);
 
@@ -472,6 +472,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObWindow *obwin = NULL;
     ObMenuFrame *menu = NULL;
     ObPrompt *prompt = NULL;
+    gboolean used;
 
     /* make a copy we can mangle */
     ee = *ec;
@@ -717,15 +718,13 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (prompt && event_handle_prompt(prompt, e))
-        ;
-    else if (e->type == ButtonPress || e->type == ButtonRelease) {
+    if (e->type == ButtonPress || e->type == ButtonRelease) {
         /* If the button press was on some non-root window, or was physically
            on the root window, then process it */
         if (window != obt_root(ob_screen) ||
             e->xbutton.subwindow == None)
         {
-            event_handle_user_input(client, e);
+            used = event_handle_user_input(client, e);
         }
         /* Otherwise only process it if it was physically on an openbox
            internal window */
@@ -735,13 +734,16 @@ static void event_process(const XEvent *ec, gpointer data)
             if ((w = window_find(e->xbutton.subwindow)) &&
                 WINDOW_IS_INTERNAL(w))
             {
-                event_handle_user_input(client, e);
+                used = event_handle_user_input(client, e);
             }
         }
     }
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
-        event_handle_user_input(client, e);
+        used = event_handle_user_input(client, e);
+
+    if (prompt && !used)
+        used = event_handle_prompt(prompt, e);
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
@@ -1955,7 +1957,7 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
     }
 }
 
-static void event_handle_user_input(ObClient *client, XEvent *e)
+static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 {
     g_assert(e->type == ButtonPress || e->type == ButtonRelease ||
              e->type == MotionNotify || e->type == KeyPress ||
@@ -1966,29 +1968,32 @@ static void event_handle_user_input(ObClient *client, XEvent *e)
             /* don't use the event if the menu used it, but if the menu
                didn't use it and it's a keypress that is bound, it will
                close the menu and be used */
-            return;
+            return TRUE;
     }
 
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
-    if (!actions_interactive_input_event(e) && !moveresize_event(e)) {
-        if (moveresize_in_progress)
-            /* make further actions work on the client being
-               moved/resized */
-            client = moveresize_client;
+    if (actions_interactive_input_event(e) || moveresize_event(e))
+        return TRUE;
 
-        if (e->type == ButtonPress ||
-            e->type == ButtonRelease ||
-            e->type == MotionNotify)
-        {
-            /* the frame may not be "visible" but they can still click on it
-               in the case where it is animating before disappearing */
-            if (!client || !frame_iconify_animating(client->frame))
-                mouse_event(client, e);
-        } else
-            keyboard_event((focus_cycle_target ? focus_cycle_target :
-                            (client ? client : focus_client)), e);
-    }
+    if (moveresize_in_progress)
+        /* make further actions work on the client being
+           moved/resized */
+        client = moveresize_client;
+
+    if (e->type == ButtonPress ||
+        e->type == ButtonRelease ||
+        e->type == MotionNotify)
+    {
+        /* the frame may not be "visible" but they can still click on it
+           in the case where it is animating before disappearing */
+        if (!client || !frame_iconify_animating(client->frame))
+            return mouse_event(client, e);
+    } else
+        return keyboard_event((focus_cycle_target ? focus_cycle_target :
+                               (client ? client : focus_client)), e);
+
+    return FALSE;
 }
 
 static void focus_delay_dest(gpointer data)

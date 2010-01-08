@@ -204,13 +204,14 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
 }
 #endif
 
-void keyboard_event(ObClient *client, const XEvent *e)
+gboolean keyboard_event(ObClient *client, const XEvent *e)
 {
     KeyBindingTree *p;
+    gboolean used;
 
     if (e->type == KeyRelease) {
         grab_key_passive_count(-1);
-        return;
+        return FALSE;
     }
 
     g_assert(e->type == KeyPress);
@@ -221,9 +222,10 @@ void keyboard_event(ObClient *client, const XEvent *e)
     {
         obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
         keyboard_reset_chains(-1);
-        return;
+        return TRUE;
     }
 
+    used = FALSE;
     if (curpos == NULL)
         p = keyboard_firstnode;
     else
@@ -258,9 +260,11 @@ void keyboard_event(ObClient *client, const XEvent *e)
                                  0, OB_FRAME_CONTEXT_NONE, client);
             }
             break;
+            used = TRUE;
         }
         p = p->next_sibling;
     }
+    return used;
 }
 
 static void node_rebind(KeyBindingTree *node)

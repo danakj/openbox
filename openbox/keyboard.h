@@ -40,7 +40,7 @@ void keyboard_chroot(GList *keylist);
 gboolean keyboard_bind(GList *keylist, struct _ObActionsAct *action);
 void keyboard_unbind_all(void);
 
-void keyboard_event(struct _ObClient *client, const XEvent *e);
+gboolean keyboard_event(struct _ObClient *client, const XEvent *e);
 /*! @param break_chroots how many chroots to break. -1 means to break them ALL!
  */
 void keyboard_reset_chains(gint break_chroots);

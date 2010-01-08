@@ -33,7 +33,7 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
                     ObMouseAction mact, struct _ObActionsAct *action);
 void mouse_unbind_all(void);
 
-void mouse_event(struct _ObClient *client, XEvent *e);
+gboolean mouse_event(struct _ObClient *client, XEvent *e);
 
 void mouse_grab_for_client(struct _ObClient *client, gboolean grab);
 

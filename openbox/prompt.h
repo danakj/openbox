@@ -38,6 +38,7 @@ struct _ObPromptElement {
 
     gint x, y, width, height;
     gboolean pressed;
+    gboolean hover;
     gint result;
 };
 

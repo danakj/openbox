@@ -93,6 +93,7 @@ gint config_mouse_screenedgetime;
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
 guint    config_submenu_show_delay;
+guint    config_submenu_hide_delay;
 gboolean config_menu_client_list_icons;
 gboolean config_menu_manage_desktops;
 
@@ -813,6 +814,8 @@ static void parse_menu(xmlNodePtr node, gpointer d)
         config_menu_middle = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "submenuShowDelay")))
         config_submenu_show_delay = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "submenuHideDelay")))
+        config_submenu_hide_delay = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "applicationIcons")))
         config_menu_client_list_icons = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "manageDesktops")))
@@ -1017,7 +1020,8 @@ void config_startup(ObtXmlInst *i)
 
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
-    config_submenu_show_delay = 0;
+    config_submenu_show_delay = 200;
+    config_submenu_hide_delay = 400;
     config_menu_client_list_icons = TRUE;
     config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;

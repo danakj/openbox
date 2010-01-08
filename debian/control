@@ -13,4 +13,4 @@ Suggests: menu, x-display-manager, ksmserver | gnome-session, kdm | gdm
 Conflicts: menu (<< 2.1.12)
 Provides: x-window-manager
 Description: A minimalistic, highly configurable, next generation window manager with extensive standards support.
- http://icculus.org/openbox/
+ http://openbox.org/

@@ -1802,8 +1802,13 @@ static gboolean event_handle_menu_input(XEvent *ev)
 
             else if (ob_keycode_match(keycode, OB_KEY_LEFT)) {
                 /* Left goes to the parent menu */
-                if (frame->parent)
+                if (frame->parent) {
+                    /* remove focus from the child */
                     menu_frame_select(frame, NULL, TRUE);
+                    /* and put it in the parent */
+                    menu_frame_select(frame->parent, frame->parent->selected,
+                                      TRUE);
+                }
                 ret = TRUE;
             }
 
@@ -1903,6 +1908,15 @@ static gboolean event_handle_menu_input(XEvent *ev)
     return ret;
 }
 
+static Bool event_look_for_menu_enter(Display *d, XEvent *ev, XPointer arg)
+{
+    ObMenuFrame *f = (ObMenuFrame*)arg;
+    ObMenuEntryFrame *e;
+    return ev->type == EnterNotify &&
+        (e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
+        !e->ignore_enters && e->frame == f;
+}
+
 static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
 {
     ObMenuFrame *f;
@@ -1925,14 +1939,16 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
         if (ev->xcrossing.detail == NotifyInferior)
             break;
 
-        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
-            (f = find_active_menu()) && f->selected == e)
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)))
         {
-            ObMenuEntryFrame *u = menu_entry_frame_under(ev->xcrossing.x_root,
-                                                         ev->xcrossing.y_root);
-            /* if we're just going from one entry in the menu to the next,
-               don't unselect stuff first */
-            if (!u || e->frame != u->frame)
+            XEvent ce;
+
+            /* check if an EnterNotify event is coming, and if not, then select
+               nothing in the menu */
+            if (XCheckIfEvent(obt_display, &ce, event_look_for_menu_enter,
+                              (XPointer)e->frame))
+                XPutBackEvent(obt_display, &ce);
+            else
                 menu_frame_select(e->frame, NULL, FALSE);
         }
         break;

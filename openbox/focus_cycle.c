@@ -115,7 +115,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_valid_target(ft, TRUE,
+        if (focus_valid_target(ft, screen_desktop, TRUE,
                                focus_cycle_iconic_windows,
                                focus_cycle_all_desktops,
                                focus_cycle_dock_windows,
@@ -186,7 +186,8 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if (cur == c)
             continue;
-        if (!focus_valid_target(it->data, TRUE, FALSE, FALSE, dock_windows,
+        if (!focus_valid_target(it->data, screen_desktop,
+                                TRUE, FALSE, FALSE, dock_windows,
                                 desktop_windows, FALSE))
             continue;
 
@@ -291,7 +292,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_valid_target(it->data, TRUE,
+            if (focus_valid_target(it->data, screen_desktop, TRUE,
                                    focus_cycle_iconic_windows,
                                    focus_cycle_all_desktops,
                                    focus_cycle_dock_windows,

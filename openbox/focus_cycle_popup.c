@@ -261,7 +261,7 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     for (it = g_list_last(focus_order); it; it = g_list_previous(it)) {
         ObClient *ft = it->data;
 
-        if (focus_valid_target(ft, TRUE,
+        if (focus_valid_target(ft, screen_desktop, TRUE,
                                iconic_windows,
                                all_desktops,
                                dock_windows,

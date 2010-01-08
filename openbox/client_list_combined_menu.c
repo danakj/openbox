@@ -53,7 +53,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         menu_add_separator(menu, SEPARATOR, screen_desktop_names[desktop]);
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            if (focus_valid_target(c, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
+            if (focus_valid_target(c, desktop,
+                                   TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
             {
                 empty = FALSE;
 

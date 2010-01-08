@@ -290,7 +290,8 @@ void client_manage(Window window, ObPrompt *prompt)
         (user_time != 0) &&
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
-        focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE,
+        focus_valid_target(self, self->desktop,
+                           FALSE, FALSE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
     {
         activate = TRUE;

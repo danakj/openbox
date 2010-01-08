@@ -129,7 +129,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            3. it is not shaded
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
-            focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE) &&
+            focus_valid_target(c, screen_desktop,
+                               TRUE, FALSE, FALSE, FALSE, FALSE, FALSE) &&
             !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -149,7 +150,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_valid_target(c, TRUE, FALSE, FALSE, FALSE, TRUE, FALSE) &&
+        if (focus_valid_target(c, screen_desktop,
+                               TRUE, FALSE, FALSE, FALSE, TRUE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -273,7 +275,8 @@ static gboolean focus_target_has_siblings(ObClient *ft,
         ObClient *c = it->data;
         /* check that it's not a helper window to avoid infinite recursion */
         if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
-            focus_valid_target(c, TRUE, iconic_windows, all_desktops,
+            focus_valid_target(c, screen_desktop,
+                               TRUE, iconic_windows, all_desktops,
                                FALSE, FALSE, FALSE))
         {
             return TRUE;
@@ -283,6 +286,7 @@ static gboolean focus_target_has_siblings(ObClient *ft,
 }
 
 gboolean focus_valid_target(ObClient *ft,
+                            guint    desktop,
                             gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
@@ -296,7 +300,7 @@ gboolean focus_valid_target(ObClient *ft,
 
        do this check first because it will usually filter out the most
        windows */
-    ok = (all_desktops || ft->desktop == screen_desktop ||
+    ok = (all_desktops || ft->desktop == desktop ||
           ft->desktop == DESKTOP_ALL);
 
     /* the window can receive focus somehow */
@@ -341,6 +345,7 @@ gboolean focus_valid_target(ObClient *ft,
     {
         ObClient *cft = client_focus_target(ft);
         ok = ok && (ft == cft || !focus_valid_target(cft,
+                                                     screen_desktop,
                                                      TRUE,
                                                      iconic_windows,
                                                      all_desktops,

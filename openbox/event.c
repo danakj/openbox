@@ -1729,6 +1729,16 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
             menu_frame_select_next(frame);
             ret = TRUE;
         }
+
+        else if (ob_keycode_match(keycode, OB_KEY_HOME)) {
+            menu_frame_select_first(frame);
+            ret = TRUE;
+        }
+
+        else if (ob_keycode_match(keycode, OB_KEY_END)) {
+            menu_frame_select_last(frame);
+            ret = TRUE;
+        }
     }
 
     /* Use KeyRelease events for running things so that the key release doesn't

@@ -127,6 +127,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                        gboolean immediate);
 void menu_frame_select_previous(ObMenuFrame *self);
 void menu_frame_select_next(ObMenuFrame *self);
+void menu_frame_select_first(ObMenuFrame *self);
+void menu_frame_select_last(ObMenuFrame *self);
 
 ObMenuFrame* menu_frame_under(gint x, gint y);
 ObMenuEntryFrame* menu_entry_frame_under(gint x, gint y);

@@ -274,12 +274,14 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
         if (obt_xml_attr_string(node, "label", &label)) {
             GSList *acts = NULL;
 
-            for (node = node->children; node; node = node->next)
-                if (!xmlStrcasecmp(node->name, (const xmlChar*) "action")) {
-                    ObActionsAct *a = actions_parse(node);
-                    if (a)
-                        acts = g_slist_append(acts, a);
-                }
+            node = obt_xml_find_node(node->children, "action");
+            while (node) {
+                ObActionsAct *action = actions_parse(node);
+                if (action)
+                    acts = g_slist_append(acts, action);
+                node = obt_xml_find_node(node->next, "action");
+            }
+
             menu_add_normal(state->parent, -1, label, acts, TRUE);
             g_free(label);
         }

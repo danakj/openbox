@@ -273,13 +273,13 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--help")) {
-            return fail(0);
+            return fail(NULL);
         }
         else if (!strcmp(argv[i], "--root"))
             root = TRUE;
         else if (!strcmp(argv[i], "--id")) {
             if (++i == argc)
-                return fail(0);
+                return fail(NULL);
             if (argv[i][0] == '0' && argv[i][1] == 'x') {
                 /* hex */
                 userid = parse_hex(argv[i]+2);
@@ -288,11 +288,12 @@ int main(int argc, char **argv)
                 /* decimal */
                 userid = atoi(argv[i]);
             }
-            break;
+            if (!userid)
+                return fail("Unable to parse argument to --id.");
         }
         else if (!strcmp(argv[i], "--display")) {
             if (++i == argc)
-                return fail(0);
+                return fail(NULL);
             dname = argv[i];
         }
         else if (*argv[i] != '-')

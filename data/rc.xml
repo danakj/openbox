@@ -693,12 +693,16 @@
 <!--
   # this is an example with comments through out. use these to make your
   # own rules, but without the comments of course.
+  # you may use one or more of the name/class/role/type rules to specify
+  # windows to match
 
   <application name="the window's _OB_NAME property (see obxprop)"
               class="the window's _OB_CLASS property (see obxprop)"
                role="the window's _OB_ROLE property (see obxprop)"
                type="the window's _NET_WM_WINDOW_TYPE (see obxprob)..
-                      (if unspecified, then it is 'dialog' for child windows)">
+                      (if unspecified, then it is 'dialog' for child windows)
+                      one of: normal, dialog, splash, utility, menu, toolbar,
+                              dock, desktop">
   # the name or the class can be set, or both. this is used to match
   # windows when they appear. role can optionally be set as well, to
   # further restrict your matches.

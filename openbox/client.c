@@ -327,9 +327,7 @@ void client_manage(Window window, ObPrompt *prompt)
                      "program + user specified" :
                      "BADNESS !?")))), place.width, place.height);
 
-        /* splash screens are also returned as TRUE for transient,
-           and so will be forced on screen below */
-        transient = place_client(self, &place.x, &place.y, settings);
+        place_client(self, &place.x, &place.y, settings);
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &place.x, &place.y,
@@ -345,11 +343,13 @@ void client_manage(Window window, ObPrompt *prompt)
                                 it is up to the placement routines to avoid
                                 the xinerama divides)
 
-                                splash screens get "transient" set to TRUE by
-                                the place_client call
+                                children and splash screens are forced on
+                                screen, but i don't remember why i decided to
+                                do that.
                              */
                              ob_state() == OB_STATE_RUNNING &&
-                             (transient ||
+                             (self->type == OB_CLIENT_TYPE_DIALOG ||
+                              self->type == OB_CLIENT_TYPE_SPLASH ||
                               (!((self->positioned & USPosition) ||
                                  (settings && settings->pos_given)) &&
                                client_normal(self) &&
@@ -791,10 +791,9 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         ObAppSettings *app = it->data;
         gboolean match = TRUE;
 
-        g_assert(app->name != NULL || app->class != NULL);
+        g_assert(app->name != NULL || app->class != NULL ||
+                 app->role != NULL || (signed)app->type >= 0);
 
-        /* we know that either name or class is not NULL so it will have to
-           match to use the rule */
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
@@ -806,8 +805,9 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
             match = FALSE;
-        else if ((signed)app->type >= 0 && app->type != self->type)
+        else if ((signed)app->type >= 0 && app->type != self->type) {
             match = FALSE;
+        }
 
         if (match) {
             ob_debug("Window matching: %s", app->name);

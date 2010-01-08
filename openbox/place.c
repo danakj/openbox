@@ -484,8 +484,8 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         return FALSE;
 
     /* try a number of methods */
-    ret = place_transient_splash(client, x, y) ||
-        (userplaced = place_per_app_setting(client, x, y, settings)) ||
+    ret = (userplaced = place_per_app_setting(client, x, y, settings)) ||
+        place_transient_splash(client, x, y) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
         place_nooverlap(client, x, y) ||

@@ -149,7 +149,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
         dst->pos_given = TRUE;
         dst->pos_force = src->pos_force;
         dst->position = src->position;
-        dst->monitor = src->monitor;
+        /* monitor is copied above */
     }
 }
 
@@ -200,8 +200,9 @@ static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = obt_xml_find_node(node->children, "application");
-    gchar *name = NULL, *class = NULL, *role = NULL, *type = NULL;
-    gboolean name_set, class_set, type_set;
+    gchar *name = NULL, *class = NULL, *role = NULL, *type_str = NULL;
+    gboolean name_set, class_set, type_set, role_set;
+    ObClientType type;
     gboolean x_pos_given;
 
     while (app) {
@@ -209,8 +210,32 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
         class_set = obt_xml_attr_string(app, "class", &class);
         name_set = obt_xml_attr_string(app, "name", &name);
-        type_set = obt_xml_attr_string(app, "type", &type);
-        if (class_set || name_set) {
+        type_set = obt_xml_attr_string(app, "type", &type_str);
+        role_set = obt_xml_attr_string(app, "role", &role);
+
+        /* validate the type tho */
+        if (type_set) {
+            if (!g_ascii_strcasecmp(type_str, "normal"))
+                type = OB_CLIENT_TYPE_NORMAL;
+            else if (!g_ascii_strcasecmp(type_str, "dialog"))
+                type = OB_CLIENT_TYPE_DIALOG;
+            else if (!g_ascii_strcasecmp(type_str, "splash"))
+                type = OB_CLIENT_TYPE_SPLASH;
+            else if (!g_ascii_strcasecmp(type_str, "utility"))
+                type = OB_CLIENT_TYPE_UTILITY;
+            else if (!g_ascii_strcasecmp(type_str, "menu"))
+                type = OB_CLIENT_TYPE_MENU;
+            else if (!g_ascii_strcasecmp(type_str, "toolbar"))
+                type = OB_CLIENT_TYPE_TOOLBAR;
+            else if (!g_ascii_strcasecmp(type_str, "dock"))
+                type = OB_CLIENT_TYPE_DOCK;
+            else if (!g_ascii_strcasecmp(type_str, "desktop"))
+                type = OB_CLIENT_TYPE_DESKTOP;
+            else
+                type_set = FALSE; /* not valid! */
+        }
+
+        if (class_set || name_set || role_set || type_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
 
@@ -220,27 +245,11 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             if (class_set)
                 settings->class = g_pattern_spec_new(class);
 
-            if (type_set) {
-                if (!g_ascii_strcasecmp(type, "normal"))
-                    settings->type = OB_CLIENT_TYPE_NORMAL;
-                else if (!g_ascii_strcasecmp(type, "dialog"))
-                    settings->type = OB_CLIENT_TYPE_DIALOG;
-                else if (!g_ascii_strcasecmp(type, "splash"))
-                    settings->type = OB_CLIENT_TYPE_SPLASH;
-                else if (!g_ascii_strcasecmp(type, "utility"))
-                    settings->type = OB_CLIENT_TYPE_UTILITY;
-                else if (!g_ascii_strcasecmp(type, "menu"))
-                    settings->type = OB_CLIENT_TYPE_MENU;
-                else if (!g_ascii_strcasecmp(type, "toolbar"))
-                    settings->type = OB_CLIENT_TYPE_TOOLBAR;
-                else if (!g_ascii_strcasecmp(type, "dock"))
-                    settings->type = OB_CLIENT_TYPE_DOCK;
-                else if (!g_ascii_strcasecmp(type, "desktop"))
-                    settings->type = OB_CLIENT_TYPE_DESKTOP;
-            }
-
-            if (obt_xml_attr_string(app, "role", &role))
+            if (role_set)
                 settings->role = g_pattern_spec_new(role);
+
+            if (type_set)
+                settings->type = type;
 
             if ((n = obt_xml_find_node(app->children, "decor")))
                 if (!obt_xml_node_contains(n, "default"))
@@ -339,7 +348,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 }
 
             config_per_app_settings = g_slist_append(config_per_app_settings,
-                                              (gpointer) settings);
+                                                     (gpointer) settings);
             g_free(name);
             g_free(class);
             g_free(role);

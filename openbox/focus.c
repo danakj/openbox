@@ -328,9 +328,10 @@ gboolean focus_valid_target(ObClient *ft,
 
     /* it's not set to skip the taskbar (but this only applies to normal typed
        windows, and is overridden if the window is modal or if the user asked
-       for this window to be focused) */
+       for this window to be focused, or if the window is iconified) */
     ok = ok && (ft->type != OB_CLIENT_TYPE_NORMAL ||
                 ft->modal ||
+                ft->iconic ||
                 user_request ||
                 !ft->skip_taskbar);
 

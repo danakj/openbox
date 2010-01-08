@@ -76,11 +76,13 @@ tests/grouptrancircular2
 tests/iconifydelay
 tests/icons
 tests/mapiconic
+tests/mingrow
 tests/modal
 tests/modal2
 tests/modal3
 tests/noresize
 tests/override
+tests/overrideinputonly
 tests/positioned
 tests/resize
 tests/restack

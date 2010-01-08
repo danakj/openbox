@@ -219,7 +219,7 @@
             <xsd:element minOccurs="0" name="hideDelay" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="middle" type="ob:bool"/>
             <xsd:element minOccurs="0" name="submenuShowDelay" type="xsd:integer"/>
-            <xsd:element minOccurs="0" name="applicationIcons" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="showIcons" type="ob:bool"/>
             <xsd:element minOccurs="0" name="manageDesktops" type="ob:bool"/>
         </xsd:sequence>
     </xsd:complexType>

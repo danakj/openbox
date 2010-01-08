@@ -230,9 +230,13 @@ struct _RrImagePic {
     /* The sum of all the pixels.  This is used to compare pictures if their
        hashes match. */
     gint sum;
+    /* The name of the image.  This is used to determine
+       if the named image already is loaded.  May be NULL if the image
+       was not loaded from disk. */
+    gchar *name;
 };
 
-typedef void (*RrImageDestroyFunc)(RrImage *image);
+typedef void (*RrImageDestroyFunc)(RrImage *image, gpointer data);
 
 /*! An RrImage is a sort of meta-image.  It can contain multiple versions of
   an image at different sizes, which may or may not be completely different
@@ -252,10 +256,11 @@ struct _RrImage {
       RrImage. */
     RrImagePic **resized;
     gint n_resized;
- 
+
     /* This function (if not NULL) will be called just before destroying
       RrImage. */
     RrImageDestroyFunc destroy_func;
+    gpointer           destroy_data;
 };
 
 /* these are the same on all endian machines because it seems to be dependant
@@ -343,12 +348,19 @@ void          RrImageCacheUnref(RrImageCache *self);
 /*! Finds an image in the cache, if it is already in there */
 RrImage*      RrImageCacheFind(RrImageCache *self,
                                RrPixel32 *data, gint w, gint h);
+/*! Finds an image in the cache, by searching for the name of the image */
+RrImage*      RrImageCacheFindName(RrImageCache *self,
+                                   const gchar *name);
 
 RrImage* RrImageNew(RrImageCache *cache);
 void     RrImageRef(RrImage *im);
 void     RrImageUnref(RrImage *im);
 
-void     RrImageAddPicture(RrImage *im, RrPixel32 *data, gint w, gint h);
+void     RrImageAddPicture(RrImage *im, const RrPixel32 *data, gint w, gint h);
+/*! Adds a picture by name, from a file on disk. 
+  @name Can be a full path to an image, or it can be a name as per the
+        freedesktop.org icon spec. */
+gboolean RrImageAddPictureName(RrImage *im, const gchar *name);
 void     RrImageRemovePicture(RrImage *im, gint w, gint h);
 
 G_END_DECLS

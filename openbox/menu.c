@@ -36,7 +36,6 @@
 #include "gettext.h"
 #include "obt/xml.h"
 #include "obt/paths.h"
-#include "imageload.h"
 
 typedef struct _ObMenuParseState ObMenuParseState;
 
@@ -275,29 +274,39 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
 
     if (state->parent) {
         /* Don't try to extract "icon" attribute if icons in user-defined
-	   menus are not enabled. */
-        if (!(config_menu_user_show_icons &&
-            obt_xml_attr_string(node, "icon", &icon)))
-        {
-            icon = NULL;
-        }
+           menus are not enabled. */
 
         if (obt_xml_attr_string(node, "label", &label)) {
+            xmlNodePtr c;
             GSList *acts = NULL;
 
-            node = obt_xml_find_node(node->children, "action");
-            while (node) {
-                ObActionsAct *action = actions_parse(node);
+            c = obt_xml_find_node(node->children, "action");
+            while (c) {
+                ObActionsAct *action = actions_parse(c);
                 if (action)
                     acts = g_slist_append(acts, action);
-                node = obt_xml_find_node(node->next, "action");
+                c = obt_xml_find_node(node->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, acts, TRUE);
             
-            if (icon) { /* Icon will be used. */
-                e->data.normal.icon = RrImageFetchFromFile(ob_rr_icons, icon);
+            if (config_menu_show_icons &&
+                obt_xml_attr_string(node, "icon", &icon))
+            {
+                RrImage *ic;
+
+                ic = RrImageCacheFindName(ob_rr_icons, icon);
+                if (ic)
+                    RrImageRef(ic);
+                else {
+                    ic = RrImageNew(ob_rr_icons);
+                    if (!RrImageAddPictureName(ic, icon))
+                        RrImageUnref(ic); /* no need to keep it around */
+                }
+                e->data.normal.icon = ic;
+
                 if (e->data.normal.icon)
                     e->data.normal.icon_alpha = 0xff;
+
                 g_free(icon);
             }
             g_free(label);

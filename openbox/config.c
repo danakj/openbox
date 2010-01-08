@@ -94,9 +94,8 @@ guint    config_menu_hide_delay;
 gboolean config_menu_middle;
 guint    config_submenu_show_delay;
 guint    config_submenu_hide_delay;
-gboolean config_menu_client_list_icons;
 gboolean config_menu_manage_desktops;
-gboolean config_menu_user_show_icons;
+gboolean config_menu_show_icons;
 
 GSList *config_menu_files;
 
@@ -817,17 +816,14 @@ static void parse_menu(xmlNodePtr node, gpointer d)
         config_submenu_show_delay = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "submenuHideDelay")))
         config_submenu_hide_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "applicationIcons")))
-        config_menu_client_list_icons = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "manageDesktops")))
         config_menu_manage_desktops = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "showIcons"))) {
-        config_menu_user_show_icons = obt_xml_node_bool(n);
-        #ifndef USE_IMLIB2
-        if (config_menu_user_show_icons)
-            g_message(_("Openbox was compiled without Imlib2."
-                      " Icons in user-defined menus will NOT be loaded."));
-        #endif
+        config_menu_show_icons = obt_xml_node_bool(n);
+#ifndef USE_IMLIB2
+        if (config_menu_show_icons)
+            g_message(_("Openbox was compiled without Imlib2 image loading support. Icons in menus will not be loaded."));
+#endif
     }
 
     while ((node = obt_xml_find_node(node, "file"))) {
@@ -1031,10 +1027,9 @@ void config_startup(ObtXmlInst *i)
     config_menu_middle = FALSE;
     config_submenu_show_delay = 200;
     config_submenu_hide_delay = 400;
-    config_menu_client_list_icons = TRUE;
     config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;
-    config_menu_user_show_icons = TRUE;
+    config_menu_show_icons = TRUE;
 
     obt_xml_register(i, "menu", parse_menu, NULL);
 

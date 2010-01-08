@@ -45,11 +45,14 @@ struct _RrImageCache {
     */
     gint max_resized_saved;
 
-    GHashTable *table;
+    /*! A hash table of images in the cache that don't have a file name
+      attached to them, with their key being a hash of the contents of the
+      image. */
+    GHashTable *pic_table;
 
-    /* Used to find out if an image file has already been loaded.
-       Quick file_name -> RrImage lookup. */
-    GHashTable *file_name_table;
+    /*! Used to find out if an image file has already been loaded.
+      Provides a quick file_name -> RrImage lookup. */
+    GHashTable *name_table;
 };
 
 #endif

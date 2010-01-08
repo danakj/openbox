@@ -32,9 +32,9 @@ RrImageCache* RrImageCacheNew(gint max_resized_saved)
     self = g_new(RrImageCache, 1);
     self->ref = 1;
     self->max_resized_saved = max_resized_saved;
-    self->table = g_hash_table_new((GHashFunc)RrImagePicHash,
-                                   (GEqualFunc)RrImagePicEqual);
-    self->file_name_table = NULL;
+    self->pic_table = g_hash_table_new((GHashFunc)RrImagePicHash,
+                                       (GEqualFunc)RrImagePicEqual);
+    self->name_table = g_hash_table_new(g_str_hash, g_str_equal);
     return self;
 }
 
@@ -46,12 +46,21 @@ void RrImageCacheRef(RrImageCache *self)
 void RrImageCacheUnref(RrImageCache *self)
 {
     if (self && --self->ref == 0) {
-        g_assert(g_hash_table_size(self->table) == 0);
-        g_assert(self->file_name_table == NULL);
-        g_hash_table_unref(self->table);
+        g_assert(g_hash_table_size(self->pic_table) == 0);
+        g_hash_table_unref(self->pic_table);
+        self->pic_table = NULL;
+
+        g_assert(g_hash_table_size(self->name_table) == 0);
+        g_hash_table_destroy(self->name_table);
+        self->name_table = NULL;
 
         g_free(self);
     }
+}
+
+RrImage* RrImageCacheFindName(RrImageCache *self, const gchar *name)
+{
+    return g_hash_table_lookup(self->name_table, name);
 }
 
 /*! Finds an image in the cache, if it is already in there */
@@ -60,8 +69,8 @@ RrImage* RrImageCacheFind(RrImageCache *self,
 {
     RrImagePic pic;
 
-    RrImagePicInit(&pic, w, h, data);
-    return g_hash_table_lookup(self->table, &pic);
+    RrImagePicInit(&pic, NULL, w, h, data);
+    return g_hash_table_lookup(self->pic_table, &pic);
 }
 
 #define hashsize(n) ((RrPixel32)1<<(n))

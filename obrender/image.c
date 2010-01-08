@@ -21,6 +21,9 @@
 #include "image.h"
 #include "color.h"
 #include "imagecache.h"
+#ifdef USE_IMLIB2
+#include <Imlib2.h>
+#endif
 
 #include <glib.h>
 
@@ -28,7 +31,8 @@
 #define FLOOR(i)        ((i) & (~0UL << FRACTION))
 #define AVERAGE(a, b)   (((((a) ^ (b)) & 0xfefefefeL) >> 1) + ((a) & (b)))
 
-void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
+void RrImagePicInit(RrImagePic *pic, const gchar *name,
+                    gint w, gint h, RrPixel32 *data)
 {
     gint i;
 
@@ -38,12 +42,14 @@ void RrImagePicInit(RrImagePic *pic, gint w, gint h, RrPixel32 *data)
     pic->sum = 0;
     for (i = w*h; i > 0; --i)
         pic->sum += *(data++);
+    pic->name = g_strdup(name);
 }
 
 static void RrImagePicFree(RrImagePic *pic)
 {
     if (pic) {
         g_free(pic->data);
+        g_free(pic->name);
         g_free(pic);
     }
 }
@@ -58,7 +64,10 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
 
     g_assert(pic->width > 0 && pic->height > 0);
 
-    g_assert(g_hash_table_lookup(self->cache->table, pic) == NULL);
+    if (pic->name)
+        g_assert(!g_hash_table_lookup(self->cache->name_table, pic->name));
+    else
+        g_assert(!g_hash_table_lookup(self->cache->pic_table, pic));
 
     /* grow the list */
     *list = g_renew(RrImagePic*, *list, ++*len);
@@ -70,8 +79,12 @@ static void AddPicture(RrImage *self, RrImagePic ***list, gint *len,
     /* set the new picture up at the front of the list */
     (*list)[0] = pic;
 
-    /* add the picture as a key to point to this image in the cache */
-    g_hash_table_insert(self->cache->table, (*list)[0], self);
+    /* add the name or the picture as a key to point to this image in the
+       cache */
+    if (pic->name)
+        g_hash_table_insert(self->cache->name_table, pic->name, self);
+    else
+        g_hash_table_insert(self->cache->pic_table, (*list)[0], self);
 
 /*
 #ifdef DEBUG
@@ -100,8 +113,11 @@ static void RemovePicture(RrImage *self, RrImagePic ***list,
 #endif
 */
 
-    /* remove the picture as a key in the cache */
-    g_hash_table_remove(self->cache->table, (*list)[i]);
+    /* remove the name or picture as a key in the cache */
+    if ((*list)[i]->name)
+        g_hash_table_remove(self->cache->name_table, (*list)[i]->name);
+    else
+        g_hash_table_remove(self->cache->pic_table, (*list)[i]);
 
     /* free the picture */
     RrImagePicFree((*list)[i]);
@@ -220,7 +236,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
     }
 
     pic = g_new(RrImagePic, 1);
-    RrImagePicInit(pic, dstW, dstH, dststart);
+    RrImagePicInit(pic, NULL, dstW, dstH, dststart);
 
     return pic;
 }
@@ -326,9 +342,11 @@ RrImage* RrImageNew(RrImageCache *cache)
 }
 
 /*! Set function that will be called just before RrImage is destroyed. */
-void RrImageSetDestroyFunc(RrImage *image, RrImageDestroyFunc func)
+void RrImageSetDestroyFunc(RrImage *image, RrImageDestroyFunc func,
+                           gpointer data)
 {
     image->destroy_func = func;
+    image->destroy_data = data;
 }
 
 void RrImageRef(RrImage *self)
@@ -346,7 +364,7 @@ void RrImageUnref(RrImage *self)
 #endif
 */
         if (self->destroy_func)
-            self->destroy_func(self);
+            self->destroy_func(self, self->destroy_data);
         while (self->n_original > 0)
             RemovePicture(self, &self->original, 0, &self->n_original);
         while (self->n_resized > 0)
@@ -355,10 +373,8 @@ void RrImageUnref(RrImage *self)
     }
 }
 
-/*! Add a new picture with the given RGBA pixel data and dimensions into the
-  RrImage.  This adds an "original" picture to the image.
-*/
-void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
+static void AddPictureFromData(RrImage *self, const char *name,
+                               const RrPixel32 *data, gint w, gint h)
 {
     gint i;
     RrImagePic *pic;
@@ -384,8 +400,53 @@ void RrImageAddPicture(RrImage *self, RrPixel32 *data, gint w, gint h)
 
     /* add the new picture */
     pic = g_new(RrImagePic, 1);
-    RrImagePicInit(pic, w, h, g_memdup(data, w*h*sizeof(RrPixel32)));
+    RrImagePicInit(pic, name, w, h, g_memdup(data, w*h*sizeof(RrPixel32)));
     AddPicture(self, &self->original, &self->n_original, pic);
+}
+
+gboolean RrImageAddPictureName(RrImage *self, const gchar *name)
+{
+#ifdef USE_IMLIB2
+    Imlib_Image img;
+    gint w, h;
+    RrPixel32 *data;
+    gchar *path;
+
+    /* XXX find the path via freedesktop icon spec (use obt) ! */
+    path = g_strdup(name);
+
+    if (!(img = imlib_load_image(path)))
+        g_message("Cannot load image \"%s\" from file \"%s\"", name, path);
+    g_free(path);
+
+    if (!img)
+        return FALSE; /* failed to load it */
+
+    /* Get data and dimensions of the image.
+
+       WARNING: This stuff is NOT threadsafe !!
+    */
+    imlib_context_set_image(img);
+    data = imlib_image_get_data_for_reading_only();
+    w = imlib_image_get_width();
+    h = imlib_image_get_height();
+
+    /* add it to the RrImage, and set its name */
+    AddPictureFromData(self, name, data, w, h);
+
+    imlib_free_image();
+    return TRUE;
+#else
+    return FALSE;
+#endif
+}
+
+/*! Add a new picture with the given RGBA pixel data and dimensions into the
+  RrImage.  This adds an "original" picture to the image.
+*/
+void RrImageAddPicture(RrImage *self, const RrPixel32 *data, gint w, gint h)
+{
+    AddPictureFromData(self, NULL, data, w, h);    
 }
 
 /*! Remove the picture from the RrImage which has the given dimensions. This

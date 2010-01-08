@@ -69,7 +69,7 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
                 e = menu_add_normal(menu, d->desktop, c->title, NULL, FALSE);
             }
 
-            if (config_menu_client_list_icons) {
+            if (config_menu_show_icons) {
                 e->data.normal.icon = client_icon(c);
                 RrImageRef(e->data.normal.icon);
                 e->data.normal.icon_alpha = c->iconic ? OB_ICONIC_ALPHA : 0xff;

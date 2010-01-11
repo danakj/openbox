@@ -636,14 +636,13 @@
   # this is an example with comments through out. use these to make your
   # own rules, but without the comments of course.
 
-  <application name="the window's _OB_NAME property (see obxprop)"
-              class="the window's _OB_CLASS property (see obxprop)"
-               role="the window's _OB_ROLE property (see obxprop)"
-               type="the window's _NET_WM_WINDOW_TYPE (see obxprob)..
+  <application name="the window's _OB_APP_NAME property (see obxprop)"
+              class="the window's _OB_APP_CLASS property (see obxprop)"
+               role="the window's _OB_APP_ROLE property (see obxprop)"
+               type="the window's _OB_APP_TYPE property (see obxprob)..
                       (if unspecified, then it is 'dialog' for child windows)">
-  # the name or the class can be set, or both. this is used to match
-  # windows when they appear. role can optionally be set as well, to
-  # further restrict your matches.
+  # you may set only one of name/class/role/type, or you may use more than one
+  # together to restrict your matches.
 
   # the name, class, and role use simple wildcard matching such as those
   # used by a shell. you can use * to match any characters and ? to match
@@ -656,7 +655,7 @@
   # order that they appear in this list
 
 
-    # each element can be left out or set to 'default' to specify to not 
+    # each rule element can be left out or set to 'default' to specify to not 
     # change that attribute of the window
 
     <decor>yes</decor>

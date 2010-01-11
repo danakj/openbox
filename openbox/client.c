@@ -76,7 +76,7 @@ static RrImage *client_default_icon     = NULL;
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
-static void client_save_session_ids(ObClient *self);
+static void client_save_app_rule_values(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -1163,7 +1163,9 @@ static void client_get_all(ObClient *self, gboolean real)
     /* get the session related properties, these can change decorations
        from per-app settings */
     client_get_session_ids(self);
-    client_save_session_ids(self);
+
+    /* save the values of the variables used for app rule matching */
+    client_save_app_rule_values(self);
 
     /* now we got everything that can affect the decorations */
     if (!real)
@@ -2372,13 +2374,36 @@ static void client_get_session_ids(ObClient *self)
     }
 }
 
-/*! Save the session IDs as seen by Openbox when the window mapped, so that
-  users can still access them later if the app changes them */
-static void client_save_session_ids(ObClient *self)
+/*! Save the properties used for app matching rules, as seen by Openbox when
+  the window mapped, so that users can still access them later if the app
+  changes them */
+static void client_save_app_rule_values(ObClient *self)
 {
-    PROP_SETS(self->window, ob_role, self->role);
-    PROP_SETS(self->window, ob_name, self->name);
-    PROP_SETS(self->window, ob_class, self->class);
+    const gchar *type;
+
+    PROP_SETS(self->window, ob_app_role, self->role);
+    PROP_SETS(self->window, ob_app_name, self->name);
+    PROP_SETS(self->window, ob_app_class, self->class);
+
+    switch (self->type) {
+    case OB_CLIENT_TYPE_NORMAL:
+        type = "normal"; break;
+    case OB_CLIENT_TYPE_DIALOG:
+        type = "dialog"; break;
+    case OB_CLIENT_TYPE_UTILITY:
+        type = "utility"; break;
+    case OB_CLIENT_TYPE_MENU:
+        type = "menu"; break;
+    case OB_CLIENT_TYPE_TOOLBAR:
+        type = "toolbar"; break;
+    case OB_CLIENT_TYPE_SPLASH:
+        type = "splash"; break;
+    case OB_CLIENT_TYPE_DESKTOP:
+        type = "desktop"; break;
+    case OB_CLIENT_TYPE_DOCK:
+        type = "dock"; break;
+    }
+    PROP_SETS(self->window, ob_app_type, type);
 }
 
 static void client_change_wm_state(ObClient *self)

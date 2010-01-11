@@ -47,8 +47,10 @@ struct _ObClient* focus_directional_cycle(ObDirection dir,
                                           gboolean dialog,
                                           gboolean done, gboolean cancel);
 
-void focus_cycle_add(struct _ObClient *ifclient);
-void focus_cycle_remove(struct _ObClient *ifclient);
+/*! Set @redraw to FALSE if there are more clients to be added/removed first */
+void focus_cycle_addremove(struct _ObClient *ifclient, gboolean redraw);
 void focus_cycle_reorder();
+
+gboolean focus_cycle_valid(struct _ObClient *client);
 
 #endif

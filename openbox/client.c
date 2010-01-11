@@ -34,6 +34,7 @@
 #include "grab.h"
 #include "prompt.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -1996,6 +1997,8 @@ void client_update_wmhints(ObClient *self)
 
         XFree(hints);
     }
+
+    focus_cycle_addremove(self, TRUE);
 }
 
 void client_update_title(ObClient *self)
@@ -3254,7 +3257,7 @@ static void client_iconify_recursive(ObClient *self,
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
-                   the list */
+                   the list. this will also call focus_cycle_addremove(). */
                 focus_order_to_bottom(self);
 
                 changed = TRUE;
@@ -3266,9 +3269,10 @@ static void client_iconify_recursive(ObClient *self,
                 self->desktop != DESKTOP_ALL)
                 client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
-            /* this puts it after the current focused window */
-            focus_order_remove(self);
-            focus_order_add_new(self);
+            /* this puts it after the current focused window, this will
+               also cause focus_cycle_addremove() to be called for the
+               client */
+            focus_order_like_new(self);
 
             changed = TRUE;
         }
@@ -3601,6 +3605,8 @@ static void client_set_desktop_recursive(ObClient *self,
             /* the new desktop's geometry may be different, so we may need to
                resize, for example if we are maximized */
             client_reconfigure(self, FALSE);
+
+        focus_cycle_addremove(self, FALSE);
     }
 
     /* move all transients */
@@ -3616,6 +3622,8 @@ void client_set_desktop(ObClient *self, guint target,
 {
     self = client_search_top_direct_parent(self);
     client_set_desktop_recursive(self, target, donthide, dontraise);
+
+    focus_cycle_addremove(NULL, TRUE);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
@@ -3864,6 +3872,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         client_hilite(self, demands_attention);
 
     client_change_state(self); /* change the hint to reflect these changes */
+
+    focus_cycle_addremove(self, TRUE);
 }
 
 ObClient *client_focus_target(ObClient *self)

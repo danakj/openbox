@@ -18,6 +18,7 @@
 */
 
 #include "focus_cycle_popup.h"
+#include "focus_cycle.h"
 #include "popup.h"
 #include "client.h"
 #include "screen.h"
@@ -78,11 +79,7 @@ static ObIconPopup *single_popup;
 static gchar   *popup_get_name (ObClient *c);
 static gboolean popup_setup    (ObFocusCyclePopup *p,
                                 gboolean create_targets,
-                                gboolean refresh_targets,
-                                gboolean iconic_windows,
-                                gboolean all_desktops,
-                                gboolean dock_windows,
-                                gboolean desktop_windows);
+                                gboolean refresh_targets);
 static void     popup_render   (ObFocusCyclePopup *p,
                                 const ObClient *c);
 
@@ -172,9 +169,7 @@ static void popup_target_free(ObFocusCyclePopupTarget *t)
 }
 
 static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
-                            gboolean refresh_targets,
-                            gboolean iconic_windows, gboolean all_desktops,
-                            gboolean dock_windows, gboolean desktop_windows)
+                            gboolean refresh_targets)
 {
     gint maxwidth, n;
     GList *it;
@@ -206,13 +201,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     for (it = g_list_last(focus_order); it; it = g_list_previous(it)) {
         ObClient *ft = it->data;
 
-        if (focus_valid_target(ft, TRUE,
-                               iconic_windows,
-                               all_desktops,
-                               dock_windows,
-                               desktop_windows,
-                               FALSE))
-        {
+        if (focus_cycle_valid(ft)) {
             GList *rit;
 
             /* reuse the target if possible during refresh */
@@ -268,8 +257,6 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
         while (rtargets) {
             popup_target_free(rtargets->data);
             rtargets = g_list_delete_link(rtargets, rtargets);
-
-            popup.targets = g_list_delete_link(popup.targets, popup.targets);
         }
     }
 
@@ -523,8 +510,7 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped)
-        popup_setup(&popup, TRUE, FALSE, iconic_windows, all_desktops,
-                    dock_windows, desktop_windows);
+        popup_setup(&popup, TRUE, FALSE);
     g_assert(popup.targets != NULL);
 
     popup_render(&popup, c);
@@ -571,8 +557,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     if (!popup.mapped) {
         Rect *a;
 
-        popup_setup(&popup, FALSE, FALSE, iconic_windows, all_desktops,
-                    dock_windows, desktop_windows);
+        popup_setup(&popup, FALSE, FALSE);
         g_assert(popup.targets == NULL);
 
         /* position the popup */
@@ -597,54 +582,67 @@ void focus_cycle_popup_single_hide(void)
     icon_popup_hide(single_popup);
 }
 
-GList* focus_cycle_popup_is_showing(ObClient *client)
+gboolean focus_cycle_popup_is_showing(ObClient *c)
 {
     if (popup.mapped) {
         GList *it;
 
         for (it = popup.targets; it; it = g_list_next(it)) {
             ObFocusCyclePopupTarget *t = it->data;
-            if (t->client == client)
-                return it;
+            if (t->client == c)
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static ObClient* popup_revert(ObClient *target)
+{
+    GList *it, *itt;
+
+    for (it = popup.targets; it; it = g_list_next(it)) {
+        ObFocusCyclePopupTarget *t = it->data;
+        if (t->client == target) {
+            /* move to a previous window if possible */
+            for (itt = it->prev; itt; itt = g_list_previous(itt)) {
+                ObFocusCyclePopupTarget *t2 = it->data;
+                if (focus_cycle_valid(t2->client))
+                    return t2->client;
+            }
+
+            /* otherwise move to a following window if possible */
+            for (itt = it->next; itt; itt = g_list_next(itt)) {
+                ObFocusCyclePopupTarget *t2 = it->data;
+                if (focus_cycle_valid(t2->client))
+                    return t2->client;
+            }
+
+            /* otherwise, we can't go anywhere there is nowhere valid to go */
+            return NULL;
         }
     }
     return NULL;
 }
 
-ObClient* focus_cycle_popup_revert(ObClient *target)
+ObClient* focus_cycle_popup_refresh(ObClient *target,
+                                    gboolean redraw)
 {
-    GList *it;
-
     if (!popup.mapped) return NULL;
 
-    for (it = popup.targets; it; it = g_list_next(it)) {
-        ObFocusCyclePopupTarget *t = it->data;
-        if (t->client == target) {
-            if (it->prev)
-                return ((ObFocusCyclePopupTarget*)it->prev->data)->client;
-            else if (it->next)
-                return ((ObFocusCyclePopupTarget*)it->next->data)->client;
-            else
-                return NULL;
-        }
-    }
-    g_assert_not_reached();
-}
+    if (!focus_cycle_valid(target))
+        target = popup_revert(target);
 
-void focus_cycle_popup_refresh(ObClient *target,
-                               gboolean iconic_windows,
-                               gboolean all_desktops,
-                               gboolean dock_windows,
-                               gboolean desktop_windows)
-{
-    if (!popup.mapped) return;
+    redraw = popup_setup(&popup, TRUE, TRUE) && redraw;
 
-    if (popup_setup(&popup, TRUE, TRUE, iconic_windows, all_desktops,
-                    dock_windows, desktop_windows))
-    {
+    if (!target && popup.targets)
+        target = ((ObFocusCyclePopupTarget*)popup.targets->data)->client;
+
+    if (target && redraw) {
         popup.mapped = FALSE;
         popup_render(&popup, target);
         XFlush(ob_display);
         popup.mapped = TRUE;
     }
+
+    return target;
 }

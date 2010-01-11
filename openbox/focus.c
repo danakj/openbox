@@ -90,6 +90,9 @@ void focus_set_client(ObClient *client)
         push_to_top(client);
         /* remove hiliting from the window when it gets focused */
         client_hilite(client, FALSE);
+
+        /* make sure the focus cycle popup shows things in the right order */
+        focus_cycle_reorder();
     }
 
     /* set the NET_ACTIVE_WINDOW hint, but preserve it on shutdown */
@@ -98,9 +101,6 @@ void focus_set_client(ObClient *client)
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
     }
-
-    /* make sure the focus cycle popup shows things in the right order */
-    focus_cycle_reorder();
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,
@@ -201,7 +201,7 @@ void focus_order_add_new(ObClient *c)
         focus_order_to_top(c);
     else {
         g_assert(!g_list_find(focus_order, c));
-        /* if there are any iconic windows, put this above them in the order,
+        /* if there are only iconic windows, put this above them in the order,
            but if there are not, then put it under the currently focused one */
         if (focus_order && ((ObClient*)focus_order->data)->iconic)
             focus_order = g_list_insert(focus_order, c, 0);
@@ -209,14 +209,20 @@ void focus_order_add_new(ObClient *c)
             focus_order = g_list_insert(focus_order, c, 1);
     }
 
-    focus_cycle_add(c);
+    focus_cycle_addremove(c, TRUE);
 }
 
 void focus_order_remove(ObClient *c)
 {
     focus_order = g_list_remove(focus_order, c);
 
-    focus_cycle_remove(c);
+    focus_cycle_addremove(c, TRUE);
+}
+
+void focus_order_like_new(struct _ObClient *c)
+{
+    focus_order = g_list_remove(focus_order, c);
+    focus_order_add_new(c);
 }
 
 void focus_order_to_top(ObClient *c)
@@ -232,6 +238,8 @@ void focus_order_to_top(ObClient *c)
              it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
         focus_order = g_list_insert_before(focus_order, it, c);
     }
+
+    focus_cycle_reorder();
 }
 
 void focus_order_to_bottom(ObClient *c)
@@ -247,6 +255,8 @@ void focus_order_to_bottom(ObClient *c)
              it && !((ObClient*)it->data)->iconic; it = g_list_next(it));
         focus_order = g_list_insert_before(focus_order, it, c);
     }
+
+    focus_cycle_reorder();
 }
 
 ObClient *focus_order_find_first(guint desktop)
@@ -292,6 +302,10 @@ gboolean focus_valid_target(ObClient *ft,
                             gboolean desktop_windows,
                             gboolean user_request)
 {
+    /* NOTE: if any of these things change on a client, then they should call
+       focus_cycle_addremove() to make sure the client is not shown/hidden
+       when it should not be */
+
     gboolean ok = FALSE;
 
     /* see if the window is still managed or is going away */

@@ -32,6 +32,7 @@
 #include "focus.h"
 #include "focus_cycle.h"
 #include "popup.h"
+#include "version.h"
 #include "obrender/render.h"
 #include "gettext.h"
 #include "obt/display.h"
@@ -294,14 +295,19 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_THEME);
     supported[i++] = OBT_PROP_ATOM(OB_CONFIG_FILE);
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
-    supported[i++] = OBT_PROP_ATOM(OB_ROLE);
-    supported[i++] = OBT_PROP_ATOM(OB_NAME);
-    supported[i++] = OBT_PROP_ATOM(OB_CLASS);
+    supported[i++] = OBT_PROP_ATOM(OB_VERSION);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_ROLE);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_NAME);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_CLASS);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_TYPE);
     g_assert(i == num_support);
 
     OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_SUPPORTED, ATOM, supported, num_support);
     g_free(supported);
+
+    OBT_PROP_SETS(RootWindow(obt_display, ob_screen), OB_VERSION, utf8,
+                  OPENBOX_VERSION);
 
     screen_tell_ksplash();
 
@@ -705,9 +711,6 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             if (client_hide(c)) {
-                /* in the middle of cycling..? kill it. */
-                focus_cycle_stop(c);
-
                 if (c == focus_client) {
                     /* c was focused and we didn't do fallback clearly so make
                        sure openbox doesnt still consider the window focused.
@@ -722,6 +725,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
             }
         }
     }
+
+    focus_cycle_addremove(NULL, TRUE);
 
     event_end_ignore_all_enters(ignore_start);
 

@@ -1300,7 +1300,7 @@ void menu_frame_select_previous(ObMenuFrame *self)
             }
         }
     }
-    menu_frame_select(self, it ? it->data : NULL, TRUE);
+    menu_frame_select(self, it ? it->data : NULL, FALSE);
 }
 
 void menu_frame_select_next(ObMenuFrame *self)
@@ -1325,5 +1325,37 @@ void menu_frame_select_next(ObMenuFrame *self)
             }
         }
     }
-    menu_frame_select(self, it ? it->data : NULL, TRUE);
+    menu_frame_select(self, it ? it->data : NULL, FALSE);
+}
+
+void menu_frame_select_first(ObMenuFrame *self)
+{
+    GList *it = NULL;
+
+    if (self->entries) {
+        for (it = self->entries; it; it = g_list_next(it)) {
+            ObMenuEntryFrame *e = it->data;
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                break;
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+                break;
+        }
+    }
+    menu_frame_select(self, it ? it->data : NULL, FALSE);
+}
+
+void menu_frame_select_last(ObMenuFrame *self)
+{
+    GList *it = NULL;
+
+    if (self->entries) {
+        for (it = g_list_last(self->entries); it; it = g_list_previous(it)) {
+            ObMenuEntryFrame *e = it->data;
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                break;
+            if (e->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
+                break;
+        }
+    }
+    menu_frame_select(self, it ? it->data : NULL, FALSE);
 }

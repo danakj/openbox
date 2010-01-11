@@ -3,6 +3,9 @@ AC_INIT([openbox], [3.5.0-rc1], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
+OB_VERSION=$PACKAGE_VERSION
+AC_SUBST(OB_VERSION)
+
 dnl Making releases:
 dnl   RR_MICRO_VERSION += 1;
 dnl   RR_INTERFACE_AGE += 1;
@@ -206,6 +209,7 @@ AC_CONFIG_FILES([
   obt/obt-3.5.pc
   obrender/version.h
   obt/version.h
+  version.h
 ])
 AC_CONFIG_COMMANDS([doc],
                    [test -d doc || mkdir doc])

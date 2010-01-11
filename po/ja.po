@@ -296,7 +296,7 @@ msgstr "著作権 (c)"
 
 #: openbox/openbox.c:529
 msgid "Syntax: openbox [options]\n"
-msgstr "使い方: openbox [オプション]\n"
+msgstr "用法: openbox [オプション]\n"
 
 #: openbox/openbox.c:530
 msgid ""

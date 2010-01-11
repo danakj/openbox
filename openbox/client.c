@@ -31,6 +31,7 @@
 #include "grab.h"
 #include "prompt.h"
 #include "focus.h"
+#include "focus_cycle.h"
 #include "stacking.h"
 #include "openbox.h"
 #include "group.h"
@@ -75,7 +76,7 @@ static RrImage *client_default_icon     = NULL;
 static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
-static void client_save_session_ids(ObClient *self);
+static void client_save_app_rule_values(ObClient *self);
 static void client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
@@ -223,6 +224,7 @@ void client_manage(Window window, ObPrompt *prompt)
     self->obwin.type = OB_WINDOW_CLASS_CLIENT;
     self->window = window;
     self->prompt = prompt;
+    self->managed = TRUE;
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
@@ -550,6 +552,8 @@ void client_unmanage(ObClient *self)
         event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
+
+    self->managed = FALSE;
 
     /* remove the window from our save set, unless we are managing an internal
        ObPrompt window */
@@ -1078,7 +1082,9 @@ static void client_get_all(ObClient *self, gboolean real)
     /* get the session related properties, these can change decorations
        from per-app settings */
     client_get_session_ids(self);
-    client_save_session_ids(self);
+
+    /* save the values of the variables used for app rule matching */
+    client_save_app_rule_values(self);
 
     /* now we got everything that can affect the decorations */
     if (!real)
@@ -1912,6 +1918,8 @@ void client_update_wmhints(ObClient *self)
 
         XFree(hints);
     }
+
+    focus_cycle_addremove(self, TRUE);
 }
 
 void client_update_title(ObClient *self)
@@ -2292,13 +2300,36 @@ static void client_get_session_ids(ObClient *self)
     }
 }
 
-/*! Save the session IDs as seen by Openbox when the window mapped, so that
-  users can still access them later if the app changes them */
-static void client_save_session_ids(ObClient *self)
+/*! Save the properties used for app matching rules, as seen by Openbox when
+  the window mapped, so that users can still access them later if the app
+  changes them */
+static void client_save_app_rule_values(ObClient *self)
 {
-    OBT_PROP_SETS(self->window, OB_ROLE, utf8, self->role);
-    OBT_PROP_SETS(self->window, OB_NAME, utf8, self->name);
-    OBT_PROP_SETS(self->window, OB_CLASS, utf8, self->class);
+    const gchar *type;
+
+    OBT_PROP_SETS(self->window, OB_APP_ROLE, utf8, self->role);
+    OBT_PROP_SETS(self->window, OB_APP_NAME, utf8, self->name);
+    OBT_PROP_SETS(self->window, OB_APP_CLASS, utf8, self->class);
+
+    switch (self->type) {
+    case OB_CLIENT_TYPE_NORMAL:
+        type = "normal"; break;
+    case OB_CLIENT_TYPE_DIALOG:
+        type = "dialog"; break;
+    case OB_CLIENT_TYPE_UTILITY:
+        type = "utility"; break;
+    case OB_CLIENT_TYPE_MENU:
+        type = "menu"; break;
+    case OB_CLIENT_TYPE_TOOLBAR:
+        type = "toolbar"; break;
+    case OB_CLIENT_TYPE_SPLASH:
+        type = "splash"; break;
+    case OB_CLIENT_TYPE_DESKTOP:
+        type = "desktop"; break;
+    case OB_CLIENT_TYPE_DOCK:
+        type = "dock"; break;
+    }
+    OBT_PROP_SETS(self->window, OB_APP_TYPE, utf8, type);
 }
 
 static void client_change_wm_state(ObClient *self)
@@ -3149,7 +3180,7 @@ static void client_iconify_recursive(ObClient *self,
                 self->iconic = iconic;
 
                 /* update the focus lists.. iconic windows go to the bottom of
-                   the list */
+                   the list. this will also call focus_cycle_addremove(). */
                 focus_order_to_bottom(self);
 
                 changed = TRUE;
@@ -3161,9 +3192,10 @@ static void client_iconify_recursive(ObClient *self,
                 self->desktop != DESKTOP_ALL)
                 client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
-            /* this puts it after the current focused window */
-            focus_order_remove(self);
-            focus_order_add_new(self);
+            /* this puts it after the current focused window, this will
+               also cause focus_cycle_addremove() to be called for the
+               client */
+            focus_order_like_new(self);
 
             changed = TRUE;
         }
@@ -3496,6 +3528,8 @@ static void client_set_desktop_recursive(ObClient *self,
             /* the new desktop's geometry may be different, so we may need to
                resize, for example if we are maximized */
             client_reconfigure(self, FALSE);
+
+        focus_cycle_addremove(self, FALSE);
     }
 
     /* move all transients */
@@ -3511,6 +3545,8 @@ void client_set_desktop(ObClient *self, guint target,
 {
     self = client_search_top_direct_parent(self);
     client_set_desktop_recursive(self, target, donthide, dontraise);
+
+    focus_cycle_addremove(NULL, TRUE);
 }
 
 gboolean client_is_direct_child(ObClient *parent, ObClient *child)
@@ -3724,6 +3760,8 @@ void client_set_state(ObClient *self, Atom action, glong data1, glong data2)
         client_hilite(self, demands_attention);
 
     client_change_state(self); /* change the hint to reflect these changes */
+
+    focus_cycle_addremove(self, TRUE);
 }
 
 ObClient *client_focus_target(ObClient *self)

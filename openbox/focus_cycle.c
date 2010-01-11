@@ -29,7 +29,14 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+typedef enum {
+    OB_CYCLE_NONE = 0,
+    OB_CYCLE_NORMAL,
+    OB_CYCLE_DIRECTIONAL
+} ObCycleType;
+
 ObClient       *focus_cycle_target = NULL;
+static ObCycleType focus_cycle_type = OB_CYCLE_NONE;
 static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_dock_windows;
@@ -50,17 +57,40 @@ void focus_cycle_shutdown(gboolean reconfig)
     if (reconfig) return;
 }
 
-void focus_cycle_stop(ObClient *ifclient)
+void focus_cycle_addremove(ObClient *c, gboolean redraw)
 {
-    /* stop focus cycling if the given client is a valid focus target,
-       and so the cycling is being disrupted */
-    if (focus_cycle_target &&
-        ((ifclient && (ifclient == focus_cycle_target ||
-                       focus_cycle_popup_is_showing(ifclient))) ||
-         !ifclient))
-    {
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
-        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+    if (!focus_cycle_type)
+        return;
+
+    if (focus_cycle_type == OB_CYCLE_DIRECTIONAL) {
+        if (c && focus_cycle_target == c) {
+            focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE,
+                                    TRUE, TRUE, TRUE);
+        }
+    }
+    else if (c && redraw) {
+        gboolean v, s;
+
+        v = focus_cycle_valid(c);
+        s = focus_cycle_popup_is_showing(c);
+
+        if (v != s)
+            focus_cycle_reorder();
+    }
+    else if (redraw) {
+        focus_cycle_reorder();
+    }
+}
+
+void focus_cycle_reorder()
+{
+    if (focus_cycle_type == OB_CYCLE_NORMAL) {
+        focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_target,
+                                                       TRUE);
+        focus_cycle_update_indicator(focus_cycle_target);
+        if (!focus_cycle_target)
+            focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE,
+                        TRUE, TRUE, TRUE, TRUE, TRUE);
     }
 }
 
@@ -115,16 +145,11 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             if (it == NULL) it = g_list_last(list);
         }
         ft = it->data;
-        if (focus_valid_target(ft, screen_desktop, TRUE,
-                               focus_cycle_iconic_windows,
-                               focus_cycle_all_desktops,
-                               focus_cycle_dock_windows,
-                               focus_cycle_desktop_windows,
-                               FALSE))
-        {
+        if (focus_cycle_valid(ft)) {
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
+                    focus_cycle_type = OB_CYCLE_NORMAL;
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 /* same arguments as focus_target_valid */
@@ -137,6 +162,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
+                focus_cycle_type = OB_CYCLE_NORMAL;
                 done = TRUE;
                 break;
             }
@@ -147,6 +173,7 @@ done_cycle:
     if (done && !cancel) ret = focus_cycle_target;
 
     focus_cycle_target = NULL;
+    focus_cycle_type = OB_CYCLE_NONE;
     g_list_free(order);
     order = NULL;
 
@@ -186,9 +213,7 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
         /* the currently selected window isn't interesting */
         if (cur == c)
             continue;
-        if (!focus_valid_target(it->data, screen_desktop,
-                                TRUE, FALSE, FALSE, dock_windows,
-                                desktop_windows, FALSE))
+        if (!focus_cycle_valid(it->data))
             continue;
 
         /* find the centre coords of this window, from the
@@ -292,16 +317,15 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         GList *it;
 
         for (it = focus_order; it; it = g_list_next(it))
-            if (focus_valid_target(it->data, screen_desktop, TRUE,
-                                   focus_cycle_iconic_windows,
-                                   focus_cycle_all_desktops,
-                                   focus_cycle_dock_windows,
-                                   focus_cycle_desktop_windows, FALSE))
+            if (focus_cycle_valid(it->data)) {
                 ft = it->data;
+                break;
+            }
     }
 
     if (ft && ft != focus_cycle_target) {/* prevents flicker */
         focus_cycle_target = ft;
+        focus_cycle_type = OB_CYCLE_DIRECTIONAL;
         if (!interactive)
             goto done_cycle;
         focus_cycle_draw_indicator(showbar ? ft : NULL);
@@ -320,9 +344,20 @@ done_cycle:
 
     first = NULL;
     focus_cycle_target = NULL;
+    focus_cycle_type = OB_CYCLE_NONE;
 
     focus_cycle_draw_indicator(NULL);
     focus_cycle_popup_single_hide();
 
     return ret;
+}
+
+gboolean focus_cycle_valid(struct _ObClient *client)
+{
+    return focus_valid_target(client, screen_desktop, TRUE,
+                              focus_cycle_iconic_windows,
+                              focus_cycle_all_desktops,
+                              focus_cycle_dock_windows,
+                              focus_cycle_desktop_windows,
+                              FALSE);
 }

@@ -224,6 +224,8 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_DOWN] = obt_keyboard_keysym_to_keycode(XK_Down);
             keys[OB_KEY_TAB] = obt_keyboard_keysym_to_keycode(XK_Tab);
             keys[OB_KEY_SPACE] = obt_keyboard_keysym_to_keycode(XK_space);
+            keys[OB_KEY_HOME] = obt_keyboard_keysym_to_keycode(XK_Home);
+            keys[OB_KEY_END] = obt_keyboard_keysym_to_keycode(XK_End);
 
             {
                 ObtXmlInst *i;
@@ -411,6 +413,8 @@ gint main(gint argc, gchar **argv)
             g_free(keys[OB_KEY_DOWN]);
             g_free(keys[OB_KEY_TAB]);
             g_free(keys[OB_KEY_SPACE]);
+            g_free(keys[OB_KEY_HOME]);
+            g_free(keys[OB_KEY_END]);
         } while (reconfigure);
     }
 

@@ -53,6 +53,8 @@ typedef enum
     OB_KEY_DOWN,
     OB_KEY_TAB,
     OB_KEY_SPACE,
+    OB_KEY_HOME,
+    OB_KEY_END,
     OB_NUM_KEYS
 } ObKey;
 

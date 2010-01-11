@@ -239,6 +239,8 @@ gint main(gint argc, gchar **argv)
             keys[OB_KEY_DOWN] = modkeys_sym_to_code(XK_Down);
             keys[OB_KEY_TAB] = modkeys_sym_to_code(XK_Tab);
             keys[OB_KEY_SPACE] = modkeys_sym_to_code(XK_space);
+            keys[OB_KEY_HOME] = modkeys_sym_to_code(XK_Home);
+            keys[OB_KEY_END] = modkeys_sym_to_code(XK_End);
 
             {
                 ObParseInst *i;
@@ -427,6 +429,8 @@ gint main(gint argc, gchar **argv)
             g_free(keys[OB_KEY_DOWN]);
             g_free(keys[OB_KEY_TAB]);
             g_free(keys[OB_KEY_SPACE]);
+            g_free(keys[OB_KEY_HOME]);
+            g_free(keys[OB_KEY_END]);
 
             modkeys_shutdown(reconfigure);
         } while (reconfigure);

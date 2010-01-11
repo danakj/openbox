@@ -55,10 +55,18 @@ void focus_cycle_stop(ObClient *ifclient)
 {
     /* stop focus cycling if the given client is a valid focus target,
        and so the cycling is being disrupted */
-    if (focus_cycle_target &&
-        ((ifclient && (ifclient == focus_cycle_target ||
-                       focus_cycle_popup_is_showing(ifclient))) ||
-         !ifclient))
+    if (focus_cycle_target && ifclient &&
+        /* shortcut check, it is what we are pointing at right now */
+        (ifclient == focus_cycle_target ||
+         /* it's shown but it shouldn't be anymore */
+         focus_cycle_popup_is_showing(ifclient) ||
+         /* it's not shown but it should be */
+         focus_valid_target(ifclient, TRUE,
+                            focus_cycle_iconic_windows,
+                            focus_cycle_all_desktops,
+                            focus_cycle_dock_windows,
+                            focus_cycle_desktop_windows,
+                            FALSE)))
     {
         focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
         focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);

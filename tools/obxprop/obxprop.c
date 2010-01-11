@@ -12,7 +12,7 @@ gint fail(const gchar *s) {
     else
         fprintf
             (stderr,
-             "Usage: obxprop [OPTIONS]\n\n"
+             "Usage: obxprop [OPTIONS] [--] [PROPERTIES ...]\n\n"
              "Options:\n"
              "    --help              Display this help and exit\n"
              "    --display DISPLAY   Connect to this X display\n"
@@ -227,7 +227,7 @@ gboolean read_prop(Display *d, Window w, Atom prop, const gchar **type, gchar **
     return FALSE;
 }
 
-void show_properties(Display *d, Window w)
+void show_properties(Display *d, Window w, int argc, char **argv)
 {
     Atom* props;
     int i, n;
@@ -241,7 +241,19 @@ void show_properties(Display *d, Window w)
         name = XGetAtomName(d, props[i]);
 
         if (read_prop(d, w, props[i], &type, &val)) {
-            g_print("%s(%s) = %s\n", name, type, val);
+            int found = 1;
+            if (argc) {
+                int i;
+
+                found = 0;
+                for (i = 0; i < argc; i++)
+                    if (!strcmp(name, argv[i])) {
+                        found = 1;
+                        break;
+                    }
+            }
+            if (found)
+                g_print("%s(%s) = %s\n", name, type, val);
             g_free(val);
         }
 
@@ -261,13 +273,13 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "--help")) {
-            return fail(0);
+            return fail(NULL);
         }
         else if (!strcmp(argv[i], "--root"))
             root = TRUE;
         else if (!strcmp(argv[i], "--id")) {
             if (++i == argc)
-                return fail(0);
+                return fail(NULL);
             if (argv[i][0] == '0' && argv[i][1] == 'x') {
                 /* hex */
                 userid = parse_hex(argv[i]+2);
@@ -276,13 +288,22 @@ int main(int argc, char **argv)
                 /* decimal */
                 userid = atoi(argv[i]);
             }
-            break;
+            if (!userid)
+                return fail("Unable to parse argument to --id.");
         }
         else if (!strcmp(argv[i], "--display")) {
             if (++i == argc)
-                return fail(0);
+                return fail(NULL);
             dname = argv[i];
         }
+        else if (*argv[i] != '-')
+            break;
+        else if (!strcmp(argv[i], "--")) {
+            i++;
+            break;
+        }
+        else
+            return fail(NULL);
     }
 
     d = XOpenDisplay(dname);
@@ -295,12 +316,13 @@ int main(int argc, char **argv)
         userid = RootWindow(d, DefaultScreen(d));
 
     if (userid == None) {
-        i = XGrabPointer(d, RootWindow(d, DefaultScreen(d)),
+        int j;
+        j = XGrabPointer(d, RootWindow(d, DefaultScreen(d)),
                          False, ButtonPressMask,
                          GrabModeAsync, GrabModeAsync,
                          None, XCreateFontCursor(d, XC_crosshair),
                          CurrentTime);
-        if (i != GrabSuccess)
+        if (j != GrabSuccess)
             return fail("Unable to grab the pointer device");
         while (1) {
             XEvent ev;
@@ -319,7 +341,7 @@ int main(int argc, char **argv)
     if (id == None)
         return fail("Unable to find window with the requested ID");
 
-    show_properties(d, id);
+    show_properties(d, id, argc - i, &argv[i]);
     
     XCloseDisplay(d);
 

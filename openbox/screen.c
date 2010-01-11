@@ -303,14 +303,19 @@ gboolean screen_annex(void)
     supported[i++] = prop_atoms.ob_theme;
     supported[i++] = prop_atoms.ob_config_file;
     supported[i++] = prop_atoms.ob_control;
-    supported[i++] = prop_atoms.ob_role;
-    supported[i++] = prop_atoms.ob_name;
-    supported[i++] = prop_atoms.ob_class;
+    supported[i++] = prop_atoms.ob_version;
+    supported[i++] = prop_atoms.ob_app_role;
+    supported[i++] = prop_atoms.ob_app_name;
+    supported[i++] = prop_atoms.ob_app_class;
+    supported[i++] = prop_atoms.ob_app_type;
     g_assert(i == num_support);
 
     PROP_SETA32(RootWindow(ob_display, ob_screen),
                 net_supported, atom, supported, num_support);
     g_free(supported);
+
+    PROP_SETS(RootWindow(ob_display, ob_screen), ob_version,
+              OB_VERSION);
 
     screen_tell_ksplash();
 

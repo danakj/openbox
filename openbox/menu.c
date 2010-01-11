@@ -299,8 +299,10 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
                     RrImageRef(ic);
                 else {
                     ic = RrImageNew(ob_rr_icons);
-                    if (!RrImageAddPictureName(ic, icon))
+                    if (!RrImageAddPictureName(ic, icon)) {
                         RrImageUnref(ic); /* no need to keep it around */
+                        ic = NULL;
+                    }
                 }
                 e->data.normal.icon = ic;
 

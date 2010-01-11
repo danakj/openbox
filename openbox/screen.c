@@ -713,8 +713,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (client_show(c))
-                focus_cycle_add(c);
+            client_show(c);
         }
     }
 
@@ -725,8 +724,6 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             if (client_hide(c)) {
-                focus_cycle_remove(c);
-
                 if (c == focus_client) {
                     /* c was focused and we didn't do fallback clearly so make
                        sure openbox doesnt still consider the window focused.
@@ -741,6 +738,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
             }
         }
     }
+
+    focus_cycle_addremove(NULL, TRUE);
 
     event_end_ignore_all_enters(ignore_start);
 

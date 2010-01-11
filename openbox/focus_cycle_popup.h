@@ -39,13 +39,13 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
                                    gboolean desktop_windows);
 void focus_cycle_popup_single_hide(void);
 
-/*! Reverts from the current @target to a new focus cycle target window */
-struct _ObClient* focus_cycle_popup_revert(struct _ObClient *target);
-/*! Redraws the focus cycle popup */
-void focus_cycle_popup_refresh(struct _ObClient *target,
-                               gboolean iconic_windows,
-                               gboolean all_desktops,
-                               gboolean dock_windows,
-                               gboolean desktop_windows);
+gboolean focus_cycle_popup_is_showing(struct _ObClient *c);
+
+/*! Redraws the focus cycle popup, and returns the current target.  If
+    the target given to the function is no longer valid, this will return
+    a different target that is valid, and which should be considered the
+    current focus cycling target. */
+struct _ObClient *focus_cycle_popup_refresh(struct _ObClient *target,
+                                            gboolean redraw);
 
 #endif

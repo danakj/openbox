@@ -58,6 +58,10 @@ void focus_order_remove(struct _ObClient *c);
 /*! Move a client to the top of the focus order */
 void focus_order_to_top(struct _ObClient *c);
 
+/*! Move a client to where it would be if it was newly added to the focus order
+ */
+void focus_order_like_new(struct _ObClient *c);
+
 /*! Move a client to the bottom of the focus order (keeps iconic windows at the
   very bottom always though). */
 void focus_order_to_bottom(struct _ObClient *c);

@@ -98,6 +98,9 @@ void focus_set_client(ObClient *client)
         PROP_SET32(RootWindow(ob_display, ob_screen),
                    net_active_window, window, active);
     }
+
+    /* make sure the focus cycle popup shows things in the right order */
+    focus_cycle_reorder();
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,
@@ -206,16 +209,14 @@ void focus_order_add_new(ObClient *c)
             focus_order = g_list_insert(focus_order, c, 1);
     }
 
-    /* in the middle of cycling..? kill it. */
-    focus_cycle_stop(c);
+    focus_cycle_add(c);
 }
 
 void focus_order_remove(ObClient *c)
 {
     focus_order = g_list_remove(focus_order, c);
 
-    /* in the middle of cycling..? kill it. */
-    focus_cycle_stop(c);
+    focus_cycle_remove(c);
 }
 
 void focus_order_to_top(ObClient *c)
@@ -292,6 +293,9 @@ gboolean focus_valid_target(ObClient *ft,
                             gboolean user_request)
 {
     gboolean ok = FALSE;
+
+    /* see if the window is still managed or is going away */
+    if (!ft->managed) return FALSE;
 
     /* it's on this desktop unless you want all desktops.
 

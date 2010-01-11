@@ -304,6 +304,7 @@ void client_manage(Window window, ObPrompt *prompt)
     self->obwin.type = Window_Client;
     self->window = window;
     self->prompt = prompt;
+    self->managed = TRUE;
 
     /* non-zero defaults */
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
@@ -632,6 +633,8 @@ void client_unmanage(ObClient *self)
         event_end_ignore_all_enters(ignore_start);
 
     mouse_grab_for_client(self, FALSE);
+
+    self->managed = FALSE;
 
     /* remove the window from our save set, unless we are managing an internal
        ObPrompt window */

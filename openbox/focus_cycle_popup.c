@@ -75,15 +75,16 @@ static ObFocusCyclePopup popup;
 /*! This popup shows a single window */
 static ObIconPopup *single_popup;
 
-static gchar *popup_get_name (ObClient *c);
-static void   popup_setup    (ObFocusCyclePopup *p,
-                              gboolean create_targets,
-                              gboolean iconic_windows,
-                              gboolean all_desktops,
-                              gboolean dock_windows,
-                              gboolean desktop_windows);
-static void   popup_render   (ObFocusCyclePopup *p,
-                              const ObClient *c);
+static gchar   *popup_get_name (ObClient *c);
+static gboolean popup_setup    (ObFocusCyclePopup *p,
+                                gboolean create_targets,
+                                gboolean refresh_targets,
+                                gboolean iconic_windows,
+                                gboolean all_desktops,
+                                gboolean dock_windows,
+                                gboolean desktop_windows);
+static void     popup_render   (ObFocusCyclePopup *p,
+                                const ObClient *c);
 
 static Window create_window(Window parent, guint bwidth, gulong mask,
                             XSetWindowAttributes *attr)
@@ -162,12 +163,36 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     RrAppearanceFree(popup.a_bg);
 }
 
-static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
-                        gboolean iconic_windows, gboolean all_desktops,
-                        gboolean dock_windows, gboolean desktop_windows)
+static void popup_target_free(ObFocusCyclePopupTarget *t)
+{
+    RrImageUnref(t->icon);
+    g_free(t->text);
+    XDestroyWindow(ob_display, t->win);
+    g_free(t);
+}
+
+static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
+                            gboolean refresh_targets,
+                            gboolean iconic_windows, gboolean all_desktops,
+                            gboolean dock_windows, gboolean desktop_windows)
 {
     gint maxwidth, n;
     GList *it;
+    GList *rtargets; /* old targets for refresh */
+    GList *rtlast;
+    gboolean change;
+
+    if (refresh_targets) {
+        rtargets = p->targets;
+        rtlast = g_list_last(rtargets);
+        p->targets = NULL;
+        p->n_targets = 0;
+        change = FALSE;
+    }
+    else {
+        rtargets = rtlast = NULL;
+        change = TRUE;
+    }
 
     g_assert(p->targets == NULL);
     g_assert(p->n_targets == 0);
@@ -188,33 +213,80 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                                desktop_windows,
                                FALSE))
         {
-            gchar *text = popup_get_name(ft);
+            GList *rit;
 
-            /* measure */
-            p->a_text->texture[0].data.text.string = text;
-            maxwidth = MAX(maxwidth, RrMinWidth(p->a_text));
+            /* reuse the target if possible during refresh */
+            for (rit = rtlast; rit; rit = g_list_previous(rit)) {
+                ObFocusCyclePopupTarget *t = rit->data;
+                if (t->client == ft) {
+                    if (rit == rtlast)
+                        rtlast = g_list_previous(rit);
+                    rtargets = g_list_remove_link(rtargets, rit);
 
-            if (!create_targets)
-                g_free(text);
-            else {
-                ObFocusCyclePopupTarget *t = g_new(ObFocusCyclePopupTarget, 1);
+                    p->targets = g_list_concat(rit, p->targets);
+                    ++n;
 
-                t->client = ft;
-                t->text = text;
-                t->icon = client_icon(t->client);
-                RrImageRef(t->icon); /* own the icon so it won't go away */
-                t->win = create_window(p->bg, 0, 0, NULL);
-
-                XMapWindow(ob_display, t->win);
-
-                p->targets = g_list_prepend(p->targets, t);
-                ++n;
+                    if (rit != rtlast)
+                        change = TRUE; /* order changed */
+                    break;
+                }
             }
+
+            if (!rit) {
+                gchar *text = popup_get_name(ft);
+
+                /* measure */
+                p->a_text->texture[0].data.text.string = text;
+                maxwidth = MAX(maxwidth, RrMinWidth(p->a_text));
+
+                if (!create_targets)
+                    g_free(text);
+                else {
+                    ObFocusCyclePopupTarget *t =
+                        g_new(ObFocusCyclePopupTarget, 1);
+
+                    t->client = ft;
+                    t->text = text;
+                    t->icon = client_icon(t->client);
+                    RrImageRef(t->icon); /* own the icon so it won't go away */
+                    t->win = create_window(p->bg, 0, 0, NULL);
+
+                    XMapWindow(ob_display, t->win);
+
+                    p->targets = g_list_prepend(p->targets, t);
+                    ++n;
+
+                    change = TRUE; /* added a window */
+                }
+            }
+        }
+    }
+
+    if (rtargets) {
+        change = TRUE; /* removed a window */
+
+        while (rtargets) {
+            popup_target_free(rtargets->data);
+            rtargets = g_list_delete_link(rtargets, rtargets);
+
+            popup.targets = g_list_delete_link(popup.targets, popup.targets);
         }
     }
 
     p->n_targets = n;
     p->maxtextw = maxwidth;
+
+    return change;
+}
+
+static void popup_cleanup(void)
+{
+    while(popup.targets) {
+        popup_target_free(popup.targets->data);
+        popup.targets = g_list_delete_link(popup.targets, popup.targets);
+    }
+    popup.n_targets = 0;
+    popup.last_target = NULL;
 }
 
 static gchar *popup_get_name(ObClient *c)
@@ -451,7 +523,7 @@ void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped)
-        popup_setup(&popup, TRUE, iconic_windows, all_desktops,
+        popup_setup(&popup, TRUE, FALSE, iconic_windows, all_desktops,
                     dock_windows, desktop_windows);
     g_assert(popup.targets != NULL);
 
@@ -479,18 +551,7 @@ void focus_cycle_popup_hide(void)
 
     popup.mapped = FALSE;
 
-    while(popup.targets) {
-        ObFocusCyclePopupTarget *t = popup.targets->data;
-
-        RrImageUnref(t->icon);
-        g_free(t->text);
-        XDestroyWindow(ob_display, t->win);
-        g_free(t);
-
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
-    }
-    popup.n_targets = 0;
-    popup.last_target = NULL;
+    popup_cleanup();
 
     g_free(popup.hilite_rgba);
     popup.hilite_rgba = NULL;
@@ -510,7 +571,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
     if (!popup.mapped) {
         Rect *a;
 
-        popup_setup(&popup, FALSE, iconic_windows, all_desktops,
+        popup_setup(&popup, FALSE, FALSE, iconic_windows, all_desktops,
                     dock_windows, desktop_windows);
         g_assert(popup.targets == NULL);
 
@@ -536,7 +597,7 @@ void focus_cycle_popup_single_hide(void)
     icon_popup_hide(single_popup);
 }
 
-gboolean focus_cycle_popup_is_showing(ObClient *client)
+GList* focus_cycle_popup_is_showing(ObClient *client)
 {
     if (popup.mapped) {
         GList *it;
@@ -544,8 +605,46 @@ gboolean focus_cycle_popup_is_showing(ObClient *client)
         for (it = popup.targets; it; it = g_list_next(it)) {
             ObFocusCyclePopupTarget *t = it->data;
             if (t->client == client)
-                return TRUE;
+                return it;
         }
     }
-    return FALSE;
+    return NULL;
+}
+
+ObClient* focus_cycle_popup_revert(ObClient *target)
+{
+    GList *it;
+
+    if (!popup.mapped) return NULL;
+
+    for (it = popup.targets; it; it = g_list_next(it)) {
+        ObFocusCyclePopupTarget *t = it->data;
+        if (t->client == target) {
+            if (it->prev)
+                return ((ObFocusCyclePopupTarget*)it->prev->data)->client;
+            else if (it->next)
+                return ((ObFocusCyclePopupTarget*)it->next->data)->client;
+            else
+                return NULL;
+        }
+    }
+    g_assert_not_reached();
+}
+
+void focus_cycle_popup_refresh(ObClient *target,
+                               gboolean iconic_windows,
+                               gboolean all_desktops,
+                               gboolean dock_windows,
+                               gboolean desktop_windows)
+{
+    if (!popup.mapped) return;
+
+    if (popup_setup(&popup, TRUE, TRUE, iconic_windows, all_desktops,
+                    dock_windows, desktop_windows))
+    {
+        popup.mapped = FALSE;
+        popup_render(&popup, target);
+        XFlush(ob_display);
+        popup.mapped = TRUE;
+    }
 }

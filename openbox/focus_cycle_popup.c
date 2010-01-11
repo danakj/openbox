@@ -605,14 +605,14 @@ static ObClient* popup_revert(ObClient *target)
         if (t->client == target) {
             /* move to a previous window if possible */
             for (itt = it->prev; itt; itt = g_list_previous(itt)) {
-                ObFocusCyclePopupTarget *t2 = it->data;
+                ObFocusCyclePopupTarget *t2 = itt->data;
                 if (focus_cycle_valid(t2->client))
                     return t2->client;
             }
 
             /* otherwise move to a following window if possible */
             for (itt = it->next; itt; itt = g_list_next(itt)) {
-                ObFocusCyclePopupTarget *t2 = it->data;
+                ObFocusCyclePopupTarget *t2 = itt->data;
                 if (focus_cycle_valid(t2->client))
                     return t2->client;
             }

@@ -75,10 +75,8 @@ void focus_cycle_addremove(ObClient *c, gboolean redraw)
         v = focus_cycle_valid(c);
         s = focus_cycle_popup_is_showing(c);
 
-        if (v != s) {
-            focus_cycle_target =
-                focus_cycle_popup_refresh(focus_cycle_target, redraw);
-        }
+        if (v != s)
+            focus_cycle_reorder();
     }
     else if (redraw) {
         focus_cycle_reorder();

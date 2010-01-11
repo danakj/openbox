@@ -932,13 +932,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_hilite_label->texture[0].data.text.color =
         theme->osd_text_active_color;
 
-    theme->osd_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
-    theme->osd_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    theme->osd_unhilite_label->texture[0].data.text.font =
-        theme->osd_font_unhilite;
-    theme->osd_unhilite_label->texture[0].data.text.color =
-        theme->osd_text_inactive_color;
-
     if (read_string(db, "osd.active.label.text.font", &str) ||
         read_string(db, "osd.label.text.font", &str))
     {
@@ -988,54 +981,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_hilite_label->texture[0].data.text.shadow_alpha =
         theme->osd_text_active_shadow_alpha;
 
-    if (read_string(db, "osd.inactive.label.text.font", &str))
-    {
-        char *p;
-        gint i = 0;
-        gint j;
-        if (strstr(str, "shadow=y")) {
-            if ((p = strstr(str, "shadowoffset=")))
-                i = parse_inline_number(p + strlen("shadowoffset="));
-            else
-                i = 1;
-            theme->osd_unhilite_label->texture[0].data.text.shadow_offset_x=i;
-            theme->osd_unhilite_label->texture[0].data.text.shadow_offset_y=i;
-        }
-        if ((p = strstr(str, "shadowtint=")))
-        {
-            i = parse_inline_number(p + strlen("shadowtint="));
-            j = (i > 0 ? 0 : 255);
-            i = ABS(i*255/100);
-
-            theme->osd_text_inactive_shadow_color = RrColorNew(inst, j, j, j);
-            theme->osd_text_inactive_shadow_alpha = i;
-        } else {
-            theme->osd_text_inactive_shadow_color = RrColorNew(inst, 0, 0, 0);
-            theme->osd_text_inactive_shadow_alpha = 50;
-        }
-    } else {
-        /* inherit the font settings from the focused label */
-        theme->osd_unhilite_label->texture[0].data.text.shadow_offset_x =
-            theme->a_unfocused_label->texture[0].data.text.shadow_offset_x;
-        theme->osd_unhilite_label->texture[0].data.text.shadow_offset_y =
-            theme->a_unfocused_label->texture[0].data.text.shadow_offset_y;
-        if (theme->title_unfocused_shadow_color)
-            theme->osd_text_inactive_shadow_color =
-                RrColorNew(inst,
-                           theme->title_unfocused_shadow_color->r,
-                           theme->title_unfocused_shadow_color->g,
-                           theme->title_unfocused_shadow_color->b);
-        else
-            theme->osd_text_inactive_shadow_color = RrColorNew(inst, 0, 0, 0);
-        theme->osd_text_inactive_shadow_alpha =
-            theme->title_unfocused_shadow_alpha;
-    }
-
-    theme->osd_unhilite_label->texture[0].data.text.shadow_color =
-        theme->osd_text_inactive_shadow_color;
-    theme->osd_unhilite_label->texture[0].data.text.shadow_alpha =
-        theme->osd_text_inactive_shadow_alpha;
-
     theme->a_unfocused_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
     theme->a_unfocused_label->texture[0].data.text.font =
@@ -1073,6 +1018,61 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->title_unfocused_shadow_color;
     theme->a_unfocused_label->texture[0].data.text.shadow_alpha =
         theme->title_unfocused_shadow_alpha;
+
+    theme->osd_unhilite_label->texture[0].type = RR_TEXTURE_TEXT;
+    theme->osd_unhilite_label->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    theme->osd_unhilite_label->texture[0].data.text.font =
+        theme->osd_font_unhilite;
+    theme->osd_unhilite_label->texture[0].data.text.color =
+        theme->osd_text_inactive_color;
+
+    if (read_string(db, "osd.inactive.label.text.font", &str))
+    {
+        char *p;
+        gint i = 0;
+        gint j;
+        if (strstr(str, "shadow=y")) {
+            if ((p = strstr(str, "shadowoffset=")))
+                i = parse_inline_number(p + strlen("shadowoffset="));
+            else
+                i = 1;
+            theme->osd_unhilite_label->texture[0].data.text.shadow_offset_x=i;
+            theme->osd_unhilite_label->texture[0].data.text.shadow_offset_y=i;
+        }
+        if ((p = strstr(str, "shadowtint=")))
+        {
+            i = parse_inline_number(p + strlen("shadowtint="));
+            j = (i > 0 ? 0 : 255);
+            i = ABS(i*255/100);
+
+            theme->osd_text_inactive_shadow_color = RrColorNew(inst, j, j, j);
+            theme->osd_text_inactive_shadow_alpha = i;
+        } else {
+            theme->osd_text_inactive_shadow_color = RrColorNew(inst, 0, 0, 0);
+            theme->osd_text_inactive_shadow_alpha = 50;
+        }
+    } else {
+        /* inherit the font settings from the unfocused label */
+        theme->osd_unhilite_label->texture[0].data.text.shadow_offset_x =
+            theme->a_unfocused_label->texture[0].data.text.shadow_offset_x;
+        theme->osd_unhilite_label->texture[0].data.text.shadow_offset_y =
+            theme->a_unfocused_label->texture[0].data.text.shadow_offset_y;
+        if (theme->title_unfocused_shadow_color)
+            theme->osd_text_inactive_shadow_color =
+                RrColorNew(inst,
+                           theme->title_unfocused_shadow_color->r,
+                           theme->title_unfocused_shadow_color->g,
+                           theme->title_unfocused_shadow_color->b);
+        else
+            theme->osd_text_inactive_shadow_color = RrColorNew(inst, 0, 0, 0);
+        theme->osd_text_inactive_shadow_alpha =
+            theme->title_unfocused_shadow_alpha;
+    }
+
+    theme->osd_unhilite_label->texture[0].data.text.shadow_color =
+        theme->osd_text_inactive_shadow_color;
+    theme->osd_unhilite_label->texture[0].data.text.shadow_alpha =
+        theme->osd_text_inactive_shadow_alpha;
 
     theme->a_menu_text_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_text_title->texture[0].data.text.justify = mtitlejust;

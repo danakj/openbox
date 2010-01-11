@@ -334,9 +334,10 @@ int main(int argc, char **argv)
                 break;
             }
         }
+        id = find_client(d, userid);
     }
-
-    id = find_client(d, userid);
+    else
+        id = userid; /* they picked this one */
 
     if (id == None)
         return fail("Unable to find window with the requested ID");

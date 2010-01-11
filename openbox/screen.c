@@ -708,7 +708,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
     for (it = stacking_list; it; it = g_list_next(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            client_show(c);
+            if (client_show(c))
+                focus_cycle_add(c);
         }
     }
 
@@ -719,8 +720,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
             if (client_hide(c)) {
-                /* in the middle of cycling..? kill it. */
-                focus_cycle_stop(c);
+                focus_cycle_remove(c);
 
                 if (c == focus_client) {
                     /* c was focused and we didn't do fallback clearly so make

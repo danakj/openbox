@@ -47,6 +47,8 @@ struct _ObClient* focus_directional_cycle(ObDirection dir,
                                           gboolean dialog,
                                           gboolean done, gboolean cancel);
 
-void focus_cycle_stop(struct _ObClient *ifclient);
+void focus_cycle_add(struct _ObClient *ifclient);
+void focus_cycle_remove(struct _ObClient *ifclient);
+void focus_cycle_reorder();
 
 #endif

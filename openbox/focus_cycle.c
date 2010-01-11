@@ -31,6 +31,7 @@
 #include <glib.h>
 
 ObClient       *focus_cycle_target = NULL;
+static gboolean focus_cycle_directional = FALSE;
 static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_dock_windows;
@@ -51,26 +52,64 @@ void focus_cycle_shutdown(gboolean reconfig)
     if (reconfig) return;
 }
 
-void focus_cycle_stop(ObClient *ifclient)
+void focus_cycle_add(ObClient *ifclient)
 {
-    /* stop focus cycling if the given client is a valid focus target,
-       and so the cycling is being disrupted */
-    if (focus_cycle_target && ifclient &&
-        /* shortcut check, it is what we are pointing at right now */
-        (ifclient == focus_cycle_target ||
-         /* it's shown but it shouldn't be anymore */
-         focus_cycle_popup_is_showing(ifclient) ||
-         /* it's not shown but it should be */
-         focus_valid_target(ifclient, TRUE,
-                            focus_cycle_iconic_windows,
-                            focus_cycle_all_desktops,
-                            focus_cycle_dock_windows,
-                            focus_cycle_desktop_windows,
-                            FALSE)))
-    {
-        focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE);
-        focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+    if (!(focus_cycle_target && ifclient && !focus_cycle_directional))
+        return;
+
+    if (focus_valid_target(ifclient, TRUE,
+                           focus_cycle_iconic_windows,
+                           focus_cycle_all_desktops,
+                           focus_cycle_dock_windows,
+                           focus_cycle_desktop_windows,
+                           FALSE))
+        focus_cycle_popup_refresh(focus_cycle_target,
+                                  focus_cycle_iconic_windows,
+                                  focus_cycle_all_desktops,
+                                  focus_cycle_dock_windows,
+                                  focus_cycle_desktop_windows); 
+}
+
+void focus_cycle_remove(ObClient *ifclient)
+{
+    if (!(focus_cycle_target && ifclient))
+        return;
+
+    if (focus_cycle_directional) {
+        if (focus_cycle_target == ifclient) {
+            focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE,
+                                    TRUE, TRUE, TRUE);
+        }
     }
+    else {
+        if (!focus_valid_target(ifclient, TRUE,
+                                focus_cycle_iconic_windows,
+                                focus_cycle_all_desktops,
+                                focus_cycle_dock_windows,
+                                focus_cycle_desktop_windows,
+                                FALSE)) {
+            if (focus_cycle_target == ifclient) {
+                focus_cycle_target =
+                    focus_cycle_popup_revert(focus_cycle_target);
+                focus_cycle_update_indicator(focus_cycle_target);
+            }
+            focus_cycle_popup_refresh(focus_cycle_target,
+                                      focus_cycle_iconic_windows,
+                                      focus_cycle_all_desktops,
+                                      focus_cycle_dock_windows,
+                                      focus_cycle_desktop_windows); 
+        }
+    }
+}
+
+void focus_cycle_reorder()
+{
+    if (focus_cycle_target && !focus_cycle_directional)
+        focus_cycle_popup_refresh(focus_cycle_target,
+                                  focus_cycle_iconic_windows,
+                                  focus_cycle_all_desktops,
+                                  focus_cycle_dock_windows,
+                                  focus_cycle_desktop_windows); 
 }
 
 ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
@@ -87,6 +126,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     if (interactive) {
         if (cancel) {
             focus_cycle_target = NULL;
+            focus_cycle_directional = FALSE;
             goto done_cycle;
         } else if (done)
             goto done_cycle;
@@ -134,6 +174,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             if (interactive) {
                 if (ft != focus_cycle_target) { /* prevents flicker */
                     focus_cycle_target = ft;
+                    focus_cycle_directional = FALSE;
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 if (dialog)
@@ -146,6 +187,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
+                focus_cycle_directional = FALSE;
                 done = TRUE;
                 break;
             }
@@ -156,6 +198,7 @@ done_cycle:
     if (done && !cancel) ret = focus_cycle_target;
 
     focus_cycle_target = NULL;
+    focus_cycle_directional = FALSE;
     g_list_free(order);
     order = NULL;
 
@@ -275,6 +318,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
 
     if (cancel) {
         focus_cycle_target = NULL;
+        focus_cycle_directional = FALSE;
         goto done_cycle;
     } else if (done && interactive)
         goto done_cycle;
@@ -310,6 +354,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
 
     if (ft && ft != focus_cycle_target) {/* prevents flicker */
         focus_cycle_target = ft;
+        focus_cycle_directional = TRUE;
         if (!interactive)
             goto done_cycle;
         focus_cycle_draw_indicator(showbar ? ft : NULL);
@@ -328,6 +373,7 @@ done_cycle:
 
     first = NULL;
     focus_cycle_target = NULL;
+    focus_cycle_directional = FALSE;
 
     focus_cycle_draw_indicator(NULL);
     focus_cycle_popup_single_hide();

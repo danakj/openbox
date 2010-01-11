@@ -217,6 +217,22 @@ static void popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     p->maxtextw = maxwidth;
 }
 
+static void popup_cleanup(void)
+{
+    while(popup.targets) {
+        ObFocusCyclePopupTarget *t = popup.targets->data;
+
+        RrImageUnref(t->icon);
+        g_free(t->text);
+        XDestroyWindow(ob_display, t->win);
+        g_free(t);
+
+        popup.targets = g_list_delete_link(popup.targets, popup.targets);
+    }
+    popup.n_targets = 0;
+    popup.last_target = NULL;
+}
+
 static gchar *popup_get_name(ObClient *c)
 {
     ObClient *p;
@@ -479,18 +495,7 @@ void focus_cycle_popup_hide(void)
 
     popup.mapped = FALSE;
 
-    while(popup.targets) {
-        ObFocusCyclePopupTarget *t = popup.targets->data;
-
-        RrImageUnref(t->icon);
-        g_free(t->text);
-        XDestroyWindow(ob_display, t->win);
-        g_free(t);
-
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
-    }
-    popup.n_targets = 0;
-    popup.last_target = NULL;
+    popup_cleanup();
 
     g_free(popup.hilite_rgba);
     popup.hilite_rgba = NULL;
@@ -536,7 +541,7 @@ void focus_cycle_popup_single_hide(void)
     icon_popup_hide(single_popup);
 }
 
-gboolean focus_cycle_popup_is_showing(ObClient *client)
+GList* focus_cycle_popup_is_showing(ObClient *client)
 {
     if (popup.mapped) {
         GList *it;
@@ -544,8 +549,46 @@ gboolean focus_cycle_popup_is_showing(ObClient *client)
         for (it = popup.targets; it; it = g_list_next(it)) {
             ObFocusCyclePopupTarget *t = it->data;
             if (t->client == client)
-                return TRUE;
+                return it;
         }
     }
-    return FALSE;
+    return NULL;
+}
+
+ObClient* focus_cycle_popup_revert(ObClient *target)
+{
+    GList *it;
+
+    if (!popup.mapped) return NULL;
+
+    for (it = popup.targets; it; it = g_list_next(it)) {
+        ObFocusCyclePopupTarget *t = it->data;
+        if (t->client == target) {
+            if (it->prev)
+                return ((ObFocusCyclePopupTarget*)it->prev->data)->client;
+            else if (it->next)
+                return ((ObFocusCyclePopupTarget*)it->next->data)->client;
+            else
+                return NULL;
+        }
+    }
+    g_assert_not_reached();
+}
+
+void focus_cycle_popup_refresh(ObClient *target,
+                               gboolean iconic_windows,
+                               gboolean all_desktops,
+                               gboolean dock_windows,
+                               gboolean desktop_windows)
+{
+    if (!popup.mapped) return;
+
+    popup_cleanup();
+    popup_setup(&popup, TRUE, iconic_windows, all_desktops,
+                dock_windows, desktop_windows);
+
+    popup.mapped = FALSE;
+    popup_render(&popup, target);
+    XFlush(ob_display);
+    popup.mapped = TRUE;
 }

@@ -13,7 +13,6 @@ openbox/menu.c
 openbox/mouse.c
 openbox/openbox.c
 openbox/screen.c
-openbox/session.c
 openbox/startupnotify.c
 openbox/translate.c
 openbox/prompt.c

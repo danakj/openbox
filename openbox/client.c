@@ -202,9 +202,10 @@ void client_manage(Window window, ObPrompt *prompt)
     gboolean activate = FALSE;
     ObAppSettings *settings;
     gboolean transient = FALSE;
-    Rect place, *monitor;
+    Rect place, *monitor, *allmonitors;
     Time launch_time, map_time;
     guint32 user_time;
+    gboolean obplaced;
 
     ob_debug("Managing window: 0x%lx", window);
 
@@ -311,6 +312,7 @@ void client_manage(Window window, ObPrompt *prompt)
     /* where the frame was placed is where the window was originally */
     place = self->area;
     monitor = screen_physical_area_monitor(screen_find_monitor(&place));
+    allmonitors = screen_physical_area_all_monitors();
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
@@ -330,7 +332,23 @@ void client_manage(Window window, ObPrompt *prompt)
                      "program + user specified" :
                      "BADNESS !?")))), place.width, place.height);
 
-        place_client(self, &place.x, &place.y, settings);
+        obplaced = place_client(self, &place.x, &place.y, settings);
+
+        /* watch for buggy apps that ask to be placed at (0,0) when there is
+           a strut there */
+        if (!obplaced && place.x == 0 && place.y == 0 &&
+            /* oldschool fullscreen windows are allowed */
+            !(self->decorations == 0 && (RECT_EQUAL(place, *monitor) ||
+                                         RECT_EQUAL(place, *allmonitors))))
+        {
+            Rect *r;
+
+            r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
+            place.x = r->x;
+            place.y = r->y;
+            ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
+            g_free(r);
+        }
 
         /* make sure the window is visible. */
         client_find_onscreen(self, &place.x, &place.y,
@@ -362,7 +380,8 @@ void client_manage(Window window, ObPrompt *prompt)
                                   makes its fullscreen window fit the screen
                                   but it is not USSize'd or USPosition'd) */
                                !(self->decorations == 0 &&
-                                 RECT_EQUAL(place, *monitor)))));
+                                 (RECT_EQUAL(place, *monitor) ||
+                                  RECT_EQUAL(place, *allmonitors))))));
     }
 
     /* if the window isn't user-sized, then make it fit inside
@@ -382,7 +401,8 @@ void client_manage(Window window, ObPrompt *prompt)
           /* don't shrink oldschool fullscreen windows to fit inside the
              struts (fixes Acroread, which makes its fullscreen window
              fit the screen but it is not USSize'd or USPosition'd) */
-          !(self->decorations == 0 && RECT_EQUAL(place, *monitor)))))
+          !(self->decorations == 0 && (RECT_EQUAL(place, *monitor) ||
+                                       RECT_EQUAL(place, *allmonitors))))))
     {
         Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
@@ -422,6 +442,8 @@ void client_manage(Window window, ObPrompt *prompt)
 
     g_free(monitor);
     monitor = NULL;
+    g_free(allmonitors);
+    allmonitors = NULL;
 
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
@@ -2456,9 +2478,10 @@ gboolean client_has_parent(ObClient *self)
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
-    Rect *monitor;
+    Rect *monitor, *allmonitors;
 
     monitor = screen_physical_area_monitor(client_monitor(self));
+    allmonitors = screen_physical_area_all_monitors();
 
     if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;
@@ -2472,7 +2495,8 @@ static ObStackingLayer calc_layer(ObClient *self)
               */
               (self->decorations == 0 &&
                !(self->max_horz && self->max_vert) &&
-               RECT_EQUAL(self->area, *monitor))) &&
+               (RECT_EQUAL(self->area, *monitor) ||
+                RECT_EQUAL(self->area, *allmonitors)))) &&
              /* you are fullscreen while you or your children are focused.. */
              (client_focused(self) || client_search_focus_tree(self) ||
               /* you can be fullscreen if you're on another desktop */
@@ -2488,6 +2512,7 @@ static ObStackingLayer calc_layer(ObClient *self)
     else l = OB_STACKING_LAYER_NORMAL;
 
     g_free(monitor);
+    g_free(allmonitors);
 
     return l;
 }

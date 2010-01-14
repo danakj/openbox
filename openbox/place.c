@@ -468,12 +468,12 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
     return FALSE;
 }
 
-/* Return TRUE if we want client.c to enforce on-screen-keeping */
+/*! Return TRUE if openbox chose the position for the window, and FALSE if
+  the application chose it */
 gboolean place_client(ObClient *client, gint *x, gint *y,
                       ObAppSettings *settings)
 {
     gboolean ret;
-    gboolean userplaced = FALSE;
 
     /* per-app settings override program specified position
      * but not user specified, unless pos_force is enabled */
@@ -484,7 +484,7 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         return FALSE;
 
     /* try a number of methods */
-    ret = (userplaced = place_per_app_setting(client, x, y, settings)) ||
+    ret = place_per_app_setting(client, x, y, settings) ||
         place_transient_splash(client, x, y) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
@@ -494,5 +494,5 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
 
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y);
-    return !userplaced;
+    return TRUE;
 }

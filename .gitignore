@@ -81,6 +81,7 @@ tests/modal
 tests/modal2
 tests/modal3
 tests/noresize
+tests/oldfullscreen
 tests/override
 tests/overrideinputonly
 tests/positioned

@@ -192,6 +192,7 @@ void obt_prop_startup(void)
     CREATE_(OB_CONTROL);
     CREATE_(OB_VERSION);
     CREATE_(OB_APP_ROLE);
+    CREATE_(OB_APP_TITLE);
     CREATE_(OB_APP_NAME);
     CREATE_(OB_APP_CLASS);
     CREATE_(OB_APP_TYPE);

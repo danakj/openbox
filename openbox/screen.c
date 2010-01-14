@@ -297,6 +297,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_CONTROL);
     supported[i++] = OBT_PROP_ATOM(OB_VERSION);
     supported[i++] = OBT_PROP_ATOM(OB_APP_ROLE);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_TITLE);
     supported[i++] = OBT_PROP_ATOM(OB_APP_NAME);
     supported[i++] = OBT_PROP_ATOM(OB_APP_CLASS);
     supported[i++] = OBT_PROP_ATOM(OB_APP_TYPE);

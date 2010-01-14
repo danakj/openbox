@@ -236,7 +236,8 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Window type: %d", self->type);
     ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
-    ob_debug("Window name: %s class: %s role: %s", self->name, self->class, self->role);
+    ob_debug("Window name: %s class: %s role: %s title: %s",
+             self->name, self->class, self->role, self->title);
 
     /* per-app settings override stuff from client_get_all, and return the
        settings for other uses too. the returned settings is a shallow copy,
@@ -796,7 +797,8 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         gboolean match = TRUE;
 
         g_assert(app->name != NULL || app->class != NULL ||
-                 app->role != NULL || (signed)app->type >= 0);
+                 app->role != NULL || app->title != NULL ||
+                 (signed)app->type >= 0);
 
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
@@ -808,6 +810,10 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         else if (app->role &&
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
+            match = FALSE;
+        else if (app->title &&
+                 !g_pattern_match(app->title,
+                                  strlen(self->title), self->title, NULL))
             match = FALSE;
         else if ((signed)app->type >= 0 && app->type != self->type) {
             match = FALSE;
@@ -1083,15 +1089,15 @@ static void client_get_all(ObClient *self, gboolean real)
        from per-app settings */
     client_get_session_ids(self);
 
-    /* save the values of the variables used for app rule matching */
-    client_save_app_rule_values(self);
-
     /* now we got everything that can affect the decorations */
     if (!real)
         return;
 
     /* get this early so we have it for debugging */
     client_update_title(self);
+
+    /* save the values of the variables used for app rule matching */
+    client_save_app_rule_values(self);
 
     client_update_protocols(self);
 
@@ -2310,6 +2316,7 @@ static void client_save_app_rule_values(ObClient *self)
     OBT_PROP_SETS(self->window, OB_APP_ROLE, utf8, self->role);
     OBT_PROP_SETS(self->window, OB_APP_NAME, utf8, self->name);
     OBT_PROP_SETS(self->window, OB_APP_CLASS, utf8, self->class);
+    OBT_PROP_SETS(self->window, OB_APP_TITLE, utf8, self->original_title);
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:

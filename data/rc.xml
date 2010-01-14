@@ -693,18 +693,19 @@
 <!--
   # this is an example with comments through out. use these to make your
   # own rules, but without the comments of course.
-  # you may use one or more of the name/class/role/type rules to specify
+  # you may use one or more of the name/class/role/title/type rules to specify
   # windows to match
 
   <application name="the window's _OB_APP_NAME property (see obxprop)"
               class="the window's _OB_APP_CLASS property (see obxprop)"
                role="the window's _OB_APP_ROLE property (see obxprop)"
+              title="the window's _OB_APP_TITLE property (see obxprop)"
                type="the window's _OB_APP_TYPE property (see obxprob)..
                       (if unspecified, then it is 'dialog' for child windows)">
-  # you may set only one of name/class/role/type, or you may use more than one
-  # together to restrict your matches.
+  # you may set only one of name/class/role/title/type, or you may use more
+  # than one together to restrict your matches.
 
-  # the name, class, and role use simple wildcard matching such as those
+  # the name, class, role, and title use simple wildcard matching such as those
   # used by a shell. you can use * to match any characters and ? to match
   # any single character.
 

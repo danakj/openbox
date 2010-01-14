@@ -200,8 +200,9 @@ static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = obt_xml_find_node(node->children, "application");
-    gchar *name = NULL, *class = NULL, *role = NULL, *type_str = NULL;
-    gboolean name_set, class_set, type_set, role_set;
+    gchar *name = NULL, *class = NULL, *role = NULL, *title = NULL,
+        *type_str = NULL;
+    gboolean name_set, class_set, type_set, role_set, title_set;
     ObClientType type;
     gboolean x_pos_given;
 
@@ -212,6 +213,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
         name_set = obt_xml_attr_string(app, "name", &name);
         type_set = obt_xml_attr_string(app, "type", &type_str);
         role_set = obt_xml_attr_string(app, "role", &role);
+        title_set = obt_xml_attr_string(app, "title", &title);
 
         /* validate the type tho */
         if (type_set) {
@@ -235,7 +237,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 type_set = FALSE; /* not valid! */
         }
 
-        if (class_set || name_set || role_set || type_set) {
+        if (class_set || name_set || role_set || title_set || type_set) {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();;
 
@@ -247,6 +249,9 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
             if (role_set)
                 settings->role = g_pattern_spec_new(role);
+
+            if (title_set)
+                settings->title = g_pattern_spec_new(title);
 
             if (type_set)
                 settings->type = type;
@@ -352,7 +357,8 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             g_free(name);
             g_free(class);
             g_free(role);
-            name = class = role = NULL;
+            g_free(title);
+            name = class = role = title = NULL;
         }
 
         app = obt_xml_find_node(app->next, "application");
@@ -1074,6 +1080,7 @@ void config_shutdown(void)
         ObAppSettings *itd = (ObAppSettings *)it->data;
         if (itd->name)  g_pattern_spec_free(itd->name);
         if (itd->role)  g_pattern_spec_free(itd->role);
+        if (itd->title) g_pattern_spec_free(itd->title);
         if (itd->class) g_pattern_spec_free(itd->class);
         g_free(it->data);
     }

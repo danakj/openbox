@@ -246,9 +246,10 @@
             <xsd:element minOccurs="0" name="fullscreen" type="ob:bool"/>
             <xsd:element minOccurs="0" name="maximized" type="ob:maximization"/>
         </xsd:all>
-        <xsd:attribute name="role" type="xsd:string"/>
-        <xsd:attribute name="type" type="ob:clienttype"/>
         <!-- at least one of these must be present -->
+        <xsd:attribute name="role" type="xsd:string"/>
+        <xsd:attribute name="title" type="xsd:string"/>
+        <xsd:attribute name="type" type="ob:clienttype"/>
         <xsd:attribute name="name" type="xsd:string"/>
         <xsd:attribute name="class" type="xsd:string"/>
     </xsd:complexType>

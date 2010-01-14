@@ -463,7 +463,9 @@ void RrImageDrawImage(RrPixel32 *target, RrTextureImage *img,
 
             /* our size difference metric.. */
             wdiff = self->original[i]->width - area->width;
+            if (wdiff < 0) wdiff *= 2; /* prefer scaling down than up */
             hdiff = self->original[i]->height - area->height;
+            if (hdiff < 0) hdiff *= 2; /* prefer scaling down than up */
             diff = (wdiff * wdiff) + (hdiff * hdiff);
 
             /* find the smallest difference */

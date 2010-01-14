@@ -861,10 +861,12 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         if (focus_cycle_target == self->client)
             focus_cycle_update_indicator(self->client);
     }
-    if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR))
+    if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR) &&
+        self->label_width)
+    {
         XResizeWindow(obt_display, self->label, self->label_width,
                       ob_rr_theme->label_height);
-
+    }
 }
 
 static void frame_adjust_cursors(ObFrame *self)

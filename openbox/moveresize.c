@@ -300,11 +300,7 @@ void moveresize_end(gboolean cancel)
 
     popup_hide(popup);
 
-    if (moving) {
-        client_move(moveresize_client,
-                    (cancel ? start_cx : cur_x),
-                    (cancel ? start_cy : cur_y));
-    } else {
+    if (!moving) {
 #ifdef SYNC
         /* turn off the alarm */
         if (moveresize_alarm != None) {
@@ -314,14 +310,18 @@ void moveresize_end(gboolean cancel)
 
         ob_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
 #endif
-
-        client_configure(moveresize_client,
-                         (cancel ? start_cx : cur_x),
-                         (cancel ? start_cy : cur_y),
-                         (cancel ? start_cw : cur_w),
-                         (cancel ? start_ch : cur_h),
-                         TRUE, TRUE, FALSE);
     }
+
+    /* don't use client_move() here, use the same width/height as
+       we've been using during the move, otherwise we get different results
+       when moving maximized windows between monitors of different sizes !
+    */
+    client_configure(moveresize_client,
+                     (cancel ? start_cx : cur_x),
+                     (cancel ? start_cy : cur_y),
+                     (cancel ? start_cw : cur_w),
+                     (cancel ? start_ch : cur_h),
+                     TRUE, TRUE, FALSE);
 
     /* dont edge warp after its ended */
     cancel_edge_warp();

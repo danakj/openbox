@@ -719,22 +719,27 @@ static void event_process(const XEvent *ec, gpointer data)
 #endif
 
     if (e->type == ButtonPress || e->type == ButtonRelease) {
+        ObWindow *w;
+        static guint pressed = 0;
+        static Window pressed_win = None;
+
         /* If the button press was on some non-root window, or was physically
-           on the root window, then process it */
+           on the root window... */
         if (window != obt_root(ob_screen) ||
-            e->xbutton.subwindow == None)
+            e->xbutton.subwindow == None ||
+            /* ...or if it is related to the last button press we handled... */
+            pressed == e->xbutton.button ||
+            /* ...or it if it was physically on an openbox
+               internal window... */
+            ((w = window_find(e->xbutton.subwindow)) &&
+             WINDOW_IS_INTERNAL(w)))
+            /* ...then process the event, otherwise ignore it */
         {
             used = event_handle_user_input(client, e);
-        }
-        /* Otherwise only process it if it was physically on an openbox
-           internal window */
-        else {
-            ObWindow *w;
 
-            if ((w = window_find(e->xbutton.subwindow)) &&
-                WINDOW_IS_INTERNAL(w))
-            {
-                used = event_handle_user_input(client, e);
+            if (e->type == ButtonPress) {
+                pressed = e->xbutton.button;
+                pressed_win = e->xbutton.subwindow;
             }
         }
     }

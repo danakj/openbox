@@ -166,6 +166,8 @@ gint main(gint argc, gchar **argv)
     obt_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler,  NULL,NULL);
     obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
     obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGTTIN, signal_handler, NULL,NULL);
+    obt_main_loop_signal_add(ob_main_loop, SIGTTOU, signal_handler, NULL,NULL);
 
     ob_screen = DefaultScreen(obt_display);
 
@@ -503,6 +505,10 @@ static void signal_handler(gint signal, gpointer data)
     case SIGCHLD:
         /* reap children */
         while (waitpid(-1, NULL, WNOHANG) > 0);
+        break;
+    case SIGTTIN:
+    case SIGTTOU:
+        ob_debug("Caught signal %d. Ignoring.", signal);
         break;
     default:
         ob_debug("Caught signal %d. Exiting.", signal);

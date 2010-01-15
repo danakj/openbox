@@ -3194,6 +3194,9 @@ void client_fullscreen(ObClient *self, gboolean fs)
 
     if (fs) {
         self->pre_fullscreen_area = self->area;
+        self->pre_fullscreen_max_horz = self->max_horz;
+        self->pre_fullscreen_max_vert = self->max_vert;
+
         /* if the window is maximized, its area isn't all that meaningful.
            save its premax area instead. */
         if (self->max_horz) {
@@ -3214,6 +3217,17 @@ void client_fullscreen(ObClient *self, gboolean fs)
     } else {
         g_assert(self->pre_fullscreen_area.width > 0 &&
                  self->pre_fullscreen_area.height > 0);
+
+        self->max_horz = self->pre_fullscreen_max_horz;
+        self->max_vert = self->pre_fullscreen_max_vert;
+        if (self->max_horz) {
+            self->pre_max_area.x = self->pre_fullscreen_area.x;
+            self->pre_max_area.width = self->pre_fullscreen_area.width;
+        }
+        if (self->max_vert) {
+            self->pre_max_area.y = self->pre_fullscreen_area.y;
+            self->pre_max_area.height = self->pre_fullscreen_area.height;
+        }
 
         x = self->pre_fullscreen_area.x;
         y = self->pre_fullscreen_area.y;

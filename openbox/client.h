@@ -147,6 +147,9 @@ struct _ObClient
     Rect pre_max_area;
     /*! Position and size of the window prior to being fullscreened */
     Rect pre_fullscreen_area;
+    /*! Remember if the window was maximized before going fullscreen */
+    gboolean pre_fullscreen_max_horz,
+             pre_fullscreen_max_vert;
 
     /*! The window's strut
       The strut defines areas of the screen that are marked off-bounds for

@@ -218,6 +218,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
         *strippedlabel = NULL;
     } else {
         gchar *i;
+        gboolean escape;
 
         *strippedlabel = g_strdup(label);
 
@@ -225,20 +226,33 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
            have to just use the first valid character
         */
 
-        i = strchr(*strippedlabel, '_');
+        /* allow __ to escape an underscore */
+        i = *strippedlabel;
+        do {
+            escape = FALSE;
+            i = strchr(i, '_');
+            if (i && *(i+1) == '_') {
+                gchar *j;
+
+                /* remove the escape '_' from the string */
+                for (j = i; *j != '\0'; ++j)
+                    *j = *(j+1);
+
+                ++i;
+                escape = TRUE;
+            }
+        } while (escape);
+
         if (allow_shortcut && i != NULL) {
             /* there is an underscore in the string */
 
             /* you have to use a printable ascii character for shortcuts
                don't allow space either, so you can have like "a _ b"
             */
-            if (VALID_SHORTCUT(*(i+1)) || *(i+1) == '_') {
-                /* Allow you to escape the first _ by putting __ */
-                if (*(i+1) != '_') {
-                    shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
-                    *position = i - *strippedlabel;
-                    *always_show = TRUE;
-                }
+            if (VALID_SHORTCUT(*(i+1))) {
+                shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
+                *position = i - *strippedlabel;
+                *always_show = TRUE;
 
                 /* remove the '_' from the string */
                 for (; *i != '\0'; ++i)

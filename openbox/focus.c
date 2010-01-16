@@ -350,11 +350,13 @@ gboolean focus_valid_target(ObClient *ft,
 
     /* it's not set to skip the taskbar (but this is overridden if the
        window is modal or if the user asked for this window to be focused,
-       or if the window is iconified, and it is not used for windows which are
+       or if the window is iconified (and does not have any parents with
+       which to uniconify it), and it is not used for windows which are
        hilited, or dialog windows as these need user interaction and should
        not be long-lasting windows */
     ok = ok && (!ft->skip_taskbar ||
-                (ft->modal || ft->iconic || user_request ||
+                (ft->modal || user_request ||
+                 (ft->iconic && !ft->parents) ||
                  ft->demands_attention ||
                  ft->type == OB_CLIENT_TYPE_DIALOG));
 

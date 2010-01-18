@@ -62,13 +62,6 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
                                gchar **strippedlabel, guint *position,
                                gboolean *always_show);
 
-static void client_dest(ObClient *client, gpointer data)
-{
-    /* menus can be associated with a client, so close any that are since
-       we are disappearing now */
-    menu_frame_hide_all_client(client);
-}
-
 void menu_startup(gboolean reconfig)
 {
     xmlDocPtr doc;
@@ -112,16 +105,10 @@ void menu_startup(gboolean reconfig)
     }
 
     g_assert(menu_parse_state.parent == NULL);
-
-    if (!reconfig)
-        client_add_destroy_notify(client_dest, NULL);
 }
 
 void menu_shutdown(gboolean reconfig)
 {
-    if (!reconfig)
-        client_remove_destroy_notify(client_dest);
-
     parse_shutdown(menu_parse_inst);
     menu_parse_inst = NULL;
 

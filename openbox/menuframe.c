@@ -62,6 +62,19 @@ static Window createWindow(Window parent, gulong mask,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 
+static void client_dest(ObClient *client, gpointer data)
+{
+    GList *it;
+
+    /* menus can be associated with a client, so null those refs since
+       we are disappearing now */
+    for (it = menu_frame_visible; it; it = g_list_next(it)) {
+        ObMenuFrame *f = it->data;
+        if (f->client == client)
+            f->client = NULL;
+    }
+}
+
 void menu_frame_startup(gboolean reconfig)
 {
     gint i;
@@ -76,6 +89,7 @@ void menu_frame_startup(gboolean reconfig)
 
     if (reconfig) return;
 
+    client_add_destroy_notify(client_dest, NULL);
     menu_frame_map = g_hash_table_new(g_int_hash, g_int_equal);
 }
 
@@ -85,6 +99,7 @@ void menu_frame_shutdown(gboolean reconfig)
 
     if (reconfig) return;
 
+    client_remove_destroy_notify(client_dest);
     g_hash_table_destroy(menu_frame_map);
 }
 
@@ -1077,22 +1092,6 @@ void menu_frame_hide_all(void)
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
-}
-
-void menu_frame_hide_all_client(ObClient *client)
-{
-    GList *it = g_list_last(menu_frame_visible);
-    if (it) {
-        ObMenuFrame *f = it->data;
-        if (f->client == client) {
-            if (config_submenu_show_delay) {
-                /* remove any submenu open requests */
-                ob_main_loop_timeout_remove(ob_main_loop,
-                                            submenu_show_timeout);
-            }
-            menu_frame_hide(f);
-        }
-    }
 }
 
 ObMenuFrame* menu_frame_under(gint x, gint y)

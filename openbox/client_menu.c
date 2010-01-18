@@ -118,7 +118,8 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     gint x, y;
     gulong ignore_start;
 
-    g_assert(c);
+    if (!c)
+        return;
 
     if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();

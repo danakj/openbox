@@ -348,14 +348,15 @@ gboolean focus_valid_target(ObClient *ft,
                   that can be focused instead */
                !focus_target_has_siblings(ft, iconic_windows, all_desktops))));
 
-    /* it's not set to skip the taskbar (but this only applies to normal typed
-       windows, and is overridden if the window is modal or if the user asked
-       for this window to be focused, or if the window is iconified) */
-    ok = ok && (ft->type != OB_CLIENT_TYPE_NORMAL ||
-                ft->modal ||
-                ft->iconic ||
-                user_request ||
-                !ft->skip_taskbar);
+    /* it's not set to skip the taskbar (but this is overridden if the
+       window is modal or if the user asked for this window to be focused,
+       or if the window is iconified, and it is not used for windows which are
+       hilited, or dialog windows as these need user interaction and should
+       not be long-lasting windows */
+    ok = ok && (!ft->skip_taskbar ||
+                (ft->modal || ft->iconic || user_request ||
+                 ft->demands_attention ||
+                 ft->type == OB_CLIENT_TYPE_DIALOG));
 
     /* it's not going to just send focus off somewhere else (modal window),
        unless that modal window is not one of our valid targets, then let

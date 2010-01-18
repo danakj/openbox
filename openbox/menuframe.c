@@ -1266,7 +1266,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
 
         /* release grabs before executing the shit */
         if (!(state & ControlMask)) {
-            menu_frame_hide_all();
+            event_cancel_all_key_grabs();
             frame = NULL;
         }
 

@@ -145,7 +145,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     /* If there is a keyboard grab going on then we need to cancel
        it so the application can grab things */
-    event_cancel_all_key_grabs();
+    if (data->uact != OB_USER_ACTION_MENU_SELECTION)
+        event_cancel_all_key_grabs();
 
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
         g_message(e->message, o->cmd);

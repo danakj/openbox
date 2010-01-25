@@ -37,7 +37,7 @@ else
   if test -z "$SESSION"; then
       # if its empty then just run openbox
       SESSION="[openbox]"
-  elif echo "$SESSION" | grep -q openbox; then
+  elif ! echo "$SESSION" | grep -q openbox; then
       # if openbox isn't in the session then append it
       SESSION="${SESSION%]},openbox]"
   fi

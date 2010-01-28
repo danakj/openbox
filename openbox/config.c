@@ -985,6 +985,8 @@ void config_startup(ObtXmlInst *i)
     config_font_inactivewindow = NULL;
     config_font_menuitem = NULL;
     config_font_menutitle = NULL;
+    config_font_activeosd = NULL;
+    config_font_inactiveosd = NULL;
 
     obt_xml_register(i, "theme", parse_theme, NULL);
 

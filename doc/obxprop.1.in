@@ -4,7 +4,7 @@ openbox \(em A minimalistic, highly configurable, next generation window
 manager with extensive standards support. 
 .SH "SYNOPSIS" 
 .PP 
-\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-display\fP]  [DISPLAY]  [\fB\-\-id\fP]  [ID]  [\fB\-\-root\fP]  
+\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-display\fP]  [DISPLAY]  [\fB\-\-id\fP]  [ID]  [\fB\-\-root\fP]  [\-\-]  [PROPERTY \&...]  
 .SH "DESCRIPTION" 
 .PP 
 obxprop is a tool for displaying the properties on an x 
@@ -32,6 +32,11 @@ Specify the X display to use.
 .IP "ID" 10 
 Specify the window identifier for the window whose properties 
 will be displayed. 
+.PP 
+Similar to \fBxprop\fR, 
+you may pass one or more property names to have 
+\fBopenbox\fR limit its output to only the properties 
+requested. 
 .SH "SEE ALSO" 
 .PP 
 openbox (1), openbox-session(1), openbox-gnome-session(1), 
@@ -39,4 +44,4 @@ openbox-kde-session(1).
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Wed 06 Jan 2010, 13:40 
+.\" created by instant / docbook-to-man, Mon 08 Feb 2010, 14:21 

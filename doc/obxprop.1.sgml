@@ -40,6 +40,8 @@ manpage.1: manpage.sgml
       <arg><option>--display</option></arg><arg>DISPLAY</arg>
       <arg><option>--id</option></arg><arg>ID</arg>
       <arg><option>--root</option></arg>
+      <arg>--</arg>
+      <arg rep="Repeat">PROPERTY</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -56,7 +58,8 @@ manpage.1: manpage.sgml
       clicking on it.</para>
 
     <para>Primarily, this tool exists for Openbox users to see the value of the
-      _OB_NAME, _OB_CLASS, and _OB_ROLE properties, which Openbox uses for
+      _OB_APP_NAME, _OB_APP_CLASS, _OB_APP_ROLE, and _OB_APP_TYPE properties,
+      which Openbox uses for
       matching windows against user-defined application rules.</para>
   </refsect1>
   <refsect1>
@@ -84,6 +87,11 @@ manpage.1: manpage.sgml
         </listitem>
       </varlistentry>
     </variablelist>
+
+    <para>Similar to <command>xprop</command>,
+      you may pass one or more property names to have
+      <command>&dhpackage;</command> limit its output to only the properties
+      requested.</para>
   </refsect1>
   <refsect1>
     <title>SEE ALSO</title>

@@ -1,3 +1,27 @@
+3.4.11:
+  * Update Hungarian, Japanese, and Latvian translations.
+  * Make xdg-autostart use the OPENBOX environment by default, so you can use
+    OnlyShowIn=OPENBOX in an autostart .desktop and it will work as expected.
+  * Don't close the menu when you hold control and execute something.
+  * Fix bug #4503 (Adjust who shows up in the Alt-Tab list using SKIP_TASKBAR).
+  * Fix flickering window when moving maximized window between monitors of
+    different sizes.
+  * Fix bug #4355 (Allow multiple escaped _'s in a menu label and allow
+    a menu shortcut to come after an escaped _).
+  * Remember the maximized state of a window when it goes fullscreen, and
+    restore it when leaving fullscreen state.
+  * Fix bug #4072 (Openbox is stopped by terminal applications writing to
+    stdout).
+  * Fix bug #4492 (Mistake in openbox-gnome-session check while setting up).
+  * Fix obxprop to make --root and --id work correctly.
+  * Add _OB_APP_ROLE/CLASS/NAME/TYPE properties (replaces _OB_ROLE/CLASS/NAME).
+  * Make the focus cycling popup dynamic when windows appear/disappear.
+  * Fix bug #4411 (Crash when window appears during focus cycling).
+  * Allow the user to specify which properties should be shown by obxprop.
+  * Fix tilde expansion in the Execute action
+  * Make Home and End keys move to the top/bottom of the active menu.
+  * Use the submenuShowDelay when navigating menus with the keyboard.
+
 3.4.10:
   * Improve keyboard navigation in Openbox menus.
   * Add a --root option and a manpage for obxprop.

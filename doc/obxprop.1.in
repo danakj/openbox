@@ -4,7 +4,7 @@ openbox \(em A minimalistic, highly configurable, next generation window
 manager with extensive standards support. 
 .SH "SYNOPSIS" 
 .PP 
-\fBopenbox\fR [\fB\-\-help\fP]  [\fB\-\-display\fP]  [DISPLAY]  [\fB\-\-id\fP]  [ID]  [\fB\-\-root\fP]  [\-\-]  [PROPERTY \&...]  
+\fBopenbox\fR [\-\-help]  [\-\-display DISPLAY]  [\-\-id ID]  [\-\-root]  [\-\-]  [PROPERTY \&...]  
 .SH "DESCRIPTION" 
 .PP 
 obxprop is a tool for displaying the properties on an x 
@@ -18,18 +18,17 @@ identifier, otherwise obxprop will allow you to select a window by
 clicking on it. 
 .PP 
 Primarily, this tool exists for Openbox users to see the value of the 
-_OB_NAME, _OB_CLASS, and _OB_ROLE properties, which Openbox uses for 
+_OB_APP_NAME, _OB_APP_CLASS, _OB_APP_ROLE, and _OB_APP_TYPE properties, 
+which Openbox uses for 
 matching windows against user-defined application rules. 
 .SH "OPTIONS" 
 .PP 
 These are the possible options that \fBopenbox\fR accepts: 
 .IP "\fB\-\-help\fP" 10 
 Show a summary of the options available. 
-.IP "\fB\-\-display\fP" 10 
-.IP "DISPLAY" 10 
+.IP "\fB\-\-display\fP DISPLAY" 10 
 Specify the X display to use. 
-.IP "\fB\-\-id\fP" 10 
-.IP "ID" 10 
+.IP "\fB\-\-id\fP ID" 10 
 Specify the window identifier for the window whose properties 
 will be displayed. 
 .PP 
@@ -44,4 +43,4 @@ openbox-kde-session(1).
 .PP 
 Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
 \fP 
-.\" created by instant / docbook-to-man, Mon 08 Feb 2010, 14:21 
+.\" created by instant / docbook-to-man, Mon 08 Feb 2010, 15:03 

@@ -36,12 +36,12 @@ manpage.1: manpage.sgml
   <refsynopsisdiv>
     <cmdsynopsis>
       <command>&dhpackage;</command>
-      <arg><option>--help</option></arg>
-      <arg><option>--display</option></arg><arg>DISPLAY</arg>
-      <arg><option>--id</option></arg><arg>ID</arg>
-      <arg><option>--root</option></arg>
-      <arg>--</arg>
-      <arg rep="Repeat">PROPERTY</arg>
+      <arg choice="Opt">--help</arg>
+      <arg choice="Opt">--display DISPLAY</arg>
+      <arg choice="Opt">--id ID</arg>
+      <arg choice="Opt">--root</arg>
+      <arg choice="Opt">--</arg>
+      <arg choice="Opt" rep="Repeat">PROPERTY</arg>
     </cmdsynopsis>
   </refsynopsisdiv>
   <refsect1>
@@ -74,13 +74,13 @@ manpage.1: manpage.sgml
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term><option>--display</option></term><term>DISPLAY</term>
+        <term><option>--display</option> DISPLAY</term>
         <listitem>
           <para>Specify the X display to use.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term><option>--id</option></term><term>ID</term>
+        <term><option>--id</option> ID</term>
         <listitem>
           <para>Specify the window identifier for the window whose properties
             will be displayed.</para>

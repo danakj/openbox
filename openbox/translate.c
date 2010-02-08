@@ -166,7 +166,11 @@ gchar *translate_keycode(guint keycode)
 
     if ((sym = XKeycodeToKeysym(ob_display, keycode, 0)) != NoSymbol)
         ret = XKeysymToString(sym);
-    return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
+    /* glib crashes in g_locale_to_utf8 if you pass it NULL here */
+    if (ret)
+        return g_locale_to_utf8(ret, -1, NULL, NULL, NULL);
+    else
+        return NULL;
 }
 
 gunichar translate_unichar(guint keycode)

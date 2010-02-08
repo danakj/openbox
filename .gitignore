@@ -22,6 +22,7 @@ doc/openbox-gnome-session.1
 doc/openbox-kde-session.1
 doc/openbox-session.1
 doc/openbox.1
+doc/obxprop.1
 libtool
 ltmain.sh
 m4/*.m4

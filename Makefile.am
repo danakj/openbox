@@ -529,7 +529,8 @@ nodist_man_MANS = \
 	doc/openbox.1 \
 	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
-	doc/openbox-kde-session.1
+	doc/openbox-kde-session.1 \
+	doc/obxprop.1
 
 EXTRA_DIST = \
 	config.rpath

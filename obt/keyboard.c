@@ -61,7 +61,8 @@ void obt_keyboard_reload(void)
         modkeys_keys[i] = 0;
 
     modmap = XGetModifierMapping(obt_display);
-    g_assert(modmap->max_keypermod > 0);
+    /* note: modmap->max_keypermod can be 0 when there is no valid key layout
+       available */
 
     XDisplayKeycodes(obt_display, &min_keycode, &max_keycode);
     keymap = XGetKeyboardMapping(obt_display, min_keycode,

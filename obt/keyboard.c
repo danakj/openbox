@@ -49,12 +49,69 @@ static gboolean hyper_l = FALSE;
 
 static gboolean started = FALSE;
 
+static XIM xim = NULL;
+static XIMStyle xim_style = 0;
+static XIC xic = NULL;
+static Window xic_window = None;
+
 void obt_keyboard_reload(void)
 {
     gint i, j, k;
+    gchar *aname, *aclass;
+    gchar firstc[7];
 
     if (started) obt_keyboard_shutdown(); /* free stuff */
     started = TRUE;
+
+    /* initialize the Input Method */
+
+    aname = g_strdup(g_get_prgname());
+    if (!aname) aname = g_strdup("obt");
+
+    /* capitalize first letter of the class */
+    i = g_unichar_to_utf8(g_unichar_toupper(g_utf8_get_char(aname)),
+                          firstc);
+    firstc[i] = '\0';
+    aclass = g_strdup_printf("%s%s", firstc, g_utf8_next_char(aname));
+
+    g_print("Opening Input Method for %s %s\n", aname, aclass);
+    xim = XOpenIM(obt_display, NULL, aname, aclass);
+
+    g_free(aclass);
+    g_free(aname);
+
+    if (!xim)
+        g_message("Failed to open an Input Method");
+    else {
+        XIMStyles *xim_styles = NULL;
+        char *r;
+
+        /* get the input method styles */
+        r = XGetIMValues(xim, XNQueryInputStyle, &xim_styles, NULL);
+        if (r || !xim_styles)
+            g_message("Input Method does not support any styles");
+        if (xim_styles) {
+            /* pick a style that doesnt need preedit or status */
+            for (i = 0; i < xim_styles->count_styles; ++i) {
+                if (xim_styles->supported_styles[i] == 
+                    (XIMPreeditNothing | XIMStatusNothing))
+                {
+                    xim_style = xim_styles->supported_styles[i];
+                    break;
+                }
+            }
+            XFree(xim_styles);
+        }
+
+        if (!xim_style)
+            g_message("Input Method does not support a usable style");
+        else if (xic_window)
+            xic = XCreateIC(xim,
+                            XNInputStyle, xim_style,
+                            XNClientWindow, xic_window,
+                            XNFocusWindow, xic_window,
+                            NULL);
+    }
 
     /* reset the keys to not be bound to any masks */
     for (i = 0; i < OBT_KEYBOARD_NUM_MODKEYS; ++i)
@@ -63,7 +120,6 @@ void obt_keyboard_reload(void)
     modmap = XGetModifierMapping(obt_display);
     /* note: modmap->max_keypermod can be 0 when there is no valid key layout
        available */
-
 
     XDisplayKeycodes(obt_display, &min_keycode, &max_keycode);
     keymap = XGetKeyboardMapping(obt_display, min_keycode,
@@ -105,6 +161,11 @@ void obt_keyboard_shutdown(void)
     modmap = NULL;
     XFree(keymap);
     keymap = NULL;
+    if (xic) XDestroyIC(xic);
+    xic = NULL;
+    if (xim) XCloseIM(xim);
+    xim = NULL;
+    xim_style = 0;
     started = FALSE;
 }
 
@@ -207,21 +268,79 @@ KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym)
     return ret;
 }
 
-gchar *obt_keyboard_keycode_to_string(guint keycode)
+void obt_keyboard_set_input_context(Window window)
+{
+    if (xic) {
+        XDestroyIC(xic);
+        xic = NULL;
+    }
+    xic_window = window;
+    if (xic_window)
+        xic = XCreateIC(xim,
+                        XNInputStyle, xim_style,
+                        XNClientWindow, xic_window,
+                        XNFocusWindow, xic_window,
+                        NULL);
+    g_message("Created Input Context (0x%x) for window 0x%x\n",
+              xic, xic_window);
+}
+
+gchar *obt_keyboard_keypress_to_string(XKeyPressedEvent *ev)
 {
     KeySym sym;
+    int ret;
+    Status status;
+    gchar *buf;
 
-    if ((sym = XKeycodeToKeysym(obt_display, keycode, 0)) != NoSymbol)
+    if (xic) {
+#ifdef X_HAVE_UTF8_STRING
+        ret = Xutf8LookupString(xic, ev, buf, 0, &sym, &status);
+#else
+        ret = XmbLookupString(xic, ev, buf, 0, &sym, &status);
+#endif
+        if (status == XBufferOverflow) {
+            g_message("bufferoverflow");
+            buf = g_malloc(ret+1);
+            buf[ret] = '\0';
+#ifdef X_HAVE_UTF8_STRING
+            ret = Xutf8LookupString(xic, ev, buf, ret+1, &sym, &status);
+            g_message("bufferoverflow read %d bytes", ret);
+#else
+            ret = XmbLookupString(xic, ev, buf, ret+1, &sym, &status);
+#endif
+            if (status == XLookupChars || status == XLookupBoth) {
+#ifndef X_HAVE_UTF8_STRING 
+                gchar *buf2 = buf;
+                buf = g_locale_to_utf8(buf2, -1, NULL, NULL, NULL);
+                g_free(buf2);
+#endif
+               return buf;
+            }
+        }
+        else if (status == XLookupKeySym)
+            return g_locale_to_utf8(XKeysymToString(sym), -1,
+                                    NULL, NULL, NULL);
+    }
+    
+    buf = g_malloc(2);
+    buf[1] = '\0';
+    ret = XLookupString(ev, buf, 1, &sym, NULL);
+    if (ret)
+        return buf;
+
+    g_free(buf);
+    if (sym != NoSymbol)
         return g_locale_to_utf8(XKeysymToString(sym), -1, NULL, NULL, NULL);
+
     return NULL;
 }
 
-gunichar obt_keyboard_keycode_to_unichar(guint keycode)
+gunichar obt_keyboard_keypress_to_unichar(XKeyPressedEvent *ev)
 {
     gunichar unikey = 0;
     char *key;
 
-    if ((key = obt_keyboard_keycode_to_string(keycode)) != NULL &&
+    if ((key = obt_keyboard_keypress_to_string(ev)) != NULL &&
         /* don't accept keys that aren't a single letter, like "space" */
         key[1] == '\0')
     {

@@ -27,6 +27,7 @@
 #include "openbox.h"
 #include "config.h"
 #include "obt/prop.h"
+#include "obt/keyboard.h"
 #include "obrender/theme.h"
 
 #define PADDING 2
@@ -960,6 +961,8 @@ static gboolean menu_frame_show(ObMenuFrame *self)
             ungrab_pointer();
             return FALSE;
         }
+
+        obt_keyboard_set_input_context(obt_root(ob_screen));
     }
 
     menu_frame_update(self);
@@ -1082,6 +1085,8 @@ static void menu_frame_hide(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* last menu shown */
+        obt_keyboard_set_input_context(None);
+
         ungrab_pointer();
         ungrab_keyboard();
     }

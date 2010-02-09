@@ -665,6 +665,18 @@ static void event_process(const XEvent *ec, gpointer data)
             if (((XkbStateNotifyEvent*)e)->changed & XkbGroupStateMask)
                 ob_reconfigure_keyboard();
 
+            {
+                //XkbDescPtr kbd;
+                XkbStateRec state;
+
+                //kbd = XkbAllocKeyboard();
+                XkbGetState(obt_display, XkbUseCoreKbd, &state);
+                g_print("effective group: %d\n", state.group);
+                g_print("base group: %d\n", state.base_group);
+
+                //XkbFreeKeyboard(kbd, 0, TRUE);
+            }
+
             break;
         default:
             break;
@@ -1809,14 +1821,13 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 f->child == e->frame)
                 menu_frame_select(e->frame, e, FALSE);
     }
-    else if (ev->type == KeyPress || ev->type == KeyRelease) {
+    else if (ev->type == KeyPress) {
         guint keycode, state;
-        gunichar unikey;
+        static gunichar unikey;
         ObMenuFrame *frame;
 
         keycode = ev->xkey.keycode;
         state = ev->xkey.state;
-        unikey = obt_keyboard_keycode_to_unichar(keycode);
 
         frame = find_active_or_last_menu();
         if (frame == NULL)
@@ -1872,6 +1883,12 @@ static gboolean event_handle_menu_input(XEvent *ev)
             else if (ob_keycode_match(keycode, OB_KEY_END)) {
                 menu_frame_select_last(frame);
                 ret = TRUE;
+            }
+
+            /* Remember the last keypress */
+            else {
+                unikey = obt_keyboard_keypress_to_unichar(&ev->xkey);
+                ret = !!unikey;
             }
         }
 

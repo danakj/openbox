@@ -718,6 +718,17 @@ void ob_reconfigure(void)
     ob_exit(0);
 }
 
+void ob_reconfigure_keyboard(void)
+{
+    /* keyboard mapping or group changed, so reload the keyboard map
+       and rebind all the key bindings */
+    ob_debug("Keyboard map changed. Reloading keyboard bindings.");
+    ob_set_state(OB_STATE_RECONFIGURING);
+    obt_keyboard_reload();
+    keyboard_rebind();
+    ob_set_state(OB_STATE_RUNNING);
+}
+
 void ob_exit(gint code)
 {
     exitcode = code;

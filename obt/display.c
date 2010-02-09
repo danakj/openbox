@@ -58,8 +58,8 @@ gboolean obt_display_open(const char *display_name)
     n = display_name ? g_strdup(display_name) : NULL;
     obt_display = d = XOpenDisplay(n);
     if (d) {
-        gint junk;
-        (void)junk;
+        gint junk, major, minor;
+        (void)junk, (void)major, (void)minor;
 
         if (fcntl(ConnectionNumber(d), F_SETFD, 1) == -1)
             g_message("Failed to set display as close-on-exec");
@@ -67,12 +67,14 @@ gboolean obt_display_open(const char *display_name)
 
         /* read what extensions are present */
 #ifdef XKB
+        major = XkbMajorVersion;
+        minor = XkbMinorVersion;
         obt_display_extension_xkb =
             XkbQueryExtension(d, &junk,
                               &obt_display_extension_xkb_basep, &junk,
-                              NULL, NULL);
+                              &major, &minor);
         if (!obt_display_extension_xkb)
-            g_message("XKB extension is not present on the server");
+            g_message("XKB extension is not present on the server or too old");
 #endif
 
 #ifdef SHAPE

@@ -236,7 +236,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
             /* you have to use a printable ascii character for shortcuts
                don't allow space either, so you can have like "a _ b"
             */
-            if (VALID_SHORTCUT(*(i+1))) {
+            if (*(i+1)) {
                 shortcut = g_unichar_tolower(g_utf8_get_char(i+1));
                 *position = i - *strippedlabel;
                 *always_show = TRUE;

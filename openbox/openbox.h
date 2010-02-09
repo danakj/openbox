@@ -57,6 +57,7 @@ void ob_exit(gint code);
 void ob_exit_replace(void);
 
 void ob_reconfigure(void);
+void ob_reconfigure_keyboard(void);
 
 void ob_exit_with_error(const gchar *msg) G_GNUC_NORETURN;
 

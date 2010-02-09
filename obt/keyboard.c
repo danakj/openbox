@@ -64,6 +64,7 @@ void obt_keyboard_reload(void)
     /* note: modmap->max_keypermod can be 0 when there is no valid key layout
        available */
 
+
     XDisplayKeycodes(obt_display, &min_keycode, &max_keycode);
     keymap = XGetKeyboardMapping(obt_display, min_keycode,
                                  max_keycode - min_keycode + 1,
@@ -227,6 +228,9 @@ gunichar obt_keyboard_keycode_to_unichar(guint keycode)
         unikey = g_utf8_get_char_validated(key, -1);
         if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
             unikey = 0;
+    }
+    if (key) {
+        g_print("key %s\n", key);
     }
     g_free(key);
     return unikey;

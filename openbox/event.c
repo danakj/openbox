@@ -56,9 +56,6 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h> /* for usleep() */
 #endif
-#ifdef XKB
-#  include <X11/XKBlib.h>
-#endif
 
 #ifdef USE_SM
 #include <X11/ICE/ICElib.h>
@@ -139,6 +136,13 @@ void event_startup(gboolean reconfig)
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
+#endif
+
+#ifdef XKB
+    /* ask to be notified when the keyboard group changes */
+    if (obt_display_extension_xkb)
+        XkbSelectEventDetails(obt_display, XkbUseCoreKbd, XkbStateNotify,
+                              XkbGroupStateMask, XkbGroupStateMask);
 #endif
 
     client_add_destroy_notify(focus_delay_client_dest, NULL);
@@ -650,14 +654,40 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_root(e);
     else if (e->type == MapRequest)
         window_manage(window);
+#ifdef XKB
+    else if (obt_display_extension_xkb &&
+             e->type == obt_display_extension_xkb_basep)
+    {
+        switch (((XkbAnyEvent*)e)->xkb_type) {
+        case XkbStateNotify:
+            /* the effective xkb group changed, so they keyboard layout is now
+               different */
+            if (((XkbStateNotifyEvent*)e)->changed & XkbGroupStateMask)
+                ob_reconfigure_keyboard();
+
+            break;
+        default:
+            break;
+        }
+    }
+#endif
     else if (e->type == MappingNotify) {
-        /* keyboard layout changes for modifier mapping changes. reload the
-           modifier map, and rebind all the key bindings as appropriate */
-        ob_debug("Keyboard map changed. Reloading keyboard bindings.");
-        ob_set_state(OB_STATE_RECONFIGURING);
-        obt_keyboard_reload();
-        keyboard_rebind();
-        ob_set_state(OB_STATE_RUNNING);
+        ob_debug("MappingNotify");
+
+#ifdef XKB
+        /* the keyboard map changed, so we might need to listen on a new
+           device */
+        if (obt_display_extension_xkb) {
+            XkbSelectEvents(obt_display, XkbUseCoreKbd, XkbStateNotifyMask, 0);
+            XRefreshKeyboardMapping(&e->xmapping);
+            XkbSelectEventDetails(obt_display, XkbUseCoreKbd, XkbStateNotify,
+                                  XkbGroupStateMask, XkbGroupStateMask);
+        }
+#else
+        XRefreshKeyboardMapping(&e->xmapping);
+#endif
+
+        ob_reconfigure_keyboard();
     }
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for

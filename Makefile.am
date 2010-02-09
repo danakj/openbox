@@ -69,7 +69,6 @@ obrender_libobrender_la_CPPFLAGS = \
 obrender_libobrender_la_LDFLAGS = \
 	-version-info $(RR_CURRENT):$(RR_REVISION):$(RR_AGE)
 obrender_libobrender_la_LIBADD = \
-	obt/libobt.la \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \

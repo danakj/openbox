@@ -663,7 +663,7 @@ static void event_process(const XEvent *ec, gpointer data)
             /* the effective xkb group changed, so they keyboard layout is now
                different */
             if (((XkbStateNotifyEvent*)e)->changed & XkbGroupStateMask)
-                ob_reconfigure_keyboard();
+                //ob_reconfigure_keyboard();
 
             {
                 //XkbDescPtr kbd;

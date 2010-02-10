@@ -274,20 +274,14 @@ static void event_hack_mods(XEvent *e)
         break;
     case KeyRelease:
 #ifdef XKB
-        /* If XKB is present, then the modifiers are all strange from its
-           magic.  Our X core protocol stuff won't work, so we use this to
-           find what the modifier state is instead. */
-        if (XkbGetState(obt_display, XkbUseCoreKbd, &xkb_state) == Success)
-            e->xkey.state =
-                obt_keyboard_only_modmasks(xkb_state.compat_state);
-        else
+        /* keep only the keyboard modifiers.  xkb includes other things here.
+           (see XKBProto.pdf document: section 2.2.2) */
+        e->xkey.state &= 0xf;
 #endif
-        {
-            e->xkey.state = obt_keyboard_only_modmasks(e->xkey.state);
-            /* remove from the state the mask of the modifier key being
-               released, if it is a modifier key being released that is */
-            e->xkey.state &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
-        }
+        e->xkey.state = obt_keyboard_only_modmasks(e->xkey.state);
+        /* remove from the state the mask of the modifier key being
+           released, if it is a modifier key being released that is */
+        e->xkey.state &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
         break;
     case MotionNotify:
         e->xmotion.state = obt_keyboard_only_modmasks(e->xmotion.state);

@@ -28,7 +28,7 @@
         Mod2Mask (1<<4), Mod3Mask (1<<5), Mod4Mask (1<<6), Mod5Mask (1<<7)
 */
 #define NUM_MASKS 8
-#define ALL_MASKS 0xff /* an or'ing of all 8 keyboard masks */
+#define ALL_MASKS 0xf /* an or'ing of all 8 keyboard masks */
 
 /* Get the bitflag for the n'th modifier mask */
 #define nth_mask(n) (1 << n)
@@ -59,6 +59,11 @@ void obt_keyboard_reload(void)
     gint i, j, k;
     gchar *aname, *aclass;
     gchar firstc[7];
+    guint ctrl;
+
+    ctrl = XkbPCF_GrabsUseXKBStateMask |
+        XkbPCF_LookupStateWhenGrabbed;
+    //XkbSetPerClientControls(obt_display, ctrl, &ctrl);
 
     if (started) obt_keyboard_shutdown(); /* free stuff */
     started = TRUE;
@@ -281,76 +286,101 @@ void obt_keyboard_set_input_context(Window window)
                         XNClientWindow, xic_window,
                         XNFocusWindow, xic_window,
                         NULL);
-    g_message("Created Input Context (0x%x) for window 0x%x\n",
-              xic, xic_window);
-}
-
-gchar *obt_keyboard_keypress_to_string(XKeyPressedEvent *ev)
-{
-    KeySym sym;
-    int ret;
-    Status status;
-    gchar *buf;
-
-    if (xic) {
-#ifdef X_HAVE_UTF8_STRING
-        ret = Xutf8LookupString(xic, ev, buf, 0, &sym, &status);
-#else
-        ret = XmbLookupString(xic, ev, buf, 0, &sym, &status);
-#endif
-        if (status == XBufferOverflow) {
-            g_message("bufferoverflow");
-            buf = g_malloc(ret+1);
-            buf[ret] = '\0';
-#ifdef X_HAVE_UTF8_STRING
-            ret = Xutf8LookupString(xic, ev, buf, ret+1, &sym, &status);
-            g_message("bufferoverflow read %d bytes", ret);
-#else
-            ret = XmbLookupString(xic, ev, buf, ret+1, &sym, &status);
-#endif
-            if (status == XLookupChars || status == XLookupBoth) {
-#ifndef X_HAVE_UTF8_STRING 
-                gchar *buf2 = buf;
-                buf = g_locale_to_utf8(buf2, -1, NULL, NULL, NULL);
-                g_free(buf2);
-#endif
-               return buf;
-            }
-        }
-        else if (status == XLookupKeySym)
-            return g_locale_to_utf8(XKeysymToString(sym), -1,
-                                    NULL, NULL, NULL);
-    }
-    
-    buf = g_malloc(2);
-    buf[1] = '\0';
-    ret = XLookupString(ev, buf, 1, &sym, NULL);
-    if (ret)
-        return buf;
-
-    g_free(buf);
-    if (sym != NoSymbol)
-        return g_locale_to_utf8(XKeysymToString(sym), -1, NULL, NULL, NULL);
-
-    return NULL;
+    g_message("Created Input Context (0x%lx) for window 0x%lx",
+              (gulong)xic, (gulong)xic_window);
 }
 
 gunichar obt_keyboard_keypress_to_unichar(XKeyPressedEvent *ev)
 {
     gunichar unikey = 0;
-    char *key;
+    KeySym sym;
+    Status status;
+    gchar *buf, fixbuf[4]; /* 4 is enough for a utf8 char */
+    gint r, bufsz;
+    gboolean got_string;
 
-    if ((key = obt_keyboard_keypress_to_string(ev)) != NULL &&
-        /* don't accept keys that aren't a single letter, like "space" */
-        key[1] == '\0')
-    {
-        unikey = g_utf8_get_char_validated(key, -1);
-        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
+    g_print("state: %x\n", ev->state);
+    got_string = FALSE;
+
+    if (xic) {
+
+        buf = fixbuf;
+        bufsz = sizeof(fixbuf);
+
+#ifdef X_HAVE_UTF8_STRING
+        r = Xutf8LookupString(xic, ev, buf, bufsz, &sym, &status);
+#else
+        r = XmbLookupString(xic, ev, buf, bufsz, &sym, &status);
+#endif
+        g_assert(r <= bufsz);
+
+        g_print("status %d\n", status);
+
+        if (status == XBufferOverflow) {
+            g_message("bufferoverflow, need %d bytes", r);
+            buf = g_new(char, r);
+            bufsz = r;
+
+#ifdef X_HAVE_UTF8_STRING
+            r = Xutf8LookupString(xic, ev, buf, bufsz, &sym, &status);
+#else
+            r = XmbLookupString(xic, ev, buf, bufsz, &sym, &status);
+#endif
+            buf[r] = '\0';
+
+            g_message("bufferoverflow read %d bytes, status=%d", r, status);
+            {
+                int i;
+                for (i = 0; i < r + 1; ++i)
+                    g_print("%u", (guchar)buf[i]);
+                g_print("\n");
+            }
+        }
+
+        if ((status == XLookupChars || status == XLookupBoth)) {
+            g_message("read %d bytes", r);
+            if ((guchar)buf[0] >= 32) { /* not an ascii control character */
+#ifndef X_HAVE_UTF8_STRING 
+                /* convert to utf8 */
+                gchar *buf2 = buf;
+                buf = g_locale_to_utf8(buf2, r, NULL, NULL, NULL);
+                g_free(buf2);
+#endif
+
+                got_string = TRUE;
+            }
+        }
+        else
+            g_message("Bad keycode lookup. Keysym 0x%x Status: %s\n",
+                      (guint) sym,
+                      (status == XBufferOverflow ? "BufferOverflow" :
+                       status == XLookupNone ? "XLookupNone" :
+                       status == XLookupKeySym ? "XLookupKeySym" :
+                       "Unknown status"));
+    }
+    else {
+        buf = fixbuf;
+        bufsz = sizeof(fixbuf);
+        r = XLookupString(ev, buf, bufsz, &sym, NULL);
+        g_assert(r <= bufsz);
+        if ((guchar)buf[0] >= 32) /* not an ascii control character */
+            got_string = TRUE;
+    }
+
+    if (got_string) {
+        unikey = g_utf8_get_char_validated(buf, -1);
+        if (unikey == (gunichar)-1 || unikey == (gunichar)-2)
             unikey = 0;
+
+        if (unikey) {
+            char *key = g_strndup(buf, r);
+            g_print("key %s\n", key);
+            g_free(key);
+        }
     }
-    if (key) {
-        g_print("key %s\n", key);
-    }
-    g_free(key);
+
+    if (buf != fixbuf) g_free(buf);
+
+    g_print("unikey: %lu\n", unikey);
     return unikey;
 }

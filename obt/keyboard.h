@@ -64,9 +64,6 @@ KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 */
 void obt_keyboard_set_input_context(Window window);
 
-/*! Give the string form of a KeyPressEvent */
-gchar *obt_keyboard_keypress_to_string(XKeyPressedEvent *ev);
-
 /*! Translate a KeyPressEvent to the unicode character it represents */
 gunichar obt_keyboard_keypress_to_unichar(XKeyPressedEvent *ev);
 

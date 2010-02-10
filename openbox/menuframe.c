@@ -952,7 +952,6 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 
     if (menu_frame_visible == NULL) {
         /* no menus shown yet */
-
         /* grab the pointer in such a way as to pass through "owner events"
            so that we can get enter/leave notifies in the menu. */
         if (!grab_pointer(TRUE, FALSE, OB_CURSOR_POINTER))
@@ -961,7 +960,6 @@ static gboolean menu_frame_show(ObMenuFrame *self)
             ungrab_pointer();
             return FALSE;
         }
-
         obt_keyboard_set_input_context(obt_root(ob_screen));
     }
 
@@ -1086,7 +1084,6 @@ static void menu_frame_hide(ObMenuFrame *self)
     if (menu_frame_visible == NULL) {
         /* last menu shown */
         obt_keyboard_set_input_context(None);
-
         ungrab_pointer();
         ungrab_keyboard();
     }

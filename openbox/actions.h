@@ -35,6 +35,7 @@ typedef gpointer (*ObActionsDataSetupFunc)(ObParseInst *i,
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
+typedef void     (*ObActionsShutdownFunc)(void);
 typedef gboolean (*ObActionsInteractiveInputFunc)(guint initial_state,
                                                   XEvent *e,
                                                   gpointer options,
@@ -64,9 +65,13 @@ gboolean actions_register(const gchar *name,
                           ObActionsInteractiveInputFunc i_input,
                           ObActionsInteractiveCancelFunc i_cancel);
 
+gboolean actions_set_shutdown(const gchar *name,
+                              ObActionsShutdownFunc shutdown);
+
 ObActionsAct* actions_parse(ObParseInst *i,
                             xmlDocPtr doc,
                             xmlNodePtr node);
+
 ObActionsAct* actions_parse_string(const gchar *name);
 
 gboolean actions_act_is_interactive(ObActionsAct *act);

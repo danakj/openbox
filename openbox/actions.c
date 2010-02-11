@@ -47,6 +47,7 @@ struct _ObActionsDefinition {
     ObActionsRunFunc run;
     ObActionsInteractiveInputFunc i_input;
     ObActionsInteractiveCancelFunc i_cancel;
+    ObActionsShutdownFunc shutdown;
 };
 
 struct _ObActionsAct {
@@ -73,7 +74,9 @@ void actions_shutdown(gboolean reconfig)
 
     /* free all the registered actions */
     while (registered) {
-        actions_definition_unref(registered->data);
+        ObActionsDefinition *d = registered->data;
+        if (d->shutdown) d->shutdown();
+        actions_definition_unref(d);
         registered = g_slist_delete_link(registered, registered);
     }
 }
@@ -109,6 +112,22 @@ gboolean actions_register(const gchar *name,
     registered = g_slist_prepend(registered, def);
 
     return TRUE;
+}
+
+gboolean actions_set_shutdown(const gchar *name,
+                              ObActionsShutdownFunc shutdown)
+{
+    GSList *it;
+    ObActionsDefinition *def;
+
+    for (it = registered; it; it = g_slist_next(it)) {
+        def = it->data;
+        if (!g_ascii_strcasecmp(name, def->name)) {
+            def->shutdown = shutdown;
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 static void actions_definition_ref(ObActionsDefinition *def)

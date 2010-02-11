@@ -40,6 +40,8 @@ typedef enum {
     OBT_KEYBOARD_NUM_MODKEYS
 } ObtModkeysKey;
 
+typedef struct _ObtIC ObtIC;
+
 void obt_keyboard_reload(void);
 
 /*! Get the modifier mask(s) for a KeyCode. (eg. a keycode bound to Alt_L could
@@ -63,6 +65,11 @@ gchar *obt_keyboard_keycode_to_string(guint keycode);
 /*! Translate a KeyCode to the unicode character it represents */
 gunichar obt_keyboard_keycode_to_unichar(guint keycode);
 
+/*! Create an input context for a window */
+ObtIC* obt_keyboard_context_new(Window w);
+
+void obt_keyboard_context_ref(ObtIC *ic);
+void obt_keyboard_context_unref(ObtIC *ic);
 
 G_END_DECLS
 

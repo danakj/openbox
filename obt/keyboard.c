@@ -22,6 +22,12 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
+struct _ObtIC
+{
+    guint ref;
+    XIC xic;
+};
+
 /* These masks are constants and the modifier keys are bound to them as
    anyone sees fit:
         ShiftMask (1<<0), LockMask (1<<1), ControlMask (1<<2), Mod1Mask (1<<3),
@@ -290,4 +296,36 @@ gunichar obt_keyboard_keycode_to_unichar(guint keycode)
     }
     g_free(key);
     return unikey;
+}
+
+ObtIC* obt_keyboard_context_new(Window w)
+{
+    ObtIC *ic = NULL;
+
+    if (w != None) {
+        ic = g_new(ObtIC, 1);
+        ic->ref = 1;
+        ic->xic = NULL;
+
+        if (xim)
+            ic->xic = XCreateIC(xim,
+                                XNInputStyle, xim_style,
+                                XNClientWindow, w,
+                                XNFocusWindow, w,
+                                NULL);
+    }
+    return ic;
+}
+
+void obt_keyboard_context_ref(ObtIC *ic)
+{
+    ++ic->ref;
+}
+
+void obt_keyboard_context_unref(ObtIC *ic)
+{
+    if (--ic->ref < 1) {
+        XDestroyIC(ic->xic);
+        g_free(ic);
+    }
 }

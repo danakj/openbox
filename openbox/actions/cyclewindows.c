@@ -43,6 +43,7 @@ static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
+                             ObtIC *ic,
                              gpointer options,
                              gboolean *used);
 static void     i_cancel_func(gpointer options);
@@ -169,6 +170,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
+                             ObtIC *ic,
                              gpointer options,
                              gboolean *used)
 {

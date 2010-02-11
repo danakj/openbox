@@ -19,6 +19,7 @@
 #include "misc.h"
 #include "frame.h"
 #include "obt/xml.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -43,9 +44,10 @@ typedef void     (*ObActionsShutdownFunc)(void);
 typedef gboolean (*ObActionsIPreFunc)(guint initial_state, gpointer options);
 typedef void     (*ObActionsIPostFunc)(gpointer options);
 typedef gboolean (*ObActionsIInputFunc)(guint initial_state,
-                                                  XEvent *e,
-                                                  gpointer options,
-                                                  gboolean *used);
+                                        XEvent *e,
+                                        ObtIC *ic,
+                                        gpointer options,
+                                        gboolean *used);
 typedef void     (*ObActionsICancelFunc)(gpointer options);
 typedef gpointer (*ObActionsIDataSetupFunc)(xmlNodePtr node,
                                             ObActionsIPreFunc *pre,

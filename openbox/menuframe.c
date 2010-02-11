@@ -27,6 +27,7 @@
 #include "openbox.h"
 #include "config.h"
 #include "obt/prop.h"
+#include "obt/keyboard.h"
 #include "obrender/theme.h"
 
 #define PADDING 2
@@ -1262,9 +1263,10 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
         GSList *acts = self->entry->data.normal.actions;
         ObClient *client = self->frame->client;
         ObMenuFrame *frame = self->frame;
+        guint mods = obt_keyboard_only_modmasks(state);
 
         /* release grabs before executing the shit */
-        if (!(state & ControlMask)) {
+        if (!(mods & ControlMask)) {
             event_cancel_all_key_grabs();
             frame = NULL;
         }

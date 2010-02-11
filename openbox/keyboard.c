@@ -33,6 +33,7 @@
 #include "moveresize.h"
 #include "popup.h"
 #include "gettext.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 
@@ -175,9 +176,12 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
     gboolean handled = FALSE;
     gboolean done = FALSE;
     gboolean cancel = FALSE;
+    guint mods;
+
+    mods = obt_keyboard_only_modmasks(ev->xkey.state);
 
     if (istate.active) {
-        if ((e->type == KeyRelease && !(istate.state & e->xkey.state))) {
+        if ((e->type == KeyRelease && !(istate.state & mods))) {
             done = TRUE;
             handled = TRUE;
         } else if (e->type == KeyPress) {
@@ -208,6 +212,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
 {
     KeyBindingTree *p;
     gboolean used;
+    guint mods;
 
     if (e->type == KeyRelease) {
         grab_key_passive_count(-1);
@@ -217,8 +222,10 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     g_assert(e->type == KeyPress);
     grab_key_passive_count(1);
 
+    mods = obt_keyboard_only_modmasks(e->xkey.state);
+
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
-        e->xkey.state == config_keyboard_reset_state)
+        mods == config_keyboard_reset_state)
     {
         obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
         keyboard_reset_chains(-1);
@@ -231,9 +238,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     else
         p = curpos->first_child;
     while (p) {
-        if (p->key == e->xkey.keycode &&
-            p->state == e->xkey.state)
-        {
+        if (p->key == e->xkey.keycode && p->state == mods) {
             /* if we hit a key binding, then close any open menus and run it */
             if (menu_frame_visible)
                 menu_frame_hide_all();

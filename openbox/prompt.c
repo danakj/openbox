@@ -520,15 +520,16 @@ void prompt_hide(ObPrompt *self)
 gboolean prompt_key_event(ObPrompt *self, XEvent *e)
 {
     gboolean shift;
-    guint shift_mask;
+    guint shift_mask, mods;
 
     if (e->type != KeyPress) return FALSE;
 
     shift_mask = obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT);
-    shift = !!(e->xkey.state & shift_mask);
+    mods = obt_keyboard_only_modmasks(e->xkey.state);
+    shift = !!(mods & shift_mask);
 
     /* only accept shift */
-    if (e->xkey.state != 0 && e->xkey.state != shift_mask)
+    if (mods != 0 && mods != shift_mask)
         return FALSE;
 
     if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE))

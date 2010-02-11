@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/client.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
 #include "openbox/prompt.h"
@@ -16,18 +17,16 @@ typedef struct {
     gchar   *sn_icon;
     gchar   *sn_wmclass;
     gchar   *prompt;
+    ObActionsData *data;
 } Options;
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
-/*
-static gboolean i_input_func(guint initial_state,
-                             XEvent *e,
-                             gpointer options,
-                             gboolean *used);
-static void     i_cancel_func(gpointer options);
-*/
+static void shutdown_func(void);
+static void client_dest(ObClient *client, gpointer data);
+
+static GSList *prompt_opts = NULL;
 
 void action_execute_startup(void)
 {
@@ -36,6 +35,20 @@ void action_execute_startup(void)
                      free_func,
                      run_func,
                      NULL, NULL);
+    actions_set_shutdown("Execute", shutdown_func);
+
+    client_add_destroy_notify(client_dest, NULL);
+}
+
+static void client_dest(ObClient *client, gpointer data)
+{
+    GSList *it;
+
+    for (it = prompt_opts; it; it = g_slist_next(it)) {
+        Options *o = it->data;
+        if (o->data->client == client)
+            o->data->client = NULL;
+    }
 }
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
@@ -70,21 +83,29 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
     return o;
 }
 
+static void shutdown_func(void)
+{
+    client_remove_destroy_notify(client_dest);
+}
+
 static void free_func(gpointer options)
 {
     Options *o = options;
 
     if (o) {
+        prompt_opts = g_slist_remove(prompt_opts, o);
+
         g_free(o->cmd);
         g_free(o->sn_name);
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
         g_free(o->prompt);
+        if (o->data) g_free(o->data);
         g_free(o);
     }
 }
 
-static Options* dup_options(Options *in)
+static Options* dup_options(Options *in, ObActionsData *data)
 {
     Options *o = g_new(Options, 1);
     o->cmd = g_strdup(in->cmd);
@@ -93,15 +114,15 @@ static Options* dup_options(Options *in)
     o->sn_icon = g_strdup(in->sn_icon);
     o->sn_wmclass = g_strdup(in->sn_wmclass);
     o->prompt = NULL;
+    o->data = g_memdup(data, sizeof(ObActionsData));
     return o;
 }
 
-static gboolean run_func(ObActionsData *data, gpointer options);
-
 static gboolean prompt_cb(ObPrompt *p, gint result, gpointer options)
 {
+    Options *o = options;
     if (result)
-        run_func(NULL, options);
+        run_func(o->data, o);
     return TRUE; /* call the cleanup func */
 }
 
@@ -129,7 +150,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             { _("Yes"), 1 }
         };
 
-        ocp = dup_options(options);
+        ocp = dup_options(options, data);
         p = prompt_new(o->prompt, _("Execute"), answers, 2, 0, 0,
                        prompt_cb, prompt_cleanup, ocp);
         prompt_show(p, NULL, FALSE);

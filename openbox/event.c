@@ -56,9 +56,6 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h> /* for usleep() */
 #endif
-#ifdef XKB
-#  include <X11/XKBlib.h>
-#endif
 
 #ifdef USE_SM
 #include <X11/ICE/ICElib.h>

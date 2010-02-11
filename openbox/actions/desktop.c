@@ -312,17 +312,15 @@ static gboolean i_input_func(guint initial_state,
     }
 
     if (e->type == KeyPress) {
+        KeySym sym = obt_keyboard_keypress_to_keysym(e);
+
         /* Escape cancels no matter what */
-        if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
+        if (sym == XK_Escape)
             return FALSE;
-        }
 
         /* There were no modifiers and they pressed enter */
-        else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN) &&
-                 !initial_state)
-        {
+        else if (sym == XK_Return && !initial_state)
             return FALSE;
-        }
     }
     /* They released the modifiers */
     else if (e->type == KeyRelease && initial_state && !(mods & initial_state))

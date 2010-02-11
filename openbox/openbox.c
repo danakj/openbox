@@ -80,9 +80,6 @@
 #include <X11/Xcursor/Xcursor.h>
 #endif
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-
 RrInstance   *ob_rr_inst;
 RrImageCache *ob_rr_icons;
 RrTheme      *ob_rr_theme;
@@ -101,7 +98,6 @@ static gboolean  reconfigure = FALSE;
 static gboolean  restart = FALSE;
 static gchar    *restart_path = NULL;
 static Cursor    cursors[OB_NUM_CURSORS];
-static KeyCode  *keys[OB_NUM_KEYS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
@@ -216,18 +212,6 @@ gint main(gint argc, gchar **argv)
             ObPrompt *xmlprompt = NULL;
 
             if (reconfigure) obt_keyboard_reload();
-
-            /* get the keycodes for keys we use */
-            keys[OB_KEY_RETURN] = obt_keyboard_keysym_to_keycode(XK_Return);
-            keys[OB_KEY_ESCAPE] = obt_keyboard_keysym_to_keycode(XK_Escape);
-            keys[OB_KEY_LEFT] = obt_keyboard_keysym_to_keycode(XK_Left);
-            keys[OB_KEY_RIGHT] = obt_keyboard_keysym_to_keycode(XK_Right);
-            keys[OB_KEY_UP] = obt_keyboard_keysym_to_keycode(XK_Up);
-            keys[OB_KEY_DOWN] = obt_keyboard_keysym_to_keycode(XK_Down);
-            keys[OB_KEY_TAB] = obt_keyboard_keysym_to_keycode(XK_Tab);
-            keys[OB_KEY_SPACE] = obt_keyboard_keysym_to_keycode(XK_space);
-            keys[OB_KEY_HOME] = obt_keyboard_keysym_to_keycode(XK_Home);
-            keys[OB_KEY_END] = obt_keyboard_keysym_to_keycode(XK_End);
 
             {
                 ObtXmlInst *i;
@@ -405,18 +389,6 @@ gint main(gint argc, gchar **argv)
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);
-
-            /* Free the key codes for built in keys */
-            g_free(keys[OB_KEY_RETURN]);
-            g_free(keys[OB_KEY_ESCAPE]);
-            g_free(keys[OB_KEY_LEFT]);
-            g_free(keys[OB_KEY_RIGHT]);
-            g_free(keys[OB_KEY_UP]);
-            g_free(keys[OB_KEY_DOWN]);
-            g_free(keys[OB_KEY_TAB]);
-            g_free(keys[OB_KEY_SPACE]);
-            g_free(keys[OB_KEY_HOME]);
-            g_free(keys[OB_KEY_END]);
         } while (reconfigure);
     }
 
@@ -735,16 +707,6 @@ Cursor ob_cursor(ObCursor cursor)
 {
     g_assert(cursor < OB_NUM_CURSORS);
     return cursors[cursor];
-}
-
-gboolean ob_keycode_match(KeyCode code, ObKey key)
-{
-    KeyCode *k;
-    
-    g_assert(key < OB_NUM_KEYS);
-    for (k = keys[key]; *k; ++k)
-        if (*k == code) return TRUE;
-    return FALSE;
 }
 
 ObState ob_state(void)

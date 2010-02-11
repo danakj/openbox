@@ -27,7 +27,6 @@
 #include "obt/display.h"
 
 #include <glib.h>
-#include <X11/Xlib.h>
 
 extern RrInstance *ob_rr_inst;
 extern RrImageCache *ob_rr_icons;
@@ -61,7 +60,5 @@ void ob_reconfigure(void);
 void ob_exit_with_error(const gchar *msg) G_GNUC_NORETURN;
 
 Cursor ob_cursor(ObCursor cursor);
-
-gboolean ob_keycode_match(KeyCode code, ObKey key);
 
 #endif

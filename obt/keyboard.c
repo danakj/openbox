@@ -281,7 +281,7 @@ KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym)
     return ret;
 }
 
-gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
+gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev)
 {
     gunichar unikey = 0;
     KeySym sym;
@@ -289,6 +289,8 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
     gchar *buf, fixbuf[4]; /* 4 is enough for a utf8 char */
     gint len, bufsz;
     gboolean got_string = FALSE;
+
+    g_return_val_if_fail(ev->type == KeyPress, 0);
 
     if (!ic)
         g_warning("Using obt_keyboard_keypress_to_unichar() without an "
@@ -299,9 +301,9 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
         bufsz = sizeof(fixbuf);
 
 #ifdef X_HAVE_UTF8_STRING
-        len = Xutf8LookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+        len = Xutf8LookupString(ic->xic, &ev->xkey, buf, bufsz, &sym, &status);
 #else
-        len = XmbLookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+        len = XmbLookupString(ic->xic, &ev->xkey, buf, bufsz, &sym, &status);
 #endif
 
         if (status == XBufferOverflow) {
@@ -309,9 +311,11 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
             bufsz = len;
 
 #ifdef X_HAVE_UTF8_STRING
-            len = Xutf8LookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+            len = Xutf8LookupString(ic->xic, &ev->xkey, buf, bufsz, &sym,
+                                    &status);
 #else
-            len = XmbLookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+            len = XmbLookupString(ic->xic, &ev->xkey, buf, bufsz, &sym,
+                                  &status);
 #endif
         }
 
@@ -338,7 +342,7 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
     else {
         buf = fixbuf;
         bufsz = sizeof(fixbuf);
-        len = XLookupString(ev, buf, bufsz, &sym, NULL);
+        len = XLookupString(&ev->xkey, buf, bufsz, &sym, NULL);
         if ((guchar)buf[0] >= 32) /* not an ascii control character */
             got_string = TRUE;
     }
@@ -352,6 +356,18 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
     if (buf != fixbuf) g_free(buf);
 
     return unikey;
+}
+
+KeySym obt_keyboard_keypress_to_keysym(XEvent *ev)
+{
+    KeySym sym;
+    gint r;
+
+    g_return_val_if_fail(ev->type == KeyPress, None);
+
+    sym = None;
+    r = XLookupString(&ev->xkey, NULL, 0, &sym, NULL);
+    return sym;
 }
 
 void obt_keyboard_context_renew(ObtIC *ic)

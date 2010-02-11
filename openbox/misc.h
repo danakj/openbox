@@ -45,21 +45,6 @@ typedef enum
 
 typedef enum
 {
-    OB_KEY_RETURN,
-    OB_KEY_ESCAPE,
-    OB_KEY_LEFT,
-    OB_KEY_RIGHT,
-    OB_KEY_UP,
-    OB_KEY_DOWN,
-    OB_KEY_TAB,
-    OB_KEY_SPACE,
-    OB_KEY_HOME,
-    OB_KEY_END,
-    OB_NUM_KEYS
-} ObKey;
-
-typedef enum
-{
     OB_STATE_STARTING,
     OB_STATE_RUNNING,
     OB_STATE_EXITING,

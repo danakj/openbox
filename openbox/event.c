@@ -1777,20 +1777,20 @@ static gboolean event_handle_menu_input(XEvent *ev)
         /* Allow control while going thru the menu */
         else if (ev->type == KeyPress && (mods & ~ControlMask) == 0) {
             gunichar unikey;
+            KeySym sym;
 
             frame->got_press = TRUE;
             frame->press_keycode = ev->xkey.keycode;
             frame->press_doexec = FALSE;
 
-            unikey = obt_keyboard_keypress_to_unichar(menu_frame_ic(frame),
-                                                      &ev->xkey);
+            sym = obt_keyboard_keypress_to_keysym(ev);
 
-            if (ob_keycode_match(ev->xkey.keycode, OB_KEY_ESCAPE)) {
+            if (sym == XK_Escape) {
                 menu_frame_hide_all();
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_LEFT)) {
+            else if (sym == XK_Left) {
                 /* Left goes to the parent menu */
                 if (frame->parent) {
                     /* remove focus from the child */
@@ -1802,7 +1802,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_RIGHT)) {
+            else if (sym == XK_Right) {
                 /* Right goes to the selected submenu */
                 if (frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
                 {
@@ -1813,28 +1813,37 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_UP)) {
+            else if (sym == XK_Up) {
                 menu_frame_select_previous(frame);
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_DOWN)) {
+            else if (sym == XK_Down) {
                 menu_frame_select_next(frame);
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_HOME)) {
+            else if (sym == XK_Home) {
                 menu_frame_select_first(frame);
                 ret = TRUE;
             }
 
-            else if (ob_keycode_match(ev->xkey.keycode, OB_KEY_END)) {
+            else if (sym == XK_End) {
                 menu_frame_select_last(frame);
                 ret = TRUE;
             }
 
+            else if (sym == XK_Return) {
+                frame->press_doexec = TRUE;
+                ret = TRUE;
+            }
+
             /* keyboard accelerator shortcuts. (if it was a valid key) */
-            else if (unikey) {
+            else if (frame->entries &&
+                     (unikey =
+                      obt_keyboard_keypress_to_unichar(menu_frame_ic(frame),
+                                                       ev)))
+            {
                 GList *start;
                 GList *it;
                 ObMenuEntryFrame *found = NULL;
@@ -1885,27 +1894,15 @@ static gboolean event_handle_menu_input(XEvent *ev)
            doesn't get sent to the focused application.
 
            Allow ControlMask only, and don't bother if the menu is empty */
-        else if (ev->type == KeyRelease && (mods & ~ControlMask) == 0 &&
-                 frame->entries && frame->got_press)
-        {
-            if (ob_keycode_match(ev->xkey.keycode, OB_KEY_RETURN)) {
-                /* Enter runs the active item or goes into the submenu.
-                   Control-Enter runs it without closing the menu. */
+        else if (ev->type == KeyRelease && (mods & ~ControlMask) == 0) {
+            if (frame->press_keycode == ev->xkey.keycode &&
+                frame->got_press &&
+                frame->press_doexec)
+            {
                 if (frame->child)
                     menu_frame_select_next(frame->child);
                 else if (frame->selected)
                     menu_entry_frame_execute(frame->selected, ev->xkey.state);
-
-                ret = TRUE;
-            }
-
-            if (frame->press_keycode == ev->xkey.keycode &&
-                frame->press_doexec)
-            {
-                if (frame->selected->entry->type == OB_MENU_ENTRY_TYPE_NORMAL)
-                    menu_entry_frame_execute(frame->selected, ev->xkey.state);
-                else
-                    menu_frame_select_next(frame->child);
             }
         }
     }

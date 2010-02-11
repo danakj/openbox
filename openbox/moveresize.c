@@ -594,24 +594,25 @@ static void cancel_edge_warp(void)
     obt_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
 }
 
-static void move_with_keys(gint keycode, gint state)
+static void move_with_keys(KeySym sym, guint state)
 {
     gint dx = 0, dy = 0, ox = cur_x, oy = cur_y;
     gint opx, px, opy, py;
     gint dist = 0;
 
     /* shift means jump to edge */
-    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT)) {
+    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT))
+    {
         gint x, y;
         ObDirection dir;
 
-        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
+        if (sym == XK_Right)
             dir = OB_DIRECTION_EAST;
-        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
+        else if (sym == XK_Left)
             dir = OB_DIRECTION_WEST;
-        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
+        else if (sym == XK_Down)
             dir = OB_DIRECTION_SOUTH;
-        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
+        else /* sym == XK_Up */
             dir = OB_DIRECTION_NORTH;
 
         client_find_move_directional(moveresize_client, dir, &x, &y);
@@ -627,13 +628,13 @@ static void move_with_keys(gint keycode, gint state)
         else
             dist = KEY_DIST;
 
-        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
+        if (sym == XK_Right)
             dx = dist;
-        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
+        else if (sym == XK_Left)
             dx = -dist;
-        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
+        else if (sym == XK_Down)
             dy = dist;
-        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
+        else /* if (sym == XK_Up) */
             dy = -dist;
     }
 
@@ -659,14 +660,14 @@ static void move_with_keys(gint keycode, gint state)
     start_y += (py - opy) - (cur_y - oy);
 }
 
-static void resize_with_keys(gint keycode, gint state)
+static void resize_with_keys(KeySym sym, guint state)
 {
     gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
     gint resist = 0;
     ObDirection dir;
 
     /* pick the edge if it needs to move */
-    if (ob_keycode_match(keycode, OB_KEY_RIGHT)) {
+    if (sym == XK_Right) {
         dir = OB_DIRECTION_EAST;
         if (key_resize_edge != OB_DIRECTION_WEST &&
             key_resize_edge != OB_DIRECTION_EAST)
@@ -674,7 +675,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_EAST;
             return;
         }
-    } else if (ob_keycode_match(keycode, OB_KEY_LEFT)) {
+    } else if (sym == XK_Left) {
         dir = OB_DIRECTION_WEST;
         if (key_resize_edge != OB_DIRECTION_WEST &&
             key_resize_edge != OB_DIRECTION_EAST)
@@ -682,7 +683,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_WEST;
             return;
         }
-    } else if (ob_keycode_match(keycode, OB_KEY_UP)) {
+    } else if (sym == XK_Up) {
         dir = OB_DIRECTION_NORTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -690,7 +691,7 @@ static void resize_with_keys(gint keycode, gint state)
             key_resize_edge = OB_DIRECTION_NORTH;
             return;
         }
-    } else /* if (ob_keycode_match(keycode, OB_KEY_DOWN)) */ {
+    } else /* if (sym == XK_Down) */ {
         dir = OB_DIRECTION_SOUTH;
         if (key_resize_edge != OB_DIRECTION_NORTH &&
             key_resize_edge != OB_DIRECTION_SOUTH)
@@ -701,16 +702,17 @@ static void resize_with_keys(gint keycode, gint state)
     }
 
     /* shift means jump to edge */
-    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT)) {
+    if (state & obt_keyboard_modkey_to_modmask(OBT_KEYBOARD_MODKEY_SHIFT))
+    {
         gint x, y, w, h;
 
-        if (ob_keycode_match(keycode, OB_KEY_RIGHT))
+        if (sym == XK_Right)
             dir = OB_DIRECTION_EAST;
-        else if (ob_keycode_match(keycode, OB_KEY_LEFT))
+        else if (sym == XK_Left)
             dir = OB_DIRECTION_WEST;
-        else if (ob_keycode_match(keycode, OB_KEY_DOWN))
+        else if (sym == XK_Down)
             dir = OB_DIRECTION_SOUTH;
-        else /* if (ob_keycode_match(keycode, OB_KEY_UP)) */
+        else /* if (sym == XK_Up)) */
             dir = OB_DIRECTION_NORTH;
 
         client_find_resize_directional(moveresize_client, key_resize_edge,
@@ -912,24 +914,24 @@ gboolean moveresize_event(XEvent *e)
         }
         used = TRUE;
     } else if (e->type == KeyPress) {
-        if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
+        KeySym sym = obt_keyboard_keypress_to_keysym(e);
+
+        if (sym == XK_Escape) {
             moveresize_end(TRUE);
             used = TRUE;
-        } else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RETURN)) {
+        } else if (sym == XK_Return) {
             moveresize_end(FALSE);
             used = TRUE;
-        } else if (ob_keycode_match(e->xkey.keycode, OB_KEY_RIGHT) ||
-                   ob_keycode_match(e->xkey.keycode, OB_KEY_LEFT) ||
-                   ob_keycode_match(e->xkey.keycode, OB_KEY_DOWN) ||
-                   ob_keycode_match(e->xkey.keycode, OB_KEY_UP))
+        } else if (sym == XK_Right || sym == XK_Left ||
+                   sym == XK_Up || sym == XK_Down)
         {
             if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD)) {
-                resize_with_keys(e->xkey.keycode, e->xkey.state);
+                resize_with_keys(sym, e->xkey.state);
                 used = TRUE;
             } else if (corner ==
                        OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD))
             {
-                move_with_keys(e->xkey.keycode, e->xkey.state);
+                move_with_keys(sym, e->xkey.state);
                 used = TRUE;
             }
         }

@@ -21,6 +21,7 @@
 
 #include <glib.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 G_BEGIN_DECLS
 
@@ -60,7 +61,11 @@ guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
 KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 
 /*! Translate a KeyPress event to the unicode character it represents */
-gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev);
+gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev);
+
+/*! Translate a KeyPress event to the KeySym that it represents.  Use this
+ for control keys, not for getting text input! */
+KeySym obt_keyboard_keypress_to_keysym(XEvent *ev);
 
 /*! Create an input context for a window.
     @client The top-level client window for the input context.

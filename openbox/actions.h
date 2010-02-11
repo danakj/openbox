@@ -35,6 +35,7 @@ typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
 typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
+typedef void     (*ObActionsShutdownFunc)(void);
 
 /* functions for interactive actions */
 /* return TRUE if the action is going to be interactive, or false to change
@@ -76,6 +77,9 @@ gboolean actions_register(const gchar *name,
                           ObActionsDataSetupFunc setup,
                           ObActionsDataFreeFunc free,
                           ObActionsRunFunc run);
+
+gboolean actions_set_shutdown(const gchar *name,
+                              ObActionsShutdownFunc shutdown);
 
 ObActionsAct* actions_parse(xmlNodePtr node);
 ObActionsAct* actions_parse_string(const gchar *name);

@@ -81,6 +81,10 @@ struct _ObMenuFrame
                            menu until it has seen a KeyPress.  this is to
                            avoid having the keybinding used to show the menu
                            end up running something inside the menu */
+    guint press_keycode; /* the KeyCode that was used in the last KeyPress */
+    gboolean press_doexec; /* if the upcoming KeyRelease should be used to
+                              execute the menu item that was selected by the
+                              KeyPress */
 };
 
 struct _ObMenuEntryFrame

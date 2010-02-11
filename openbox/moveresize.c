@@ -923,13 +923,15 @@ gboolean moveresize_event(XEvent *e)
                    ob_keycode_match(e->xkey.keycode, OB_KEY_DOWN) ||
                    ob_keycode_match(e->xkey.keycode, OB_KEY_UP))
         {
+            guint state = obt_keyboard_only_modmasks(e->xkey.state);
+
             if (corner == OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD)) {
-                resize_with_keys(e->xkey.keycode, e->xkey.state);
+                resize_with_keys(e->xkey.keycode, state);
                 used = TRUE;
             } else if (corner ==
                        OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD))
             {
-                move_with_keys(e->xkey.keycode, e->xkey.state);
+                move_with_keys(e->xkey.keycode, state);
                 used = TRUE;
             }
         }

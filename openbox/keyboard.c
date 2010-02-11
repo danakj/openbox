@@ -33,6 +33,7 @@
 #include "moveresize.h"
 #include "popup.h"
 #include "gettext.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 
@@ -175,9 +176,17 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
     gboolean handled = FALSE;
     gboolean done = FALSE;
     gboolean cancel = FALSE;
+    guint state;
+
+    state = obt_keyboard_only_modmasks(ev->xkey.state);
+    if (e->type == KeyRelease) {
+        /* remove from the state the mask of the modifier key being
+           released, if it is a modifier key being released that is */
+        state &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
+    }
 
     if (istate.active) {
-        if ((e->type == KeyRelease && !(istate.state & e->xkey.state))) {
+        if ((e->type == KeyRelease && !(istate.state & state))) {
             done = TRUE;
             handled = TRUE;
         } else if (e->type == KeyPress) {
@@ -194,7 +203,7 @@ gboolean keyboard_process_interactive_grab(const XEvent *e, ObClient **client)
         }
 
         if (done)
-            keyboard_interactive_end(e->xkey.state, cancel, e->xkey.time,TRUE);
+            keyboard_interactive_end(state, cancel, e->xkey.time,TRUE);
 
         if (handled)
             *client = istate.client;
@@ -208,6 +217,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
 {
     KeyBindingTree *p;
     gboolean used;
+    guint state;
 
     if (e->type == KeyRelease) {
         grab_key_passive_count(-1);
@@ -217,8 +227,10 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     g_assert(e->type == KeyPress);
     grab_key_passive_count(1);
 
+    state = obt_keyboard_only_modmasks(e->xkey.state);
+
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
-        e->xkey.state == config_keyboard_reset_state)
+        state == config_keyboard_reset_state)
     {
         obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
         keyboard_reset_chains(-1);
@@ -232,7 +244,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
         p = curpos->first_child;
     while (p) {
         if (p->key == e->xkey.keycode &&
-            p->state == e->xkey.state)
+            p->state == state)
         {
             /* if we hit a key binding, then close any open menus and run it */
             if (menu_frame_visible)

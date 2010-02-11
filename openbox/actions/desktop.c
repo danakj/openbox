@@ -2,7 +2,7 @@
 #include "openbox/screen.h"
 #include "openbox/client.h"
 #include "openbox/openbox.h"
-#include <glib.h>
+#include "obt/keyboard.h"
 
 typedef enum {
     LAST,
@@ -300,6 +300,15 @@ static gboolean i_input_func(guint initial_state,
                              gpointer options,
                              gboolean *used)
 {
+    guint mods;
+
+    mods = obt_keyboard_only_modmasks(e->xkey.state);
+    if (e->type == KeyRelease) {
+        /* remove from the state the mask of the modifier key being
+           released, if it is a modifier key being released that is */
+        mods &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
+    }
+
     if (e->type == KeyPress) {
         /* Escape cancels no matter what */
         if (ob_keycode_match(e->xkey.keycode, OB_KEY_ESCAPE)) {
@@ -315,7 +324,7 @@ static gboolean i_input_func(guint initial_state,
     }
     /* They released the modifiers */
     else if (e->type == KeyRelease && initial_state &&
-             (e->xkey.state & initial_state) == 0)
+             (mods & initial_state) == 0)
     {
         return FALSE;
     }

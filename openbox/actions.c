@@ -107,6 +107,7 @@ ObActionsDefinition* do_register(const gchar *name,
     def->name = g_strdup(name);
     def->free = free;
     def->run = run;
+    def->shutdown = NULL;
 
     registered = g_slist_prepend(registered, def);
     return def;

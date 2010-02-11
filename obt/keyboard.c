@@ -34,6 +34,7 @@
 #define nth_mask(n) (1 << n)
 
 static void set_modkey_mask(guchar mask, KeySym sym);
+static void xim_init(void);
 void obt_keyboard_shutdown();
 
 static XModifierKeymap *modmap;
@@ -49,12 +50,17 @@ static gboolean hyper_l = FALSE;
 
 static gboolean started = FALSE;
 
+static XIM xim = NULL;
+static XIMStyle xim_style = 0;
+
 void obt_keyboard_reload(void)
 {
     gint i, j, k;
 
     if (started) obt_keyboard_shutdown(); /* free stuff */
     started = TRUE;
+
+    xim_init();
 
     /* reset the keys to not be bound to any masks */
     for (i = 0; i < OBT_KEYBOARD_NUM_MODKEYS; ++i)
@@ -104,7 +110,61 @@ void obt_keyboard_shutdown(void)
     modmap = NULL;
     XFree(keymap);
     keymap = NULL;
+    if (xim) XCloseIM(xim);
+    xim = NULL;
+    xim_style = 0;
     started = FALSE;
+}
+
+void xim_init(void)
+{
+    gchar *aname, *aclass;
+
+    aname = g_strdup(g_get_prgname());
+    if (!aname) aname = g_strdup("obt");
+
+    aclass = g_strdup(aname);
+    if (g_ascii_islower(aclass[0]))
+        aclass[0] = g_ascii_toupper(aclass[0]);
+
+    g_print("Opening Input Method for %s %s\n", aname, aclass);
+    xim = XOpenIM(obt_display, NULL, aname, aclass);
+
+    if (!xim)
+        g_message("Failed to open an Input Method");
+    else {
+        XIMStyles *xim_styles = NULL;
+        char *r;
+
+        /* get the input method styles */
+        r = XGetIMValues(xim, XNQueryInputStyle, &xim_styles, NULL);
+        if (r || !xim_styles)
+            g_message("Input Method does not support any styles");
+        if (xim_styles) {
+            int i;
+
+            /* find a style that doesnt need preedit or status */
+            for (i = 0; i < xim_styles->count_styles; ++i) {
+                if (xim_styles->supported_styles[i] == 
+                    (XIMPreeditNothing | XIMStatusNothing))
+                {
+                    xim_style = xim_styles->supported_styles[i];
+                    break;
+                }
+            }
+            XFree(xim_styles);
+        }
+
+        if (!xim_style) {
+            g_message("Input Method does not support a usable style");
+
+            XCloseIM(xim);
+            xim = NULL;
+        }
+    }
+
+    g_free(aclass);
+    g_free(aname);
 }
 
 guint obt_keyboard_keycode_to_modmask(guint keycode)

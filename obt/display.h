@@ -56,6 +56,8 @@ extern gint     obt_display_extension_sync_basep;
 
 extern Display* obt_display;
 
+/*! Open the X display.  You should call g_set_prgname() before calling this
+  function for X Input Methods to work correctly. */
 gboolean obt_display_open(const char *display_name);
 void     obt_display_close(void);
 

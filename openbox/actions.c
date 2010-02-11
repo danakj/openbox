@@ -108,6 +108,7 @@ gboolean actions_register(const gchar *name,
     def->run = run;
     def->i_input = i_input;
     def->i_cancel = i_cancel;
+    def->shutdown = NULL;
 
     registered = g_slist_prepend(registered, def);
 

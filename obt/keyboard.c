@@ -331,6 +331,9 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev)
                 got_string = TRUE;
             }
         }
+        else if (status == XLookupKeySym)
+            /* this key doesn't have a text representation, it is a command
+               key of some sort */;
         else
             g_message("Bad keycode lookup. Keysym 0x%x Status: %s\n",
                       (guint) sym,

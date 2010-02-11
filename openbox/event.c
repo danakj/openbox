@@ -1782,6 +1782,9 @@ static gboolean event_handle_menu_input(XEvent *ev)
             frame->press_keycode = ev->xkey.keycode;
             frame->press_doexec = FALSE;
 
+            unikey = obt_keyboard_keypress_to_unichar(menu_frame_ic(frame),
+                                                      &ev->xkey);
+
             if (ob_keycode_match(ev->xkey.keycode, OB_KEY_ESCAPE)) {
                 menu_frame_hide_all();
                 ret = TRUE;
@@ -1831,7 +1834,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
             }
 
             /* keyboard accelerator shortcuts. (if it was a valid key) */
-            else if ((unikey = obt_keyboard_keypress_to_unichar(&ev->xkey))) {
+            else if (unikey) {
                 GList *start;
                 GList *it;
                 ObMenuEntryFrame *found = NULL;

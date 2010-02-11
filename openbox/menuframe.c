@@ -155,6 +155,13 @@ void menu_frame_free(ObMenuFrame *self)
     }
 }
 
+ObtIC* menu_frame_ic(ObMenuFrame *self)
+{
+    /* menus are always used through a grab right now, so they can always use
+       the grab input context */
+    return grab_input_context();
+}
+
 static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame)
 {

@@ -40,6 +40,7 @@ static guint pgrabs = 0;
 /*! The time at which the last grab was made */
 static Time  grab_time = CurrentTime;
 static gint passive_count = 0;
+static ObtIC *ic = NULL;
 
 static Time ungrab_time(void)
 {
@@ -58,6 +59,11 @@ static Time ungrab_time(void)
     return t;
 }
 
+static Window grab_window(void)
+{
+    return screen_support_win;
+}
+
 gboolean grab_on_keyboard(void)
 {
     return kgrabs > 0;
@@ -68,13 +74,18 @@ gboolean grab_on_pointer(void)
     return pgrabs > 0;
 }
 
+ObtIC *grab_input_context(void)
+{
+    return ic;
+}
+
 gboolean grab_keyboard_full(gboolean grab)
 {
     gboolean ret = FALSE;
 
     if (grab) {
         if (kgrabs++ == 0) {
-            ret = XGrabKeyboard(obt_display, obt_root(ob_screen),
+            ret = XGrabKeyboard(obt_display, grab_window(),
                                 False, GrabModeAsync, GrabModeAsync,
                                 event_curtime) == Success;
             if (!ret)
@@ -102,7 +113,7 @@ gboolean grab_pointer_full(gboolean grab, gboolean owner_events,
 
     if (grab) {
         if (pgrabs++ == 0) {
-            ret = XGrabPointer(obt_display, screen_support_win, owner_events,
+            ret = XGrabPointer(obt_display, grab_window(), owner_events,
                                GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync,
                                (confine ? obt_root(ob_screen) : None),
@@ -157,10 +168,15 @@ void grab_startup(gboolean reconfig)
     mask_list[i++] = caps | scroll;
     mask_list[i++] = num | caps | scroll;
     g_assert(i == MASK_LIST_SIZE);
+
+    ic = obt_keyboard_context_new(obt_root(ob_screen), grab_window());
 }
 
 void grab_shutdown(gboolean reconfig)
 {
+    obt_keyboard_context_unref(ic);
+    ic = NULL;
+
     if (reconfig) return;
 
     while (ungrab_keyboard());

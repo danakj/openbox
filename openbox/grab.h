@@ -20,12 +20,15 @@
 #define __grab_h
 
 #include "misc.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 #include <X11/Xlib.h>
 
 void grab_startup(gboolean reconfig);
 void grab_shutdown(gboolean reconfig);
+
+ObtIC *grab_input_context(void);
 
 gboolean grab_keyboard_full(gboolean grab);
 /*! @param confine If true the pointer is confined to the screen */

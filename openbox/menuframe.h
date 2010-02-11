@@ -23,6 +23,7 @@
 #include "geom.h"
 #include "window.h"
 #include "obrender/render.h"
+#include "obt/keyboard.h"
 
 #include <glib.h>
 
@@ -112,6 +113,8 @@ ObMenuFrame* menu_frame_new(struct _ObMenu *menu,
                             guint show_from,
                             struct _ObClient *client);
 void menu_frame_free(ObMenuFrame *self);
+
+ObtIC* menu_frame_ic(ObMenuFrame *self);
 
 void menu_frame_move(ObMenuFrame *self, gint x, gint y);
 void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,

@@ -22,6 +22,7 @@
 #include "window.h"
 #include "geom.h"
 #include "obrender/render.h"
+#include "obt/keyboard.h"
 #include <glib.h>
 #include <X11/Xlib.h>
 
@@ -47,6 +48,7 @@ struct _ObPrompt
     ObInternalWindow super;
     gint ref;
 
+    ObtIC *ic;
     guint event_mask;
 
     /* keep a copy of this because we re-render things that may need it

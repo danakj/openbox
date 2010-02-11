@@ -166,6 +166,8 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
                                        CopyFromParent,
                                        CWOverrideRedirect,
                                        &attrib);
+    self->ic = obt_keyboard_context_new(self->super.window,
+                                        self->super.window);
 
     /* make it a dialog type window */
     OBT_PROP_SET32(self->super.window, NET_WM_WINDOW_TYPE, ATOM,
@@ -238,6 +240,8 @@ void prompt_unref(ObPrompt *self)
             prompt_hide(self);
 
         prompt_list = g_list_remove(prompt_list, self);
+
+        obt_keyboard_context_unref(self->ic);
 
         for (i = 0; i < self->n_buttons; ++i) {
             window_remove(self->button[i].window);

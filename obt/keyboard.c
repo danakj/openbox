@@ -26,6 +26,8 @@ struct _ObtIC
 {
     guint ref;
     XIC xic;
+    Window client;
+    Window focus;
 };
 
 /* These masks are constants and the modifier keys are bound to them as
@@ -42,6 +44,7 @@ struct _ObtIC
 static void set_modkey_mask(guchar mask, KeySym sym);
 static void xim_init(void);
 void obt_keyboard_shutdown();
+void obt_keyboard_context_renew(ObtIC *ic);
 
 static XModifierKeymap *modmap;
 static KeySym *keymap;
@@ -58,6 +61,7 @@ static gboolean started = FALSE;
 
 static XIM xim = NULL;
 static XIMStyle xim_style = 0;
+static GSList *xic_all = NULL;
 
 void obt_keyboard_reload(void)
 {
@@ -124,6 +128,7 @@ void obt_keyboard_shutdown(void)
 
 void xim_init(void)
 {
+    GSList *it;
     gchar *aname, *aclass;
 
     aname = g_strdup(g_get_prgname());
@@ -168,6 +173,10 @@ void xim_init(void)
             xim = NULL;
         }
     }
+
+    /* any existing contexts need to be recreated for the new input method */
+    for (it = xic_all; it; it = g_slist_next(it))
+        obt_keyboard_context_renew(it->data);
 
     g_free(aclass);
     g_free(aname);
@@ -272,48 +281,113 @@ KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym)
     return ret;
 }
 
-gchar *obt_keyboard_keycode_to_string(guint keycode)
-{
-    KeySym sym;
-
-    if ((sym = XKeycodeToKeysym(obt_display, keycode, 0)) != NoSymbol)
-        return g_locale_to_utf8(XKeysymToString(sym), -1, NULL, NULL, NULL);
-    return NULL;
-}
-
-gunichar obt_keyboard_keycode_to_unichar(guint keycode)
+gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev)
 {
     gunichar unikey = 0;
-    char *key;
+    KeySym sym;
+    Status status;
+    gchar *buf, fixbuf[4]; /* 4 is enough for a utf8 char */
+    gint len, bufsz;
+    gboolean got_string = FALSE;
 
-    if ((key = obt_keyboard_keycode_to_string(keycode)) != NULL &&
-        /* don't accept keys that aren't a single letter, like "space" */
-        key[1] == '\0')
-    {
-        unikey = g_utf8_get_char_validated(key, -1);
-        if (unikey == (gunichar)-1 || unikey == (gunichar)-2 || unikey == 0)
-            unikey = 0;
+    if (!ic)
+        g_warning("Using obt_keyboard_keypress_to_unichar() without an "
+                  "Input Context.  No i18n support!");
+
+    if (ic && ic->xic) {
+        buf = fixbuf;
+        bufsz = sizeof(fixbuf);
+
+#ifdef X_HAVE_UTF8_STRING
+        len = Xutf8LookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+#else
+        len = XmbLookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+#endif
+
+        if (status == XBufferOverflow) {
+            buf = g_new(char, len);
+            bufsz = len;
+
+#ifdef X_HAVE_UTF8_STRING
+            len = Xutf8LookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+#else
+            len = XmbLookupString(ic->xic, ev, buf, bufsz, &sym, &status);
+#endif
+        }
+
+        if ((status == XLookupChars || status == XLookupBoth)) {
+            if ((guchar)buf[0] >= 32) { /* not an ascii control character */
+#ifndef X_HAVE_UTF8_STRING
+                /* convert to utf8 */
+                gchar *buf2 = buf;
+                buf = g_locale_to_utf8(buf2, r, NULL, NULL, NULL);
+                g_free(buf2);
+#endif
+
+                got_string = TRUE;
+            }
+        }
+        else
+            g_message("Bad keycode lookup. Keysym 0x%x Status: %s\n",
+                      (guint) sym,
+                      (status == XBufferOverflow ? "BufferOverflow" :
+                       status == XLookupNone ? "XLookupNone" :
+                       status == XLookupKeySym ? "XLookupKeySym" :
+                       "Unknown status"));
     }
-    g_free(key);
+    else {
+        buf = fixbuf;
+        bufsz = sizeof(fixbuf);
+        len = XLookupString(ev, buf, bufsz, &sym, NULL);
+        if ((guchar)buf[0] >= 32) /* not an ascii control character */
+            got_string = TRUE;
+    }
+
+    if (got_string) {
+        gunichar u = g_utf8_get_char_validated(buf, len);
+        if (u && u != (gunichar)-1 && u != (gunichar)-2)
+            unikey = u;
+    }
+
+    if (buf != fixbuf) g_free(buf);
+
     return unikey;
 }
 
-ObtIC* obt_keyboard_context_new(Window w)
+void obt_keyboard_context_renew(ObtIC *ic)
 {
-    ObtIC *ic = NULL;
-
-    if (w != None) {
-        ic = g_new(ObtIC, 1);
-        ic->ref = 1;
+    if (ic->xic) {
+        XDestroyIC(ic->xic);
         ic->xic = NULL;
-
-        if (xim)
-            ic->xic = XCreateIC(xim,
-                                XNInputStyle, xim_style,
-                                XNClientWindow, w,
-                                XNFocusWindow, w,
-                                NULL);
     }
+
+    if (xim) {
+        ic->xic = XCreateIC(xim,
+                            XNInputStyle, xim_style,
+                            XNClientWindow, ic->client,
+                            XNFocusWindow, ic->focus,
+                            NULL);
+        if (!ic->xic)
+            g_message("Error creating Input Context for window 0x%x 0x%x\n",
+                      (guint)ic->client, (guint)ic->focus);
+    }
+}
+
+ObtIC* obt_keyboard_context_new(Window client, Window focus)
+{
+    ObtIC *ic;
+
+    g_return_val_if_fail(client != None && focus != None, NULL);
+
+    ic = g_new(ObtIC, 1);
+    ic->ref = 1;
+    ic->client = client;
+    ic->focus = focus;
+    ic->xic = NULL;
+
+    obt_keyboard_context_renew(ic);
+    xic_all = g_slist_prepend(xic_all, ic);
+
     return ic;
 }
 
@@ -325,6 +399,7 @@ void obt_keyboard_context_ref(ObtIC *ic)
 void obt_keyboard_context_unref(ObtIC *ic)
 {
     if (--ic->ref < 1) {
+        xic_all = g_slist_remove(xic_all, ic);
         XDestroyIC(ic->xic);
         g_free(ic);
     }

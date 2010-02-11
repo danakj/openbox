@@ -59,14 +59,14 @@ guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
 /*! Convert a KeySym to all the KeyCodes which generate it. */
 KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 
-/*! Give the string form of a KeyCode */
-gchar *obt_keyboard_keycode_to_string(guint keycode);
+/*! Translate a KeyPress event to the unicode character it represents */
+gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XKeyPressedEvent *ev);
 
-/*! Translate a KeyCode to the unicode character it represents */
-gunichar obt_keyboard_keycode_to_unichar(guint keycode);
-
-/*! Create an input context for a window */
-ObtIC* obt_keyboard_context_new(Window w);
+/*! Create an input context for a window.
+    @client The top-level client window for the input context.
+    @focus The subwindow within the client for the input context.
+*/
+ObtIC* obt_keyboard_context_new(Window client, Window focus);
 
 void obt_keyboard_context_ref(ObtIC *ic);
 void obt_keyboard_context_unref(ObtIC *ic);

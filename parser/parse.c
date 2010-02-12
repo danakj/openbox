@@ -219,10 +219,12 @@ void parse_close(xmlDocPtr doc)
 void parse_tree(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
 {
     while (node) {
-        struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
+        if (node->name) {
+            struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
 
-        if (c)
-            c->func(i, doc, node, c->data);
+            if (c)
+                c->func(i, doc, node, c->data);
+        }
 
         node = node->next;
     }

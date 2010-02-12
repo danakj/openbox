@@ -202,7 +202,7 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
         else if (cb <= pb && b > pb && b < pb + resist)
             *y = pb - h + 1;
 
-        g_free(area);
+        g_slice_free(Rect, area);
         g_free(parea);
     }
 
@@ -414,7 +414,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             break;
         }
 
-        g_free(area);
+        g_slice_free(Rect, area);
         g_free(parea);
     }
 }

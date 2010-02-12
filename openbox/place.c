@@ -150,7 +150,7 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     else       *y = areas[i]->y;
 
     for (i = 0; i < screen_num_monitors; ++i)
-        g_free(areas[i]);
+        g_slice_free(Rect, areas[i]);
     g_free(areas);
 
     return TRUE;
@@ -339,7 +339,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     }
 
     for (i = 0; i < screen_num_monitors; ++i)
-        g_free(areas[i]);
+        g_slice_free(Rect, areas[i]);
     g_free(areas);
     return ret;
 }
@@ -363,6 +363,8 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     *x = MIN(MAX(*x, l), r);
     *y = py - client->area.height / 2 - client->frame->size.top;
     *y = MIN(MAX(*y, t), b);
+
+    g_slice_free(Rect, area);
 
     return TRUE;
 }
@@ -394,7 +396,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
 
         /* don't free the first one, it's being set as "screen" */
         for (i = 1; i < screen_num_monitors; ++i)
-            g_free(areas[i]);
+            g_slice_free(Rect, areas[i]);
         g_free(areas);
     }
 
@@ -414,7 +416,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     else
         *y = screen->y + settings->position.y.pos;
 
-    g_free(screen);
+    g_slice_free(Rect, screen);
     return TRUE;
 }
 
@@ -460,7 +462,7 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
 
         for (i = 0; i < screen_num_monitors; ++i)
-            g_free(areas[i]);
+            g_slice_free(Rect, areas[i]);
         g_free(areas);
         return TRUE;
     }

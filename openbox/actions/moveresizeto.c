@@ -174,8 +174,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
         actions_client_move(data, FALSE);
 
-        g_free(area);
-        g_free(carea);
+        g_slice_free(Rect, area);
+        g_slice_free(Rect, carea);
     }
 
     return FALSE;

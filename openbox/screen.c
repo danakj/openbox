@@ -1298,11 +1298,14 @@ typedef struct {
 } ObScreenStrut;
 
 #define RESET_STRUT_LIST(sl) \
-    (g_slist_free(sl), sl = NULL)
+    while (sl) { \
+        g_slice_free(ObScreenStrut, (sl)->data); \
+        sl = g_slist_delete_link(sl, sl); \
+    }
 
 #define ADD_STRUT_TO_LIST(sl, d, s) \
 { \
-    ObScreenStrut *ss = g_new(ObScreenStrut, 1); \
+    ObScreenStrut *ss = g_slice_new(ObScreenStrut); \
     ss->desktop = d; \
     ss->strut = s;  \
     sl = g_slist_prepend(sl, ss); \
@@ -1436,7 +1439,7 @@ void screen_update_areas(void)
         dims[i*4+1] = area->y;
         dims[i*4+2] = area->width;
         dims[i*4+3] = area->height;
-        g_free(area);
+        g_slice_free(Rect, area);
     }
 
     /* set the legacy workarea hint to the union of all the monitors */
@@ -1608,7 +1611,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
         }
     }
 
-    a = g_new(Rect, 1);
+    a = g_slice_new(Rect);
     a->x = l;
     a->y = t;
     a->width = r - l + 1;

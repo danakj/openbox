@@ -135,6 +135,7 @@ Rect *screen_physical_area_primary(gboolean fixed);
 /*! @param head is the number of the head or one of SCREEN_AREA_ALL_MONITORS,
            SCREEN_AREA_ONE_MONITOR
     @param search NULL or the whole monitor(s)
+    @return A Rect allocated with g_slice_new()
  */
 Rect* screen_area(guint desktop, guint head, Rect *search);
 

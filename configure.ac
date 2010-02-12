@@ -175,6 +175,9 @@ PKG_CHECK_MODULES(IMLIB2, [imlib2],
     AC_DEFINE(USE_IMLIB2, [1], [Use Imlib2 image library])
     AC_SUBST(IMLIB2_CFLAGS)
     AC_SUBST(IMLIB2_LIBS)
+    # export it for the pkg-config file
+    PKG_CONFIG_IMLIB=imlib2
+    AC_SUBST(PKG_CONFIG_IMLIB)
     imlib2_found=yes
   ],
   [

@@ -223,7 +223,7 @@ void obt_main_loop_unref(ObtMainLoop *loop)
         for (it = loop->timers; it; it = g_slist_next(it)) {
             ObtMainLoopTimer *t = it->data;
             if (t->destroy) t->destroy(t->data);
-            g_free(t);
+            g_slice_free(ObtMainLoopTimer, t);
         }
         g_slist_free(loop->timers);
         loop->timers = NULL;
@@ -348,7 +348,7 @@ void obt_main_loop_x_add(ObtMainLoop *loop,
 {
     ObtMainLoopXHandlerType *h;
 
-    h = g_new(ObtMainLoopXHandlerType, 1);
+    h = g_slice_new(ObtMainLoopXHandlerType);
     h->loop = loop;
     h->func = handler;
     h->data = data;
@@ -377,7 +377,7 @@ void obt_main_loop_x_remove(ObtMainLoop *loop,
         if (h->func == handler) {
             loop->x_handlers = g_slist_delete_link(loop->x_handlers, it);
             if (h->destroy) h->destroy(h->data);
-            g_free(h);
+            g_slice_free(ObtMainLoopXHandlerType, h);
         }
     }
 
@@ -425,7 +425,7 @@ void obt_main_loop_signal_add(ObtMainLoop *loop,
 
     g_return_if_fail(signal < NUM_SIGNALS);
 
-    h = g_new(ObtMainLoopSignalHandlerType, 1);
+    h = g_slice_new(ObtMainLoopSignalHandlerType);
     h->loop = loop;
     h->signal = signal;
     h->func = handler;
@@ -473,7 +473,7 @@ void obt_main_loop_signal_remove(ObtMainLoop *loop,
                     g_slist_delete_link(loop->signal_handlers[i], it);
                 if (h->destroy) h->destroy(h->data);
 
-                g_free(h);
+                g_slice_free(ObtMainLoopSignalHandlerType, h);
             }
         }
     }
@@ -505,7 +505,7 @@ void obt_main_loop_fd_add(ObtMainLoop *loop,
 {
     ObtMainLoopFdHandlerType *h;
 
-    h = g_new(ObtMainLoopFdHandlerType, 1);
+    h = g_slice_new(ObtMainLoopFdHandlerType);
     h->loop = loop;
     h->fd = fd;
     h->func = handler;
@@ -525,6 +525,7 @@ static void fd_handler_destroy(gpointer data)
 
     if (h->destroy)
         h->destroy(h->data);
+    g_slice_free(ObtMainLoopFdHandlerType, h);
 }
 
 void obt_main_loop_fd_remove(ObtMainLoop *loop,
@@ -567,7 +568,7 @@ void obt_main_loop_timeout_add(ObtMainLoop *loop,
                                GEqualFunc cmp,
                                GDestroyNotify notify)
 {
-    ObtMainLoopTimer *t = g_new(ObtMainLoopTimer, 1);
+    ObtMainLoopTimer *t = g_slice_new(ObtMainLoopTimer);
 
     g_assert(microseconds > 0); /* if it's 0 it'll cause an infinite loop */
 
@@ -655,7 +656,7 @@ static void timer_dispatch(ObtMainLoop *loop, GTimeVal **wait)
             loop->timers = g_slist_delete_link(loop->timers, it);
             if (curr->destroy)
                 curr->destroy(curr->data);
-            g_free(curr);
+            g_slice_free(ObtMainLoopTimer, curr);
             continue;
         }
 
@@ -676,7 +677,7 @@ static void timer_dispatch(ObtMainLoop *loop, GTimeVal **wait)
         } else {
             if (curr->destroy)
                 curr->destroy(curr->data);
-            g_free(curr);
+            g_slice_free(ObtMainLoopTimer, curr);
         }
 
         /* the timer queue has been shuffled, start from the beginning

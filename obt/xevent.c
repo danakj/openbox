@@ -43,6 +43,7 @@ struct _ObtXEventBinding
 static void xevent_handler(const XEvent *e, gpointer data);
 static guint window_hash(Window *w) { return *w; }
 static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
+static void binding_free(gpointer b);
 
 ObtXEventHandler* xevent_new(void)
 {
@@ -94,15 +95,20 @@ void xevent_set_handler(ObtXEventHandler *h, gint type, Window win,
         for (i = h->num_event_types; i < type + 1; ++i)
             h->bindings[i] = g_hash_table_new_full((GHashFunc)window_hash,
                                                    (GEqualFunc)window_comp,
-                                                   NULL, g_free);
+                                                   NULL, binding_free);
         h->num_event_types = type + 1;
     }
 
-    b = g_new(ObtXEventBinding, 1);
+    b = g_slice_new(ObtXEventBinding);
     b->win = win;
     b->func = func;
     b->data = data;
     g_hash_table_replace(h->bindings[type], &b->win, b);
+}
+
+static void binding_free(gpointer b)
+{
+    g_slice_free(ObtXEventBinding, b);
 }
 
 void xevent_remove_handler(ObtXEventHandler *h, gint type, Window win)

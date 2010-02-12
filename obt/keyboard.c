@@ -402,7 +402,7 @@ ObtIC* obt_keyboard_context_new(Window client, Window focus)
 
     g_return_val_if_fail(client != None && focus != None, NULL);
 
-    ic = g_new(ObtIC, 1);
+    ic = g_slice_new(ObtIC);
     ic->ref = 1;
     ic->client = client;
     ic->focus = focus;
@@ -424,6 +424,6 @@ void obt_keyboard_context_unref(ObtIC *ic)
     if (--ic->ref < 1) {
         xic_all = g_slist_remove(xic_all, ic);
         XDestroyIC(ic->xic);
-        g_free(ic);
+        g_slice_free(ObtIC, ic);
     }
 }

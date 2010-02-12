@@ -234,7 +234,7 @@ void dock_configure(void)
     gint gravity;
     gint l, r, t, b;
     gint strw, strh;
-    Rect *a;
+    Rect const *a;
     gint hidesize;
 
     RrMargins(dock->a_frame, &l, &t, &r, &b);
@@ -548,8 +548,6 @@ void dock_configure(void)
     }
 
     screen_update_areas();
-
-    g_free(a);
 }
 
 void dock_app_configure(ObDockApp *app, gint w, gint h)

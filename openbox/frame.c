@@ -1677,12 +1677,10 @@ static gboolean frame_animate_iconify(gpointer p)
 
     if (self->client->icon_geometry.width == 0) {
         /* there is no icon geometry set so just go straight down */
-        Rect *a = screen_physical_area_monitor
-            (screen_find_monitor(&self->area));
+        Rect const *a = screen_physical_area_monitor(screen_find_monitor(&self->area));
         iconx = self->area.x + self->area.width / 2 + 32;
         icony = a->y + a->width;
         iconw = 64;
-        g_free(a);
     } else {
         iconx = self->client->icon_geometry.x;
         icony = self->client->icon_geometry.y;

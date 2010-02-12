@@ -135,7 +135,8 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 
 void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
 {
-    Rect *area, *parea;
+    Rect *area;
+    Rect const *parea;
     guint i;
     gint l, t, r, b; /* requested edges */
     gint al, at, ar, ab; /* screen area edges */
@@ -167,10 +168,8 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     for (i = 0; i < screen_num_monitors; ++i) {
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
-            g_free(parea);
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
             continue;
-        }
 
         area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
                            &desired_area);
@@ -203,7 +202,6 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
             *y = pb - h + 1;
 
         g_slice_free(Rect, area);
-        g_free(parea);
     }
 
     frame_frame_gravity(c->frame, x, y);
@@ -326,7 +324,8 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
 {
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
-    Rect *area, *parea;
+    Rect *area;
+    Rect const *parea;
     gint al, at, ar, ab; /* screen boundaries */
     gint pl, pt, pr, pb; /* physical screen boundaries */
     guint i;
@@ -344,10 +343,8 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     for (i = 0; i < screen_num_monitors; ++i) {
         parea = screen_physical_area_monitor(i);
 
-        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area)) {
-            g_free(parea);
+        if (!RECT_INTERSECTS_RECT(*parea, c->frame->area))
             continue;
-        }
 
         area = screen_area(c->desktop, SCREEN_AREA_ALL_MONITORS,
                            &desired_area);
@@ -415,6 +412,5 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
         }
 
         g_slice_free(Rect, area);
-        g_free(parea);
     }
 }

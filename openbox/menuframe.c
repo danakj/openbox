@@ -321,7 +321,7 @@ static void menu_frame_place_submenu(ObMenuFrame *self, gint *x, gint *y)
 void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
                                gint *dx, gint *dy)
 {
-    Rect *a = NULL;
+    Rect const *a = NULL;
     gint pos, half;
 
     *dx = *dy = 0;
@@ -345,8 +345,6 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
         *dx = MAX(*dx, a->x - x);
         *dy = MAX(*dy, a->y - y);
     }
-
-    g_free(a);
 }
 
 static void menu_entry_frame_render(ObMenuEntryFrame *self)
@@ -833,7 +831,7 @@ void menu_frame_render(ObMenuFrame *self)
 static void menu_frame_update(ObMenuFrame *self)
 {
     GList *mit, *fit;
-    Rect *a;
+    Rect const *a;
     gint h;
 
     menu_pipe_execute(self->menu);
@@ -930,8 +928,6 @@ static void menu_frame_update(ObMenuFrame *self)
             self->entries = g_list_append(self->entries, more_frame);
         }
     }
-
-    g_free(a);
 
     menu_frame_render(self);
 }

@@ -79,7 +79,7 @@ static void set_curpos(KeyBindingTree *newpos)
     if (curpos != NULL) {
         gchar *text = NULL;
         GList *it;
-        Rect *a;
+        Rect const *a;
 
         for (it = curpos->keylist; it; it = g_list_next(it)) {
             gchar *oldtext = text;
@@ -95,7 +95,6 @@ static void set_curpos(KeyBindingTree *newpos)
         /* 1 second delay for the popup to show */
         popup_delay_show(popup, G_USEC_PER_SEC, text);
         g_free(text);
-        g_free(a);
     } else {
         popup_hide(popup);
     }

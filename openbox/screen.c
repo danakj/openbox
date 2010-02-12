@@ -939,7 +939,7 @@ static gboolean hide_desktop_popup_func(gpointer data)
 
 void screen_show_desktop_popup(guint d, gboolean perm)
 {
-    Rect *a;
+    Rect const *a;
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
@@ -965,8 +965,6 @@ void screen_show_desktop_popup(guint d, gboolean perm)
                                   g_direct_equal, NULL);
     if (perm)
         desktop_popup_perm = TRUE;
-
-    g_free(a);
 }
 
 void screen_hide_desktop_popup(void)
@@ -1626,7 +1624,7 @@ guint screen_find_monitor(Rect *search)
     guint mostv = 0;
 
     for (i = 0; i < screen_num_monitors; ++i) {
-        Rect *area = screen_physical_area_monitor(i);
+        Rect const *area = screen_physical_area_monitor(i);
         if (RECT_INTERSECTS_RECT(*area, *search)) {
             Rect r;
             guint v;
@@ -1639,24 +1637,20 @@ guint screen_find_monitor(Rect *search)
                 most = i;
             }
         }
-        g_free(area);
     }
     return most;
 }
 
-Rect* screen_physical_area_all_monitors(void)
+Rect const* screen_physical_area_all_monitors(void)
 {
     return screen_physical_area_monitor(screen_num_monitors);
 }
 
-Rect* screen_physical_area_monitor(guint head)
+Rect const* screen_physical_area_monitor(guint head)
 {
-    Rect *a;
     g_assert(head <= screen_num_monitors);
 
-    a = g_new(Rect, 1);
-    *a = monitor_area[head];
-    return a;
+    return &monitor_area[head];
 }
 
 gboolean screen_physical_area_monitor_contains(guint head, Rect *search)
@@ -1676,7 +1670,7 @@ guint screen_monitor_active(void)
         return screen_monitor_pointer();
 }
 
-Rect* screen_physical_area_active(void)
+Rect const* screen_physical_area_active(void)
 {
     return screen_physical_area_monitor(screen_monitor_active());
 }
@@ -1697,7 +1691,7 @@ guint screen_monitor_primary(gboolean fixed)
         return screen_monitor_pointer();
 }
 
-Rect *screen_physical_area_primary(gboolean fixed)
+Rect const *screen_physical_area_primary(gboolean fixed)
 {
     return screen_physical_area_monitor(screen_monitor_primary(fixed));
 }

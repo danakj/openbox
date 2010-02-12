@@ -104,15 +104,17 @@ void screen_install_colormap(struct _ObClient *client, gboolean install);
 
 void screen_update_areas(void);
 
-Rect *screen_physical_area_all_monitors(void);
+Rect const* screen_physical_area_all_monitors(void);
 
-Rect *screen_physical_area_monitor(guint head);
+/*! Returns a Rect which is owned by the screen code and should not be freed */
+Rect const* screen_physical_area_monitor(guint head);
 
 /*! Returns the monitor which contains the active window, or the one
   containing the pointer otherwise. */
 guint screen_monitor_active(void);
 
-Rect *screen_physical_area_active(void);
+/*! Returns a Rect which is owned by the screen code and should not be freed */
+Rect const* screen_physical_area_active(void);
 
 /*! Returns the primary monitor, as specified by the config.
   @fixed If TRUE, then this will always return a fixed monitor, otherwise
@@ -124,8 +126,9 @@ guint screen_monitor_primary(gboolean fixed);
   @fixed If TRUE, then this will always use a fixed monitor as primary,
          otherwise it may change based on where focus is, or other heuristics.
          See screen_monitor_primary().
+  @return A Rect which is owned by the screen code and should not be freed
 */
-Rect *screen_physical_area_primary(gboolean fixed);
+Rect const *screen_physical_area_primary(gboolean fixed);
 
 /* doesn't include struts which the search area is already outside of when
    'search' is not NULL */

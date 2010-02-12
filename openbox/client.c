@@ -202,7 +202,8 @@ void client_manage(Window window, ObPrompt *prompt)
     gboolean activate = FALSE;
     ObAppSettings *settings;
     gboolean transient = FALSE;
-    Rect place, *monitor, *allmonitors;
+    Rect place;
+    Rect const *monitor, *allmonitors;
     Time launch_time, map_time;
     guint32 user_time;
     gboolean obplaced;
@@ -440,9 +441,7 @@ void client_manage(Window window, ObPrompt *prompt)
     client_apply_startup_state(self, place.x, place.y,
                                place.width, place.height);
 
-    g_free(monitor);
     monitor = NULL;
-    g_free(allmonitors);
     allmonitors = NULL;
 
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
@@ -2049,7 +2048,7 @@ void client_update_strut(ObClient *self)
     if (!got &&
         OBT_PROP_GETA32(self->window, NET_WM_STRUT, CARDINAL, &data, &num)) {
         if (num == 4) {
-            Rect *a;
+            Rect const *a;
 
             got = TRUE;
 
@@ -2062,7 +2061,6 @@ void client_update_strut(ObClient *self)
                               a->x, a->x + a->width - 1,
                               a->y, a->y + a->height - 1,
                               a->x, a->x + a->width - 1);
-            g_free(a);
         }
         g_free(data);
     }
@@ -2478,7 +2476,7 @@ gboolean client_has_parent(ObClient *self)
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
-    Rect *monitor, *allmonitors;
+    Rect const *monitor, *allmonitors;
 
     monitor = screen_physical_area_monitor(client_monitor(self));
     allmonitors = screen_physical_area_all_monitors();
@@ -2510,9 +2508,6 @@ static ObStackingLayer calc_layer(ObClient *self)
     else if (self->above) l = OB_STACKING_LAYER_ABOVE;
     else if (self->below) l = OB_STACKING_LAYER_BELOW;
     else l = OB_STACKING_LAYER_NORMAL;
-
-    g_free(monitor);
-    g_free(allmonitors);
 
     return l;
 }
@@ -2840,7 +2835,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
-        Rect *a;
+        Rect const *a;
         guint i;
 
         i = screen_find_monitor(&desired);
@@ -2853,8 +2848,6 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         user = FALSE; /* ignore if the client can't be moved/resized when it
                          is fullscreening */
-
-        g_free(a);
     } else if (self->max_horz || self->max_vert) {
         Rect *a;
         guint i;

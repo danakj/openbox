@@ -158,7 +158,8 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     gint emptyx, emptyy; /* empty space between elements */
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
-    Rect *area, mon;
+    Rect const *area;
+    Rect mon;
     gboolean hasicon = self->hasicon;
 
     /* when there is no icon and the text is not parent relative, then
@@ -259,8 +260,6 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     x=MAX(MIN(x, area->x+area->width-w),area->x);
     y=MAX(MIN(y, area->y+area->height-h),area->y);
 
-    g_free(area);
-
     if (m == screen_num_monitors) {
         RECT_SET(mon, x, y, w, h);
         m = screen_find_monitor(&mon);
@@ -270,8 +269,6 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
         x=MAX(MIN(x, area->x+area->width-w),area->x);
         y=MAX(MIN(y, area->y+area->height-h),area->y);
-
-        g_free(area);
     }
 
     /* set the windows/appearances up */

@@ -269,9 +269,8 @@ static void prompt_layout(ObPrompt *self)
     b += OUTSIDE_MARGIN;
 
     {
-        Rect *area = screen_physical_area_all_monitors();
+        Rect const *area = screen_physical_area_all_monitors();
         maxw = MIN(MAX_WIDTH, area->width*4/5);
-        g_free(area);
     }
 
     /* find the button sizes and how much space we need for them */

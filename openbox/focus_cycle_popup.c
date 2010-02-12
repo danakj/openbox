@@ -392,7 +392,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint ml, mt, mr, mb;
     gint l, t, r, b;
     gint x, y, w, h;
-    Rect *screen_area = NULL;
+    Rect const *screen_area = NULL;
     gint i;
     GList *it;
     const ObFocusCyclePopupTarget *newtarget;
@@ -697,8 +697,6 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 
     p->last_target = newtarget;
 
-    g_free(screen_area);
-
     XFlush(obt_display);
 }
 
@@ -761,7 +759,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped) {
-        Rect *a;
+        Rect const *a;
 
         popup_setup(&popup, FALSE, FALSE);
         g_assert(popup.targets == NULL);
@@ -774,7 +772,6 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
         icon_popup_min_width(single_popup, POPUP_WIDTH);
         icon_popup_max_width(single_popup, MAX(a->width/3, POPUP_WIDTH));
         icon_popup_text_width(single_popup, popup.maxtextw);
-        g_free(a);
     }
 
     text = popup_get_name(c);

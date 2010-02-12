@@ -116,10 +116,19 @@ void obt_keyboard_reload(void)
 
 void obt_keyboard_shutdown(void)
 {
+    GSList *it;
+
     XFreeModifiermap(modmap);
     modmap = NULL;
     XFree(keymap);
     keymap = NULL;
+    for (it = xic_all; it; it = g_slist_next(it)) {
+        ObtIC* ic = it->data;
+        if (ic->xic) {
+            XDestroyIC(ic->xic);
+            ic->xic = NULL;
+        }
+    }
     if (xim) XCloseIM(xim);
     xim = NULL;
     xim_style = 0;
@@ -375,11 +384,6 @@ KeySym obt_keyboard_keypress_to_keysym(XEvent *ev)
 
 void obt_keyboard_context_renew(ObtIC *ic)
 {
-    if (ic->xic) {
-        XDestroyIC(ic->xic);
-        ic->xic = NULL;
-    }
-
     if (xim) {
         ic->xic = XCreateIC(xim,
                             XNInputStyle, xim_style,

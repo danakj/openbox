@@ -300,6 +300,9 @@ void obt_main_loop_run(ObtMainLoop *loop)
             do {
                 XNextEvent(loop->display, &e);
 
+                if (e.type == MappingNotify)
+                    XRefreshKeyboardMapping(&e.xmapping);
+
                 for (it = loop->x_handlers; it; it = g_slist_next(it)) {
                     ObtMainLoopXHandlerType *h = it->data;
                     h->func(&e, h->data);

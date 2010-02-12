@@ -300,8 +300,10 @@ void obt_xml_tree(ObtXmlInst *i, xmlNodePtr node)
     g_assert(i->doc); /* a doc is open? */
 
     while (node) {
-        struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
-        if (c) c->func(node, c->data);
+        if (node->name) {
+            struct Callback *c = g_hash_table_lookup(i->callbacks, node->name);
+            if (c) c->func(node, c->data);
+        }
         node = node->next;
     }
 }

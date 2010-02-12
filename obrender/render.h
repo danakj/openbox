@@ -316,6 +316,8 @@ RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);
 RrFont *RrFontOpenDefault   (const RrInstance *inst);
 void    RrFontClose         (RrFont *f);
+/*! Returns an RrSize, that was allocated with g_slice_new().  Use g_slice_free() to
+  free it. */
 RrSize *RrFontMeasureString (const RrFont *f, const gchar *str,
                              gint shadow_offset_x, gint shadow_offset_y,
                              gboolean flow, gint maxwidth);

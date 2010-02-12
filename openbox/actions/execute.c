@@ -53,7 +53,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
 
     if ((n = obt_xml_find_node(node, "command")) ||
         (n = obt_xml_find_node(node, "execute")))
@@ -97,21 +97,22 @@ static void free_func(gpointer options)
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
         g_free(o->prompt);
-        if (o->data) g_free(o->data);
-        g_free(o);
+        if (o->data) g_slice_free(ObActionsData, o->data);
+        g_slice_free(Options, o);
     }
 }
 
 static Options* dup_options(Options *in, ObActionsData *data)
 {
-    Options *o = g_new(Options, 1);
+    Options *o = g_slice_new(Options);
     o->cmd = g_strdup(in->cmd);
     o->sn = in->sn;
     o->sn_name = g_strdup(in->sn_name);
     o->sn_icon = g_strdup(in->sn_icon);
     o->sn_wmclass = g_strdup(in->sn_wmclass);
     o->prompt = NULL;
-    o->data = g_memdup(data, sizeof(ObActionsData));
+    o->data = g_slice_new(ObActionsData);
+    memcpy(o->data, data, sizeof(ObActionsData));
     return o;
 }
 

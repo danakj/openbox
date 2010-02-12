@@ -59,7 +59,7 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
 {
     g_type_init(); /* supposedly needed for pango but seems to work without */
 
-    definst = g_new (RrInstance, 1);
+    definst = g_slice_new(RrInstance);
     definst->display = display;
     definst->screen = screen;
 
@@ -214,7 +214,7 @@ void RrInstanceFree (RrInstance *inst)
         g_free(inst->pseudo_colors);
         g_hash_table_destroy(inst->color_hash);
         g_object_unref(inst->pango);
-        g_free(inst);
+        g_slice_free(RrInstance, inst);
     }
 }
 

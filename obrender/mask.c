@@ -24,7 +24,7 @@
 RrPixmapMask *RrPixmapMaskNew(const RrInstance *inst,
                               gint w, gint h, const gchar *data)
 {
-    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    RrPixmapMask *m = g_slice_new(RrPixmapMask);
     m->inst = inst;
     m->width = w;
     m->height = h;
@@ -40,7 +40,7 @@ void RrPixmapMaskFree(RrPixmapMask *m)
     if (m) {
         XFreePixmap(RrDisplay(m->inst), m->mask);
         g_free(m->data);
-        g_free(m);
+        g_slice_free(RrPixmapMask, m);
     }
 }
 
@@ -70,7 +70,7 @@ void RrPixmapMaskDraw(Pixmap p, const RrTextureMask *m, const RrRect *area)
 
 RrPixmapMask *RrPixmapMaskCopy(const RrPixmapMask *src)
 {
-    RrPixmapMask *m = g_new(RrPixmapMask, 1);
+    RrPixmapMask *m = g_slice_new(RrPixmapMask);
     m->inst = src->inst;
     m->width = src->width;
     m->height = src->height;

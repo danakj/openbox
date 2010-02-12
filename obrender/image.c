@@ -50,7 +50,7 @@ static void RrImagePicFree(RrImagePic *pic)
     if (pic) {
         g_free(pic->data);
         g_free(pic->name);
-        g_free(pic);
+        g_slice_free(RrImagePic, pic);
     }
 }
 
@@ -235,7 +235,7 @@ static RrImagePic* ResizeImage(RrPixel32 *src,
         }
     }
 
-    pic = g_new(RrImagePic, 1);
+    pic = g_slice_new(RrImagePic);
     RrImagePicInit(pic, NULL, dstW, dstH, dststart);
 
     return pic;
@@ -335,7 +335,7 @@ RrImage* RrImageNew(RrImageCache *cache)
 
     g_assert(cache != NULL);
 
-    self = g_new0(RrImage, 1);
+    self = g_slice_new0(RrImage);
     self->ref = 1;
     self->cache = cache;
     return self;
@@ -369,7 +369,7 @@ void RrImageUnref(RrImage *self)
             RemovePicture(self, &self->original, 0, &self->n_original);
         while (self->n_resized > 0)
             RemovePicture(self, &self->resized, 0, &self->n_resized);
-        g_free(self);
+        g_slice_free(RrImage, self);
     }
 }
 
@@ -399,7 +399,7 @@ static void AddPictureFromData(RrImage *self, const char *name,
         }
 
     /* add the new picture */
-    pic = g_new(RrImagePic, 1);
+    pic = g_slice_new(RrImagePic);
     RrImagePicInit(pic, name, w, h, g_memdup(data, w*h*sizeof(RrPixel32)));
     AddPicture(self, &self->original, &self->n_original, pic);
 }

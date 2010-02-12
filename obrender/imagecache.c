@@ -29,7 +29,7 @@ RrImageCache* RrImageCacheNew(gint max_resized_saved)
 
     g_assert(max_resized_saved >= 0);
 
-    self = g_new(RrImageCache, 1);
+    self = g_slice_new(RrImageCache);
     self->ref = 1;
     self->max_resized_saved = max_resized_saved;
     self->pic_table = g_hash_table_new((GHashFunc)RrImagePicHash,
@@ -54,7 +54,7 @@ void RrImageCacheUnref(RrImageCache *self)
         g_hash_table_destroy(self->name_table);
         self->name_table = NULL;
 
-        g_free(self);
+        g_slice_free(RrImageCache, self);
     }
 }
 

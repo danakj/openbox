@@ -68,7 +68,7 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     PangoStyle pstyle;
     PangoAttrList *attrlist;
 
-    out = g_new(RrFont, 1);
+    out = g_slice_new(RrFont);
     out->inst = inst;
     out->ref = 1;
     out->font_desc = pango_font_description_new();
@@ -133,7 +133,7 @@ void RrFontClose(RrFont *f)
         if (--f->ref < 1) {
             g_object_unref(f->layout);
             pango_font_description_free(f->font_desc);
-            g_free(f);
+            g_slice_free(RrFont, f);
         }
     }
 }
@@ -181,7 +181,7 @@ RrSize *RrFontMeasureString(const RrFont *f, const gchar *str,
 
     g_assert(!flow || maxwidth > 0);
 
-    size = g_new(RrSize, 1);
+    size = g_slice_new(RrSize);
     font_measure_full(f, str, &size->width, &size->height, shadow_x, shadow_y,
                       flow, maxwidth);
     return size;

@@ -81,7 +81,7 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
         xcol.green = (g << 8) | g;
         xcol.blue = (b << 8) | b;
         if (XAllocColor(RrDisplay(inst), RrColormap(inst), &xcol)) {
-            out = g_new(RrColor, 1);
+            out = g_slice_new(RrColor);
             out->inst = inst;
             out->r = xcol.red >> 8;
             out->g = xcol.green >> 8;
@@ -112,7 +112,7 @@ void RrColorFree(RrColor *c)
             if (c->pixel) XFreeColors(RrDisplay(c->inst), RrColormap(c->inst),
                                       &c->pixel, 1, 0);
             if (c->gc) XFreeGC(RrDisplay(c->inst), c->gc);
-            g_free(c);
+            g_slice_free(RrColor, c);
         }
     }
 }

@@ -102,7 +102,7 @@ ObActionsDefinition* do_register(const gchar *name,
             return NULL;
     }
 
-    def = g_new(ObActionsDefinition, 1);
+    def = g_slice_new(ObActionsDefinition);
     def->ref = 1;
     def->name = g_strdup(name);
     def->free = free;
@@ -164,7 +164,7 @@ static void actions_definition_unref(ObActionsDefinition *def)
 {
     if (def && --def->ref == 0) {
         g_free(def->name);
-        g_free(def);
+        g_slice_free(ObActionsDefinition, def);
     }
 }
 
@@ -184,7 +184,7 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name)
 
     /* if we found the action */
     if (def) {
-        act = g_new(ObActionsAct, 1);
+        act = g_slice_new(ObActionsAct);
         act->ref = 1;
         act->def = def;
         actions_definition_ref(act->def);
@@ -268,7 +268,7 @@ void actions_act_unref(ObActionsAct *act)
             act->def->free(act->options);
         /* unref the definition */
         actions_definition_unref(act->def);
-        g_free(act);
+        g_slice_free(ObActionsAct, act);
     }
 }
 

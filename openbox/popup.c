@@ -31,7 +31,7 @@
 ObPopup *popup_new(void)
 {
     XSetWindowAttributes attrib;
-    ObPopup *self = g_new0(ObPopup, 1);
+    ObPopup *self = g_slice_new0(ObPopup);
 
     self->obwin.type = OB_WINDOW_CLASS_INTERNAL;
     self->gravity = NorthWestGravity;
@@ -72,7 +72,7 @@ void popup_free(ObPopup *self)
         RrAppearanceFree(self->a_text);
         window_remove(self->bg);
         stacking_remove(self);
-        g_free(self);
+        g_slice_free(ObPopup, self);
     }
 }
 
@@ -342,7 +342,7 @@ ObIconPopup *icon_popup_new(void)
 {
     ObIconPopup *self;
 
-    self = g_new0(ObIconPopup, 1);
+    self = g_slice_new0(ObIconPopup);
     self->popup = popup_new();
     self->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
     self->icon = XCreateWindow(obt_display, self->popup->bg,
@@ -364,7 +364,7 @@ void icon_popup_free(ObIconPopup *self)
         XDestroyWindow(obt_display, self->icon);
         RrAppearanceFree(self->a_icon);
         popup_free(self->popup);
-        g_free(self);
+        g_slice_free(ObIconPopup, self);
     }
 }
 
@@ -501,7 +501,7 @@ ObPagerPopup *pager_popup_new(void)
 {
     ObPagerPopup *self;
 
-    self = g_new(ObPagerPopup, 1);
+    self = g_slice_new(ObPagerPopup);
     self->popup = popup_new();
 
     self->desks = 0;
@@ -527,7 +527,7 @@ void pager_popup_free(ObPagerPopup *self)
         RrAppearanceFree(self->hilight);
         RrAppearanceFree(self->unhilight);
         popup_free(self->popup);
-        g_free(self);
+        g_slice_free(ObPagerPopup, self);
     }
 }
 

@@ -376,7 +376,7 @@ static void session_setup_restart_command(void)
 
 static ObSMSaveData *sm_save_get_data(void)
 {
-    ObSMSaveData *savedata = g_new0(ObSMSaveData, 1);
+    ObSMSaveData *savedata = g_slice_new0(ObSMSaveData);
     /* save the active desktop and client.
        we don't bother to preemptively save the other desktop state like
        number and names of desktops, cuz those shouldn't be changing during
@@ -398,7 +398,7 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
     if (savedata == NULL)
         savedata = sm_save_get_data();
     success = session_save_to_file(savedata);
-    g_free(savedata);
+    g_slice_free(ObSMSaveData, savedata);
 
     /* tell the session manager how to restore this state */
     if (success) session_setup_restart_command();
@@ -443,7 +443,7 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
 
     if (!SmcRequestSaveYourselfPhase2(conn, sm_save_yourself_2, savedata)) {
         ob_debug_type(OB_DEBUG_SM, "Requst for phase 2 failed");
-        g_free(savedata);
+        g_slice_free(ObSMSaveData, savedata);
         SmcSaveYourselfDone(conn, FALSE);
     }
 }
@@ -630,7 +630,7 @@ static void session_state_free(ObSessionState *state)
         g_free(state->class);
         g_free(state->role);
 
-        g_free(state);
+        g_slice_free(ObSessionState, state);
     }
 }
 
@@ -731,7 +731,7 @@ static void session_load_file(const gchar *path)
     {
         ObSessionState *state;
 
-        state = g_new0(ObSessionState, 1);
+        state = g_slice_new0(ObSessionState);
 
         if (!obt_xml_attr_string(node, "id", &state->id))
             if (!obt_xml_attr_string(node, "command", &state->command))

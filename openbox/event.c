@@ -811,7 +811,7 @@ void event_enter_client(ObClient *client)
 
             obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
 
-            data = g_new(ObFocusDelayData, 1);
+            data = g_slice_new(ObFocusDelayData);
             data->client = client;
             data->time = event_curtime;
             data->serial = event_curserial;
@@ -846,7 +846,7 @@ void event_leave_client(ObClient *client)
 
             obt_main_loop_timeout_remove(ob_main_loop, unfocus_delay_func);
 
-            data = g_new(ObFocusDelayData, 1);
+            data = g_slice_new(ObFocusDelayData);
             data->client = client;
             data->time = event_curtime;
             data->serial = event_curserial;
@@ -1997,7 +1997,7 @@ static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 
 static void focus_delay_dest(gpointer data)
 {
-    g_free(data);
+    g_slice_free(ObFocusDelayData, data);
 }
 
 static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2)
@@ -2059,7 +2059,7 @@ static void event_ignore_enter_range(gulong start, gulong end)
     g_assert(start != 0);
     g_assert(end != 0);
 
-    r = g_new(ObSerialRange, 1);
+    r = g_slice_new(ObSerialRange);
     r->start = start;
     r->end = end;
     ignore_serials = g_slist_prepend(ignore_serials, r);
@@ -2094,7 +2094,7 @@ static gboolean is_enter_focus_event_ignored(gulong serial)
         if ((glong)(serial - r->end) > 0) {
             /* past the end */
             ignore_serials = g_slist_delete_link(ignore_serials, it);
-            g_free(r);
+            g_slice_free(ObSerialRange, r);
         }
         else if ((glong)(serial - r->start) >= 0)
             return TRUE;

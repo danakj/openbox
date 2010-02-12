@@ -246,7 +246,7 @@ static void popup_target_free(ObFocusCyclePopupTarget *t)
     g_free(t->text);
     XDestroyWindow(obt_display, t->iconwin);
     XDestroyWindow(obt_display, t->textwin);
-    g_free(t);
+    g_slice_free(ObFocusCyclePopupTarget, t);
 }
 
 static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
@@ -313,7 +313,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                     g_free(text);
                 } else {
                     ObFocusCyclePopupTarget *t =
-                        g_new(ObFocusCyclePopupTarget, 1);
+                        g_slice_new(ObFocusCyclePopupTarget);
 
                     t->client = ft;
                     t->text = text;

@@ -45,7 +45,7 @@ ObGroup *group_add(Window leader, ObClient *client)
 
     self = g_hash_table_lookup(group_map, &leader);
     if (self == NULL) {
-        self = g_new(ObGroup, 1);
+        self = g_slice_new(ObGroup);
         self->leader = leader;
         self->members = NULL;
         g_hash_table_insert(group_map, &self->leader, self);
@@ -61,6 +61,6 @@ void group_remove(ObGroup *self, ObClient *client)
     self->members = g_slist_remove(self->members, client);
     if (self->members == NULL) {
         g_hash_table_remove(group_map, &self->leader);
-        g_free(self);
+        g_slice_free(ObGroup, self);
     }
 }

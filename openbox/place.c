@@ -158,7 +158,7 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
 
 static GSList* area_add(GSList *list, Rect *a)
 {
-    Rect *r = g_new(Rect, 1);
+    Rect *r = g_slice_new(Rect);
     *r = *a;
     return g_slist_prepend(list, r);
 }
@@ -210,7 +210,7 @@ static GSList* area_remove(GSList *list, Rect *a)
             }
 
             /* 'r' is not being added to the result list, so free it */
-            g_free(r);
+            g_slice_free(Rect, r);
         }
     }
     g_slist_free(list);
@@ -332,7 +332,7 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
             }
 
             while (spaces) {
-                g_free(spaces->data);
+                g_slice_free(Rect, spaces->data);
                 spaces = g_slist_delete_link(spaces, spaces);
             }
         }

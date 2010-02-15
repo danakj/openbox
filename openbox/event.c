@@ -1314,11 +1314,23 @@ static void event_handle_client(ObClient *client, XEvent *e)
                        (e->xclient.data.l[0] == 2 ? "user" : "INVALID"))));
             /* XXX make use of data.l[2] !? */
             if (e->xclient.data.l[0] == 1 || e->xclient.data.l[0] == 2) {
-                event_curtime = e->xclient.data.l[1];
+                /* we can not trust the timestamp from applications.
+                   e.g. chromium passes a very old timestamp.  openbox thinks
+                   the window will get focus and calls XSetInputFocus with the
+                   (old) timestamp, which doesn't end up moving focus at all.
+                   but the window is raised, not hilited, etc, as if it was
+                   really going to get focus.
+
+                   so do not use this timestamp in event_curtime, as this would
+                   be used in XSetInputFocus.
+                */
+                /*event_curtime = e->xclient.data.l[1];*/
                 if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"
                                   " missing a timestamp\n", client->title);
+
+                event_curtime = event_get_server_time();
             } else
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "

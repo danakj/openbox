@@ -782,7 +782,7 @@ static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
 
     /* This is focus stealing prevention */
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "Want to focus new window 0x%x at time %u "
+                  "Want to focus window 0x%x at time %u "
                   "launched at %u (last user interaction time %u)\n",
                   self->window, steal_time, launch_time,
                   event_last_user_time);

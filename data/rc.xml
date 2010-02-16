@@ -673,7 +673,7 @@
        menu is hidden again -->
   <middle>no</middle>
   <!-- center submenus vertically about the parent entry -->
-  <submenuShowDelay>200</submenuShowDelay>
+  <submenuShowDelay>100</submenuShowDelay>
   <!-- time to delay before showing a submenu after hovering over the parent
        entry.
        if this is a negative value, then the delay is infinite and the

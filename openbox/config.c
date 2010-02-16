@@ -1042,7 +1042,7 @@ void config_startup(ObtXmlInst *i)
 
     config_menu_hide_delay = 250;
     config_menu_middle = FALSE;
-    config_submenu_show_delay = 200;
+    config_submenu_show_delay = 100;
     config_submenu_hide_delay = 400;
     config_menu_manage_desktops = TRUE;
     config_menu_files = NULL;

@@ -502,7 +502,7 @@ void client_manage(Window window, ObPrompt *prompt)
     client_set_list();
 
     /* free the ObAppSettings shallow copy */
-    g_free(settings);
+    g_slice_free(ObAppSettings, settings);
 
     ob_debug("Managed window 0x%lx plate 0x%x (%s)",
              window, self->frame->window, self->class);
@@ -536,7 +536,7 @@ ObClient *client_fake_manage(Window window)
              self->frame->size.top, self->frame->size.bottom);
 
     /* free the ObAppSettings shallow copy */
-    g_free(settings);
+    g_slice_free(ObAppSettings, settings);
 
     return self;
 }

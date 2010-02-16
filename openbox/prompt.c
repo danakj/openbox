@@ -152,7 +152,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
 
     attrib.override_redirect = FALSE;
 
-    self = g_new0(ObPrompt, 1);
+    self = g_slice_new0(ObPrompt);
     self->ref = 1;
     self->func = func;
     self->cleanup = cleanup;
@@ -250,7 +250,7 @@ void prompt_unref(ObPrompt *self)
 
         XDestroyWindow(obt_display, self->msg.window);
         XDestroyWindow(obt_display, self->super.window);
-        g_free(self);
+        g_slice_free(ObPrompt, self);
     }
 }
 

@@ -80,7 +80,7 @@ ObtPaths* obt_paths_new(void)
     ObtPaths *p;
     const gchar *path;
 
-    p = g_new0(ObtPaths, 1);
+    p = g_slice_new0(ObtPaths);
     p->ref = 1;
 
     path = g_getenv("XDG_CONFIG_HOME");
@@ -163,7 +163,7 @@ void obt_paths_unref(ObtPaths *p)
         g_free(p->data_home);
         g_free(p->cache_home);
 
-        obt_free0(p, ObtPaths, 1);
+        g_slice_free(ObtPaths, p);
     }
 }
 

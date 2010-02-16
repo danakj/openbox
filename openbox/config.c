@@ -106,7 +106,7 @@ GSList *config_per_app_settings;
 
 ObAppSettings* config_create_app_settings(void)
 {
-    ObAppSettings *settings = g_new0(ObAppSettings, 1);
+    ObAppSettings *settings = g_slice_new0(ObAppSettings);
     settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
@@ -239,7 +239,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
         if (class_set || name_set || role_set || title_set || type_set) {
             xmlNodePtr n, c;
-            ObAppSettings *settings = config_create_app_settings();;
+            ObAppSettings *settings = config_create_app_settings();
 
             if (name_set)
                 settings->name = g_pattern_spec_new(name);
@@ -1084,7 +1084,7 @@ void config_shutdown(void)
         if (itd->role)  g_pattern_spec_free(itd->role);
         if (itd->title) g_pattern_spec_free(itd->title);
         if (itd->class) g_pattern_spec_free(itd->class);
-        g_free(it->data);
+        g_slice_free(ObAppSettings, it->data);
     }
     g_slist_free(config_per_app_settings);
 }

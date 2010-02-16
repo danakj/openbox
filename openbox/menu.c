@@ -374,7 +374,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 {
     ObMenu *self;
 
-    self = g_new0(ObMenu, 1);
+    self = g_slice_new0(ObMenu);
     self->name = g_strdup(name);
     self->data = data;
 
@@ -393,7 +393,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
 
        more_menu->more_menu will always be NULL, since there is only 1 for
        each menu. */
-    self->more_menu = g_new0(ObMenu, 1);
+    self->more_menu = g_slice_new0(ObMenu);
     self->more_menu->name = _("More...");
     self->more_menu->title = _("More...");
     self->more_menu->data = data;
@@ -423,9 +423,9 @@ static void menu_destroy_hash_value(ObMenu *self)
     g_free(self->name);
     g_free(self->title);
     g_free(self->execute);
-    g_free(self->more_menu);
+    g_slice_free(ObMenu, self->more_menu);
 
-    g_free(self);
+    g_slice_free(ObMenu, self);
 }
 
 void menu_free(ObMenu *menu)
@@ -505,7 +505,7 @@ static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)
 
     g_assert(menu);
 
-    self = g_new0(ObMenuEntry, 1);
+    self = g_slice_new0(ObMenuEntry);
     self->ref = 1;
     self->type = type;
     self->menu = menu;
@@ -550,7 +550,7 @@ void menu_entry_unref(ObMenuEntry *self)
             break;
         }
 
-        g_free(self);
+        g_slice_free(ObMenuEntry, self);
     }
 }
 

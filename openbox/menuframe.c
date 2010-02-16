@@ -108,7 +108,7 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     ObMenuFrame *self;
     XSetWindowAttributes attr;
 
-    self = g_new0(ObMenuFrame, 1);
+    self = g_slice_new0(ObMenuFrame);
     self->obwin.type = OB_WINDOW_CLASS_MENUFRAME;
     self->menu = menu;
     self->selected = NULL;
@@ -151,7 +151,7 @@ void menu_frame_free(ObMenuFrame *self)
 
         XDestroyWindow(obt_display, self->window);
 
-        g_free(self);
+        g_slice_free(ObMenuFrame, self);
     }
 }
 
@@ -168,7 +168,7 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     ObMenuEntryFrame *self;
     XSetWindowAttributes attr;
 
-    self = g_new0(ObMenuEntryFrame, 1);
+    self = g_slice_new0(ObMenuEntryFrame);
     self->entry = entry;
     self->frame = frame;
 
@@ -216,7 +216,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
             g_hash_table_remove(menu_frame_map, &self->bullet);
         }
 
-        g_free(self);
+        g_slice_free(ObMenuEntryFrame, self);
     }
 }
 

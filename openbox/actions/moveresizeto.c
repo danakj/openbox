@@ -24,15 +24,16 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
 static gpointer setup_center_func(xmlNodePtr node);
 
 void action_moveresizeto_startup(void)
 {
-    actions_register("MoveResizeTo", setup_func, g_free, run_func);
+    actions_register("MoveResizeTo", setup_func, free_func, run_func);
     /* 3.4-compatibility */
-    actions_register("MoveToCenter", setup_center_func, g_free, run_func);
+    actions_register("MoveToCenter", setup_center_func, free_func, run_func);
 }
 
 static void parse_coord(xmlNodePtr n, gint *pos,
@@ -59,7 +60,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
     o->x = G_MININT;
     o->y = G_MININT;
     o->w = G_MININT;
@@ -101,6 +102,11 @@ static gpointer setup_func(xmlNodePtr node)
     }
 
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -186,7 +192,7 @@ static gpointer setup_center_func(xmlNodePtr node)
 {
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
     o->x = G_MININT;
     o->y = G_MININT;
     o->w = G_MININT;

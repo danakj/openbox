@@ -9,6 +9,7 @@ typedef struct {
 static gpointer setup_func_top(xmlNodePtr node);
 static gpointer setup_func_bottom(xmlNodePtr node);
 static gpointer setup_func_send(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
 static gpointer setup_sendtop_func(xmlNodePtr node);
@@ -17,24 +18,24 @@ static gpointer setup_sendnormal_func(xmlNodePtr node);
 
 void action_layer_startup(void)
 {
-    actions_register("ToggleAlwaysOnTop", setup_func_top, g_free,
+    actions_register("ToggleAlwaysOnTop", setup_func_top, free_func,
                      run_func);
-    actions_register("ToggleAlwaysOnBottom", setup_func_bottom, g_free,
+    actions_register("ToggleAlwaysOnBottom", setup_func_bottom, free_func,
                      run_func);
-    actions_register("SendToLayer", setup_func_send, g_free,
+    actions_register("SendToLayer", setup_func_send, free_func,
                      run_func);
     /* 3.4-compatibility */
-    actions_register("SendToTopLayer", setup_sendtop_func, g_free,
+    actions_register("SendToTopLayer", setup_sendtop_func, free_func,
                      run_func);
-    actions_register("SendToBottomLayer", setup_sendbottom_func, g_free,
+    actions_register("SendToBottomLayer", setup_sendbottom_func, free_func,
                      run_func);
-    actions_register("SendToNormalLayer", setup_sendnormal_func, g_free,
+    actions_register("SendToNormalLayer", setup_sendnormal_func, free_func,
                      run_func);
 }
 
 static gpointer setup_func_top(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->layer = 1;
     o->toggle = TRUE;
     return o;
@@ -42,7 +43,7 @@ static gpointer setup_func_top(xmlNodePtr node)
 
 static gpointer setup_func_bottom(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->layer = -1;
     o->toggle = TRUE;
     return o;
@@ -53,7 +54,7 @@ static gpointer setup_func_send(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
 
     if ((n = obt_xml_find_node(node, "layer"))) {
         gchar *s = obt_xml_node_string(n);
@@ -70,6 +71,11 @@ static gpointer setup_func_send(xmlNodePtr node)
     }
 
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -102,7 +108,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 /* 3.4-compatibility */
 static gpointer setup_sendtop_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->layer = 1;
     o->toggle = FALSE;
     return o;
@@ -110,7 +116,7 @@ static gpointer setup_sendtop_func(xmlNodePtr node)
 
 static gpointer setup_sendbottom_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->layer = -1;
     o->toggle = FALSE;
     return o;
@@ -118,7 +124,7 @@ static gpointer setup_sendbottom_func(xmlNodePtr node)
 
 static gpointer setup_sendnormal_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->layer = 0;
     o->toggle = FALSE;
     return o;

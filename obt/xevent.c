@@ -49,7 +49,7 @@ ObtXEventHandler* xevent_new(void)
 {
     ObtXEventHandler *h;
 
-    h = g_new0(ObtXEventHandler, 1);
+    h = g_slice_new0(ObtXEventHandler);
     h->ref = 1;
 
     return h;
@@ -71,7 +71,7 @@ void xevent_unref(ObtXEventHandler *h)
             g_hash_table_destroy(h->bindings[i]);
         g_free(h->bindings);
 
-        obt_free0(h, ObtXEventHandler, 1);
+        g_slice_free(ObtXEventHandler, h);
     }
 }
 

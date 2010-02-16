@@ -10,11 +10,12 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_focus_startup(void)
 {
-    actions_register("Focus", setup_func, g_free, run_func);
+    actions_register("Focus", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -22,7 +23,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
     o->stop_int = TRUE;
 
     if ((n = obt_xml_find_node(node, "here")))
@@ -30,6 +31,11 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_xml_find_node(node, "stopInteractive")))
         o->stop_int = obt_xml_node_bool(n);
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 /* Always return FALSE because its not interactive */

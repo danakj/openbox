@@ -9,12 +9,13 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
 void action_exit_startup(void)
 {
-    actions_register("Exit", setup_func, NULL, run_func);
-    actions_register("SessionLogout", setup_func, NULL, run_func);
+    actions_register("Exit", setup_func, free_func, run_func);
+    actions_register("SessionLogout", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -22,13 +23,18 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
     o->prompt = TRUE;
 
     if ((n = obt_xml_find_node(node, "prompt")))
         o->prompt = obt_xml_node_bool(n);
 
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 static void do_exit(void)
@@ -50,6 +56,7 @@ static void prompt_cleanup(ObPrompt *p, gpointer data)
 {
     prompt_unref(p);
 }
+
 
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)

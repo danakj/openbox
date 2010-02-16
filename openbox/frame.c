@@ -89,7 +89,7 @@ ObFrame *frame_new(ObClient *client)
     ObFrame *self;
     Visual *visual;
 
-    self = g_new0(ObFrame, 1);
+    self = g_slice_new0(ObFrame);
     self->client = client;
 
     visual = check_32bit_client(client);
@@ -229,7 +229,7 @@ void frame_free(ObFrame *self)
     if (self->colormap)
         XFreeColormap(obt_display, self->colormap);
 
-    g_free(self);
+    g_slice_free(ObFrame, self);
 }
 
 void frame_show(ObFrame *self)

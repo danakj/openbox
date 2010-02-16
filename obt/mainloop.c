@@ -155,7 +155,7 @@ ObtMainLoop *obt_main_loop_new(void)
 {
     ObtMainLoop *loop;
 
-    loop = g_new0(ObtMainLoop, 1);
+    loop = g_slice_new0(ObtMainLoop);
     loop->ref = 1;
     FD_ZERO(&loop->fd_set);
     loop->fd_x = -1;
@@ -249,7 +249,7 @@ void obt_main_loop_unref(ObtMainLoop *loop)
             }
         }
 
-        obt_free0(loop, ObtMainLoop, 1);
+        g_slice_free(ObtMainLoop, loop);
     }
 }
 

@@ -10,6 +10,7 @@ typedef struct {
 static gpointer setup_func(xmlNodePtr node);
 static gpointer setup_add_func(xmlNodePtr node);
 static gpointer setup_remove_func(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
 static gpointer setup_addcurrent_func(xmlNodePtr node);
@@ -19,17 +20,18 @@ static gpointer setup_removelast_func(xmlNodePtr node);
 
 void action_addremovedesktop_startup(void)
 {
-    actions_register("AddDesktop", setup_add_func, g_free, run_func);
-    actions_register("RemoveDesktop", setup_remove_func, g_free, run_func);
+    actions_register("AddDesktop", setup_add_func, free_func, run_func);
+    actions_register("RemoveDesktop", setup_remove_func, free_func, run_func);
 
     /* 3.4-compatibility */
-    actions_register("AddDesktopLast", setup_addlast_func, g_free, run_func);
+    actions_register("AddDesktopLast", setup_addlast_func,
+                     free_func, run_func);
     actions_register("RemoveDesktopLast", setup_removelast_func,
-                     g_free, run_func);
+                     free_func, run_func);
     actions_register("AddDesktopCurrent", setup_addcurrent_func,
-                     g_free, run_func);
+                     free_func, run_func);
     actions_register("RemoveDesktopCurrent", setup_removecurrent_func,
-                     g_free, run_func);
+                     free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -37,7 +39,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
 
     if ((n = obt_xml_find_node(node, "where"))) {
         gchar *s = obt_xml_node_string(n);
@@ -63,6 +65,11 @@ static gpointer setup_remove_func(xmlNodePtr node)
     Options *o = setup_func(node);
     o->add = FALSE;
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 /* Always return FALSE because its not interactive */

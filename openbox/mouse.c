@@ -155,7 +155,7 @@ void mouse_unbind_all(void)
                     actions_act_unref(jt->data);
                 g_slist_free(b->actions[j]);
             }
-            g_free(b);
+            g_slice_free(ObMouseBinding, b);
         }
         g_slist_free(bound_contexts[i]);
         bound_contexts[i] = NULL;
@@ -390,7 +390,7 @@ gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
     }
 
     /* add the binding */
-    b = g_new0(ObMouseBinding, 1);
+    b = g_slice_new0(ObMouseBinding);
     b->state = state;
     b->button = button;
     b->actions[mact] = g_slist_append(NULL, action);

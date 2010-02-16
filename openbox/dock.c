@@ -80,7 +80,7 @@ void dock_startup(gboolean reconfig)
     STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                       0, 0, 0, 0, 0, 0, 0, 0);
 
-    dock = g_new0(ObDock, 1);
+    dock = g_slice_new0(ObDock);
     dock->obwin.type = OB_WINDOW_CLASS_DOCK;
 
     dock->hidden = TRUE;
@@ -129,6 +129,8 @@ void dock_shutdown(gboolean reconfig)
     RrAppearanceFree(dock->a_frame);
     window_remove(dock->frame);
     stacking_remove(dock);
+    g_slice_free(ObDock, dock);
+    dock = NULL;
 }
 
 void dock_manage(Window icon_win, Window name_win)
@@ -137,7 +139,7 @@ void dock_manage(Window icon_win, Window name_win)
     XWindowAttributes attrib;
     gchar **data;
 
-    app = g_new0(ObDockApp, 1);
+    app = g_slice_new0(ObDockApp);
     app->name_win = name_win;
     app->icon_win = icon_win;
 
@@ -224,7 +226,7 @@ void dock_unmanage(ObDockApp *app, gboolean reparent)
 
     g_free(app->name);
     g_free(app->class);
-    g_free(app);
+    g_slice_free(ObDockApp, app);
 }
 
 void dock_configure(void)

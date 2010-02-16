@@ -10,6 +10,7 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
+static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
 static gpointer setup_north_func(xmlNodePtr node);
@@ -19,12 +20,12 @@ static gpointer setup_west_func(xmlNodePtr node);
 
 void action_movetoedge_startup(void)
 {
-    actions_register("MoveToEdge", setup_func, g_free, run_func);
+    actions_register("MoveToEdge", setup_func, free_func, run_func);
     /* 3.4-compatibility */
-    actions_register("MoveToEdgeNorth", setup_north_func, g_free, run_func);
-    actions_register("MoveToEdgeSouth", setup_south_func, g_free, run_func);
-    actions_register("MoveToEdgeEast", setup_east_func, g_free, run_func);
-    actions_register("MoveToEdgeWest", setup_west_func, g_free, run_func);
+    actions_register("MoveToEdgeNorth", setup_north_func, free_func, run_func);
+    actions_register("MoveToEdgeSouth", setup_south_func, free_func, run_func);
+    actions_register("MoveToEdgeEast", setup_east_func, free_func, run_func);
+    actions_register("MoveToEdgeWest", setup_west_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -32,7 +33,7 @@ static gpointer setup_func(xmlNodePtr node)
     xmlNodePtr n;
     Options *o;
 
-    o = g_new0(Options, 1);
+    o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
 
     if ((n = obt_xml_find_node(node, "direction"))) {
@@ -53,6 +54,11 @@ static gpointer setup_func(xmlNodePtr node)
     }
 
     return o;
+}
+
+static void free_func(gpointer o)
+{
+    g_slice_free(Options, o);
 }
 
 /* Always return FALSE because its not interactive */
@@ -77,28 +83,28 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 /* 3.4-compatibility */
 static gpointer setup_north_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
     return o;
 }
 
 static gpointer setup_south_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_SOUTH;
     return o;
 }
 
 static gpointer setup_east_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_EAST;
     return o;
 }
 
 static gpointer setup_west_func(xmlNodePtr node)
 {
-    Options *o = g_new0(Options, 1);
+    Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_WEST;
     return o;
 }

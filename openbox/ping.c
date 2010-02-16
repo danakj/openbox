@@ -75,7 +75,7 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     /* make sure we're not already pinging the client */
     if (g_hash_table_find(ping_ids, find_client, client) != NULL) return;
 
-    t = g_new0(ObPingTarget, 1);
+    t = g_slice_new0(ObPingTarget);
     t->client = client;
     t->h = h;
 
@@ -161,6 +161,6 @@ static void ping_end(ObClient *client, gpointer data)
         obt_main_loop_timeout_remove_data(ob_main_loop, ping_timeout,
                                           t, FALSE);
 
-        g_free(t);
+        g_slice_free(ObPingTarget, t);
     }
 }

@@ -99,7 +99,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             return NULL;
     }
 
-    theme = g_new0(RrTheme, 1);
+    theme = g_slice_new0(RrTheme);
 
     theme->inst = inst;
     theme->name = g_strdup(name ? name : DEFAULT_THEME);
@@ -1658,7 +1658,7 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->osd_unhilite_bg);
         RrAppearanceFree(theme->osd_unhilite_label);
 
-        g_free(theme);
+        g_slice_free(RrTheme, theme);
     }
 }
 

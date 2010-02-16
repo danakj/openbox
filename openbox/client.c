@@ -702,7 +702,7 @@ void client_fake_unmanage(ObClient *self)
     /* this is all that got allocated to get the decorations */
 
     frame_free(self->frame);
-    g_free(self);
+    g_slice_free(ObClient, self);
 }
 
 static gboolean client_can_steal_focus(ObClient *self, Time steal_time,

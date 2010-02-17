@@ -170,7 +170,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         event_cancel_all_key_grabs();
 
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
-        g_message(e->message, o->cmd);
+        g_message("%s", e->message);
         g_error_free(e);
     }
     else {
@@ -189,7 +189,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                            G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e))
         {
-            g_message(e->message, o->cmd);
+            g_message("%s", e->message);
             g_error_free(e);
 
             if (o->sn)

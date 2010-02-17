@@ -1,4 +1,4 @@
 all clean install:
-	$(MAKE) -C ../.. -$(MAKEFLAGS) $@
+	$(MAKE) -C .. -$(MAKEFLAGS) $@
 
 .PHONY: all clean install

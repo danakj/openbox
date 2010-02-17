@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# xdg-autostart runs things based on the XDG autostart specification
+# openbox-xdg-autostart runs things based on the XDG autostart specification
 # Copyright (C) 2008       Dana Jansens
 #
 # XDG autostart specification can be found here:
@@ -19,8 +19,8 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
 
-ME="xdg-autostart"
-VERSION="1.0"
+ME="openbox-xdg-autostart"
+VERSION="1.1"
 
 import os, glob, sys
 try:

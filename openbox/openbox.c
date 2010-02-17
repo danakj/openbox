@@ -102,6 +102,7 @@ static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
 static gchar    *config_file = NULL;
+static gchar    *startup_cmd = NULL;
 
 static void signal_handler(gint signal, gpointer data);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
@@ -342,6 +343,29 @@ gint main(gint argc, gchar **argv)
 
             ob_set_state(OB_STATE_RUNNING);
 
+            if (startup_cmd) {
+                gchar **argv = NULL;
+                GError *e = NULL;
+                gboolean ok;
+
+                if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+                    g_message("Error parsing startup command: %s",
+                              e->message);
+                    g_error_free(e);
+                    e = NULL;
+                }
+                ok = g_spawn_async(NULL, argv, NULL,
+                                   G_SPAWN_SEARCH_PATH |
+                                   G_SPAWN_DO_NOT_REAP_CHILD,
+                                   NULL, NULL, NULL, &e);
+                if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+                    g_message("Error launching startup command: %s",
+                              e->message);
+                    g_error_free(e);
+                    e = NULL;
+                }
+            }
+
             /* look for parsing errors */
             {
                 xmlErrorPtr e = xmlGetLastError();
@@ -519,6 +543,7 @@ static void print_help(void)
     g_print(_("  --exit              Exit Openbox\n"));
     g_print(_("\nDebugging options:\n"));
     g_print(_("  --sync              Run in synchronous mode\n"));
+    g_print(_("  --startup CMD       Run CMD after starting\n"));
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
     g_print(_("  --debug-session     Display debugging output for session management\n"));
@@ -579,6 +604,18 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--sync")) {
             xsync = TRUE;
+        }
+        else if (!strcmp(argv[i], "--startup")) {
+            if (i == *argc - 1) /* no args left */
+                g_printerr(_("--startup requires an argument\n"));
+            else {
+                /* this will be in the current locale encoding, which is
+                   what we want */
+                startup_cmd = argv[i+1];
+                remove_args(argc, argv, i, 2);
+                --i; /* this arg was removed so go back */
+                ob_debug("--startup %s", startup_cmd);
+            }
         }
         else if (!strcmp(argv[i], "--debug")) {
             ob_debug_enable(OB_DEBUG_NORMAL, TRUE);

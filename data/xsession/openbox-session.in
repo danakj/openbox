@@ -12,15 +12,11 @@ xprop -root -remove _NET_NUMBER_OF_DESKTOPS \
       -remove _NET_DESKTOP_NAMES \
       -remove _NET_CURRENT_DESKTOP 2> /dev/null
 
-AUTOSTART="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/autostart.sh"
-GLOBALAUTOSTART="@configdir@/openbox/autostart.sh"
+# Set up the environment
+A="@configdir@/openbox/environment"
+test -r $A && . $A
+A="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/environment"
+test -r $A && . $A
 
-if test -r $AUTOSTART; then
-    . $AUTOSTART
-else
-    if test -r $GLOBALAUTOSTART; then
-        . $GLOBALAUTOSTART
-    fi
-fi
-
-exec @bindir@/openbox "$@"
+# Run Openbox, and have it run the autostart stuff
+exec @bindir@/openbox --startup "@libexecdir@/openbox-autostart OPENBOX" "$@"

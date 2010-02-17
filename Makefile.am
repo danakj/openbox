@@ -12,7 +12,7 @@ obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
 rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/obrender
 pixmapdir       = $(datadir)/pixmaps
 xsddir          = $(datadir)/openbox
-secretbindir    = $(libdir)/openbox
+libexecdir      = $(prefix)/libexec
 appsdir         = $(datadir)/applications
 
 theme = Clearlooks
@@ -36,13 +36,19 @@ bin_PROGRAMS = \
 	tools/gnome-panel-control/gnome-panel-control \
 	tools/obxprop/obxprop
 
-dist_secretbin_SCRIPTS = \
-	tools/xdg-autostart/xdg-autostart
-
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session
+
+dist_rc_SCRIPTS = \
+	data/environment \
+	data/autostart/autostart
+
+dist_libexec_SCRIPTS = \
+	data/autostart/openbox-xdg-autostart \
+	data/autostart/openbox-autostart
+
 
 ## obrender ##
 
@@ -446,9 +452,6 @@ dist_apps_DATA = \
 dist_pixmap_DATA = \
 	data/openbox.png
 
-nodist_rc_DATA = \
-	data/autostart.sh
-
 dist_rc_DATA = \
 	data/rc.xml \
 	data/menu.xml
@@ -456,10 +459,10 @@ dist_rc_DATA = \
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@configdir\@!$(configdir)!' \
-	-e 's!@secretbindir\@!$(secretbindir)!' \
+	-e 's!@libexecdir\@!$(libexecdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
-data/autostart.sh: $(srcdir)/data/autostart.sh.in Makefile
+data/autostart/openbox-autostart: $(srcdir)/data/autostart/openbox-autostart.in Makefile
 	@echo make: creating $@
 	@$(edit) $< >$@
 
@@ -488,7 +491,6 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	data/autostart.sh.in \
 	data/rc.xsd \
 	data/menu.xsd \
 	data/xsession/openbox.desktop.in \

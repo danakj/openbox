@@ -130,6 +130,8 @@ obt_libobt_la_SOURCES = \
 	obt/mainloop.c \
 	obt/xml.h \
 	obt/xml.c \
+	obt/ddfile.h \
+	obt/ddfile.c \
 	obt/paths.h \
 	obt/paths.c \
 	obt/prop.h \

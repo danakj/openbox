@@ -109,6 +109,7 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num);
 static void parse_env();
 static void parse_args(gint *argc, gchar **argv);
 static Cursor load_cursor(const gchar *name, guint fontval);
+static void run_startup_cmd(void);
 
 gint main(gint argc, gchar **argv)
 {
@@ -343,28 +344,7 @@ gint main(gint argc, gchar **argv)
 
             ob_set_state(OB_STATE_RUNNING);
 
-            if (startup_cmd) {
-                gchar **argv = NULL;
-                GError *e = NULL;
-                gboolean ok;
-
-                if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
-                    g_message("Error parsing startup command: %s",
-                              e->message);
-                    g_error_free(e);
-                    e = NULL;
-                }
-                ok = g_spawn_async(NULL, argv, NULL,
-                                   G_SPAWN_SEARCH_PATH |
-                                   G_SPAWN_DO_NOT_REAP_CHILD,
-                                   NULL, NULL, NULL, &e);
-                if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
-                    g_message("Error launching startup command: %s",
-                              e->message);
-                    g_error_free(e);
-                    e = NULL;
-                }
-            }
+            if (startup_cmd) run_startup_cmd();
 
             /* look for parsing errors */
             {
@@ -560,6 +540,30 @@ static void remove_args(gint *argc, gchar **argv, gint index, gint num)
     for (; i < *argc; ++i)
         argv[i] = NULL;
     *argc -= num;
+}
+
+static void run_startup_cmd(void)
+{
+    gchar **argv = NULL;
+    GError *e = NULL;
+    gboolean ok;
+
+    if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+        g_message("Error parsing startup command: %s",
+                  e->message);
+        g_error_free(e);
+        e = NULL;
+    }
+    ok = g_spawn_async(NULL, argv, NULL,
+                       G_SPAWN_SEARCH_PATH |
+                       G_SPAWN_DO_NOT_REAP_CHILD,
+                       NULL, NULL, NULL, &e);
+    if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+        g_message("Error launching startup command: %s",
+                  e->message);
+        g_error_free(e);
+        e = NULL;
+    }
 }
 
 static void parse_env(void)

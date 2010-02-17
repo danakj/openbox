@@ -232,7 +232,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     e = NULL;
     if (!g_shell_parse_argv(cmd, NULL, &argv, &e)) {
-        g_message(e->message, o->cmd);
+        g_message("%s", e->message);
         g_error_free(e);
     }
     else {
@@ -254,7 +254,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                            G_SPAWN_DO_NOT_REAP_CHILD,
                            NULL, NULL, NULL, &e);
         if (!ok) {
-            g_message(e->message, o->cmd);
+            g_message("%s", e->message);
             g_error_free(e);
         }
 

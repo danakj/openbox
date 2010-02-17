@@ -64,6 +64,7 @@ obrender_libobrender_la_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
+	$(CAIRO_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 obrender_libobrender_la_LDFLAGS = \
@@ -71,6 +72,7 @@ obrender_libobrender_la_LDFLAGS = \
 obrender_libobrender_la_LIBADD = \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
+	$(CAIRO_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 obrender_libobrender_la_SOURCES = \
@@ -94,7 +96,9 @@ obrender_libobrender_la_SOURCES = \
 	obrender/render.h \
 	obrender/render.c \
 	obrender/theme.h \
-	obrender/theme.c
+	obrender/theme.c \
+	obrender/window.h \
+	obrender/window.c
 
 ## obt ##
 

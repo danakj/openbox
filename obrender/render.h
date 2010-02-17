@@ -46,6 +46,7 @@ typedef struct _RrColor            RrColor;
 typedef struct _RrImage            RrImage;
 typedef struct _RrImagePic         RrImagePic;
 typedef struct _RrImageCache       RrImageCache;
+typedef struct _RrWindow           RrWindow;
 
 typedef guint32 RrPixel32;
 typedef guint16 RrPixel16;

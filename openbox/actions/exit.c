@@ -10,11 +10,12 @@ typedef struct {
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node);
 static gboolean run_func(ObActionsData *data, gpointer options);
+static void free_func(gpointer options);
 
 void action_exit_startup(void)
 {
-    actions_register("Exit", setup_func, NULL, run_func, NULL, NULL);
-    actions_register("SessionLogout", setup_func, NULL, run_func, NULL, NULL);
+    actions_register("Exit", setup_func, free_func, run_func, NULL, NULL);
+    actions_register("SessionLogout", setup_func, free_func, run_func, NULL, NULL);
 }
 
 static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
@@ -29,6 +30,12 @@ static gpointer setup_func(ObParseInst *i, xmlDocPtr doc, xmlNodePtr node)
         o->prompt = parse_bool(doc, n);
 
     return o;
+}
+
+static void free_func(gpointer options)
+{
+    if (options)
+        g_free(options);
 }
 
 static void do_exit(void)

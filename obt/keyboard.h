@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 /*! These keys are bound to the modifier masks in any fashion,
   except for CapsLock, Shift, and Control. */
 typedef enum {
+    OBT_KEYBOARD_MODKEY_NONE,
     OBT_KEYBOARD_MODKEY_CAPSLOCK,
     OBT_KEYBOARD_MODKEY_NUMLOCK,
     OBT_KEYBOARD_MODKEY_SCROLLLOCK,
@@ -45,9 +46,10 @@ typedef struct _ObtIC ObtIC;
 
 void obt_keyboard_reload(void);
 
-/*! Get the modifier mask(s) for a KeyCode. (eg. a keycode bound to Alt_L could
-  return a mask of (Mod1Mask | Mask3Mask)) */
-guint obt_keyboard_keycode_to_modmask(guint keycode);
+/*! Get the modifier mask(s) for a keyboard event.
+  (eg. a keycode bound to Alt_L could return a mask of (Mod1Mask | Mask3Mask))
+*/
+guint obt_keyboard_keyevent_to_modmask(XEvent *e);
 
 /*! Strip off all modifiers except for the modifier keys. This strips stuff
   like Button1Mask, and also LockMask, NumlockMask, and ScrolllockMask */
@@ -56,6 +58,9 @@ guint obt_keyboard_only_modmasks(guint mask);
 /*! Get the modifier masks for a modifier key. This includes both the left and
   right keys when there are both. */
 guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
+
+/*! Get the modifier key which was pressed or released in a keyboard event */
+ObtModkeysKey obt_keyboard_keyevent_to_modkey(XEvent *e);
 
 /*! Convert a KeySym to all the KeyCodes which generate it. */
 KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);

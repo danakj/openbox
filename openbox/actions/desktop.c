@@ -316,7 +316,7 @@ static gboolean i_input_func(guint initial_state,
     if (e->type == KeyRelease) {
         /* remove from the state the mask of the modifier key being
            released, if it is a modifier key being released that is */
-        mods &= ~obt_keyboard_keycode_to_modmask(e->xkey.keycode);
+        mods &= ~obt_keyboard_keyevent_to_modmask(e);
     }
 
     if (e->type == KeyPress) {

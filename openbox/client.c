@@ -372,7 +372,7 @@ void client_manage(Window window, ObPrompt *prompt)
         /* NET_WM_USER_TIME 0 when mapping means don't focus */
         (user_time != 0) &&
         /* this checks for focus=false for the window */
-        (!settings || settings->focus != 0) &&
+        settings->focus != 0 &&
         focus_valid_target(self, FALSE, FALSE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
     {

@@ -368,7 +368,7 @@ static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
         interactive_act = act;
         actions_act_ref(interactive_act);
 
-        interactive_initial_state = state;
+        interactive_initial_state = obt_keyboard_only_modmasks(state);
 
         /* if using focus_delay, stop the timer now so that focus doesn't go
            moving on us, which would kill the action */

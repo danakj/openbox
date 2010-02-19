@@ -2488,7 +2488,7 @@ ObClient *client_search_focus_tree_full(ObClient *self)
 
         for (it = self->parents; it; it = g_slist_next(it)) {
             ObClient *c = it->data;
-            if ((c = client_search_focus_tree_full(it->data))) return c;
+            if ((c = client_search_focus_tree_full(c))) return c;
         }
 
         return NULL;

@@ -513,7 +513,6 @@ void screen_resize(void)
 
 void screen_set_num_desktops(guint num)
 {
-    guint old;
     gulong *viewport;
     GList *it, *stacking_copy;
 
@@ -521,7 +520,6 @@ void screen_set_num_desktops(guint num)
 
     if (screen_num_desktops == num) return;
 
-    old = screen_num_desktops;
     screen_num_desktops = num;
     PROP_SET32(RootWindow(ob_display, ob_screen),
                net_number_of_desktops, cardinal, num);

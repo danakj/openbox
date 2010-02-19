@@ -205,7 +205,7 @@ static void parse_per_app_settings(ObParseInst *inst, xmlDocPtr doc,
     gboolean x_pos_given;
 
     while (app) {
-        name_set = class_set = type_set = x_pos_given = FALSE;
+        x_pos_given = FALSE;
 
         class_set = parse_attr_string("class", app, &class);
         name_set = parse_attr_string("name", app, &name);

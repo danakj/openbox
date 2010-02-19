@@ -642,6 +642,7 @@ static void event_process(const XEvent *ec, gpointer data)
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
         ob_debug("Keyboard map changed. Reloading keyboard bindings.\n");
+        XRefreshKeyboardMapping(&e->xmapping);
         ob_set_state(OB_STATE_RECONFIGURING);
         modkeys_shutdown(TRUE);
         modkeys_startup(TRUE);

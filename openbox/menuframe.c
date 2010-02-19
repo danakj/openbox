@@ -654,7 +654,6 @@ void menu_frame_render(ObMenuFrame *self)
     if (self->entries) {
         gint l, t, r, b;
 
-        e = self->entries->data;
         ob_rr_theme->a_menu_text_normal->texture[0].data.text.string = "";
         tw = RrMinWidth(ob_rr_theme->a_menu_text_normal);
         tw += 2*PADDING;

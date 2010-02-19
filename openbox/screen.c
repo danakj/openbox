@@ -1460,7 +1460,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
 {
     Rect *a;
     GSList *it;
-    gint l, r, t, b, al, ar, at, ab;
+    gint l, r, t, b;
     guint i, d;
     gboolean us = search != NULL; /* user provided search */
 
@@ -1480,36 +1480,32 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
     }
     if (head == SCREEN_AREA_ONE_MONITOR) head = screen_find_monitor(search);
 
-    /* al is "all left" meaning the furthest left you can get, l is our
-       "working left" meaning our current strut edge which we're calculating
-    */
-
     /* only include monitors which the search area lines up with */
     if (RECT_INTERSECTS_RECT(monitor_area[screen_num_monitors], *search)) {
-        al = l = RECT_RIGHT(monitor_area[screen_num_monitors]);
-        at = t = RECT_BOTTOM(monitor_area[screen_num_monitors]);
-        ar = r = RECT_LEFT(monitor_area[screen_num_monitors]);
-        ab = b = RECT_TOP(monitor_area[screen_num_monitors]);
+        l = RECT_RIGHT(monitor_area[screen_num_monitors]);
+        t = RECT_BOTTOM(monitor_area[screen_num_monitors]);
+        r = RECT_LEFT(monitor_area[screen_num_monitors]);
+        b = RECT_TOP(monitor_area[screen_num_monitors]);
         for (i = 0; i < screen_num_monitors; ++i) {
             /* add the monitor if applicable */
             if (RANGES_INTERSECT(search->x, search->width,
                                  monitor_area[i].x, monitor_area[i].width))
             {
-                at = t = MIN(t, RECT_TOP(monitor_area[i]));
-                ab = b = MAX(b, RECT_BOTTOM(monitor_area[i]));
+                t = MIN(t, RECT_TOP(monitor_area[i]));
+                b = MAX(b, RECT_BOTTOM(monitor_area[i]));
             }
             if (RANGES_INTERSECT(search->y, search->height,
                                  monitor_area[i].y, monitor_area[i].height))
             {
-                al = l = MIN(l, RECT_LEFT(monitor_area[i]));
-                ar = r = MAX(r, RECT_RIGHT(monitor_area[i]));
+                l = MIN(l, RECT_LEFT(monitor_area[i]));
+                r = MAX(r, RECT_RIGHT(monitor_area[i]));
             }
         }
     } else {
-        al = l = RECT_LEFT(monitor_area[screen_num_monitors]);
-        at = t = RECT_TOP(monitor_area[screen_num_monitors]);
-        ar = r = RECT_RIGHT(monitor_area[screen_num_monitors]);
-        ab = b = RECT_BOTTOM(monitor_area[screen_num_monitors]);
+        l = RECT_LEFT(monitor_area[screen_num_monitors]);
+        t = RECT_TOP(monitor_area[screen_num_monitors]);
+        r = RECT_RIGHT(monitor_area[screen_num_monitors]);
+        b = RECT_BOTTOM(monitor_area[screen_num_monitors]);
     }
 
     for (d = 0; d < screen_num_desktops; ++d) {

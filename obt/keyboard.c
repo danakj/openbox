@@ -300,7 +300,7 @@ KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym)
     for (i = min_keycode; i <= max_keycode; ++i)
         for (j = 0; j < keysyms_per_keycode; ++j)
             if (sym == keymap[(i-min_keycode) * keysyms_per_keycode + j]) {
-                ret = g_renew(KeyCode, ret, ++n);
+                ret = g_renew(KeyCode, ret, ++n + 1);
                 ret[n-1] = i;
                 ret[n] = 0;
             }

@@ -317,7 +317,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint innerw, innerh;
     gint i;
     GList *it;
-    const ObFocusCyclePopupTarget *newtarget;
+    const ObFocusCyclePopupTarget *newtarget = NULL;
     gint newtargetx, newtargety;
 
     screen_area = screen_physical_area_primary(FALSE);

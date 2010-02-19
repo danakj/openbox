@@ -655,7 +655,7 @@ static void move_with_keys(gint keycode, gint state)
 static void resize_with_keys(gint keycode, gint state)
 {
     gint dw = 0, dh = 0, pdx = 0, pdy = 0, opx, opy, px, py;
-    gint dist = 0, resist = 0;
+    gint resist = 0;
     ObDirection dir;
 
     /* pick the edge if it needs to move */
@@ -745,27 +745,27 @@ static void resize_with_keys(gint keycode, gint state)
 
         if (key_resize_edge == OB_DIRECTION_WEST) {
             if (dir == OB_DIRECTION_WEST)
-                dw = (dist = distw);
+                dw = distw;
             else
-                dw = -(dist = distw);
+                dw = -distw;
         }
         else if (key_resize_edge == OB_DIRECTION_EAST) {
             if (dir == OB_DIRECTION_EAST)
-                dw = (dist = distw);
+                dw = distw;
             else
-                dw = -(dist = distw);
+                dw = -distw;
         }
         else if (key_resize_edge == OB_DIRECTION_NORTH) {
             if (dir == OB_DIRECTION_NORTH)
-                dh = (dist = disth);
+                dh = disth;
             else
-                dh = -(dist = disth);
+                dh = -disth;
         }
         else /*if (key_resize_edge == OB_DIRECTION_SOUTH)*/ {
             if (dir == OB_DIRECTION_SOUTH)
-                dh = (dist = disth);
+                dh = disth;
             else
-                dh = -(dist = disth);
+                dh = -disth;
         }
     }
 

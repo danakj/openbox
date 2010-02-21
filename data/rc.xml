@@ -431,6 +431,12 @@
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>left</edge></action>
     </mousebind>
+
+    <mousebind button="Right" action="Press">
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="ShowMenu"><menu>client-menu</menu></action>
+    </mousebind>
   </context>
 
   <context name="Right">
@@ -440,6 +446,12 @@
     </mousebind>
     <mousebind button="Left" action="Drag">
       <action name="Resize"><edge>right</edge></action>
+    </mousebind>
+
+    <mousebind button="Right" action="Press">
+      <action name="Focus"/>
+      <action name="Raise"/>
+      <action name="ShowMenu"><menu>client-menu</menu></action>
     </mousebind>
   </context>
 

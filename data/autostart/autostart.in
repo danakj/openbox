@@ -6,8 +6,8 @@
 
 # If you want to use GNOME config tools...
 #
-#if test -x /usr/libexec/gnome-settings-daemon >/dev/null; then
-#  /usr/libexec/gnome-settings-daemon &
+#if test -x @libexecdir@/gnome-settings-daemon >/dev/null; then
+#  @libexecdir@/gnome-settings-daemon &
 #elif which gnome-settings-daemon >/dev/null; then
 #  gnome-settings-daemon &
 #fi

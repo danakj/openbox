@@ -444,6 +444,7 @@ edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@configdir\@!$(configdir)!' \
 	-e 's!@secretbindir\@!$(secretbindir)!' \
+	-e 's!@libexecdir\@!$(libexecdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
 data/autostart.sh: $(srcdir)/data/autostart.sh.in Makefile

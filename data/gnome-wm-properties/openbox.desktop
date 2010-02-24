@@ -1,4 +1,5 @@
 [Desktop Entry]
+Type=Application
 Name=Openbox
 Exec=openbox
 

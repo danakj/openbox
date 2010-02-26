@@ -220,7 +220,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         g_free(t->text);
         XDestroyWindow(obt_display, t->iconwin);
         XDestroyWindow(obt_display, t->textwin);
-        g_free(t);
+        g_slice_free(ObFocusCyclePopupTarget, t);
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }

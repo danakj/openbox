@@ -148,7 +148,7 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
     area of the part of the rectable on each monitor.  The number of the
     monitor containing the greatest area of the rectangle is returned.
 */
-guint screen_find_monitor(Rect *search);
+guint screen_find_monitor(const Rect const *search);
 
 /*! Finds the monitor which contains the point @x, @y */
 guint screen_find_monitor_point(guint x, guint y);

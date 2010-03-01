@@ -203,7 +203,6 @@ void client_manage(Window window, ObPrompt *prompt)
     ObAppSettings *settings;
     gboolean transient = FALSE;
     Rect place;
-    Rect const *monitor, *allmonitors;
     Time launch_time, map_time;
     guint32 user_time;
     gboolean obplaced;
@@ -312,8 +311,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* where the frame was placed is where the window was originally */
     place = self->area;
-    monitor = screen_physical_area_monitor(screen_find_monitor(&place));
-    allmonitors = screen_physical_area_all_monitors();
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
@@ -339,8 +336,7 @@ void client_manage(Window window, ObPrompt *prompt)
            a strut there */
         if (!obplaced && place.x == 0 && place.y == 0 &&
             /* oldschool fullscreen windows are allowed */
-            !(self->decorations == 0 && (RECT_EQUAL(place, *monitor) ||
-                                         RECT_EQUAL(place, *allmonitors))))
+            !client_is_oldfullscreen(self, &place))
         {
             Rect *r;
 
@@ -382,9 +378,7 @@ void client_manage(Window window, ObPrompt *prompt)
                                   fit inside the struts (fixes Acroread, which
                                   makes its fullscreen window fit the screen
                                   but it is not USSize'd or USPosition'd) */
-                               !(self->decorations == 0 &&
-                                 (RECT_EQUAL(place, *monitor) ||
-                                  RECT_EQUAL(place, *allmonitors))))));
+                               !client_is_oldfullscreen(self, &place))));
     }
 
     /* if the window isn't user-sized, then make it fit inside
@@ -404,8 +398,7 @@ void client_manage(Window window, ObPrompt *prompt)
           /* don't shrink oldschool fullscreen windows to fit inside the
              struts (fixes Acroread, which makes its fullscreen window
              fit the screen but it is not USSize'd or USPosition'd) */
-          !(self->decorations == 0 && (RECT_EQUAL(place, *monitor) ||
-                                       RECT_EQUAL(place, *allmonitors))))))
+          !client_is_oldfullscreen(self, &place))))
     {
         Rect *a = screen_area(self->desktop, SCREEN_AREA_ONE_MONITOR, &place);
 
@@ -442,9 +435,6 @@ void client_manage(Window window, ObPrompt *prompt)
     */
     client_apply_startup_state(self, place.x, place.y,
                                place.width, place.height);
-
-    monitor = NULL;
-    allmonitors = NULL;
 
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
@@ -2475,6 +2465,24 @@ gboolean client_has_parent(ObClient *self)
     return self->parents != NULL;
 }
 
+gboolean client_is_oldfullscreen(const ObClient const *self,
+                                 const Rect const *area)
+{
+    Rect const *monitor, *allmonitors;
+
+    /* No decorations and fills the monitor = oldskool fullscreen.
+       But not for maximized windows.
+    */
+
+    if (self->decorations || self->max_horz || self->max_vert) return FALSE;
+
+    monitor = screen_physical_area_monitor(screen_find_monitor(area));
+    allmonitors = screen_physical_area_all_monitors();
+
+    return (RECT_EQUAL(*area, *monitor) ||
+            RECT_EQUAL(*area, *allmonitors));
+}
+
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
@@ -2490,13 +2498,7 @@ static ObStackingLayer calc_layer(ObClient *self)
         else l = OB_STACKING_LAYER_ABOVE;
     }
     else if ((self->fullscreen ||
-              /* No decorations and fills the monitor = oldskool fullscreen.
-                 But not for maximized windows.
-              */
-              (self->decorations == 0 &&
-               !(self->max_horz && self->max_vert) &&
-               (RECT_EQUAL(self->area, *monitor) ||
-                RECT_EQUAL(self->area, *allmonitors)))) &&
+              client_is_oldfullscreen(self, &self->area)) &&
              /* you are fullscreen while you or your children are focused.. */
              (client_focused(self) || client_search_focus_tree(self) ||
               /* you can be fullscreen if you're on another desktop */
@@ -2990,8 +2992,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                       gboolean user, gboolean final, gboolean force_reply)
 {
-    Rect oldframe;
-    gint oldw, oldh;
+    Rect oldframe, oldclient;
     gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     gboolean fmoved, fresized;
@@ -3011,9 +3012,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     moved = (x != self->area.x || y != self->area.y);
     resized = (w != self->area.width || h != self->area.height);
 
-    oldw = self->area.width;
-    oldh = self->area.height;
     oldframe = self->frame->area;
+    oldclient = self->area;
     RECT_SET(self->area, x, y, w, h);
 
     /* for app-requested resizes, always resize if 'resized' is true.
@@ -3024,10 +3024,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
                                     (resized && config_resize_redraw))));
 
     /* if the client is enlarging, then resize the client before the frame */
-    if (send_resize_client && (w > oldw || h > oldh)) {
+    if (send_resize_client && (w > oldclient.width || h > oldclient.height)) {
         XMoveResizeWindow(obt_display, self->window,
                           self->frame->size.left, self->frame->size.top,
-                          MAX(w, oldw), MAX(h, oldh));
+                          MAX(w, oldclient.width), MAX(h, oldclient.height));
         frame_adjust_client_area(self->frame);
     }
 
@@ -3115,7 +3115,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        both of these resize sections may run, because the top one only resizes
        in the direction that is growing
      */
-    if (send_resize_client && (w <= oldw || h <= oldh)) {
+    if (send_resize_client && (w <= oldclient.width || h <= oldclient.height))
+    {
         frame_adjust_client_area(self->frame);
         XMoveResizeWindow(obt_display, self->window,
                           self->frame->size.left, self->frame->size.top, w, h);
@@ -3124,9 +3125,13 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     XFlush(obt_display);
 
     /* if it moved between monitors, then this can affect the stacking
-       layer of this window or others - for fullscreen windows */
+       layer of this window or others - for fullscreen windows.
+       also if it changed to/from oldschool fullscreen then its layer may
+       change */
     if (screen_find_monitor(&self->frame->area) !=
-        screen_find_monitor(&oldframe))
+        screen_find_monitor(&oldframe) ||
+        (final && (client_is_oldfullscreen(self, &oldclient) !=
+                   client_is_oldfullscreen(self, &self->area))))
     {
         client_calc_layer(self);
     }

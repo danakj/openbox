@@ -1617,7 +1617,7 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
     return a;
 }
 
-guint screen_find_monitor(Rect *search)
+guint screen_find_monitor(const Rect const *search)
 {
     guint i;
     guint most = screen_num_monitors;

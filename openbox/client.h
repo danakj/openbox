@@ -490,6 +490,11 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
 */
 void client_fullscreen(ObClient *self, gboolean fs);
 
+/*! Determine if the window, using the given client-area, would be considered
+  as an "oldschool fullscreen" window, that is, if it is filling a whole
+  monitor. */
+gboolean client_is_oldfullscreen(const ObClient const *self, const Rect *area);
+
 /*! Iconifies or uniconifies the client window
   @param iconic true if the window should be iconified; false if it should be
                 restored.

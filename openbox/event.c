@@ -1256,15 +1256,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
         g_print("x %d y %d grav %d %d\n", x, y, client->gravity, NorthWestGravity);
         if (x == 0 && y == 0 && client->gravity == NorthWestGravity) {
             const Rect to = { x, y, w, h };
-            Rect const *monitor, *allmonitors;
-            monitor = screen_physical_area_monitor(client_monitor(client));
-            allmonitors = screen_physical_area_all_monitors();
 
             /* oldschool fullscreen windows are allowed */
-            if (!(client->decorations == 0 &&
-                  (RECT_EQUAL(to, *monitor) ||
-                   RECT_EQUAL(to, *allmonitors))))
-            {
+            if (!client_is_oldfullscreen(client, &to)) {
                 Rect *r;
 
                 r = screen_area(client->desktop, SCREEN_AREA_ALL_MONITORS,

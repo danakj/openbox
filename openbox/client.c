@@ -345,9 +345,11 @@ void client_manage(Window window, ObPrompt *prompt)
             Rect *r;
 
             r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
-            place.x = r->x;
-            place.y = r->y;
-            ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
+            if (r->x || r->y) {
+                place.x = r->x;
+                place.y = r->y;
+                ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
+            }
             g_slice_free(Rect, r);
         }
 

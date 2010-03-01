@@ -1247,6 +1247,49 @@ static void event_handle_client(ObClient *client, XEvent *e)
                notify is sent or not */
         }
 
+        /* check for broken apps (java swing) moving to 0,0 when there is a
+           strut there.
+
+           XXX remove this some day...that would be nice. but really unexpected
+           from Sun Microsystems.
+        */
+        g_print("x %d y %d grav %d %d\n", x, y, client->gravity, NorthWestGravity);
+        if (x == 0 && y == 0 && client->gravity == NorthWestGravity) {
+            const Rect to = { x, y, w, h };
+            Rect const *monitor, *allmonitors;
+            monitor = screen_physical_area_monitor(client_monitor(client));
+            allmonitors = screen_physical_area_all_monitors();
+
+            /* oldschool fullscreen windows are allowed */
+            if (!(client->decorations == 0 &&
+                  (RECT_EQUAL(to, *monitor) ||
+                   RECT_EQUAL(to, *allmonitors))))
+            {
+                Rect *r;
+
+                r = screen_area(client->desktop, SCREEN_AREA_ALL_MONITORS,
+                                NULL);
+                if (r->x || r->y) {
+                    /* move the window only to the corner outside struts */
+                    x = r->x;
+                    y = r->y;
+
+                    ob_debug_type(OB_DEBUG_APP_BUGS,
+                                  "Application %s is trying to move via "
+                                  "ConfigureRequest to 0,0 using "
+                                  "NorthWestGravity, while there is a "
+                                  "strut there. "
+                                  "Moving buggy app from (0,0) to (%d,%d)",
+                                  client->title, r->x, r->y);
+                }
+
+                g_slice_free(Rect, r);
+
+                /* they still requested a move, so don't change whether a
+                   notify is sent or not */
+            }
+        }
+
         {
             gint lw, lh;
 

@@ -1,12 +1,12 @@
 !# Clearlooks-Evolving
-!# Clearlooks as it evolves in gnome-svn...
-!# Last updated 19/01/08
+!# Clearlooks as it evolves in gnome-git...
+!# Last updated 09/03/10
 
 # Fonts
 # these are really halos, but who cares?
 
 *.font: shadow=n
-window.active.label.text.font:shadow=y:shadowtint=25:shadowoffset=1
+window.active.label.text.font:shadow=y:shadowtint=30:shadowoffset=1
 window.inactive.label.text.font:shadow=y:shadowtint=00:shadowoffset=0
 menu.items.font:shadow=y:shadowtint=0:shadowoffset=1
 
@@ -25,11 +25,11 @@ menu.overlap: 2
 *.bg.highlight: 50
 *.bg.shadow:    05
 
-window.active.title.bg.highlight: 40
-window.active.title.bg.shadow:    00
+window.active.title.bg.highlight: 35
+window.active.title.bg.shadow:    05
 
 window.inactive.title.bg.highlight: 30
-window.inactive.title.bg.shadow:    00
+window.inactive.title.bg.shadow:    05
 
 window.*.grip.bg.highlight: 50
 window.*.grip.bg.shadow:    30
@@ -61,6 +61,11 @@ menu.items.active.bg.colorTo.splitTo: #80a7d6
 menu.items.active.bg.border.color: #4b6e99
 menu.items.active.text.color: #ffffff
 
+menu.separator.width: 1
+menu.separator.padding.width: 0
+menu.separator.padding.height: 3
+menu.separator.color: #aaaaaa
+
 !# set handles here and only the once?
 
 window.*.handle.bg: Raised solid
@@ -70,9 +75,6 @@ window.*.grip.bg: Raised solid
 window.*.grip.bg.color: #eaebec
 
 !# Active
-
-!# no handles - kind of closer to the clearlooks border, maybe?
-!#window.active.border.color: #455d7c
 
 window.*.border.color: #585a5d
 
@@ -135,7 +137,7 @@ window.inactive.button.*.image.color: #6D6C6C
 !# osd (pop ups and what not, dock?)
 
 osd.border.width: 1
-osd.border.color:  #999
+osd.border.color:  #aaaaaa
 
 osd.bg: flat border gradient splitvertical
 osd.bg.color: #F0EFEE

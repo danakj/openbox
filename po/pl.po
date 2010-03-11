@@ -4,14 +4,15 @@
 # Madej <madej@afn.no-ip.org>, 2004.
 # Paweł Rusinek <p.rusinek@gmail.com>, 2007.
 # Piotr Drąg <raven@pmail.pl>, 2007.
+# Jakub Łojewski <lojewski@ovi.com>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2011-08-01 18:20+0200\n"
-"PO-Revision-Date: 2007-07-14 00:43+0200\n"
-"Last-Translator: Piotr Drąg <raven@pmail.pl>\n"
+"PO-Revision-Date: 2010-03-11 13:55+0100\n"
+"Last-Translator: Jakub Łojewski <lojewski@ovi.com>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -21,19 +22,19 @@ msgstr ""
 #: openbox/actions.c:198
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr ""
+msgstr "Wywołana akcja \"%s\" nie istnieje."
 
 #: openbox/actions/execute.c:147
 msgid "No"
-msgstr ""
+msgstr "Nie"
 
 #: openbox/actions/execute.c:148
 msgid "Yes"
-msgstr ""
+msgstr "Tak"
 
 #: openbox/actions/execute.c:152
 msgid "Execute"
-msgstr ""
+msgstr "Wykonaj"
 
 #: openbox/actions/execute.c:161
 #, c-format
@@ -42,39 +43,39 @@ msgstr "Nie można przekonwertować ścieżki \"%s\" z UTF-8"
 
 #: openbox/actions/exit.c:69 openbox/client.c:3550
 msgid "Cancel"
-msgstr ""
+msgstr "Anuluj"
 
 #: openbox/actions/exit.c:70
 msgid "Exit"
-msgstr ""
+msgstr "Wyjście"
 
 #: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Czy na pewno chcesz się wylogować?"
 
 #: openbox/actions/exit.c:75
 msgid "Log Out"
-msgstr ""
+msgstr "Wyloguj"
 
 #: openbox/actions/exit.c:78
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Czy na pewno chcesz opuścić Openboksa?"
 
 #: openbox/actions/exit.c:79
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Opuść Openbox"
 
 #: openbox/client.c:2037
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Okno bez nazwy"
 
 #: openbox/client.c:2051 openbox/client.c:2082
 msgid "Killing..."
-msgstr ""
+msgstr "Kończenie..."
 
 #: openbox/client.c:2053 openbox/client.c:2084
 msgid "Not Responding"
-msgstr ""
+msgstr "Nie odpowiada"
 
 #: openbox/client.c:3539
 #, c-format
@@ -82,21 +83,23 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Okno \"%s\" nie odpowiada. Czy wymusić zakończenie poprzez wysłanie sygnału "
+"%s?"
 
 #: openbox/client.c:3541
 msgid "End Process"
-msgstr ""
+msgstr "Zakończ proces"
 
 #: openbox/client.c:3545
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
-msgstr ""
+msgstr "Okno \"%s\" nie odpowiada. Odłączyć je od serwera X?"
 
 #: openbox/client.c:3547
 msgid "Disconnect"
-msgstr ""
+msgstr "Odłącz"
 
 #: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
@@ -278,10 +281,14 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Jeden lub więcej błędów składniowych XML zostało znalezionych podczas "
+"sprawdzania plików konfiguracyjnych. Zobacz stdout aby uzyskać więcej "
+"informacji. Ostatnio błąd znaleziono w pliku \"%s\" linia %d, z wiadomością: "
+"%s"
 
 #: openbox/openbox.c:372
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Błąd składniowy Openboksa"
 
 #: openbox/openbox.c:438
 #, c-format
@@ -323,7 +330,7 @@ msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:536
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file FILE  Podaj ścieżkę do pliku konfiguracji\n"
 
 #: openbox/openbox.c:537
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -347,7 +354,7 @@ msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
 #: openbox/openbox.c:541
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Opuść Openbox\n"
 
 #: openbox/openbox.c:542
 msgid ""
@@ -394,7 +401,7 @@ msgstr ""
 #: openbox/openbox.c:632 openbox/openbox.c:666
 #, c-format
 msgid "%s requires an argument\n"
-msgstr ""
+msgstr "%s wymaga argumentu\n"
 
 #: openbox/openbox.c:709
 #, c-format
@@ -464,7 +471,7 @@ msgstr "Żądany klawisz \"%s\" nie istnieje na ekranie"
 
 #: openbox/prompt.c:153
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #~ msgid "Unable to save the session to \"%s\": %s"
 #~ msgstr "Nie można zapisać sesji do \"%s\": %s"
@@ -472,8 +479,18 @@ msgstr ""
 #~ msgid "Error while saving the session to \"%s\": %s"
 #~ msgstr "Wystąpił błąd podczas zapisywania sesji do \"%s\": %s"
 
+#~ msgid "Not connected to a session manager"
+#~ msgstr "Nie podłączono do menedżera sesji"
+
 #~ msgid "X Error: %s"
 #~ msgstr "Błąd X: %s"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout jest niedostępne, ponieważ Openbox został stworzony bez "
+#~ "wsparcia dla zarządzania sesją"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "Wykonanie \"%s\" nie powiodło się: %s"

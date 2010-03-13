@@ -8,15 +8,16 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.7\n"
+"Project-Id-Version: Openbox 3.4.11\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
-"PO-Revision-Date: 2008-03-17 21:26+0100\n"
+"POT-Creation-Date: 2010-03-11 14:26+0100\n"
+"PO-Revision-Date: 2010-03-13 21:56+0100\n"
 "Last-Translator: Lauri Hakko <aperculum@gmail.com>\n"
 "Language-Team: None\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: openbox/actions.c:149
 #, c-format
@@ -40,54 +41,43 @@ msgstr "Suorita"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Polun \"%s\" muuntaminen utf8:sta epäonnistui"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:62 openbox/client.c:3506
 msgid "Cancel"
 msgstr "Peruuta"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:63
 msgid "Exit"
 msgstr "Sulje"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Haluatko varmasti sulkea Openboxin"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Sulje Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"SessionLogout tapahtuma ei ole suoritettavissa, koska Openbox käännettiin "
-"ilman istunnon hallinnan tukea"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Kirjaudu ulos"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:67
 msgid "Are you sure you want to log out?"
 msgstr "Haluatko varmasti kirjautua ulos?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:68
+msgid "Log Out"
+msgstr "Kirjaudu ulos"
+
+#: openbox/actions/exit.c:71
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Haluatko varmasti sulkea Openboxin"
+
+#: openbox/actions/exit.c:72
+msgid "Exit Openbox"
+msgstr "Sulje Openbox"
+
+#: openbox/client.c:2024
 msgid "Unnamed Window"
 msgstr "Nimetön ikkuna"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2038 openbox/client.c:2070
 msgid "Killing..."
 msgstr "Tapetaan..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2040 openbox/client.c:2072
 msgid "Not Responding"
 msgstr "Ei vastaa"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3495
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -96,11 +86,11 @@ msgstr ""
 "Ikkuna \"%s\" ei näytä vastaavan.  Haluatko sulkea sen lähettämällä sille "
 "singaalin %s?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3497
 msgid "End Process"
 msgstr "Lopeta prosessi"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3501
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -109,7 +99,7 @@ msgstr ""
 "Ikkuna \"%s\" ei näytä vastaavan.  Haluatko katkaista sen yhteyden X-"
 "palvelimeen?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3503
 msgid "Disconnect"
 msgstr "Katkaise yhteys"
 
@@ -197,7 +187,7 @@ msgstr "(Epä)_reunusta"
 msgid "_Close"
 msgstr "_Sulje"
 
-#: openbox/config.c:781
+#: openbox/config.c:798
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Asetustiedostossa määritelty painike \"%s\" on virheellinen"
@@ -226,7 +216,7 @@ msgstr "Virheellinen tulos putkivalikosta \"%s\""
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "Valikon \"%s\" lukemista yritettiin, mutta sitä ei ole olemassa"
 
-#: openbox/menu.c:367 openbox/menu.c:368
+#: openbox/menu.c:370 openbox/menu.c:371
 msgid "More..."
 msgstr "Lisää..."
 
@@ -261,17 +251,17 @@ msgstr "X-palvelin ei tue maa-asetusta."
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Maa-asetusmuuttujia ei voitu tehdä X-palvelimelle."
 
-#: openbox/openbox.c:263
+#: openbox/openbox.c:265
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Kelvollista asetustiedostoa ei löytynyt, käytetään yksinkertaisia "
 "oletusarvoja"
 
-#: openbox/openbox.c:297
+#: openbox/openbox.c:299
 msgid "Unable to load a theme."
 msgstr "Teeman lataaminen epäonnistui."
 
-#: openbox/openbox.c:377
+#: openbox/openbox.c:379
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -282,29 +272,29 @@ msgstr ""
 "stdout saadaksesi lisätietoja. Viimeisin virhe oli tiedostossa \"%s\" "
 "rivillä %d: %s"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:381
 msgid "Openbox Syntax Error"
 msgstr "Openbox syntaksivirhe"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:381
 msgid "Close"
 msgstr "Sulje"
 
-#: openbox/openbox.c:448
+#: openbox/openbox.c:463
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "Uudelleenkäynnistys ei onnistunut käynnistämään uutta ohjelmaa \"%s\": %s"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:533 openbox/openbox.c:535
 msgid "Copyright (c)"
 msgstr "Tekijänoikeudet (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:544
 msgid "Syntax: openbox [options]\n"
 msgstr "Syntaksi: openbox [valitsin]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:545
 msgid ""
 "\n"
 "Options:\n"
@@ -312,30 +302,30 @@ msgstr ""
 "\n"
 "Käyttö:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:546
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Näytä tämä ohje ja poistu\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:547
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Näytä version tiedot ja poistu\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:548
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Korvaa käynnissä oleva ikkunointiohjelma\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:552
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file FILE  Määritä käytettävän asetustiedoston polku\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:553
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Estä yhteys istuntojen hallintaan\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:554
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -343,19 +333,19 @@ msgstr ""
 "\n"
 "Komentojen antaminen käynnissä olevalle Openboxille:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:555
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Lataa Openboxin asetustiedosto uudelleen\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:556
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Käynnistä Openbox uudelleen\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:557
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Sulje Openbox\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:558
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -363,23 +353,23 @@ msgstr ""
 "\n"
 "Vianjäljityksen asetukset:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:559
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Aja synkronointi-tilassa\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:560
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Näytä vianjäljitystuloste\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:561
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Näytä vianjäljitystuloste ikkunavalitsimelle\n"
 
-#: openbox/openbox.c:547
+#: openbox/openbox.c:562
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Jaa näyttö kahteen vale-xinerama-ruutuun\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:563
 #, c-format
 msgid ""
 "\n"
@@ -388,26 +378,26 @@ msgstr ""
 "\n"
 "Ilmoita virheistä: %s\n"
 
-#: openbox/openbox.c:617
+#: openbox/openbox.c:645
 msgid "--config-file requires an argument\n"
 msgstr "--config-file tarvitsee argumentin\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:688
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Virheellinen valitsin \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:103 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Ikkunointiohjelma on jo käynnissä näytöllä %d"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:125
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Ikkunointiohjelman valinta ruudulla %d ei onnistunut"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:146
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Ikkunointiohjelma ruudulla %d ei sulkeudu"
@@ -416,8 +406,8 @@ msgstr "Ikkunointiohjelma ruudulla %d ei sulkeudu"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
-#, fuzzy, c-format
+#: openbox/screen.c:421
+#, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
 "Overriding the Openbox configuration."
@@ -431,27 +421,27 @@ msgstr[1] ""
 "Openbox on asetettu käyttämään %d työtilaa, mutta nykyisessä istunnossa "
 "työtiloja on %d.  Ohitetaan Openboxin asetus."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1203
 #, c-format
 msgid "desktop %i"
 msgstr "työtila %i"
 
-#: openbox/session.c:104
+#: openbox/session.c:105
 #, c-format
 msgid "Unable to make directory \"%s\": %s"
 msgstr "Hakemiston \"%s\" luonti epäonnistui: %s"
 
-#: openbox/session.c:466
+#: openbox/session.c:472
 #, c-format
 msgid "Unable to save the session to \"%s\": %s"
 msgstr "Istuntoa ei voitu tallentaa hakemistoon \"%s\": %s"
 
-#: openbox/session.c:605
+#: openbox/session.c:611
 #, c-format
 msgid "Error while saving the session to \"%s\": %s"
 msgstr "Virhe tallennettaessa istuntoa hakemistoon \"%s\": %s"
 
-#: openbox/session.c:842
+#: openbox/session.c:848
 msgid "Not connected to a session manager"
 msgstr "Ei yhteyttä istunnon hallintaan"
 
@@ -488,6 +478,13 @@ msgstr "X-virhe: %s"
 #: openbox/prompt.c:200
 msgid "OK"
 msgstr "OK"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout tapahtuma ei ole suoritettavissa, koska Openbox käännettiin "
+#~ "ilman istunnon hallinnan tukea"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "Ohjelman \"%s\" suorittaminen epäonnistui: %s"

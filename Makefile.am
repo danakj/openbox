@@ -69,6 +69,7 @@ obrender_libobrender_la_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
+	$(IMLIB2_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 obrender_libobrender_la_LDFLAGS = \
@@ -77,6 +78,7 @@ obrender_libobrender_la_LIBADD = \
 	$(X_LIBS) \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
+	$(IMLIB2_LIBS) \
 	$(XML_LIBS)
 obrender_libobrender_la_SOURCES = \
 	gettext.h \
@@ -159,7 +161,6 @@ openbox_openbox_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(LIBSN_CFLAGS) \
 	$(XML_CFLAGS) \
-	$(IMLIB2_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
 	-DCONFIGDIR=\"$(configdir)\" \
@@ -173,7 +174,6 @@ openbox_openbox_LDADD = \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
-	$(IMLIB2_LIBS) \
 	obrender/libobrender.la \
 	obt/libobt.la
 openbox_openbox_LDFLAGS = -export-dynamic

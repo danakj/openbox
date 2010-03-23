@@ -335,6 +335,8 @@ void client_manage(Window window, ObPrompt *prompt)
         /* watch for buggy apps that ask to be placed at (0,0) when there is
            a strut there */
         if (!obplaced && place.x == 0 && place.y == 0 &&
+            /* non-normal windows are allowed */
+            client_normal(self) &&
             /* oldschool fullscreen windows are allowed */
             !client_is_oldfullscreen(self, &place))
         {

@@ -1253,8 +1253,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
            XXX remove this some day...that would be nice. but really unexpected
            from Sun Microsystems.
         */
-        g_print("x %d y %d grav %d %d\n", x, y, client->gravity, NorthWestGravity);
-        if (x == 0 && y == 0 && client->gravity == NorthWestGravity) {
+        if (x == 0 && y == 0 && client->gravity == NorthWestGravity &&
+            client_normal(client))
+        {
             const Rect to = { x, y, w, h };
 
             /* oldschool fullscreen windows are allowed */

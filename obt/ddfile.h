@@ -24,9 +24,9 @@
 G_BEGIN_DECLS
 
 typedef enum {
-	OBT_DDFILE_TYPE_APPLICATION = 0,
-	OBT_DDFILE_TYPE_LINK        = 1,
-	OBT_DDFILE_TYPE_DIRECTORY   = 2
+	OBT_DDFILE_TYPE_APPLICATION = 1,
+	OBT_DDFILE_TYPE_LINK        = 2,
+	OBT_DDFILE_TYPE_DIRECTORY   = 3
 } ObtDDFileType;
 
 typedef enum {
@@ -48,7 +48,7 @@ typedef enum {
 
 typedef struct _ObtDDFile     ObtDDFile;
 
-ObtDDFile* obt_ddfile_new_from_file(const gchar *name);
+ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths);
 
 void obt_ddfile_ref(ObtDDFile *e);
 void obt_ddfile_unref(ObtDDFile *e);

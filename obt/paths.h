@@ -34,6 +34,7 @@ const gchar* obt_paths_data_home(ObtPaths *p);
 const gchar* obt_paths_cache_home(ObtPaths *p);
 GSList* obt_paths_config_dirs(ObtPaths *p);
 GSList* obt_paths_data_dirs(ObtPaths *p);
+GSList* obt_paths_autostart_dirs(ObtPaths *p);
 
 gchar *obt_paths_expand_tilde(const gchar *f);
 gboolean obt_paths_mkdir(const gchar *path, gint mode);

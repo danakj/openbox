@@ -37,6 +37,7 @@ struct _ObtPaths
     gchar  *cache_home;
     GSList *config_dirs;
     GSList *data_dirs;
+    GSList *autostart_dirs;
 };
 
 static gint slist_path_cmp(const gchar *a, const gchar *b)
@@ -79,6 +80,7 @@ ObtPaths* obt_paths_new(void)
 {
     ObtPaths *p;
     const gchar *path;
+    GSList *it;
 
     p = g_slice_new0(ObtPaths);
     p->ref = 1;
@@ -118,6 +120,11 @@ ObtPaths* obt_paths_new(void)
     p->config_dirs = slist_path_add(p->config_dirs,
                                     g_strdup(p->config_home),
                                     (GSListFunc) g_slist_prepend);
+
+    for (it = p->config_dirs; it; it = g_slist_next(it)) {
+        gchar *const s = g_strdup_printf("%s/autostart", (gchar*)it->data);
+        p->autostart_dirs = g_slist_append(p->autostart_dirs, s);
+    }
 
     path = g_getenv("XDG_DATA_DIRS");
     if (path && path[0] != '\0') /* not unset or empty */
@@ -159,6 +166,9 @@ void obt_paths_unref(ObtPaths *p)
         for (it = p->data_dirs; it; it = g_slist_next(it))
             g_free(it->data);
         g_slist_free(p->data_dirs);
+        for (it = p->autostart_dirs; it; it = g_slist_next(it))
+            g_free(it->data);
+        g_slist_free(p->autostart_dirs);
         g_free(p->config_home);
         g_free(p->data_home);
         g_free(p->cache_home);
@@ -246,4 +256,9 @@ GSList* obt_paths_config_dirs(ObtPaths *p)
 GSList* obt_paths_data_dirs(ObtPaths *p)
 {
     return p->data_dirs;
+}
+
+GSList* obt_paths_autostart_dirs(ObtPaths *p)
+{
+    return p->autostart_dirs;
 }

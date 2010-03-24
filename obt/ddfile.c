@@ -96,7 +96,7 @@ static gchar* parse_string(const gchar *in, gboolean locale,
     if (!locale) {
         end = in + bytes;
         for (i = in; i < end; ++i) {
-            if (*i > 127) {
+            if (*i > 126 || *i < 32) { /* non-control character ascii */
                 end = i;
                 parse_error("Invalid bytes in string", parse, error);
                 break;
@@ -128,6 +128,10 @@ static gchar* parse_string(const gchar *in, gboolean locale,
         }
         else if (*i == '\\')
             backslash = TRUE;
+        else if (*i >= 127 || *i < 32) { /* avoid ascii control characters */
+            parse_error("Found control character in string", parse, error);
+            break;
+        }
         else {
             memcpy(o, i, next-i);
             o += next-i;

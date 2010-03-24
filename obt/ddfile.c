@@ -39,6 +39,8 @@ typedef enum {
 } ObtDDDataType;
 
 struct _ObtDDFile {
+    guint ref;
+
     ObtDDFileType type;
     gchar *name; /*!< Specific name for the object (eg Firefox) */
     gchar *generic; /*!< Generic name for the object (eg Web Browser) */
@@ -71,9 +73,9 @@ static void parse_error(const gchar *m, const ObtDDParse *const parse,
                         gboolean *error)
 {
     if (!parse->filename)
-        g_warning("%s at line %lud of input\n", m, parse->lineno);
+        g_warning("%s at line %lu of input\n", m, parse->lineno);
     else
-        g_warning("%s at line %lud of file %s\n",
+        g_warning("%s at line %lu of file %s\n",
                   m, parse->lineno, parse->filename);
     if (error) *error = TRUE;
 }
@@ -153,4 +155,141 @@ static float parse_numeric(const gchar *in, const ObtDDParse *const parse,
     if (sscanf(in, "%f", &out) == 0)
         parse_error("Invalid numeric value", parse, error);
     return out;
+}
+
+gboolean parse_file_line(FILE *f, gchar **buf, gulong *size, gulong *read,
+                         ObtDDParse *parse, gboolean *error)
+{
+    const gulong BUFMUL = 80;
+    size_t ret;
+    gulong i, null;
+
+    if (*size == 0) {
+        g_assert(*read == 0);
+        *size = BUFMUL;
+        *buf = g_new(char, *size);
+    }
+
+    /* remove everything up to a null zero already in the buffer and shift
+       the rest to the front */
+    null = *size;
+    for (i = 0; i < *read; ++i) {
+        if (null < *size)
+            (*buf)[i-null-1] = (*buf)[i];
+        else if ((*buf)[i] == '\0')
+            null = i;
+    }
+    if (null < *size)
+        *read -= null + 1;
+
+    /* is there already a newline in the buffer? */
+    for (i = 0; i < *read; ++i)
+        if ((*buf)[i] == '\n') {
+            /* turn it into a null zero and done */
+            (*buf)[i] = '\0';
+            return TRUE;
+        }
+
+    /* we need to read some more to find a newline */
+    while (TRUE) {
+        gulong eol;
+        gchar *newread;
+
+        newread = *buf + *read;
+        ret = fread(newread, sizeof(char), *size-*read, f);
+        if (ret < *size - *read && !feof(f)) {
+            parse_error("Error reading", parse, error);
+            return FALSE;
+        }
+        *read += ret;
+
+        /* strip out null zeros in the input and look for an endofline */
+        null = 0;
+        eol = *size;
+        for (i = newread-*buf; i < *read; ++i) {
+            if (null > 0)
+                (*buf)[i] = (*buf)[i+null];
+            if ((*buf)[i] == '\0') {
+                ++null;
+                --(*read);
+                --i; /* try again */
+            }
+            else if ((*buf)[i] == '\n' && eol == *size) {
+                eol = i;
+                /* turn it into a null zero */
+                (*buf)[i] = '\0';
+            }
+        }
+
+        if (eol != *size)
+            /* found an endofline, done */
+            break;
+        else if (feof(f) && *read < *size) {
+            /* found the endoffile, done (if there is space) */
+            if (*read > 0) {
+                /* stick a null zero on if there is test on the last line */
+                (*buf)[(*read)++] = '\0';
+            }
+            break;
+        }
+        else {
+            /* read more */
+            size += BUFMUL;
+            *buf = g_renew(char, *buf, *size);
+        }
+    }
+    return *read > 0;
+}
+
+static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
+{
+    gchar *buf = NULL;
+    gulong bytes = 0, read = 0;
+    gboolean error = FALSE;
+
+    while (parse_file_line(f, &buf, &bytes, &read, parse, &error)) {
+        /* XXX use the string in buf */
+        ++parse->lineno;
+    }
+
+    if (buf) g_free(buf);
+    return !error;
+}
+
+ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
+{
+    ObtDDFile *dd;
+    ObtDDParse parse;
+    GSList *it;
+    FILE *f;
+
+    dd = g_slice_new(ObtDDFile);
+    dd->ref = 1;
+
+    f = NULL;
+    for (it = paths; it && !f; it = g_slist_next(it)) {
+        gchar *path = g_strdup_printf("%s/%s", (char*)it->data, name);
+        if ((f = fopen(path, "r"))) {
+            parse.filename = path;
+            parse.lineno = 0;
+            if (!parse_file(dd, f, &parse)) f = NULL;
+        }
+    }
+    if (!f) {
+        obt_ddfile_unref(dd);
+        dd = NULL;
+    }
+    return dd;
+}
+
+void obt_ddfile_ref(ObtDDFile *dd)
+{
+    ++dd->ref;
+}
+
+void obt_ddfile_unref(ObtDDFile *dd)
+{
+    if (--dd->ref < 1) {
+        g_slice_free(ObtDDFile, dd);
+    }
 }

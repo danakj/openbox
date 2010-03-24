@@ -429,6 +429,7 @@ rrpubinclude_HEADERS = \
 	obrender/version.h
 
 obtpubinclude_HEADERS = \
+	obt/ddfile.h \
 	obt/display.h \
 	obt/keyboard.h \
 	obt/mainloop.h \

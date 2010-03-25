@@ -25,33 +25,51 @@
 #include <stdio.h>
 #endif
 
-typedef void (*ObtDDParseGroupFunc)(const gchar *group,
-                                    GHashTable *key_hash);
+typedef struct _ObtDDParse ObtDDParse;
+typedef struct _ObtDDParseGroup ObtDDParseGroup;
 
-typedef struct _ObtDDParseGroup {
+typedef void (*ObtDDParseGroupFunc)(gchar *key, const gchar *val,
+                                    ObtDDParse *parse, gboolean *error);
+
+struct _ObtDDParseGroup {
     gchar *name;
     gboolean seen;
-    ObtDDParseGroupFunc func;
-    /* the key is a string (a key in the .desktop).
-       the value is a strings (a value in the .desktop) */
+    ObtDDParseGroupFunc key_func;
+    /* the key is a string (a key inside the group in the .desktop).
+       the value is an ObtDDParseValue */
     GHashTable *key_hash;
-} ObtDDParseGroup;
+};
 
-typedef struct _ObtDDParse {
+struct _ObtDDParse {
     gchar *filename;
     gulong lineno;
     ObtDDParseGroup *group;
     /* the key is a group name, the value is a ObtDDParseGroup */
     GHashTable *group_hash;
-} ObtDDParse;
+};
 
 typedef enum {
     DATA_STRING,
     DATA_LOCALESTRING,
+    DATA_STRINGS,
+    DATA_LOCALESTRINGS,
     DATA_BOOLEAN,
     DATA_NUMERIC,
     NUM_DATA_TYPES
 } ObtDDDataType;
+
+typedef struct _ObtDDParseValue {
+    ObtDDDataType type;
+    union _ObtDDParseValueValue {
+        gchar *string;
+        struct _ObtDDParseValueStrings {
+            gchar *s;
+            gulong n;
+        } strings;
+        gboolean boolean;
+        gfloat numeric;
+    } value;
+} ObtDDParseValue;
 
 struct _ObtDDFile {
     guint ref;
@@ -63,7 +81,7 @@ struct _ObtDDFile {
     gchar *icon; /*!< Name/path for an icon for the object */
 
     union _ObtDDFileData {
-        struct {
+        struct _ObtDDFileApp {
             gchar *exec; /*!< Executable to run for the app */
             gchar *wdir; /*!< Working dir to run the app in */
             gboolean term; /*!< Run the app in a terminal or not */
@@ -76,22 +94,43 @@ struct _ObtDDFile {
             ObtDDFileAppStartup startup;
             gchar *startup_wmclass;
         } app;
-        struct {
+        struct _ObtDDFileLink {
             gchar *url;
         } link;
-        struct {
+        struct _ObtDDFileDir {
         } dir;
     } d;
 };
+
+static void value_free(ObtDDParseValue *v)
+{
+    switch (v->type) {
+    case DATA_STRING:
+    case DATA_LOCALESTRING:
+        g_free(v->value.string); break;
+    case DATA_STRINGS:
+    case DATA_LOCALESTRINGS:
+        g_free(v->value.strings.s);
+        v->value.strings.n = 0;
+        break;
+    case DATA_BOOLEAN:
+        break;
+    case DATA_NUMERIC:
+        break;
+    default:
+        g_assert_not_reached();
+    }
+    g_slice_free(ObtDDParseValue, v);
+}
 
 static ObtDDParseGroup* group_new(gchar *name, ObtDDParseGroupFunc f)
 {
     ObtDDParseGroup *g = g_slice_new(ObtDDParseGroup);
     g->name = name;
-    g->func = f;
+    g->key_func = f;
     g->seen = FALSE;
     g->key_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                        g_free, g_free);
+                                        g_free, (GDestroyNotify)value_free);
     return g;
 }
 
@@ -117,8 +156,14 @@ static void parse_error(const gchar *m, const ObtDDParse *const parse,
 }
 
 /* reads an input string, strips out invalid stuff, and parses
-   backslash-stuff */
-static gchar* parse_string(const gchar *in, gboolean locale,
+   backslash-stuff
+   if @nstrings is not NULL, then it splits the output string at ';'
+   characters.  they are all returned in the same string with null zeros
+   between them, @nstrings is set to the number of such strings.
+ */
+static gchar* parse_string(const gchar *in,
+                           gboolean locale,
+                           gulong *nstrings,
                            const ObtDDParse *const parse,
                            gboolean *error)
 {
@@ -143,6 +188,8 @@ static gchar* parse_string(const gchar *in, gboolean locale,
     else if (!g_utf8_validate(in, bytes, &end))
         parse_error("Invalid bytes in localestring", parse, error);
 
+    if (nstrings) *nstrings = 1;
+
     out = g_new(char, bytes + 1);
     i = in; o = out;
     backslash = FALSE;
@@ -154,6 +201,7 @@ static gchar* parse_string(const gchar *in, gboolean locale,
             case 'n': *o++ = '\n'; break;
             case 't': *o++ = '\t'; break;
             case 'r': *o++ = '\r'; break;
+            case ';': *o++ = ';'; break;
             case '\\': *o++ = '\\'; break;
             default:
                 parse_error((locale ?
@@ -165,6 +213,10 @@ static gchar* parse_string(const gchar *in, gboolean locale,
         }
         else if (*i == '\\')
             backslash = TRUE;
+        else if (*i == ';' && nstrings) {
+            ++nstrings;
+            *o = '\0';
+        }
         else if ((guchar)*i >= 127 || (guchar)*i < 32) {
             /* avoid ascii control characters */
             parse_error("Found control character in string", parse, error);
@@ -190,17 +242,64 @@ static gboolean parse_bool(const gchar *in, const ObtDDParse *const parse,
     return FALSE;
 }
 
-static float parse_numeric(const gchar *in, const ObtDDParse *const parse,
+static gfloat parse_numeric(const gchar *in, const ObtDDParse *const parse,
     gboolean *error)
 {
-    float out = 0;
+    gfloat out = 0;
     if (sscanf(in, "%f", &out) == 0)
         parse_error("Invalid numeric value", parse, error);
     return out;
 }
 
-gboolean parse_file_line(FILE *f, gchar **buf, gulong *size, gulong *read,
-                         ObtDDParse *parse, gboolean *error)
+static void parse_group_desktop_entry(gchar *key, const gchar *val,
+                                      ObtDDParse *parse, gboolean *error)
+{
+    ObtDDParseValue v, *pv;
+
+    /* figure out value type */
+    v.type = NUM_DATA_TYPES;
+
+    /* parse the value */
+    
+    switch (v.type) {
+    case DATA_STRING:
+        v.value.string = parse_string(val, FALSE, NULL, parse, error);
+        g_assert(v.value.string);
+        break;
+    case DATA_LOCALESTRING:
+        v.value.string = parse_string(val, TRUE, NULL, parse, error);
+        g_assert(v.value.string);
+        break;
+    case DATA_STRINGS:
+        v.value.strings.s = parse_string(val, FALSE, &v.value.strings.n,
+                                         parse, error);
+        g_assert(v.value.strings.s);
+        g_assert(v.value.strings.n);
+        break;
+    case DATA_LOCALESTRINGS:
+        v.value.strings.s = parse_string(val, TRUE, &v.value.strings.n,
+                                         parse, error);
+        g_assert(v.value.strings.s);
+        g_assert(v.value.strings.n);
+        break;
+    case DATA_BOOLEAN:
+        v.value.boolean = parse_bool(val, parse, error);
+        break;
+    case DATA_NUMERIC:
+        v.value.numeric = parse_numeric(val, parse, error);
+        break;
+    default:
+        g_assert_not_reached();
+    }
+
+    pv = g_slice_new(ObtDDParseValue);
+    *pv = v;
+    g_hash_table_insert(parse->group->key_hash, key, pv);
+}
+
+static gboolean parse_file_line(FILE *f, gchar **buf,
+                                gulong *size, gulong *read,
+                                ObtDDParse *parse, gboolean *error)
 {
     const gulong BUFMUL = 80;
     size_t ret;
@@ -334,7 +433,7 @@ static void parse_key_value(const gchar *buf, gulong len,
                             ObtDDParse *parse, gboolean *error)
 {
     gulong i, keyend, valstart, eq;
-    char *key, *val;
+    char *key;
 
     /* find the end of the key */
     for (i = 0; i < len; ++i)
@@ -377,22 +476,14 @@ static void parse_key_value(const gchar *buf, gulong len,
     }
 
     key = g_strndup(buf, keyend);
-    val = g_strndup(buf+valstart, len-valstart);
     if (g_hash_table_lookup(parse->group->key_hash, key)) {
         parse_error("Duplicate key found", parse, error);
         g_free(key);
-        g_free(val);
         return;
     }
-    g_hash_table_insert(parse->group->key_hash, key, val);
-    g_print("Found key/value %s=%s.\n", key, val);
-}
-
-void foreach_group(gpointer pkey, gpointer pvalue, gpointer user_data)
-{
-    gchar *name = pkey;
-    ObtDDParseGroup *g = pvalue;
-    if (g->func) g->func(name, g->key_hash);
+    g_print("Found key/value %s=%s.\n", key, buf+valstart);
+    if (parse->group->key_func)
+        parse->group->key_func(key, buf+valstart, parse, error);
 }
 
 static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
@@ -417,16 +508,8 @@ static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
         ++parse->lineno;
     }
 
-    g_hash_table_foreach(parse->group_hash, foreach_group, NULL);
-
     if (buf) g_free(buf);
     return !error;
-}
-
-static void parse_group_desktop_entry(const gchar *group,
-                                      GHashTable *keys)
-{
-    g_print("Parsing group %s\n", group);
 }
 
 ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)

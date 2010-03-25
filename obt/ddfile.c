@@ -25,9 +25,21 @@
 #include <stdio.h>
 #endif
 
+typedef void (*ObtDDParseGroupFunc)(const gchar *group,
+                                    const gchar *key,
+                                    const gchar *value);
+
+typedef struct _ObtDDParseGroup {
+    gchar *name;
+    gboolean seen;
+    ObtDDParseGroupFunc func;
+} ObtDDParseGroup;
+
 typedef struct _ObtDDParse {
     gchar *filename;
     gulong lineno;
+    ObtDDParseGroup *group;
+    GHashTable *group_hash;
 } ObtDDParse;
 
 typedef enum {
@@ -69,6 +81,15 @@ struct _ObtDDFile {
     } d;
 };
 
+static void group_free(ObtDDParseGroup *g)
+{
+    g_free(g->name);
+    g_slice_free(ObtDDParseGroup, g);
+}
+
+/* Displays a warning message including the file name and line number, and
+   sets the boolean @error to true if it points to a non-NULL address.
+*/
 static void parse_error(const gchar *m, const ObtDDParse *const parse,
                         gboolean *error)
 {
@@ -96,7 +117,8 @@ static gchar* parse_string(const gchar *in, gboolean locale,
     if (!locale) {
         end = in + bytes;
         for (i = in; i < end; ++i) {
-            if (*i > 126 || *i < 32) { /* non-control character ascii */
+            if ((guchar)*i > 126 || (guchar)*i < 32) {
+                /* non-control character ascii */
                 end = i;
                 parse_error("Invalid bytes in string", parse, error);
                 break;
@@ -128,7 +150,8 @@ static gchar* parse_string(const gchar *in, gboolean locale,
         }
         else if (*i == '\\')
             backslash = TRUE;
-        else if (*i >= 127 || *i < 32) { /* avoid ascii control characters */
+        else if ((guchar)*i >= 127 || (guchar)*i < 32) {
+            /* avoid ascii control characters */
             parse_error("Found control character in string", parse, error);
             break;
         }
@@ -245,14 +268,68 @@ gboolean parse_file_line(FILE *f, gchar **buf, gulong *size, gulong *read,
     return *read > 0;
 }
 
+static void parse_group(const gchar *buf, gulong len,
+                        ObtDDParse *parse, gboolean *error)
+{
+    ObtDDParseGroup *g;
+    gchar *group;
+    gulong i;
+
+    /* get the group name */
+    group = g_strndup(buf+1, len-2);
+    for (i = 0; i < len-2; ++i)
+        if ((guchar)group[i] < 32 || (guchar)group[i] >= 127) {
+            /* valid ASCII only */
+            parse_error("Invalid character found", parse, NULL);
+            group[i] = '\0'; /* stopping before this character */
+            break;
+        }
+
+    /* make sure it's a new group */
+    g = g_hash_table_lookup(parse->group_hash, group);
+    if (g && g->seen) {
+        parse_error("Duplicate group found", parse, error);
+        g_free(group);
+        return;
+    }
+    /* if it's the first group, make sure it's named Desktop Entry */
+    else if (!parse->group && strcmp(group, "Desktop Entry") != 0)
+    {
+        parse_error("Incorrect group found, "
+                    "expected [Desktop Entry]",
+                    parse, error);
+        g_free(group);
+        return;
+    }
+    else {
+        if (!g) {
+            g = g_slice_new(ObtDDParseGroup);
+            g->name = group;
+            g->func = NULL;
+            g_hash_table_insert(parse->group_hash, group, g);
+        }
+        else
+            g_free(group);
+
+        g->seen = TRUE;
+        parse->group = g;
+        g_print("Found group %s\n", g->name);
+    }
+}
+
 static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
 {
     gchar *buf = NULL;
     gulong bytes = 0, read = 0;
     gboolean error = FALSE;
 
-    while (parse_file_line(f, &buf, &bytes, &read, parse, &error)) {
+    while (!error && parse_file_line(f, &buf, &bytes, &read, parse, &error)) {
         /* XXX use the string in buf */
+        gulong len = strlen(buf);
+        if (buf[0] == '#' || buf[0] == '\0')
+            ; /* ignore comment lines */
+        else if (buf[0] == '[' && buf[len-1] == ']')
+            parse_group(buf, len, parse, &error);
         ++parse->lineno;
     }
 
@@ -270,12 +347,21 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
     dd = g_slice_new(ObtDDFile);
     dd->ref = 1;
 
+    parse.filename = NULL;
+    parse.lineno = 0;
+    parse.group = NULL;
+    /* hashtable keys are group names, value is a ObtDDParseGroup */
+    parse.group_hash = g_hash_table_new_full(g_str_hash,
+                                             g_str_equal,
+                                             NULL,
+                                             (GDestroyNotify)group_free);
+
     f = NULL;
     for (it = paths; it && !f; it = g_slist_next(it)) {
         gchar *path = g_strdup_printf("%s/%s", (char*)it->data, name);
         if ((f = fopen(path, "r"))) {
             parse.filename = path;
-            parse.lineno = 0;
+            parse.lineno = 1;
             if (!parse_file(dd, f, &parse)) f = NULL;
         }
     }
@@ -283,6 +369,9 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
         obt_ddfile_unref(dd);
         dd = NULL;
     }
+
+    g_hash_table_destroy(parse.group_hash);
+
     return dd;
 }
 

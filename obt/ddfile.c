@@ -364,6 +364,7 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
             parse.lineno = 1;
             if (!parse_file(dd, f, &parse)) f = NULL;
         }
+        g_free(path);
     }
     if (!f) {
         obt_ddfile_unref(dd);

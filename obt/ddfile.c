@@ -26,19 +26,22 @@
 #endif
 
 typedef void (*ObtDDParseGroupFunc)(const gchar *group,
-                                    const gchar *key,
-                                    const gchar *value);
+                                    GHashTable *key_hash);
 
 typedef struct _ObtDDParseGroup {
     gchar *name;
     gboolean seen;
     ObtDDParseGroupFunc func;
+    /* the key is a string (a key in the .desktop).
+       the value is a strings (a value in the .desktop) */
+    GHashTable *key_hash;
 } ObtDDParseGroup;
 
 typedef struct _ObtDDParse {
     gchar *filename;
     gulong lineno;
     ObtDDParseGroup *group;
+    /* the key is a group name, the value is a ObtDDParseGroup */
     GHashTable *group_hash;
 } ObtDDParse;
 
@@ -84,6 +87,7 @@ struct _ObtDDFile {
 static void group_free(ObtDDParseGroup *g)
 {
     g_free(g->name);
+    g_hash_table_destroy(g->key_hash);
     g_slice_free(ObtDDParseGroup, g);
 }
 
@@ -306,6 +310,8 @@ static void parse_group(const gchar *buf, gulong len,
             g = g_slice_new(ObtDDParseGroup);
             g->name = group;
             g->func = NULL;
+            g->key_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                                g_free, g_free);
             g_hash_table_insert(parse->group_hash, group, g);
         }
         else
@@ -315,6 +321,64 @@ static void parse_group(const gchar *buf, gulong len,
         parse->group = g;
         g_print("Found group %s\n", g->name);
     }
+}
+
+static void parse_key_value(const gchar *buf, gulong len,
+                            ObtDDParse *parse, gboolean *error)
+{
+    gulong i, keyend, valstart, eq;
+    char *key, *val;
+
+    /* find the end of the key */
+    for (i = 0; i < len; ++i)
+        if (!(((guchar)buf[i] >= 'A' && (guchar)buf[i] <= 'Z') ||
+              ((guchar)buf[i] >= 'a' && (guchar)buf[i] <= 'z') ||
+              ((guchar)buf[i] >= '0' && (guchar)buf[i] <= '9') ||
+              ((guchar)buf[i] == '-'))) {
+            /* not part of the key */
+            keyend = i;
+            break;
+        }
+    if (keyend < 1) {
+        parse_error("Empty key", parse, error);
+        return;
+    }
+    /* find the = character */
+    for (i = keyend; i < len; ++i) {
+        if (buf[i] == '=') {
+            eq = i;
+            break;
+        }
+        else if (buf[i] != ' ') {
+            parse_error("Invalid character in key name", parse, error);
+            return ;
+        }
+    }
+    if (i == len) {
+        parse_error("Key without value found", parse, error);
+        return;
+    }
+    /* find the start of the value */
+    for (i = eq+1; i < len; ++i)
+        if (buf[i] != ' ') {
+            valstart = i;
+            break;
+        }
+    if (i == len) {
+        parse_error("Empty value found", parse, error);
+        return;
+    }
+
+    key = g_strndup(buf, keyend);
+    val = g_strndup(buf+valstart, len-valstart);
+    if (g_hash_table_lookup(parse->group->key_hash, key)) {
+        parse_error("Duplicate key found", parse, error);
+        g_free(key);
+        g_free(val);
+        return;
+    }
+    g_hash_table_insert(parse->group->key_hash, key, val);
+    g_print("Found key/value %s=%s.\n", key, val);
 }
 
 static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
@@ -330,6 +394,12 @@ static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
             ; /* ignore comment lines */
         else if (buf[0] == '[' && buf[len-1] == ']')
             parse_group(buf, len, parse, &error);
+        else if (!parse->group)
+            /* just ignore keys outside of groups */
+            parse_error("Key found before group", parse, NULL);
+        else
+            /* ignore errors in key-value pairs and continue */
+            parse_key_value(buf, len, parse, NULL);
         ++parse->lineno;
     }
 

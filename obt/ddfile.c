@@ -84,6 +84,17 @@ struct _ObtDDFile {
     } d;
 };
 
+static ObtDDParseGroup* group_new(gchar *name, ObtDDParseGroupFunc f)
+{
+    ObtDDParseGroup *g = g_slice_new(ObtDDParseGroup);
+    g->name = name;
+    g->func = f;
+    g->seen = FALSE;
+    g->key_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+                                        g_free, g_free);
+    return g;
+}
+
 static void group_free(ObtDDParseGroup *g)
 {
     g_free(g->name);
@@ -307,12 +318,8 @@ static void parse_group(const gchar *buf, gulong len,
     }
     else {
         if (!g) {
-            g = g_slice_new(ObtDDParseGroup);
-            g->name = group;
-            g->func = NULL;
-            g->key_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                                g_free, g_free);
-            g_hash_table_insert(parse->group_hash, group, g);
+            g = group_new(group, NULL);
+            g_hash_table_insert(parse->group_hash, g->name, g);
         }
         else
             g_free(group);
@@ -381,6 +388,13 @@ static void parse_key_value(const gchar *buf, gulong len,
     g_print("Found key/value %s=%s.\n", key, val);
 }
 
+void foreach_group(gpointer pkey, gpointer pvalue, gpointer user_data)
+{
+    gchar *name = pkey;
+    ObtDDParseGroup *g = pvalue;
+    if (g->func) g->func(name, g->key_hash);
+}
+
 static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
 {
     gchar *buf = NULL;
@@ -403,14 +417,23 @@ static gboolean parse_file(ObtDDFile *dd, FILE *f, ObtDDParse *parse)
         ++parse->lineno;
     }
 
+    g_hash_table_foreach(parse->group_hash, foreach_group, NULL);
+
     if (buf) g_free(buf);
     return !error;
+}
+
+static void parse_group_desktop_entry(const gchar *group,
+                                      GHashTable *keys)
+{
+    g_print("Parsing group %s\n", group);
 }
 
 ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
 {
     ObtDDFile *dd;
     ObtDDParse parse;
+    ObtDDParseGroup *desktop_entry;
     GSList *it;
     FILE *f;
     gboolean success;
@@ -425,6 +448,11 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
                                              g_str_equal,
                                              NULL,
                                              (GDestroyNotify)group_free);
+
+    /* set up the groups (there's only one right now) */
+    desktop_entry = group_new(g_strdup("Desktop Entry"),
+                              parse_group_desktop_entry);
+    g_hash_table_insert(parse.group_hash, desktop_entry->name, desktop_entry);
 
     success = FALSE;
     for (it = paths; it && !success; it = g_slist_next(it)) {

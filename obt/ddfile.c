@@ -343,6 +343,7 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
     ObtDDParse parse;
     GSList *it;
     FILE *f;
+    gboolean success;
 
     dd = g_slice_new(ObtDDFile);
     dd->ref = 1;
@@ -350,23 +351,23 @@ ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths)
     parse.filename = NULL;
     parse.lineno = 0;
     parse.group = NULL;
-    /* hashtable keys are group names, value is a ObtDDParseGroup */
     parse.group_hash = g_hash_table_new_full(g_str_hash,
                                              g_str_equal,
                                              NULL,
                                              (GDestroyNotify)group_free);
 
-    f = NULL;
-    for (it = paths; it && !f; it = g_slist_next(it)) {
+    success = FALSE;
+    for (it = paths; it && !success; it = g_slist_next(it)) {
         gchar *path = g_strdup_printf("%s/%s", (char*)it->data, name);
         if ((f = fopen(path, "r"))) {
             parse.filename = path;
             parse.lineno = 1;
-            if (!parse_file(dd, f, &parse)) f = NULL;
+            success = parse_file(dd, f, &parse);
+            fclose(f);
         }
         g_free(path);
     }
-    if (!f) {
+    if (!success) {
         obt_ddfile_unref(dd);
         dd = NULL;
     }

@@ -916,7 +916,7 @@ gboolean moveresize_event(XEvent *e)
         if (sym == XK_Escape) {
             moveresize_end(TRUE);
             used = TRUE;
-        } else if (sym == XK_Return) {
+        } else if (sym == XK_Return || sym == XK_KP_Enter) {
             moveresize_end(FALSE);
             used = TRUE;
         } else if (sym == XK_Right || sym == XK_Left ||

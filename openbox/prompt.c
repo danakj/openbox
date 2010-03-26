@@ -540,7 +540,7 @@ gboolean prompt_key_event(ObPrompt *self, XEvent *e)
 
     if (sym == XK_Escape)
         prompt_cancel(self);
-    else if (sym == XK_Return || sym == XK_space)
+    else if (sym == XK_Return || sym == XK_KP_Enter || sym == XK_space)
         prompt_run_callback(self, self->focus->result);
     else if (sym == XK_Tab || sym == XK_Left || sym == XK_Right) {
         gint i;

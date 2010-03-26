@@ -1882,7 +1882,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (sym == XK_Return) {
+            else if (sym == XK_Return || sym == XK_KP_Enter) {
                 frame->press_doexec = TRUE;
                 ret = TRUE;
             }

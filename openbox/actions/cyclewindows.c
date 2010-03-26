@@ -195,7 +195,7 @@ static gboolean i_input_func(guint initial_state,
         }
 
         /* There were no modifiers and they pressed enter */
-        else if (sym == XK_Return && !initial_state) {
+        else if ((sym == XK_Return || sym == XK_KP_Enter) && !initial_state) {
             o->cancel = FALSE;
             o->state = e->xkey.state;
             return FALSE;

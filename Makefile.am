@@ -135,8 +135,10 @@ obt_libobt_la_SOURCES = \
 	obt/mainloop.c \
 	obt/xml.h \
 	obt/xml.c \
-	obt/ddfile.h \
-	obt/ddfile.c \
+	obt/ddparse.h \
+	obt/ddparse.c \
+	obt/link.h \
+	obt/link.c \
 	obt/paths.h \
 	obt/paths.c \
 	obt/prop.h \
@@ -429,7 +431,7 @@ rrpubinclude_HEADERS = \
 	obrender/version.h
 
 obtpubinclude_HEADERS = \
-	obt/ddfile.h \
+	obt/link.h \
 	obt/display.h \
 	obt/keyboard.h \
 	obt/mainloop.h \

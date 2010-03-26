@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
  
-   obt/ddfile.h for the Openbox window manager
+   obt/link.h for the Openbox window manager
    Copyright (c) 2009        Dana Jansens
  
    This program is free software; you can redistribute it and/or modify
@@ -16,50 +16,50 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __obt_ddfile_h
-#define __obt_ddfile_h
+#ifndef __obt_link_h
+#define __obt_link_h
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
 typedef enum {
-	OBT_DDFILE_TYPE_APPLICATION = 1,
-	OBT_DDFILE_TYPE_LINK        = 2,
-	OBT_DDFILE_TYPE_DIRECTORY   = 3
-} ObtDDFileType;
+	OBT_LINK_TYPE_APPLICATION = 1,
+	OBT_LINK_TYPE_URL         = 2,
+	OBT_LINK_TYPE_DIRECTORY   = 3
+} ObtLinkType;
 
 typedef enum {
-	OBT_DDFILE_APP_STARTUP_NO_SUPPORT,
-	OBT_DDFILE_APP_STARTUP_PROTOCOL_SUPPORT,
-	OBT_DDFILE_APP_STARTUP_LEGACY_SUPPORT
-} ObtDDFileAppStartup;
+	OBT_LINK_APP_STARTUP_NO_SUPPORT,
+	OBT_LINK_APP_STARTUP_PROTOCOL_SUPPORT,
+	OBT_LINK_APP_STARTUP_LEGACY_SUPPORT
+} ObtLinkAppStartup;
 
 typedef enum {
 	/*! The app can be launched with a single local file */
-	OBT_DDFILE_APP_SINGLE_LOCAL = 1 << 0,
+	OBT_LINK_APP_SINGLE_LOCAL = 1 << 0,
 	/*! The app can be launched with multiple local files */
-	OBT_DDFILE_APP_MULTI_LOCAL  = 1 << 1,
+	OBT_LINK_APP_MULTI_LOCAL  = 1 << 1,
 	/*! The app can be launched with a single URL */
-	OBT_DDFILE_APP_SINGLE_URL   = 1 << 2,
+	OBT_LINK_APP_SINGLE_URL   = 1 << 2,
 	/*! The app can be launched with multiple URLs */
-	OBT_DDFILE_APP_MULTI_URL    = 1 << 3
-} ObtDDFileAppOpen;
+	OBT_LINK_APP_MULTI_URL    = 1 << 3
+} ObtLinkAppOpen;
 
-typedef struct _ObtDDFile     ObtDDFile;
+typedef struct _ObtLink     ObtLink;
 
-ObtDDFile* obt_ddfile_new_from_file(const gchar *name, GSList *paths);
+ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths);
 
-void obt_ddfile_ref(ObtDDFile *e);
-void obt_ddfile_unref(ObtDDFile *e);
+void obt_link_ref(ObtLink *e);
+void obt_link_unref(ObtLink *e);
 
 /*! Returns TRUE if the file exists but says it should be ignored, with
-    the Hidden flag.  No other functions can be used for the ObtDDFile
+    the Hidden flag.  No other functions can be used for the ObtLink
     in this case. */
-gboolean obt_ddfile_deleted (ObtDDFile *e);
+gboolean obt_link_deleted (ObtLink *e);
 
 /*! Returns the type of object refered to by the .desktop file. */
-ObtDDFileType obt_ddfile_type (ObtDDFile *e);
+ObtLinkType obt_link_type (ObtLink *e);
 
 /*! Returns TRUE if the .desktop file should be displayed to users, given the
     current	environment.  If FALSE,	the .desktop file should not be showed.
@@ -67,32 +67,32 @@ ObtDDFileType obt_ddfile_type (ObtDDFile *e);
     @env A semicolon-deliminated list of environemnts.  Can be one or more of:
          GNOME, KDE, ROX, XFCE.  Other environments not listed here may also
          be supported.  This can be null also if not listing any environment. */
-gboolean obt_ddfile_display(ObtDDFile *e, const gchar *env);
+gboolean obt_link_display(ObtLink *e, const gchar *env);
 
-const gchar* obt_ddfile_name           (ObtDDFile *e);
-const gchar* obt_ddfile_generic_name   (ObtDDFile *e);
-const gchar* obt_ddfile_comment        (ObtDDFile *e);
+const gchar* obt_link_name           (ObtLink *e);
+const gchar* obt_link_generic_name   (ObtLink *e);
+const gchar* obt_link_comment        (ObtLink *e);
 /*! Returns the icon for the object referred to by the .desktop file.
     Returns either an absolute path, or a string which can be used to find the
     icon using the algorithm given by:
     http://freedesktop.org/wiki/Specifications/icon-theme-spec?action=show&redirect=Standards/icon-theme-spec
 */
-const gchar* obt_ddfile_icon           (ObtDDFile *e);
+const gchar* obt_link_icon           (ObtLink *e);
 
-const gchar *obt_ddfile_link_url(ObtDDFile *e);
+const gchar *obt_link_url_path(ObtLink *e);
 
-const gchar*  obt_ddfile_app_executable      (ObtDDFile *e);
+const gchar*  obt_link_app_executable      (ObtLink *e);
 /*! Returns the path in which the application should be run */
-const gchar*  obt_ddfile_app_path            (ObtDDFile *e);
-gboolean      obt_ddfile_app_run_in_terminal (ObtDDFile *e);
-const gchar** obt_ddfile_app_mime_types      (ObtDDFile *e);
-/*! Returns a combination of values in the ObtDDFileAppOpen enum,
+const gchar*  obt_link_app_path            (ObtLink *e);
+gboolean      obt_link_app_run_in_terminal (ObtLink *e);
+const gchar** obt_link_app_mime_types      (ObtLink *e);
+/*! Returns a combination of values in the ObtLinkAppOpen enum,
     specifying if the application can be launched to open one or more files
     and URLs. */
-ObtDDFileAppOpen obt_ddfile_app_open(ObtDDFile *e);
+ObtLinkAppOpen obt_link_app_open(ObtLink *e);
 
-ObtDDFileAppStartup obt_ddfile_app_startup_notify(ObtDDFile *e);
-const gchar* obt_ddfile_app_startup_wmclass(ObtDDFile *e);
+ObtLinkAppStartup obt_link_app_startup_notify(ObtLink *e);
+const gchar* obt_link_app_startup_wmclass(ObtLink *e);
 
 
 G_END_DECLS

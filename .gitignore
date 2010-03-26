@@ -99,3 +99,4 @@ tests/urgent
 tests/usertimewin
 data/autostart/openbox-autostart
 data/autostart/autostart
+obrender/rendertest

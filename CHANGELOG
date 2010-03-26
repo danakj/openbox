@@ -1,3 +1,11 @@
+3.4.11.1:
+  * Updated Polish translation.
+  * Fixed bug #4519 (Incorrect focus in reused windows).
+  * Lower the default submenu open/hide delay from 200ms to 100ms.
+  * Fix some more problems with gnome integration.
+  * Update Clearlooks theme.
+  * Some other small fixes.
+
 3.4.11:
   * Update Hungarian, Japanese, and Latvian translations.
   * Make xdg-autostart use the OPENBOX environment by default, so you can use

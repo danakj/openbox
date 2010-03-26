@@ -41,6 +41,7 @@ manpage.1: manpage.sgml
       <arg><option>--replace</option></arg>
       <arg><option>--reconfigure</option></arg>
       <arg><option>--restart</option></arg>
+      <arg><option>--config-file FILE</option></arg>
       <arg><option>--sm-disable</option></arg>
       <arg><option>--sync</option></arg>
       <arg><option>--debug</option></arg>
@@ -134,6 +135,13 @@ manpage.1: manpage.sgml
           <para>If Openbox is already running on the display, tell it to
             restart. This is useful if you have upgraded Openbox and don't
             want to restart X.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--config-file FILE</option></term>
+        <listitem>
+          <para>Use FILE for configuration instead of looking for rc.xml
+            in the XDG search path. FILE is an absolute path.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

@@ -543,6 +543,7 @@ CLEANFILES = \
 	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
 	doc/openbox-kde-session.1 \
+	doc/obxprop.1 \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
 	data/xsession/openbox-kde-session \

@@ -27,9 +27,11 @@
 typedef struct _ObtDDParse ObtDDParse;
 
 /* Parses the value and adds it to the group's key_hash, with the given
-   key */
-typedef void (*ObtDDParseValueFunc)(gchar *key, const gchar *val,
-                                    ObtDDParse *parse, gboolean *error);
+   key
+   Return TRUE if it is added to the hash table, and FALSE if not.
+*/
+typedef gboolean (*ObtDDParseValueFunc)(gchar *key, const gchar *val,
+                                        ObtDDParse *parse, gboolean *error);
 
 
 struct _ObtDDParse {
@@ -387,7 +389,10 @@ static void parse_key_value(const gchar *buf, gulong len,
     }
     g_print("Found key/value %s=%s.\n", key, buf+valstart);
     if (parse->group->value_func)
-        parse->group->value_func(key, buf+valstart, parse, error);
+        if (!parse->group->value_func(key, buf+valstart, parse, error)) {
+            parse_error("Unknown key", parse, error);
+            g_free(key);
+        }
 }
 
 static gboolean parse_file(FILE *f, ObtDDParse *parse)
@@ -415,14 +420,103 @@ static gboolean parse_file(FILE *f, ObtDDParse *parse)
     return !error;
 }
 
-static void parse_desktop_entry_value(gchar *key, const gchar *val,
-                                      ObtDDParse *parse, gboolean *error)
+static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
+                                          ObtDDParse *parse, gboolean *error)
 {
     ObtDDParseValue v, *pv;
 
-    /* figure out value type */
-    v.type = OBT_DDPARSE_NUM_VALUE_TYPES;
-    /* XXX do this part */
+    switch (key[0]) {
+    case 'C':
+        switch (key[1]) {
+        case 'a': /* Categories */
+            if (strcmp(key+2, "tegories")) return FALSE;
+            v.type = OBT_DDPARSE_STRINGS; break;
+        case 'o': /* Comment */
+            if (strcmp(key+2, "mment")) return FALSE;
+            v.type = OBT_DDPARSE_LOCALESTRING; break;
+        default:
+            return FALSE;
+        }
+        break;
+    case 'E': /* Exec */
+        if (strcmp(key+1, "xec")) return FALSE;
+        v.type = OBT_DDPARSE_STRING; break;
+    case 'G': /* GenericName */
+        if (strcmp(key+1, "enericName")) return FALSE;
+        v.type = OBT_DDPARSE_LOCALESTRING; break;
+    case 'I': /* Icon */
+        if (strcmp(key+1, "con")) return FALSE;
+        v.type = OBT_DDPARSE_LOCALESTRING; break;
+    case 'H': /* Hidden */
+        if (strcmp(key+1, "idden")) return FALSE;
+        v.type = OBT_DDPARSE_BOOLEAN; break;
+    case 'M': /* MimeType */
+        if (strcmp(key+1, "imeType")) return FALSE;
+        v.type = OBT_DDPARSE_STRINGS; break;
+    case 'N':
+        switch (key[1]) {
+        case 'a': /* Name */
+            if (strcmp(key+2, "me")) return FALSE;
+            v.type = OBT_DDPARSE_LOCALESTRING; break;
+        case 'o':
+            switch (key[2]) {
+            case 'D': /* NoDisplay */
+                if (strcmp(key+3, "isplay")) return FALSE;
+                v.type = OBT_DDPARSE_BOOLEAN; break;
+            case 't': /* NotShowIn */
+                if (strcmp(key+3, "ShowIn")) return FALSE;
+                v.type = OBT_DDPARSE_STRINGS; break;
+            default:
+                return FALSE;
+            }
+            break;
+        default:
+            return FALSE;
+        }
+        break;
+    case 'P': /* Path */
+        if (strcmp(key+1, "ath")) return FALSE;
+        v.type = OBT_DDPARSE_STRING; break;
+    case 'S': /* Path */
+        if (key[1] == 't' && key[2] == 'a' && key[3] == 'r' &&
+            key[4] == 't' && key[5] == 'u' && key[6] == 'p')
+            switch (key[7]) {
+            case 'N': /* StartupNotify */
+                if (strcmp(key+8, "otify")) return FALSE;
+                v.type = OBT_DDPARSE_BOOLEAN; break;
+            case 'W': /* StartupWMClass */
+                if (strcmp(key+8, "MClass")) return FALSE;
+                v.type = OBT_DDPARSE_STRING; break;
+            default:
+                return FALSE;
+            }
+        else
+            return FALSE;
+        break;
+    case 'T':
+        switch (key[1]) {
+        case 'e': /* Terminal */
+            if (strcmp(key+2, "rminal")) return FALSE;
+            v.type = OBT_DDPARSE_BOOLEAN; break;
+        case 'r': /* TryExec */
+            if (strcmp(key+2, "yExec")) return FALSE;
+            v.type = OBT_DDPARSE_STRING; break;
+        case 'y': /* Type */
+            if (strcmp(key+2, "pe")) return FALSE;
+            v.type = OBT_DDPARSE_STRING; break;
+        default:
+            return FALSE;
+        }
+        break;
+    case 'U': /* URL */
+        if (strcmp(key+1, "RL")) return FALSE;
+        v.type = OBT_DDPARSE_STRING; break;
+    case 'V': /* MimeType */
+        if (strcmp(key+1, "ersion")) return FALSE;
+        v.type = OBT_DDPARSE_STRING; break;
+    default:
+        return FALSE;
+    }
 
     /* parse the value */
     switch (v.type) {
@@ -459,6 +553,7 @@ static void parse_desktop_entry_value(gchar *key, const gchar *val,
     pv = g_slice_new(ObtDDParseValue);
     *pv = v;
     g_hash_table_insert(parse->group->key_hash, key, pv);
+    return TRUE;
 }
 
 GHashTable* obt_ddparse_file(const gchar *name, GSList *paths)

@@ -46,6 +46,9 @@ extern gboolean ob_sm_restore;
 extern gboolean ob_replace_wm;
 extern gboolean ob_debug_xinerama;
 
+/*! The current locale for the LC_MESSAGES category */
+extern const gchar *ob_locale_msg;
+
 /* The state of execution of the window manager */
 ObState ob_state(void);
 void ob_set_state(ObState state);

@@ -91,6 +91,7 @@ gchar        *ob_sm_id = NULL;
 gchar        *ob_sm_save_file = NULL;
 gboolean      ob_sm_restore = TRUE;
 gboolean      ob_debug_xinerama = FALSE;
+const gchar  *ob_locale_msg = NULL;
 
 static ObState   state;
 static gboolean  xsync = FALSE;
@@ -120,6 +121,8 @@ gint main(gint argc, gchar **argv)
     ob_debug_startup();
 
     /* initialize the locale */
+    if (!(ob_locale_msg = setlocale(LC_MESSAGES, "")))
+        g_message("Couldn't set messages locale category from environment.");
     if (!setlocale(LC_ALL, ""))
         g_message("Couldn't set locale from environment.");
     bindtextdomain(PACKAGE_NAME, LOCALEDIR);

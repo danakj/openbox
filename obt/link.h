@@ -23,6 +23,8 @@
 
 G_BEGIN_DECLS
 
+struct _ObtPaths;
+
 typedef enum {
 	OBT_LINK_TYPE_APPLICATION = 1,
 	OBT_LINK_TYPE_URL         = 2,
@@ -48,7 +50,8 @@ typedef enum {
 
 typedef struct _ObtLink     ObtLink;
 
-ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths);
+ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths,
+                              struct _ObtPaths *p);
 
 void obt_link_ref(ObtLink *e);
 void obt_link_unref(ObtLink *e);

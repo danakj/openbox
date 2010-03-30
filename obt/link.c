@@ -18,6 +18,7 @@
 
 #include "obt/link.h"
 #include "obt/ddparse.h"
+#include "obt/paths.h"
 #include <glib.h>
 
 struct _ObtLink {
@@ -25,6 +26,10 @@ struct _ObtLink {
 
     ObtLinkType type;
     gchar *name; /*!< Specific name for the object (eg Firefox) */
+    gboolean display; /*<! When false, do not display this link in menus or
+                           launchers, etc */
+    gboolean deleted; /*<! When true, the Link could exist but is deleted
+                           for the current user */
     gchar *generic; /*!< Generic name for the object (eg Web Browser) */
     gchar *comment; /*!< Comment/description to display for the object */
     gchar *icon; /*!< Name/path for an icon for the object */
@@ -44,20 +49,22 @@ struct _ObtLink {
             gchar *startup_wmclass;
         } app;
         struct _ObtLinkLink {
-            gchar *url;
-        } link;
+            gchar *addr;
+        } url;
         struct _ObtLinkDir {
         } dir;
     } d;
 };
 
-ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths)
+ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
+                              ObtPaths *p)
 {
-    ObtLink *lnk;
+    ObtLink *link;
     GHashTable *groups, *keys;
     ObtDDParseGroup *g;
+    ObtDDParseValue *v, *type, *name, *target;
 
-    groups = obt_ddparse_file(name, paths);
+    groups = obt_ddparse_file(ddname, paths);
     if (!groups) return NULL;
     g = g_hash_table_lookup(groups, "Desktop Entry");
     if (!g) {
@@ -67,11 +74,66 @@ ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths)
 
     keys = obt_ddparse_group_keys(g);
 
-    lnk = g_slice_new(ObtLink);
-    lnk->ref = 1;
-    /* XXX turn the values in the .desktop file into an ObtLink */
+    /* check that required keys exist */
 
-    return lnk;
+    if (!(type = g_hash_table_lookup(keys, "Type")))
+    { g_hash_table_destroy(groups); return NULL; }
+    if (!(name = g_hash_table_lookup(keys, "Name")))
+    { g_hash_table_destroy(groups); return NULL; }
+
+    if (type->value.enumerable == OBT_LINK_TYPE_APPLICATION) {
+        if (!(target = g_hash_table_lookup(keys, "Exec")))
+        { g_hash_table_destroy(groups); return NULL; }
+    }
+    else if (type->value.enumerable == OBT_LINK_TYPE_URL) {
+        if (!(target = g_hash_table_lookup(keys, "URL")))
+        { g_hash_table_destroy(groups); return NULL; }
+    }
+    else
+        target = NULL;
+
+    /* parse all the optional keys and build ObtLink (steal the strings) */
+    link = g_slice_new0(ObtLink);
+    link->ref = 1;
+    link->type = type->value.enumerable;
+    if (link->type == OBT_LINK_TYPE_APPLICATION)
+        link->d.app.exec = target->value.string, target->value.string = NULL;
+    else if (link->type == OBT_LINK_TYPE_URL)
+        link->d.url.addr = target->value.string, target->value.string = NULL;
+    link->display = TRUE;
+
+    if ((v = g_hash_table_lookup(keys, "Hidden")))
+        link->deleted = v->value.boolean;
+
+    if ((v = g_hash_table_lookup(keys, "NoDisplay")))
+        link->display = !v->value.boolean;
+
+    if ((v = g_hash_table_lookup(keys, "GenericName")))
+        link->generic = v->value.string, v->value.string = NULL;
+
+    if ((v = g_hash_table_lookup(keys, "Comment")))
+        link->comment = v->value.string, v->value.string = NULL;
+
+    if ((v = g_hash_table_lookup(keys, "Icon")))
+        link->icon = v->value.string, v->value.string = NULL;
+
+    /* XXX handle Only/NotShowIn, better know the current environment */
+
+    if (link->type == OBT_LINK_TYPE_APPLICATION) {
+        if ((v = g_hash_table_lookup(keys, "TryExec"))) {
+            /* XXX spawn a thread to check TryExec? */
+            link->display = link->display &&
+                obt_paths_try_exec(p, v->value.string);
+        }
+
+        /* XXX there's more app specific stuff */
+    }
+
+    else if (link->type == OBT_LINK_TYPE_URL) {
+        /* XXX there's URL specific stuff */
+    }
+
+    return link;
 }
 
 void obt_link_ref(ObtLink *dd)

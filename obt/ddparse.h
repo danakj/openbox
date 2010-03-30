@@ -27,6 +27,7 @@ typedef enum {
     OBT_DDPARSE_LOCALESTRINGS,
     OBT_DDPARSE_BOOLEAN,
     OBT_DDPARSE_NUMERIC,
+    OBT_DDPARSE_ENUM_APPLICATION,
     OBT_DDPARSE_NUM_VALUE_TYPES
 } ObtDDParseValueType;
 
@@ -40,6 +41,7 @@ typedef struct _ObtDDParseValue {
         } strings;
         gboolean boolean;
         gfloat numeric;
+        guint enumerable;
     } value;
 } ObtDDParseValue;
 

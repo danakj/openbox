@@ -17,6 +17,7 @@
 */
 
 #include "obt/ddparse.h"
+#include "obt/link.h"
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
@@ -77,8 +78,8 @@ static void parse_value_free(ObtDDParseValue *v)
         v->value.strings.n = 0;
         break;
     case OBT_DDPARSE_BOOLEAN:
-        break;
     case OBT_DDPARSE_NUMERIC:
+    case OBT_DDPARSE_ENUM_APPLICATION:
         break;
     default:
         g_assert_not_reached();
@@ -545,6 +546,18 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         break;
     case OBT_DDPARSE_NUMERIC:
         v.value.numeric = parse_value_numeric(val, parse, error);
+        break;
+    case OBT_DDPARSE_ENUM_APPLICATION:
+        if (val[0] == 'A' && strcmp(val+1, "pplication") == 0)
+            v.value.enumerable = OBT_LINK_TYPE_APPLICATION;
+        else if (val[0] == 'L' && strcmp(val+1, "ink") == 0)
+            v.value.enumerable = OBT_LINK_TYPE_URL;
+        else if (val[0] == 'D' && strcmp(val+1, "irectory") == 0)
+            v.value.enumerable = OBT_LINK_TYPE_DIRECTORY;
+        else {
+            parse_error("Unknown Type", parse, error);
+            return FALSE;
+        }
         break;
     default:
         g_assert_not_reached();

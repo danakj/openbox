@@ -725,8 +725,9 @@ static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
     if (!(self->desktop == screen_desktop ||
           self->desktop == DESKTOP_ALL) &&
         /* the timestamp is from before you changed desktops */
-        launch_time && screen_desktop_user_time &&
-        !event_time_after(launch_time, screen_desktop_user_time))
+        (!launch_time ||
+         (screen_desktop_user_time &&
+          !event_time_after(launch_time, screen_desktop_user_time))))
     {
         steal = FALSE;
         ob_debug_type(OB_DEBUG_FOCUS,

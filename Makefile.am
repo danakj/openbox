@@ -126,6 +126,7 @@ obt_libobt_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 obt_libobt_la_SOURCES = \
+	obt/bsearch.h \
 	obt/display.h \
 	obt/display.c \
 	obt/internal.h \

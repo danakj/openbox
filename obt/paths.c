@@ -16,9 +16,13 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "obt/bsearch.h"
 #include "obt/paths.h"
 #include "obt/util.h"
 
+#ifdef HAVE_STDLIB_H
+#  include <stdlib.h>
+#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #endif
@@ -90,6 +94,12 @@ static GSList* split_paths(const gchar *paths)
     return list;
 }
 
+int gid_cmp(const void *va, const void *vb)
+{
+    const gid_t a = *(const gid_t*)va, b = *(const gid_t*)vb;
+    return a>b ? 1 : (a == b ? 0 : -1);
+}
+
 static void find_uid_gid(uid_t *u, gid_t **g, guint *n)
 {
     struct passwd *pw;
@@ -115,6 +125,8 @@ static void find_uid_gid(uid_t *u, gid_t **g, guint *n)
         }
     }
     endgrent();
+
+    qsort(*g, sizeof(gid_t), *n, gid_cmp);
 }
 
 ObtPaths* obt_paths_new(void)
@@ -317,7 +329,7 @@ static inline gboolean try_exec(const ObtPaths *const p,
                                 const gchar *const path)
 {
     struct stat st;
-    guint i;
+    BSEARCH_SETUP(guint);
 
     stat(path, &st);
 
@@ -325,9 +337,9 @@ static inline gboolean try_exec(const ObtPaths *const p,
         return FALSE;
     if (st.st_uid == p->uid)
         return st.st_mode & S_IXUSR;
-    for (i = 0; i < p->n_gid; ++i)
-        if (st.st_gid == p->gid[i])
-            return st.st_mode & S_IXGRP;
+    BSEARCH(guint, p->gid, 0, p->n_gid, st.st_gid);
+    if (BSEARCH_FOUND())
+        return st.st_mode & S_IXGRP;
     return st.st_mode & S_IXOTH;
 }
 

@@ -40,6 +40,11 @@ gchar *obt_paths_expand_tilde(const gchar *f);
 gboolean obt_paths_mkdir(const gchar *path, gint mode);
 gboolean obt_paths_mkdir_path(const gchar *path, gint mode);
 
+/*! Returns TRUE if the @path points to an executable file.
+  If the @path is not an absolute path, then it is searched for in $PATH.
+*/
+gboolean obt_paths_try_exec(ObtPaths *p, const gchar *path);
+
 G_END_DECLS
 
 #endif

@@ -28,6 +28,15 @@
 #ifdef HAVE_STRING_H
 #  include <string.h>
 #endif
+#ifdef HAVE_UNISTD_H
+#  include <unistd.h>
+#endif
+#ifdef HAVE_GRP_H
+#  include <grp.h>
+#endif
+#ifdef HAVE_PWD_H
+#  include <pwd.h>
+#endif
 
 struct _ObtPaths
 {
@@ -38,6 +47,11 @@ struct _ObtPaths
     GSList *config_dirs;
     GSList *data_dirs;
     GSList *autostart_dirs;
+    GSList *exec_dirs;
+
+    uid_t   uid;
+    gid_t  *gid;
+    guint   n_gid;
 };
 
 static gint slist_path_cmp(const gchar *a, const gchar *b)
@@ -76,6 +90,33 @@ static GSList* split_paths(const gchar *paths)
     return list;
 }
 
+static void find_uid_gid(uid_t *u, gid_t **g, guint *n)
+{
+    struct passwd *pw;
+    const gchar *name;
+    struct group *gr;
+
+    *u = getuid();
+    pw = getpwuid(*u);
+    name = pw->pw_name;
+
+    *g = g_new(gid_t, *n=1);
+    (*g)[0] = getgid();
+
+    while ((gr = getgrent())) {
+        if (gr->gr_gid != (*g)[0]) { /* skip the main group */
+            gchar **c;
+            for (c = gr->gr_mem; *c; ++c)
+                if (strcmp(*c, name) == 0) {
+                    *g = g_renew(gid_t, *g, ++(*n)); /* save the group */
+                    (*g)[*n-1] = gr->gr_gid;
+                    break;
+                }
+        }
+    }
+    endgrent();
+}
+
 ObtPaths* obt_paths_new(void)
 {
     ObtPaths *p;
@@ -84,6 +125,8 @@ ObtPaths* obt_paths_new(void)
 
     p = g_slice_new0(ObtPaths);
     p->ref = 1;
+
+    find_uid_gid(&p->uid, &p->gid, &p->n_gid);
 
     path = g_getenv("XDG_CONFIG_HOME");
     if (path && path[0] != '\0') /* not unset or empty */
@@ -147,6 +190,13 @@ ObtPaths* obt_paths_new(void)
     p->data_dirs = slist_path_add(p->data_dirs,
                                   g_strdup(p->data_home),
                                   (GSListFunc) g_slist_prepend);
+
+    path = g_getenv("PATH");
+    if (path && path[0] != '\0') /* not unset or empty */
+        p->exec_dirs = split_paths(path);
+    else
+        p->exec_dirs = NULL;
+
     return p;
 }
 
@@ -261,4 +311,41 @@ GSList* obt_paths_data_dirs(ObtPaths *p)
 GSList* obt_paths_autostart_dirs(ObtPaths *p)
 {
     return p->autostart_dirs;
+}
+
+static inline gboolean try_exec(const ObtPaths *const p,
+                                const gchar *const path)
+{
+    struct stat st;
+    guint i;
+
+    stat(path, &st);
+
+    if (!S_ISREG(st.st_mode))
+        return FALSE;
+    if (st.st_uid == p->uid)
+        return st.st_mode & S_IXUSR;
+    for (i = 0; i < p->n_gid; ++i)
+        if (st.st_gid == p->gid[i])
+            return st.st_mode & S_IXGRP;
+    return st.st_mode & S_IXOTH;
+}
+
+gboolean obt_paths_try_exec(ObtPaths *p, const gchar *path)
+{
+    if (path[0] == '/') {
+        return try_exec(p, path);
+    }
+    else {
+        GSList *it;
+
+        for (it = p->exec_dirs; it; it = g_slist_next(it)) {
+            gchar *f = g_strdup_printf(it->data, G_DIR_SEPARATOR_S, path);
+            gboolean e = try_exec(p, f);
+            g_free(f);
+            if (e) return TRUE;
+        }
+    }
+
+    return FALSE;
 }

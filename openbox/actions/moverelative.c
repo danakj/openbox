@@ -2,11 +2,14 @@
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
+#include "openbox/config.h"
 #include <stdlib.h> /* for atoi */
 
 typedef struct {
     gint x;
+    gint x_denom;
     gint y;
+    gint y_denom;
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
@@ -22,13 +25,20 @@ static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
+    gchar *s;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "x")))
-        o->x = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "y")))
-        o->y = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "x"))) {
+        s = obt_xml_node_string(n);
+        config_parse_relative_number(s, &o->x, &o->x_denom);
+        g_free(s);
+    }
+    if ((n = obt_xml_find_node(node, "y"))) {
+        s = obt_xml_node_string(n);
+        config_parse_relative_number(s, &o->y, &o->y_denom);
+        g_free(s);
+    }
 
     return o;
 }
@@ -48,8 +58,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         gint x, y, lw, lh, w, h;
 
         c = data->client;
-        x = c->area.x + o->x;
-        y = c->area.y + o->y;
+        x = o->x;
+        y = o->y;
+        if (o->x_denom || o->y_denom) {
+            const Rect *carea;
+
+            carea = screen_area(c->desktop, client_monitor(c), NULL);
+            if (o->x_denom)
+                x = (x * carea->width) / o->x_denom;
+            if (o->y_denom)
+                y = (y * carea->height) / o->y_denom;
+        }
+        x = c->area.x + x;
+        y = c->area.y + y;
         w = c->area.width;
         h = c->area.height;
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);

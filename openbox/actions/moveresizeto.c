@@ -2,6 +2,7 @@
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
+#include "openbox/config.h"
 #include <stdlib.h> /* for atoi */
 
 enum {
@@ -12,14 +13,12 @@ enum {
 };
 
 typedef struct {
-    gboolean xcenter;
-    gboolean ycenter;
-    gboolean xopposite;
-    gboolean yopposite;
-    gint x;
-    gint y;
+    GravityCoord x;
+    GravityCoord y;
     gint w;
+    gint w_denom;
     gint h;
+    gint h_denom;
     gint monitor;
 } Options;
 
@@ -36,53 +35,34 @@ void action_moveresizeto_startup(void)
     actions_register("MoveToCenter", setup_center_func, free_func, run_func);
 }
 
-static void parse_coord(xmlNodePtr n, gint *pos,
-                        gboolean *opposite, gboolean *center)
-{
-    gchar *s = obt_xml_node_string(n);
-    if (g_ascii_strcasecmp(s, "current") != 0) {
-        if (!g_ascii_strcasecmp(s, "center"))
-            *center = TRUE;
-        else {
-            if (s[0] == '-')
-                *opposite = TRUE;
-            if (s[0] == '-' || s[0] == '+')
-                *pos = atoi(s+1);
-            else
-                *pos = atoi(s);
-        }
-    }
-    g_free(s);
-}
-
 static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
     o = g_slice_new0(Options);
-    o->x = G_MININT;
-    o->y = G_MININT;
+    o->x.pos = G_MININT;
+    o->y.pos = G_MININT;
     o->w = G_MININT;
     o->h = G_MININT;
     o->monitor = CURRENT_MONITOR;
 
     if ((n = obt_xml_find_node(node, "x")))
-        parse_coord(n, &o->x, &o->xopposite, &o->xcenter);
+        config_parse_gravity_coord(n, &o->x);
 
     if ((n = obt_xml_find_node(node, "y")))
-        parse_coord(n, &o->y, &o->yopposite, &o->ycenter);
+        config_parse_gravity_coord(n, &o->y);
 
     if ((n = obt_xml_find_node(node, "width"))) {
         gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->w = obt_xml_node_int(n);
+            config_parse_relative_number(s, &o->w, &o->w_denom);
         g_free(s);
     }
     if ((n = obt_xml_find_node(node, "height"))) {
         gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
-            o->h = obt_xml_node_int(n);
+            config_parse_relative_number(s, &o->h, &o->h_denom);
         g_free(s);
     }
 
@@ -141,9 +121,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         w = o->w;
         if (w == G_MININT) w = c->area.width;
+        else if (o->w_denom) w = (w * area->width) / o->w_denom;
 
         h = o->h;
         if (h == G_MININT) h = c->area.height;
+        else if (o->h_denom) h = (h * area->height) / o->h_denom;
 
         /* it might not be able to resize how they requested, so find out what
            it will actually be resized to */
@@ -155,16 +137,20 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         w += c->frame->size.left + c->frame->size.right;
         h += c->frame->size.top + c->frame->size.bottom;
 
-        x = o->x;
-        if (o->xcenter) x = (area->width - w) / 2;
+        x = o->x.pos;
+        if (o->x.denom)
+            x = (x * area->width) / o->x.denom;
+        if (o->x.center) x = (area->width - w) / 2;
         else if (x == G_MININT) x = c->frame->area.x - carea->x;
-        else if (o->xopposite) x = area->width - w - x;
+        else if (o->x.opposite) x = area->width - w - x;
         x += area->x;
 
-        y = o->y;
-        if (o->ycenter) y = (area->height - h) / 2;
+        y = o->y.pos;
+        if (o->y.denom)
+            y = (y * area->height) / o->y.denom;
+        if (o->y.center) y = (area->height - h) / 2;
         else if (y == G_MININT) y = c->frame->area.y - carea->y;
-        else if (o->yopposite) y = area->height - h - y;
+        else if (o->y.opposite) y = area->height - h - y;
         y += area->y;
 
         /* get the client's size back */
@@ -193,12 +179,12 @@ static gpointer setup_center_func(xmlNodePtr node)
     Options *o;
 
     o = g_slice_new0(Options);
-    o->x = G_MININT;
-    o->y = G_MININT;
+    o->x.pos = G_MININT;
+    o->y.pos = G_MININT;
     o->w = G_MININT;
     o->h = G_MININT;
     o->monitor = -1;
-    o->xcenter = TRUE;
-    o->ycenter = TRUE;
+    o->x.center = TRUE;
+    o->y.center = TRUE;
     return o;
 }

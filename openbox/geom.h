@@ -24,6 +24,7 @@
 
 typedef struct _GravityCoord {
     gint pos;
+    gint denom;
     gboolean center;
     gboolean opposite;
 } GravityCoord;

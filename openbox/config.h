@@ -215,5 +215,10 @@ ObAppSettings* config_create_app_settings(void);
   src. */
 void config_app_settings_copy_non_defaults(const ObAppSettings *src,
                                            ObAppSettings *dest);
+/*! Parses an x geometry style position, with some extensions like ratios
+  and percentages */
+void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c);
+/*! Parses a rational number or percentage into num and denom */
+void config_parse_relative_number(gchar *s, gint *num, gint *denom);
 
 #endif

@@ -406,6 +406,8 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
             settings->position.x.pos;
     else
         *x = screen->x + settings->position.x.pos;
+    if (settings->position.x.denom)
+        *x = (*x * screen->width) / settings->position.x.denom;
 
     if (settings->position.y.center)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
@@ -414,6 +416,8 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
             settings->position.y.pos;
     else
         *y = screen->y + settings->position.y.pos;
+    if (settings->position.y.denom)
+        *y = (*y * screen->height) / settings->position.y.denom;
 
     g_slice_free(Rect, screen);
     return TRUE;

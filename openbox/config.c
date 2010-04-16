@@ -154,18 +154,29 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     }
 }
 
-static void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
+void config_parse_relative_number(gchar *s, gint *num, gint *denom)
+{
+    *num = strtol(s, &s, 10);
+
+    if (*s == '%') {
+        *denom = 100;
+    } else if (*s == '/') {
+        *denom = atoi(s+1);
+    }
+}
+
+void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 {
     gchar *s = obt_xml_node_string(node);
     if (!g_ascii_strcasecmp(s, "center"))
         c->center = TRUE;
     else {
+        gchar *ps = s;
         if (s[0] == '-')
             c->opposite = TRUE;
         if (s[0] == '-' || s[0] == '+')
-            c->pos = atoi(s+1);
-        else
-            c->pos = atoi(s);
+            ps++;
+        config_parse_relative_number(ps, &c->pos, &c->denom);
     }
     g_free(s);
 }

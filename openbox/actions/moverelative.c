@@ -3,7 +3,6 @@
 #include "openbox/screen.h"
 #include "openbox/frame.h"
 #include "openbox/config.h"
-#include <stdlib.h> /* for atoi */
 
 typedef struct {
     gint x;

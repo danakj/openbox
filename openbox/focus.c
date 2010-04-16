@@ -133,7 +133,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
         */
         if ((allow_omnipresent || c->desktop == screen_desktop) &&
             focus_valid_target(c, screen_desktop,
-                               TRUE, FALSE, FALSE, FALSE, FALSE, FALSE) &&
+                               TRUE, FALSE, FALSE, TRUE, FALSE, FALSE,
+                               FALSE) &&
             !c->shaded &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -154,7 +155,7 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            backup fallback though)
         */
         if (focus_valid_target(c, screen_desktop,
-                               TRUE, FALSE, FALSE, FALSE, TRUE, FALSE) &&
+                               TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
         {
@@ -288,7 +289,7 @@ static gboolean focus_target_has_siblings(ObClient *ft,
         if (c != ft && c->type == OB_CLIENT_TYPE_NORMAL &&
             focus_valid_target(c, screen_desktop,
                                TRUE, iconic_windows, all_desktops,
-                               FALSE, FALSE, FALSE))
+                               TRUE, FALSE, FALSE, FALSE))
         {
             return TRUE;
         }
@@ -301,6 +302,7 @@ gboolean focus_valid_target(ObClient *ft,
                             gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
+                            gboolean nonhilite_windows,
                             gboolean dock_windows,
                             gboolean desktop_windows,
                             gboolean user_request)
@@ -320,6 +322,9 @@ gboolean focus_valid_target(ObClient *ft,
        windows */
     ok = (all_desktops || ft->desktop == desktop ||
           ft->desktop == DESKTOP_ALL);
+
+    /* if we only include hilited windows, check if the window is */
+    ok = ok && (nonhilite_windows || ft->demands_attention);
 
     /* the window can receive focus somehow */
     ok = ok && (ft->can_focus || ft->focus_notify);
@@ -370,6 +375,7 @@ gboolean focus_valid_target(ObClient *ft,
                                                      TRUE,
                                                      iconic_windows,
                                                      all_desktops,
+                                                     nonhilite_windows,
                                                      dock_windows,
                                                      desktop_windows,
                                                      FALSE));

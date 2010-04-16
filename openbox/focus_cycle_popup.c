@@ -700,10 +700,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     XFlush(obt_display);
 }
 
-void focus_cycle_popup_show(ObClient *c, gboolean iconic_windows,
-                            gboolean all_desktops, gboolean dock_windows,
-                            gboolean desktop_windows,
-                            ObFocusCyclePopupMode mode)
+void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode)
 {
     g_assert(c != NULL);
 
@@ -747,11 +744,7 @@ void focus_cycle_popup_hide(void)
     popup_cleanup();
 }
 
-void focus_cycle_popup_single_show(struct _ObClient *c,
-                                   gboolean iconic_windows,
-                                   gboolean all_desktops,
-                                   gboolean dock_windows,
-                                   gboolean desktop_windows)
+void focus_cycle_popup_single_show(struct _ObClient *c)
 {
     gchar *text;
 

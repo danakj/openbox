@@ -36,6 +36,7 @@ void focus_cycle_shutdown(gboolean reconfig);
 
 /*! Cycle focus amongst windows. */
 struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
+                              gboolean nonhilite_windows,
                               gboolean dock_windows, gboolean desktop_windows,
                               gboolean linear, gboolean interactive,
                               gboolean showbar, ObFocusCyclePopupMode mode,

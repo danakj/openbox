@@ -54,7 +54,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
             if (focus_valid_target(c, desktop,
-                                   TRUE, TRUE, FALSE, FALSE, FALSE, FALSE))
+                                   TRUE, TRUE,
+                                   FALSE, TRUE, FALSE, FALSE, FALSE))
             {
                 empty = FALSE;
 

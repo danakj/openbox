@@ -33,17 +33,10 @@ typedef enum {
 void focus_cycle_popup_startup(gboolean reconfig);
 void focus_cycle_popup_shutdown(gboolean reconfig);
 
-void focus_cycle_popup_show(struct _ObClient *c, gboolean iconic_windows,
-                            gboolean all_desktops, gboolean dock_windows,
-                            gboolean desktop_windows,
-                            ObFocusCyclePopupMode mode);
+void focus_cycle_popup_show(struct _ObClient *c, ObFocusCyclePopupMode mode);
 void focus_cycle_popup_hide(void);
 
-void focus_cycle_popup_single_show(struct _ObClient *c,
-                                   gboolean iconic_windows,
-                                   gboolean all_desktops,
-                                   gboolean dock_windows,
-                                   gboolean desktop_windows);
+void focus_cycle_popup_single_show(struct _ObClient *c);
 void focus_cycle_popup_single_hide(void);
 
 gboolean focus_cycle_popup_is_showing(struct _ObClient *c);

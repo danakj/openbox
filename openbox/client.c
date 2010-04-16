@@ -295,7 +295,7 @@ void client_manage(Window window, ObPrompt *prompt)
         /* this checks for focus=false for the window */
         (!settings || settings->focus != 0) &&
         focus_valid_target(self, self->desktop,
-                           FALSE, FALSE, TRUE, FALSE, FALSE,
+                           FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
     {
         activate = TRUE;

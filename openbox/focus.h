@@ -73,6 +73,7 @@ gboolean focus_valid_target(struct _ObClient *ft,
                             gboolean helper_windows,
                             gboolean iconic_windows,
                             gboolean all_desktops,
+                            gboolean nonhilite_windows,
                             gboolean dock_windows,
                             gboolean desktop_windows,
                             gboolean user_request);

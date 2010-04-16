@@ -11,6 +11,7 @@ typedef struct {
     gboolean linear;
     gboolean dock_windows;
     gboolean desktop_windows;
+    gboolean only_hilite_windows;
     gboolean all_desktops;
     gboolean forward;
     gboolean bar;
@@ -83,6 +84,8 @@ static gpointer setup_func(xmlNodePtr node,
         o->raise = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "panels")))
         o->dock_windows = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "hilite")))
+        o->only_hilite_windows = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "desktop")))
         o->desktop_windows = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "allDesktops")))
@@ -154,6 +157,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     ft = focus_cycle(o->forward,
                      o->all_desktops,
+                     !o->only_hilite_windows,
                      o->dock_windows,
                      o->desktop_windows,
                      o->linear,
@@ -226,6 +230,7 @@ static void i_post_func(gpointer options)
 
     ft = focus_cycle(o->forward,
                      o->all_desktops,
+                     !o->only_hilite_windows,
                      o->dock_windows,
                      o->desktop_windows,
                      o->linear,

@@ -39,6 +39,7 @@ ObClient       *focus_cycle_target = NULL;
 static ObCycleType focus_cycle_type = OB_CYCLE_NONE;
 static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
+static gboolean focus_cycle_nonhilite_windows;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
 
@@ -89,12 +90,13 @@ void focus_cycle_reorder()
                                                        TRUE);
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
-            focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE,
+            focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
                         TRUE, TRUE, TRUE, TRUE, TRUE);
     }
 }
 
 ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
+                      gboolean nonhilite_windows,
                       gboolean dock_windows, gboolean desktop_windows,
                       gboolean linear, gboolean interactive,
                       gboolean showbar, ObFocusCyclePopupMode mode,
@@ -126,6 +128,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     if (focus_cycle_target == NULL) {
         focus_cycle_iconic_windows = TRUE;
         focus_cycle_all_desktops = all_desktops;
+        focus_cycle_nonhilite_windows = nonhilite_windows;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
         start = it = g_list_find(list, focus_client);
@@ -153,12 +156,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 /* same arguments as focus_target_valid */
-                focus_cycle_popup_show(ft,
-                                       focus_cycle_iconic_windows,
-                                       focus_cycle_all_desktops,
-                                       focus_cycle_dock_windows,
-                                       focus_cycle_desktop_windows,
-                                       mode);
+                focus_cycle_popup_show(ft, mode);
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -302,6 +300,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (focus_cycle_target == NULL) {
         focus_cycle_iconic_windows = FALSE;
         focus_cycle_all_desktops = FALSE;
+        focus_cycle_nonhilite_windows = TRUE;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
     }
@@ -332,11 +331,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     }
     if (focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */
-        focus_cycle_popup_single_show(focus_cycle_target,
-                                      focus_cycle_iconic_windows,
-                                      focus_cycle_all_desktops,
-                                      focus_cycle_dock_windows,
-                                      focus_cycle_desktop_windows);
+        focus_cycle_popup_single_show(focus_cycle_target);
     return focus_cycle_target;
 
 done_cycle:
@@ -357,6 +352,7 @@ gboolean focus_cycle_valid(struct _ObClient *client)
     return focus_valid_target(client, screen_desktop, TRUE,
                               focus_cycle_iconic_windows,
                               focus_cycle_all_desktops,
+                              focus_cycle_nonhilite_windows,
                               focus_cycle_dock_windows,
                               focus_cycle_desktop_windows,
                               FALSE);

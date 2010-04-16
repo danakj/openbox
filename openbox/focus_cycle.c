@@ -37,6 +37,7 @@ typedef enum {
 
 ObClient       *focus_cycle_target = NULL;
 static ObCycleType focus_cycle_type = OB_CYCLE_NONE;
+static gboolean focus_cycle_linear;
 static gboolean focus_cycle_iconic_windows;
 static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_nonhilite_windows;
@@ -87,7 +88,8 @@ void focus_cycle_reorder()
 {
     if (focus_cycle_type == OB_CYCLE_NORMAL) {
         focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_target,
-                                                       TRUE);
+                                                       TRUE,
+                                                       focus_cycle_linear);
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
             focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
@@ -126,6 +128,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     }
 
     if (focus_cycle_target == NULL) {
+        focus_cycle_linear = linear;
         focus_cycle_iconic_windows = TRUE;
         focus_cycle_all_desktops = all_desktops;
         focus_cycle_nonhilite_windows = nonhilite_windows;
@@ -156,7 +159,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 /* same arguments as focus_target_valid */
-                focus_cycle_popup_show(ft, mode);
+                focus_cycle_popup_show(ft, mode, focus_cycle_linear);
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -298,6 +301,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         goto done_cycle;
 
     if (focus_cycle_target == NULL) {
+        focus_cycle_linear = FALSE;
         focus_cycle_iconic_windows = FALSE;
         focus_cycle_all_desktops = FALSE;
         focus_cycle_nonhilite_windows = TRUE;

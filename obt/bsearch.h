@@ -23,9 +23,12 @@
 
 G_BEGIN_DECLS
 
+/*! Setup to do a binary search on an array holding elements of type @t */
 #define BSEARCH_SETUP(t) \
     register t l_BSEARCH, r_BSEARCH, out_BSEARCH;
 
+/*! Search an array @ar holding elements of type @t, starting at index @start,
+  with @size elements, looking for value @val. */
 #define BSEARCH(t, ar, start, size, val)         \
 { \
     l_BSEARCH = (start);              \
@@ -44,7 +47,10 @@ G_BEGIN_DECLS
     } \
 }
 
+/*! Returns true if the element last searched for was found in the array */
 #define BSEARCH_FOUND() (l_BSEARCH <= r_BSEARCH)
+/*! Returns the position in the array at which the element last searched for
+  was found. */
 #define BSEARCH_AT() (out_BSEARCH)
 
 

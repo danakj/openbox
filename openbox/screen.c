@@ -939,7 +939,7 @@ static gboolean hide_desktop_popup_func(gpointer data)
 
 void screen_show_desktop_popup(guint d, gboolean perm)
 {
-    Rect const *a;
+    const Rect *a;
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
@@ -1617,14 +1617,14 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
     return a;
 }
 
-guint screen_find_monitor(const Rect const *search)
+guint screen_find_monitor(const Rect *search)
 {
     guint i;
     guint most = screen_num_monitors;
     guint mostv = 0;
 
     for (i = 0; i < screen_num_monitors; ++i) {
-        Rect const *area = screen_physical_area_monitor(i);
+        const Rect *area = screen_physical_area_monitor(i);
         if (RECT_INTERSECTS_RECT(*area, *search)) {
             Rect r;
             guint v;
@@ -1641,12 +1641,12 @@ guint screen_find_monitor(const Rect const *search)
     return most;
 }
 
-Rect const* screen_physical_area_all_monitors(void)
+const Rect* screen_physical_area_all_monitors(void)
 {
     return screen_physical_area_monitor(screen_num_monitors);
 }
 
-Rect const* screen_physical_area_monitor(guint head)
+const Rect* screen_physical_area_monitor(guint head)
 {
     g_assert(head <= screen_num_monitors);
 
@@ -1670,7 +1670,7 @@ guint screen_monitor_active(void)
         return screen_monitor_pointer();
 }
 
-Rect const* screen_physical_area_active(void)
+const Rect* screen_physical_area_active(void)
 {
     return screen_physical_area_monitor(screen_monitor_active());
 }
@@ -1691,7 +1691,7 @@ guint screen_monitor_primary(gboolean fixed)
         return screen_monitor_pointer();
 }
 
-Rect const *screen_physical_area_primary(gboolean fixed)
+const Rect* screen_physical_area_primary(gboolean fixed)
 {
     return screen_physical_area_monitor(screen_monitor_primary(fixed));
 }

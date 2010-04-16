@@ -136,7 +136,7 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
 void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
 {
     Rect *area;
-    Rect const *parea;
+    const Rect *parea;
     guint i;
     gint l, t, r, b; /* requested edges */
     gint al, at, ar, ab; /* screen area edges */
@@ -325,7 +325,7 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint dlt, drb; /* my destination left/top and right/bottom sides */
     Rect *area;
-    Rect const *parea;
+    const Rect *parea;
     gint al, at, ar, ab; /* screen boundaries */
     gint pl, pt, pr, pb; /* physical screen boundaries */
     guint i;

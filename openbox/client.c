@@ -2043,7 +2043,7 @@ void client_update_strut(ObClient *self)
     if (!got &&
         OBT_PROP_GETA32(self->window, NET_WM_STRUT, CARDINAL, &data, &num)) {
         if (num == 4) {
-            Rect const *a;
+            const Rect *a;
 
             got = TRUE;
 
@@ -2468,10 +2468,10 @@ gboolean client_has_parent(ObClient *self)
     return self->parents != NULL;
 }
 
-gboolean client_is_oldfullscreen(const ObClient const *self,
-                                 const Rect const *area)
+gboolean client_is_oldfullscreen(const ObClient *self,
+                                 const Rect *area)
 {
-    Rect const *monitor, *allmonitors;
+    const Rect *monitor, *allmonitors;
 
     /* No decorations and fills the monitor = oldskool fullscreen.
        But not for maximized windows.
@@ -2489,7 +2489,7 @@ gboolean client_is_oldfullscreen(const ObClient const *self,
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
-    Rect const *monitor, *allmonitors;
+    const Rect *monitor, *allmonitors;
 
     monitor = screen_physical_area_monitor(client_monitor(self));
     allmonitors = screen_physical_area_all_monitors();
@@ -2842,7 +2842,7 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
     /* set the size and position if fullscreen */
     if (self->fullscreen) {
-        Rect const *a;
+        const Rect *a;
         guint i;
 
         i = screen_find_monitor(&desired);

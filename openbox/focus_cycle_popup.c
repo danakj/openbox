@@ -392,7 +392,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     gint ml, mt, mr, mb;
     gint l, t, r, b;
     gint x, y, w, h;
-    Rect const *screen_area = NULL;
+    const Rect *screen_area = NULL;
     gint i;
     GList *it;
     const ObFocusCyclePopupTarget *newtarget;
@@ -759,7 +759,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped) {
-        Rect const *a;
+        const Rect *a;
 
         popup_setup(&popup, FALSE, FALSE);
         g_assert(popup.targets == NULL);

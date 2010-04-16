@@ -107,7 +107,7 @@ static Rect **pick_head(ObClient *c)
     screen_pointer_pos(&px, &py);
 
     for (i = 0; i < screen_num_monitors; i++) {
-        Rect const *monitor = screen_physical_area_monitor(i);
+        const Rect *monitor = screen_physical_area_monitor(i);
         gboolean contain = RECT_CONTAINS(*monitor, px, py);
         if (contain) {
             add_choice(choice, i);

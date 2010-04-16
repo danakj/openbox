@@ -79,7 +79,7 @@ static void set_curpos(KeyBindingTree *newpos)
     if (curpos != NULL) {
         gchar *text = NULL;
         GList *it;
-        Rect const *a;
+        const Rect *a;
 
         for (it = curpos->keylist; it; it = g_list_next(it)) {
             gchar *oldtext = text;

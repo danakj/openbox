@@ -104,17 +104,17 @@ void screen_install_colormap(struct _ObClient *client, gboolean install);
 
 void screen_update_areas(void);
 
-Rect const* screen_physical_area_all_monitors(void);
+const Rect* screen_physical_area_all_monitors(void);
 
 /*! Returns a Rect which is owned by the screen code and should not be freed */
-Rect const* screen_physical_area_monitor(guint head);
+const Rect* screen_physical_area_monitor(guint head);
 
 /*! Returns the monitor which contains the active window, or the one
   containing the pointer otherwise. */
 guint screen_monitor_active(void);
 
 /*! Returns a Rect which is owned by the screen code and should not be freed */
-Rect const* screen_physical_area_active(void);
+const Rect* screen_physical_area_active(void);
 
 /*! Returns the primary monitor, as specified by the config.
   @fixed If TRUE, then this will always return a fixed monitor, otherwise
@@ -128,7 +128,7 @@ guint screen_monitor_primary(gboolean fixed);
          See screen_monitor_primary().
   @return A Rect which is owned by the screen code and should not be freed
 */
-Rect const *screen_physical_area_primary(gboolean fixed);
+const Rect* screen_physical_area_primary(gboolean fixed);
 
 /* doesn't include struts which the search area is already outside of when
    'search' is not NULL */
@@ -148,7 +148,7 @@ gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
     area of the part of the rectable on each monitor.  The number of the
     monitor containing the greatest area of the rectangle is returned.
 */
-guint screen_find_monitor(const Rect const *search);
+guint screen_find_monitor(const Rect *search);
 
 /*! Finds the monitor which contains the point @x, @y */
 guint screen_find_monitor_point(guint x, guint y);

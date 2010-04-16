@@ -236,7 +236,7 @@ void dock_configure(void)
     gint gravity;
     gint l, r, t, b;
     gint strw, strh;
-    Rect const *a;
+    const Rect *a;
     gint hidesize;
 
     RrMargins(dock->a_frame, &l, &t, &r, &b);

@@ -158,7 +158,7 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
     gint emptyx, emptyy; /* empty space between elements */
     gint textx, texty, textw, texth;
     gint iconx, icony, iconw, iconh;
-    Rect const *area;
+    const Rect *area;
     Rect mon;
     gboolean hasicon = self->hasicon;
 

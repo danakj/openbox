@@ -269,7 +269,7 @@ static void prompt_layout(ObPrompt *self)
     b += OUTSIDE_MARGIN;
 
     {
-        Rect const *area = screen_physical_area_all_monitors();
+        const Rect *area = screen_physical_area_all_monitors();
         maxw = MIN(MAX_WIDTH, area->width*4/5);
     }
 

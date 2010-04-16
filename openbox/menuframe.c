@@ -321,7 +321,7 @@ static void menu_frame_place_submenu(ObMenuFrame *self, gint *x, gint *y)
 void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
                                gint *dx, gint *dy)
 {
-    Rect const *a = NULL;
+    const Rect *a = NULL;
     gint pos, half;
 
     *dx = *dy = 0;
@@ -831,7 +831,7 @@ void menu_frame_render(ObMenuFrame *self)
 static void menu_frame_update(ObMenuFrame *self)
 {
     GList *mit, *fit;
-    Rect const *a;
+    const Rect *a;
     gint h;
 
     menu_pipe_execute(self->menu);

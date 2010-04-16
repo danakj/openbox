@@ -112,7 +112,7 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
                        c->frame->area.x + c->frame->area.width / 2,
                        c->frame->area.y + c->frame->area.height / 2);
     else /* Fixed */ {
-        Rect const *area = screen_physical_area_active();
+        const Rect *area = screen_physical_area_active();
         gint gravity, x, y;
 
         x = config_resize_popup_fixed.x.pos;
@@ -554,7 +554,7 @@ static void do_edge_warp(gint x, gint y)
     dir = -1;
 
     for (i = 0; i < screen_num_monitors; ++i) {
-        Rect const *a = screen_physical_area_monitor(i);
+        const Rect *a = screen_physical_area_monitor(i);
         if (x == RECT_LEFT(*a)) dir = OB_DIRECTION_WEST;
         if (x == RECT_RIGHT(*a)) dir = OB_DIRECTION_EAST;
         if (y == RECT_TOP(*a)) dir = OB_DIRECTION_NORTH;

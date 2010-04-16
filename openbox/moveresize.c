@@ -529,6 +529,34 @@ static void calc_resize(gboolean keyboard, gint keydist, gint *dw, gint *dh,
     *dh = nh - oh;
 }
 
+static void edge_warp_move_ptr(void)
+{
+    gint x, y;
+    const Rect* a;
+
+    screen_pointer_pos(&x, &y);
+    a = screen_physical_area_all_monitors();
+
+    switch (edge_warp_dir) {
+	case OB_DIRECTION_NORTH:
+	    y = a->height - 1;
+	    break;
+	case OB_DIRECTION_EAST:
+	    x = a->x;
+	    break;
+	case OB_DIRECTION_SOUTH:
+	    y = a->y;
+	    break;
+	case OB_DIRECTION_WEST:
+	    x = a->width - 1;
+	    break;
+	default:
+        g_assert_not_reached();
+    }
+
+    XWarpPointer(obt_display, 0, obt_root(ob_screen), 0, 0, 0, 0, x, y);
+}
+
 static gboolean edge_warp_delay_func(gpointer data)
 {
     guint d;
@@ -537,7 +565,10 @@ static gboolean edge_warp_delay_func(gpointer data)
        after that */
     if (edge_warp_odd) {
         d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
-        if (d != screen_desktop) screen_set_desktop(d, TRUE);
+        if (d != screen_desktop) {
+            if (config_mouse_screenedgewarp) edge_warp_move_ptr();
+            screen_set_desktop(d, TRUE);
+        }
     }
     edge_warp_odd = !edge_warp_odd;
 

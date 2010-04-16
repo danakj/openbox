@@ -318,6 +318,9 @@
   <!-- Time before changing desktops when the pointer touches the edge of the
        screen while moving a window, in milliseconds (1000 = 1 second).
        Set this to 0 to disable warping -->
+  <screenEdgeWarpMouse>false</screenEdgeWarpMouse>
+  <!-- Set this to TRUE to move the mouse pointer across the desktop when
+       switching due to hitting the edge of the screen -->
 
   <context name="Frame">
     <mousebind button="A-Left" action="Press">

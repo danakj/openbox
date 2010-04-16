@@ -210,6 +210,7 @@
             <xsd:element minOccurs="0" name="dragThreshold" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="doubleClickTime" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="screenEdgeWarpTime" type="xsd:integer"/>
+            <xsd:element minOccurs="0" name="screenEdgeWarpMouse" type="ob:bool"/>
             <xsd:element maxOccurs="unbounded" name="context" type="ob:context"/>
         </xsd:sequence>
     </xsd:complexType>

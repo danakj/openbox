@@ -86,9 +86,10 @@ guint           config_dock_app_move_modifiers;
 guint config_keyboard_reset_keycode;
 guint config_keyboard_reset_state;
 
-gint config_mouse_threshold;
-gint config_mouse_dclicktime;
-gint config_mouse_screenedgetime;
+gint     config_mouse_threshold;
+gint     config_mouse_dclicktime;
+gint     config_mouse_screenedgetime;
+gboolean config_mouse_screenedgewarp;
 
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
@@ -465,6 +466,8 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
         if (config_mouse_screenedgetime && config_mouse_screenedgetime < 25)
             config_mouse_screenedgetime = 25;
     }
+    if ((n = obt_xml_find_node(node, "screenEdgeWarpMouse")))
+        config_mouse_screenedgewarp = obt_xml_node_bool(n);
 
     n = obt_xml_find_node(node, "context");
     while (n) {
@@ -1030,6 +1033,7 @@ void config_startup(ObtXmlInst *i)
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
     config_mouse_screenedgetime = 400;
+    config_mouse_screenedgewarp = FALSE;
 
     bind_default_mouse();
 

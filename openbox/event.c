@@ -1622,8 +1622,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
         } else if (msgtype == XA_WM_HINTS) {
             client_update_wmhints(client);
         } else if (msgtype == XA_WM_TRANSIENT_FOR) {
-            client_update_transient_for(client);
+            /* get the transient-ness first, as this affects if the client
+               decides to be transient for the group or not in
+               client_update_transient_for() */
             client_get_type_and_transientness(client);
+            client_update_transient_for(client);
             /* type may have changed, so update the layer */
             client_calc_layer(client);
             client_setup_decor_and_functions(client, TRUE);

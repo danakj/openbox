@@ -28,8 +28,6 @@ struct _ObClient;
     to determine if the user is working in another window */
 #define OB_EVENT_USER_TIME_DELAY (500) /* 0.5 seconds */
 
-/*! Time at which the last event with a timestamp occured. */
-extern Time event_curtime;
 /*! The last user-interaction time, as given by the clients */
 extern Time event_last_user_time;
 
@@ -66,6 +64,14 @@ void event_halt_focus_delay(void);
     comes at the same time or later than t2. */
 gboolean event_time_after(guint32 t1, guint32 t2);
 
-Time event_get_server_time(void);
+/*! Time at which the current event occured.  If this is not known, this
+  is a time at or after it, but at or before any other events we will process
+*/
+Time event_time(void);
+/*! A time at which an event happened that caused this current event to be
+  generated.  This is a user-provided time and not to be trusted.
+  Returns CurrentTime if there was no source time provided.
+ */
+Time event_source_time(void);
 
 #endif

@@ -388,7 +388,7 @@ static void do_resize(void)
             ce.xclient.window = moveresize_client->window;
             ce.xclient.format = 32;
             ce.xclient.data.l[0] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST);
-            ce.xclient.data.l[1] = event_curtime;
+            ce.xclient.data.l[1] = event_time();
             ce.xclient.data.l[2] = XSyncValueLow32(val);
             ce.xclient.data.l[3] = XSyncValueHigh32(val);
             ce.xclient.data.l[4] = 0l;

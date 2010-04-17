@@ -255,7 +255,7 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
     if (desktop >= 0 && (unsigned) desktop < screen_num_desktops)
         sn_launcher_context_set_workspace(sn_launcher, (signed) desktop);
     sn_launcher_context_initiate(sn_launcher, "openbox", program,
-                                 event_curtime);
+                                 event_time());
     id = sn_launcher_context_get_startup_id(sn_launcher);
 
     /* 20 second timeout for apps to start */

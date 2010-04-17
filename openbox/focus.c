@@ -194,7 +194,7 @@ void focus_nothing(void)
 
     /* when nothing will be focused, send focus to the backup target */
     XSetInputFocus(obt_display, screen_support_win, RevertToPointerRoot,
-                   event_curtime);
+                   event_time());
 }
 
 void focus_order_add_new(ObClient *c)

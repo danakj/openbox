@@ -209,9 +209,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Managing window: 0x%lx", window);
 
-    /* we want to always have a valid time when the window is mapping */
-    g_assert(event_curtime != CurrentTime);
-
     /* choose the events we want to receive on the CLIENT window
        (ObPrompt windows can request events too) */
     attrib_set.event_mask = CLIENT_EVENTMASK |
@@ -273,7 +270,7 @@ void client_manage(Window window, ObPrompt *prompt)
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
     if (!OBT_PROP_GET32(self->window, NET_WM_USER_TIME, CARDINAL, &user_time))
-        user_time = event_curtime;
+        user_time = event_time();
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -442,7 +439,7 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
     if (activate) {
-        activate = client_can_steal_focus(self, event_curtime, launch_time);
+        activate = client_can_steal_focus(self, event_time(), launch_time);
 
         if (!activate) {
             /* if the client isn't stealing focus, then hilite it so the user
@@ -3400,7 +3397,7 @@ void client_close(ObClient *self)
     else {
         /* request the client to close with WM_DELETE_WINDOW */
         OBT_PROP_MSG_TO(self->window, self->window, WM_PROTOCOLS,
-                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_curtime,
+                        OBT_PROP_ATOM(WM_DELETE_WINDOW), event_time(),
                         0, 0, 0, NoEventMask);
 
         /* we're trying to close the window, so see if it is responding. if it
@@ -3854,7 +3851,7 @@ gboolean client_focus(ObClient *self)
 
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Focusing client \"%s\" (0x%x) at time %u",
-                  self->title, self->window, event_curtime);
+                  self->title, self->window, event_time());
 
     /* if using focus_delay, stop the timer now so that focus doesn't
        go moving on us */
@@ -3866,7 +3863,7 @@ gboolean client_focus(ObClient *self)
         /* This can cause a BadMatch error with CurrentTime, or if an app
            passed in a bad time for _NET_WM_ACTIVE_WINDOW. */
         XSetInputFocus(obt_display, self->window, RevertToPointerRoot,
-                       event_curtime);
+                       event_time());
     }
 
     if (self->focus_notify) {
@@ -3877,7 +3874,7 @@ gboolean client_focus(ObClient *self)
         ce.xclient.window = self->window;
         ce.xclient.format = 32;
         ce.xclient.data.l[0] = OBT_PROP_ATOM(WM_TAKE_FOCUS);
-        ce.xclient.data.l[1] = event_curtime;
+        ce.xclient.data.l[1] = event_time();
         ce.xclient.data.l[2] = 0l;
         ce.xclient.data.l[3] = 0l;
         ce.xclient.data.l[4] = 0l;
@@ -3925,7 +3922,7 @@ void client_activate(ObClient *self, gboolean desktop,
     if ((user && (desktop ||
                   self->desktop == DESKTOP_ALL ||
                   self->desktop == screen_desktop)) ||
-        client_can_steal_focus(self, event_curtime, CurrentTime))
+        client_can_steal_focus(self, event_time(), CurrentTime))
     {
         client_present(self, here, raise, unshade);
     }

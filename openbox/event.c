@@ -97,10 +97,15 @@ static gboolean focus_delay_func(gpointer data);
 static gboolean unfocus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
-Time event_curtime = CurrentTime;
-Time event_last_user_time = CurrentTime;
-/*! The serial of the current X event */
+Time event_last_user_time;
 
+/*! The time of the current X event (if it had a timestamp) */
+static Time event_curtime;
+/*! The source time that started the current X event (user-provided, so not
+  to be trusted) */
+static Time event_sourcetime;
+
+/*! The serial of the current X event */
 static gulong event_curserial;
 static gboolean focus_left_screen = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
@@ -140,9 +145,9 @@ void event_startup(gboolean reconfig)
 
     client_add_destroy_notify(focus_delay_client_dest, NULL);
 
-    /* get an initial time for event_curtime (mapping the initial windows needs
-       a timestamp) */
-    event_curtime = event_get_server_time();
+    event_curtime = CurrentTime;
+    event_sourcetime = CurrentTime;
+    event_last_user_time = CurrentTime;
 }
 
 void event_shutdown(gboolean reconfig)
@@ -211,7 +216,7 @@ static Window event_get_window(XEvent *e)
     return window;
 }
 
-static inline Time event_time(const XEvent *e)
+static inline Time event_get_timestamp(const XEvent *e)
 {
     Time t = CurrentTime;
 
@@ -255,14 +260,7 @@ static inline Time event_time(const XEvent *e)
 
 static void event_set_curtime(XEvent *e)
 {
-    Time t = event_time(e);
-
-    if (t == CurrentTime) {
-        /* Some events don't come with timestamps :(
-           ...but we want the time anyways. */
-        if (e->type == MapRequest)
-            t = event_get_server_time();
-    }
+    Time t = event_get_timestamp(e);
 
     /* watch that if we get an event earlier than the last specified user_time,
        which can happen if the clock goes backwards, we erase the last
@@ -270,6 +268,7 @@ static void event_set_curtime(XEvent *e)
     if (t && event_last_user_time && event_time_after(event_last_user_time, t))
         event_last_user_time = CurrentTime;
 
+    event_sourcetime = CurrentTime;
     event_curtime = t;
 }
 
@@ -747,7 +746,7 @@ static void event_process(const XEvent *ec, gpointer data)
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time */
-    event_curtime = CurrentTime;
+    event_curtime = event_sourcetime = CurrentTime;
     event_curserial = 0;
 }
 
@@ -768,11 +767,12 @@ static void event_handle_root(XEvent *e)
         if (msgtype == OBT_PROP_ATOM(NET_CURRENT_DESKTOP)) {
             guint d = e->xclient.data.l[0];
             if (d < screen_num_desktops) {
-                event_curtime = e->xclient.data.l[1];
-                if (event_curtime == 0)
+                if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_CURRENT_DESKTOP message is missing "
                                   "a timestamp");
+                else
+                    event_sourcetime = e->xclient.data.l[1];
                 screen_set_desktop(d, TRUE);
             }
         } else if (msgtype == OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS)) {
@@ -831,7 +831,7 @@ void event_enter_client(ObClient *client)
 
             data = g_slice_new(ObFocusDelayData);
             data->client = client;
-            data->time = event_curtime;
+            data->time = event_time();
             data->serial = event_curserial;
 
             obt_main_loop_timeout_add(ob_main_loop,
@@ -841,7 +841,7 @@ void event_enter_client(ObClient *client)
         } else {
             ObFocusDelayData data;
             data.client = client;
-            data.time = event_curtime;
+            data.time = event_time();
             data.serial = event_curserial;
             focus_delay_func(&data);
         }
@@ -866,7 +866,7 @@ void event_leave_client(ObClient *client)
 
             data = g_slice_new(ObFocusDelayData);
             data->client = client;
-            data->time = event_curtime;
+            data->time = event_time();
             data->serial = event_curserial;
 
             obt_main_loop_timeout_add(ob_main_loop,
@@ -876,7 +876,7 @@ void event_leave_client(ObClient *client)
         } else {
             ObFocusDelayData data;
             data.client = client;
-            data.time = event_curtime;
+            data.time = event_time();
             data.serial = event_curserial;
             unfocus_delay_func(&data);
         }
@@ -1423,13 +1423,11 @@ static void event_handle_client(ObClient *client, XEvent *e)
                    so do not use this timestamp in event_curtime, as this would
                    be used in XSetInputFocus.
                 */
-                /*event_curtime = e->xclient.data.l[1];*/
+                event_sourcetime = e->xclient.data.l[1];
                 if (e->xclient.data.l[1] == 0)
                     ob_debug_type(OB_DEBUG_APP_BUGS,
                                   "_NET_ACTIVE_WINDOW message for window %s is"
                                   " missing a timestamp", client->title);
-
-                event_curtime = event_get_server_time();
             } else
                 ob_debug_type(OB_DEBUG_APP_BUGS,
                               "_NET_ACTIVE_WINDOW message for window %s is "
@@ -2080,7 +2078,7 @@ static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2)
 static gboolean focus_delay_func(gpointer data)
 {
     ObFocusDelayData *d = data;
-    Time old = event_curtime;
+    Time old = event_curtime; /* save the curtime */
 
     event_curtime = d->time;
     event_curserial = d->serial;
@@ -2093,7 +2091,7 @@ static gboolean focus_delay_func(gpointer data)
 static gboolean unfocus_delay_func(gpointer data)
 {
     ObFocusDelayData *d = data;
-    Time old = event_curtime;
+    Time old = event_curtime; /* save the curtime */
 
     event_curtime = d->time;
     event_curserial = d->serial;
@@ -2226,13 +2224,18 @@ gboolean event_time_after(guint32 t1, guint32 t2)
 
 Bool find_timestamp(Display *d, XEvent *e, XPointer a)
 {
-    const Time t = event_time(e);
+    const Time t = event_get_timestamp(e);
     return t != CurrentTime;
 }
 
-Time event_get_server_time(void)
+Time event_time(void)
 {
     XEvent event;
+
+    if (event_curtime) return event_curtime;
+
+    /* Some events don't come with timestamps :(
+       ...but we can get one anyways >:) */
 
     /* Generate a timestamp so there is guaranteed at least one in the queue
        eventually */
@@ -2243,5 +2246,11 @@ Time event_get_server_time(void)
     /* Grab the first timestamp available */
     XPeekIfEvent(obt_display, &event, find_timestamp, NULL);
 
-    return event.xproperty.time;
+    /* Save the time so we don't have to do this again for this event */
+    return event_curtime = event.xproperty.time;
+}
+
+Time event_source_time(void)
+{
+    return event_sourcetime;
 }

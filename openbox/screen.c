@@ -116,7 +116,7 @@ static gboolean replace_wm(void)
             current_wm_sn_owner = None;
     }
 
-    timestamp = event_get_server_time();
+    timestamp = event_time();
 
     XSetSelectionOwner(obt_display, wm_sn_atom, screen_support_win,
                        timestamp);
@@ -731,8 +731,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     event_end_ignore_all_enters(ignore_start);
 
-    if (event_curtime != CurrentTime)
-        screen_desktop_user_time = event_curtime;
+    if (event_source_time() != CurrentTime)
+        screen_desktop_user_time = event_source_time();
 }
 
 void screen_add_desktop(gboolean current)

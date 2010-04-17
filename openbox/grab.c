@@ -44,7 +44,7 @@ static ObtIC *ic = NULL;
 
 static Time ungrab_time(void)
 {
-    Time t = event_curtime;
+    Time t = event_time();
     if (grab_time == CurrentTime ||
         !(t == CurrentTime || event_time_after(t, grab_time)))
         /* When the time moves backward on the server, then we can't use
@@ -87,12 +87,12 @@ gboolean grab_keyboard_full(gboolean grab)
         if (kgrabs++ == 0) {
             ret = XGrabKeyboard(obt_display, grab_window(),
                                 False, GrabModeAsync, GrabModeAsync,
-                                event_curtime) == Success;
+                                event_time()) == Success;
             if (!ret)
                 --kgrabs;
             else {
                 passive_count = 0;
-                grab_time = event_curtime;
+                grab_time = event_time();
             }
         } else
             ret = TRUE;
@@ -117,11 +117,11 @@ gboolean grab_pointer_full(gboolean grab, gboolean owner_events,
                                GRAB_PTR_MASK,
                                GrabModeAsync, GrabModeAsync,
                                (confine ? obt_root(ob_screen) : None),
-                               ob_cursor(cur), event_curtime) == Success;
+                               ob_cursor(cur), event_time()) == Success;
             if (!ret)
                 --pgrabs;
             else
-                grab_time = event_curtime;
+                grab_time = event_time();
         } else
             ret = TRUE;
     } else if (pgrabs > 0) {
@@ -238,7 +238,7 @@ void ungrab_passive_key(void)
     /*ob_debug("ungrabbing %d passive grabs\n", passive_count);*/
     if (passive_count) {
         /* kill our passive grab */
-        XUngrabKeyboard(obt_display, event_curtime);
+        XUngrabKeyboard(obt_display, event_time());
         passive_count = 0;
     }
 }

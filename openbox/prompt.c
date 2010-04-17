@@ -462,7 +462,7 @@ void prompt_show(ObPrompt *self, ObClient *parent, gboolean modal)
         /* activate the prompt */
         OBT_PROP_MSG(ob_screen, self->super.window, NET_ACTIVE_WINDOW,
                      1, /* from an application.. */
-                     event_curtime,
+                     event_time(),
                      0,
                      0, 0);
         return;

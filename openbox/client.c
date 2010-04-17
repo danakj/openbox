@@ -203,13 +203,14 @@ void client_manage(Window window, ObPrompt *prompt)
     ObAppSettings *settings;
     gboolean transient = FALSE;
     Rect place;
-    Time launch_time, map_time;
+    Time launch_time;
     guint32 user_time;
     gboolean obplaced;
 
     ob_debug("Managing window: 0x%lx", window);
 
-    map_time = event_get_server_time();
+    /* we want to always have a valid time when the window is mapping */
+    g_assert(event_curtime != CurrentTime);
 
     /* choose the events we want to receive on the CLIENT window
        (ObPrompt windows can request events too) */
@@ -272,7 +273,7 @@ void client_manage(Window window, ObPrompt *prompt)
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
     if (!OBT_PROP_GET32(self->window, NET_WM_USER_TIME, CARDINAL, &user_time))
-        user_time = map_time;
+        user_time = event_curtime;
 
     /* do this after we have a frame.. it uses the frame to help determine the
        WM_STATE to apply. */
@@ -441,7 +442,7 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
     if (activate) {
-        activate = client_can_steal_focus(self, map_time, launch_time);
+        activate = client_can_steal_focus(self, event_curtime, launch_time);
 
         if (!activate) {
             /* if the client isn't stealing focus, then hilite it so the user

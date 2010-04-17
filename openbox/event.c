@@ -139,6 +139,10 @@ void event_startup(gboolean reconfig)
 #endif
 
     client_add_destroy_notify(focus_delay_client_dest, NULL);
+
+    /* get an initial time for event_curtime (mapping the initial windows needs
+       a timestamp) */
+    event_curtime = event_get_server_time();
 }
 
 void event_shutdown(gboolean reconfig)
@@ -207,7 +211,7 @@ static Window event_get_window(XEvent *e)
     return window;
 }
 
-static void event_set_curtime(XEvent *e)
+static inline Time event_time(const XEvent *e)
 {
     Time t = CurrentTime;
 
@@ -238,12 +242,26 @@ static void event_set_curtime(XEvent *e)
         if (obt_display_extension_sync &&
             e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
         {
-            t = ((XSyncAlarmNotifyEvent*)e)->time;
+            t = ((const XSyncAlarmNotifyEvent*)e)->time;
         }
 #endif
         /* if more event types are anticipated, get their timestamp
            explicitly */
         break;
+    }
+
+    return t;
+}
+
+static void event_set_curtime(XEvent *e)
+{
+    Time t = event_time(e);
+
+    if (t == CurrentTime) {
+        /* Some events don't come with timestamps :(
+           ...but we want the time anyways. */
+        if (e->type == MapRequest)
+            t = event_get_server_time();
     }
 
     /* watch that if we get an event earlier than the last specified user_time,
@@ -2206,14 +2224,24 @@ gboolean event_time_after(guint32 t1, guint32 t2)
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
 }
 
+Bool find_timestamp(Display *d, XEvent *e, XPointer a)
+{
+    const Time t = event_time(e);
+    return t != CurrentTime;
+}
+
 Time event_get_server_time(void)
 {
-    /* Generate a timestamp */
     XEvent event;
 
+    /* Generate a timestamp so there is guaranteed at least one in the queue
+       eventually */
     XChangeProperty(obt_display, screen_support_win,
                     OBT_PROP_ATOM(WM_CLASS), OBT_PROP_ATOM(STRING),
                     8, PropModeAppend, NULL, 0);
-    XWindowEvent(obt_display, screen_support_win, PropertyChangeMask, &event);
+
+    /* Grab the first timestamp available */
+    XPeekIfEvent(obt_display, &event, find_timestamp, NULL);
+
     return event.xproperty.time;
 }

@@ -3128,11 +3128,16 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     /* if it moved between monitors, then this can affect the stacking
        layer of this window or others - for fullscreen windows.
        also if it changed to/from oldschool fullscreen then its layer may
-       change */
-    if (screen_find_monitor(&self->frame->area) !=
-        screen_find_monitor(&oldframe) ||
-        (final && (client_is_oldfullscreen(self, &oldclient) !=
-                   client_is_oldfullscreen(self, &self->area))))
+       change
+
+       watch out tho, don't try change stacking stuff if the window is no
+       longer being managed !
+    */
+    if (self->managed &&
+        (screen_find_monitor(&self->frame->area) !=
+         screen_find_monitor(&oldframe) ||
+         (final && (client_is_oldfullscreen(self, &oldclient) !=
+                    client_is_oldfullscreen(self, &self->area)))))
     {
         client_calc_layer(self);
     }

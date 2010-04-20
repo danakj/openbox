@@ -438,8 +438,11 @@ void stacking_add(ObWindow *win)
 {
     g_assert(screen_support_win != None); /* make sure I dont break this in the
                                              future */
+    /* don't add windows that are being unmanaged ! */
+    if (WINDOW_IS_CLIENT(win)) g_assert(WINDOW_AS_CLIENT(win)->managed);
 
     stacking_list = g_list_append(stacking_list, win);
+
     stacking_raise(win);
 }
 
@@ -497,6 +500,9 @@ void stacking_add_nonintrusive(ObWindow *win)
     }
 
     client = WINDOW_AS_CLIENT(win);
+
+    /* don't add windows that are being unmanaged ! */
+    g_assert(client->managed);
 
     /* insert above its highest parent (or its highest child !) */
     it_below = find_highest_relative(client);

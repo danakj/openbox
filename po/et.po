@@ -1,21 +1,23 @@
+# Openboxi eesti keele tõlge
 # translation of openbox to Estonian
 # Copyright (C) 2007 Dana Jansens
 # This file is distributed under the same license as the Openbox 3 package.
 #
 # Andres Järv <andresjarv@gmail.com>, 2007.
+# Mihkel <turakas gmail com>, 2010
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.3\n"
+"Project-Id-Version: Openbox 3.4.11.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2011-08-01 18:20+0200\n"
-"PO-Revision-Date: 2007-07-20 16:54+0200\n"
-"Last-Translator: Andres Järv <andresjarv@gmail.com>\n"
+"PO-Revision-Date: 2010-04-21 21:40+0300\n"
+"Last-Translator: mihkel <turakas@gmail.com>\n"
 "Language-Team: Estonian <et@li.org>\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: openbox/actions.c:198
 #, c-format
@@ -24,15 +26,15 @@ msgstr "Taotleti kehtetut käsklust \"%s\". Sellist käsklust pole olemas."
 
 #: openbox/actions/execute.c:147
 msgid "No"
-msgstr ""
+msgstr "Ei"
 
 #: openbox/actions/execute.c:148
 msgid "Yes"
-msgstr ""
+msgstr "Jah"
 
 #: openbox/actions/execute.c:152
 msgid "Execute"
-msgstr ""
+msgstr "Käivita"
 
 #: openbox/actions/execute.c:161
 #, c-format
@@ -41,39 +43,39 @@ msgstr "Raja \"%s\" ümberkodeerimine UTF8-st ebaõnnestus"
 
 #: openbox/actions/exit.c:69 openbox/client.c:3550
 msgid "Cancel"
-msgstr ""
+msgstr "Katkesta"
 
 #: openbox/actions/exit.c:70
 msgid "Exit"
-msgstr ""
+msgstr "Välju"
 
 #: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Kas oled kindel, et soovid välja logida?"
 
 #: openbox/actions/exit.c:75
 msgid "Log Out"
-msgstr ""
+msgstr "Logi välja"
 
 #: openbox/actions/exit.c:78
 msgid "Are you sure you want to exit Openbox?"
-msgstr ""
+msgstr "Kas oled kindel, et soovid OpenBoxist väljuda?"
 
 #: openbox/actions/exit.c:79
 msgid "Exit Openbox"
-msgstr ""
+msgstr "Välju Openbox-st"
 
 #: openbox/client.c:2037
 msgid "Unnamed Window"
-msgstr ""
+msgstr "Nimetu aken"
 
 #: openbox/client.c:2051 openbox/client.c:2082
 msgid "Killing..."
-msgstr ""
+msgstr "Tapan..."
 
 #: openbox/client.c:2053 openbox/client.c:2084
 msgid "Not Responding"
-msgstr ""
+msgstr "Ei vasta"
 
 #: openbox/client.c:3539
 #, c-format
@@ -81,10 +83,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
+"Paistab, et aken \"%s\" ei vasta enam. Kas soovid teda jõuga väljuma sundida "
+"saates %s signaali?"
 
 #: openbox/client.c:3541
 msgid "End Process"
-msgstr ""
+msgstr "Lõpeta protsess"
 
 #: openbox/client.c:3545
 #, c-format
@@ -92,10 +96,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
+"Paistab, et aken \"%s\" ei vasta enam. Kas soovid ta X serverist lahti "
+"ühendada?"
 
 #: openbox/client.c:3547
 msgid "Disconnect"
-msgstr ""
+msgstr "Ühenda lahti"
 
 #: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
@@ -189,7 +195,7 @@ msgstr "Vigane kontekst \"%s\" hiire kiirklahvides"
 #: openbox/config.c:857
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Vigane nupp \"%s\" määratletud konfiguratsioonifailis"
+msgstr "Vigane nupp \"%s\" määratud seadistuste failis"
 
 #: openbox/config.c:882
 msgid ""
@@ -208,7 +214,7 @@ msgstr "Sulge"
 
 #: openbox/keyboard.c:161
 msgid "Conflict with key binding in config file"
-msgstr "Konflikt kiirklahviga konfiguratsioonifailis"
+msgstr "Konflikt kiirklahviga seadistuste failis"
 
 #: openbox/menu.c:94 openbox/menu.c:106
 #, c-format
@@ -250,7 +256,7 @@ msgstr "DISPLAY keskkonnamuutujas oleva ekraani avamine ebaõnnestus."
 
 #: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
-msgstr "Obrender-damisteegi käivitamine ebaõnnestus."
+msgstr "Obrender-damise teegi käivitamine ebaõnnestus."
 
 #: openbox/openbox.c:193
 msgid "X server does not support locale."
@@ -263,12 +269,12 @@ msgstr "Ei suudetud sättida lokaadimuutujaid X serveri jaoks."
 #: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Ei suudetud leida kehtivat konfiguratsioonifaili, kasutatakse lihtsaid "
+"Kehtiva seadistuste faili leidmine ebaõnnestus, kasutatakse lihtsaid "
 "vaikimisi seadeid"
 
 #: openbox/openbox.c:286
 msgid "Unable to load a theme."
-msgstr "Ei suudetud laadida teemat."
+msgstr "Teema laadimine ebaõnnestus."
 
 #: openbox/openbox.c:370
 #, c-format
@@ -277,10 +283,13 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
+"Üks või enam XML süntaki viga leiti Openboxi seadistuse faili parsides. "
+"Rohkem infot leiad stdout-st. Viimane viga oli failis \"%s\", real %d ja "
+"sõnum oli: %s"
 
 #: openbox/openbox.c:372
 msgid "Openbox Syntax Error"
-msgstr ""
+msgstr "Openboxi süntaksi viga"
 
 #: openbox/openbox.c:438
 #, c-format
@@ -320,7 +329,7 @@ msgstr "  --replace           Hetkel töötava aknahalduri asendamine\n"
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:536
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr ""
+msgstr "  --config-file FAIL Määra kasutatava seadistuste faili teekond\n"
 
 #: openbox/openbox.c:537
 msgid "  --sm-disable        Disable connection to the session manager\n"
@@ -344,7 +353,7 @@ msgstr "  --restart           Openboxi taaskäivitamine\n"
 
 #: openbox/openbox.c:541
 msgid "  --exit              Exit Openbox\n"
-msgstr ""
+msgstr "  --exit              Välju Openbox-st\n"
 
 #: openbox/openbox.c:542
 msgid ""
@@ -390,7 +399,7 @@ msgstr ""
 #: openbox/openbox.c:632 openbox/openbox.c:666
 #, c-format
 msgid "%s requires an argument\n"
-msgstr ""
+msgstr "%s nõuab argumenti\n"
 
 #: openbox/openbox.c:709
 #, c-format
@@ -425,7 +434,11 @@ msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr[0] ""
+"Openbox on seadistatud %d töölauale, aga aktiivsel seansil on %d. Tühistan "
+"Openboxi seadistuse."
 msgstr[1] ""
+"Openbox on seadistatud %d töölauale, aga aktiivsel seansil on %d. Tühistan "
+"Openboxi seadistuse."
 
 #: openbox/screen.c:1205
 #, c-format
@@ -459,7 +472,7 @@ msgstr "Soovitud klahvi \"%s\" ei ole sellel ekraanil"
 
 #: openbox/prompt.c:153
 msgid "OK"
-msgstr ""
+msgstr "Sobib"
 
 #~ msgid "Unable to save the session to \"%s\": %s"
 #~ msgstr "Seansi \"%s\" salvestamine ebaõnnestus: %s"
@@ -467,8 +480,18 @@ msgstr ""
 #~ msgid "Error while saving the session to \"%s\": %s"
 #~ msgstr "Seansi \"%s\" salvestamisel ilmnes viga: %s"
 
+#~ msgid "Not connected to a session manager"
+#~ msgstr "Pole ühendatud seansihalduriga"
+
 #~ msgid "X Error: %s"
 #~ msgstr "X-i viga: %s"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout tegevust pole saadaval, kuna Openbox on kompileeritud "
+#~ "seansi haldamise toeta"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "\"%s\" käivitamine ebaõnnestus: %s"

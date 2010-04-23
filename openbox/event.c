@@ -1352,10 +1352,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
           to an already unmapped window.
         */
 
-        /* we don't want the reparent event, put it back on the stack for the
-           X server to deal with after we unmanage the window */
-        XPutBackEvent(obt_display, e);
-
         ob_debug("ReparentNotify for window 0x%x", client->window);
         client_unmanage(client);
         break;

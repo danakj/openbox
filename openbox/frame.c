@@ -1064,7 +1064,6 @@ void frame_release_client(ObFrame *self)
         */
         if (ev.xreparent.parent != self->window) {
             reparent = FALSE;
-            XPutBackEvent(obt_display, &ev);
             break;
         }
     }

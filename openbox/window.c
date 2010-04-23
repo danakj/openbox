@@ -146,6 +146,13 @@ void window_manage_all(void)
     if (children) XFree(children);
 }
 
+static Bool check_unmap(Display *d, XEvent *e, XPointer arg)
+{
+    const Window win = *(Window*)arg;
+    return ((e->type == DestroyNotify && e->xdestroywindow.window == win) ||
+            (e->type == UnmapNotify && e->xunmap.window == win));
+}
+
 void window_manage(Window win)
 {
     XEvent e;
@@ -158,10 +165,7 @@ void window_manage(Window win)
 
     /* check if it has already been unmapped by the time we started
        mapping. the grab does a sync so we don't have to here */
-    if (XCheckTypedWindowEvent(obt_display, win, DestroyNotify, &e) ||
-        XCheckTypedWindowEvent(obt_display, win, UnmapNotify, &e))
-    {
-        XPutBackEvent(obt_display, &e);
+    if (XCheckIfEvent(obt_display, &e, check_unmap, (XPointer)&win)) {
         ob_debug("Trying to manage unmapped window. Aborting that.");
         no_manage = TRUE;
     }

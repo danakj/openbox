@@ -1374,7 +1374,14 @@ void screen_update_areas(void)
 {
     guint i;
     gulong *dims;
-    GList *it;
+    GList *it, *onscreen;
+
+    /* collect the clients that are on screen */
+    onscreen = NULL;
+    for (it = client_list; it; it = g_list_next(it)) {
+        if (client_monitor(it->data) != screen_num_monitors)
+            onscreen = g_list_prepend(onscreen, it->data);
+    }
 
     g_free(monitor_area);
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
@@ -1448,8 +1455,10 @@ void screen_update_areas(void)
                     dims, 4 * screen_num_desktops);
 
     /* the area has changed, adjust all the windows if they need it */
-    for (it = client_list; it; it = g_list_next(it))
+    for (it = onscreen; it; it = g_list_next(it)) {
+        client_move_onscreen(it->data, FALSE);
         client_reconfigure(it->data, FALSE);
+    }
 
     g_free(dims);
 }

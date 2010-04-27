@@ -3197,6 +3197,11 @@ void client_fullscreen(ObClient *self, gboolean fs)
     ob_debug("Window %s going fullscreen (%d)",
              self->title, self->fullscreen);
 
+    if (fs) {
+        /* make sure the window is on some monitor */
+        client_find_onscreen(self, &x, &y, w, h, FALSE);
+    }
+
     client_setup_decor_and_functions(self, FALSE);
     client_move_resize(self, x, y, w, h);
 
@@ -3338,6 +3343,11 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
         self->max_horz = max;
     if (dir == 0 || dir == 2) /* vert */
         self->max_vert = max;
+
+    if (max) {
+        /* make sure the window is on some monitor */
+        client_find_onscreen(self, &x, &y, w, h, FALSE);
+    }
 
     client_change_state(self); /* change the state hints on the client */
 

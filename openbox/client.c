@@ -2488,10 +2488,6 @@ gboolean client_is_oldfullscreen(const ObClient *self,
 static ObStackingLayer calc_layer(ObClient *self)
 {
     ObStackingLayer l;
-    const Rect *monitor, *allmonitors;
-
-    monitor = screen_physical_area_monitor(client_monitor(self));
-    allmonitors = screen_physical_area_all_monitors();
 
     if (self->type == OB_CLIENT_TYPE_DESKTOP)
         l = OB_STACKING_LAYER_DESKTOP;

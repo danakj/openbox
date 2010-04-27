@@ -41,6 +41,7 @@
 
 /* how far windows move and resize with the keyboard arrows */
 #define KEY_DIST 8
+#define SYNC_TIMEOUTS 4
 
 gboolean moveresize_in_progress = FALSE;
 ObClient *moveresize_client = NULL;
@@ -58,7 +59,7 @@ static ObDirection edge_warp_dir = -1;
 static gboolean edge_warp_odd = FALSE;
 static ObDirection key_resize_edge = -1;
 #ifdef SYNC
-static gboolean waiting_for_sync;
+static guint waiting_for_sync;
 #endif
 
 static ObPopup *popup = NULL;
@@ -291,7 +292,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
                                             XSyncCAEvents,
                                             &aa);
 
-        waiting_for_sync = FALSE;
+        waiting_for_sync = 0;
     }
 #endif
 }
@@ -355,28 +356,33 @@ static void do_resize(void)
 {
     gint x, y, w, h, lw, lh;
 
-    /* see if it is actually going to resize */
-    x = 0;
-    y = 0;
+    /* see if it is actually going to resize
+       USE cur_x AND cur_y HERE !  Otherwise the try_configure won't know
+       what struts to use !!
+     */
+    x = cur_x;
+    y = cur_y;
     w = cur_w;
     h = cur_h;
     client_try_configure(moveresize_client, &x, &y, &w, &h,
                          &lw, &lh, TRUE);
     if (!(w == moveresize_client->area.width &&
-          h == moveresize_client->area.height))
+          h == moveresize_client->area.height) &&
+        /* if waiting_for_sync == 0, then we aren't waiting.
+           if it is > SYNC_TIMEOUTS, then we have timed out
+           that many times already, so forget about waiting more */
+        (waiting_for_sync == 0 || waiting_for_sync > SYNC_TIMEOUTS))
     {
-
 #ifdef SYNC
         if (config_resize_redraw && obt_display_extension_sync &&
-            moveresize_client->sync_request && moveresize_client->sync_counter &&
+            /* don't send another sync when one is pending */
+            waiting_for_sync == 0 &&
+            moveresize_client->sync_request &&
+            moveresize_client->sync_counter &&
             !moveresize_client->not_responding)
         {
             XEvent ce;
             XSyncValue val;
-
-            /* are we already waiting for the sync counter to catch up? */
-            if (waiting_for_sync)
-                return;
 
             /* increment the value we're waiting for */
             ++moveresize_client->sync_counter_value;
@@ -396,7 +402,7 @@ static void do_resize(void)
             XSendEvent(obt_display, moveresize_client->window, FALSE,
                        NoEventMask, &ce);
 
-            waiting_for_sync = TRUE;
+            waiting_for_sync = 1;
 
             obt_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
             obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
@@ -405,8 +411,10 @@ static void do_resize(void)
         }
 #endif
 
+        /* force a ConfigureNotify, it is part of the spec for SYNC resizing
+           and MUST follow the sync counter notification */
         client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
-                         TRUE, FALSE, FALSE);
+                         TRUE, FALSE, TRUE);
     }
 
     /* this would be better with a fixed width font ... XXX can do it better
@@ -421,10 +429,13 @@ static void do_resize(void)
 #ifdef SYNC
 static gboolean sync_timeout_func(gpointer data)
 {
-    waiting_for_sync = FALSE; /* we timed out waiting for our sync... */
+    ++waiting_for_sync; /* we timed out waiting for our sync... */
     do_resize(); /* ...so let any pending resizes through */
 
-    return FALSE; /* don't repeat */
+    if (waiting_for_sync > SYNC_TIMEOUTS)
+        return FALSE; /* don't repeat */
+    else
+        return TRUE; /* keep waiting */
 }
 #endif
 
@@ -970,7 +981,7 @@ gboolean moveresize_event(XEvent *e)
 #ifdef SYNC
     else if (e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
     {
-        waiting_for_sync = FALSE; /* we got our sync... */
+        waiting_for_sync = 0; /* we got our sync... */
         do_resize(); /* ...so try resize if there is more change pending */
         used = TRUE;
     }

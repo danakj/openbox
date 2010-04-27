@@ -1551,7 +1551,13 @@ void client_update_sync_request_counter(ObClient *self)
 
     if (OBT_PROP_GET32(self->window, NET_WM_SYNC_REQUEST_COUNTER, CARDINAL,&i))
     {
+        XSyncValue val;
+
         self->sync_counter = i;
+
+        /* this must be set when managing a new window according to EWMH */
+        XSyncIntToValue(&val, 0);
+        XSyncSetCounter(obt_display, self->sync_counter, val);
     } else
         self->sync_counter = None;
 }
@@ -3082,9 +3088,11 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        used to follow the same rules as above, but _Java_ Swing can't handle
        this. So just to appease Swing, when user = TRUE, we always send
        a synthetic ConfigureNotify to give the window its root coordinates.
+       Lastly, if force_reply is TRUE, we always send a
+       ConfigureNotify, which is needed during a resize with XSYNCronization.
     */
     if ((!user && !resized && (rootmoved || force_reply)) ||
-        (user && final && rootmoved))
+        (user && ((!resized && force_reply) || (final && rootmoved))))
     {
         XEvent event;
 

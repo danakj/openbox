@@ -1659,6 +1659,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
         }
 #ifdef SYNC
         else if (msgtype == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER)) {
+            /* if they are resizing right now this would cause weird behaviour.
+               if one day a user reports clients stop resizing, then handle
+               this better by resetting a new XSync alarm and stuff on the
+               new counter, but I expect it will never happen */
+            if (moveresize_client == client)
+                moveresize_end(FALSE);
             client_update_sync_request_counter(client);
         }
 #endif

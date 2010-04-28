@@ -42,6 +42,7 @@
 #include "obrender/render.h"
 #include "gettext.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/prop.h"
 
 #ifdef HAVE_UNISTD_H
@@ -3620,36 +3621,31 @@ ObClient *client_search_modal_child(ObClient *self)
     return NULL;
 }
 
-static gboolean client_validate_unmap(ObClient *self, int n)
+struct ObClientFindDestroyUnmap {
+    Window window;
+    gint ignore_unmaps;
+};
+
+static gboolean find_destroy_unmap(XEvent *e, gpointer data)
 {
-    XEvent e;
-    gboolean ret = TRUE;
-
-    if (XCheckTypedWindowEvent(obt_display, self->window, UnmapNotify, &e)) {
-        if (n < self->ignore_unmaps) // ignore this one, but look for more
-            ret = client_validate_unmap(self, n+1);
-        else
-            ret = FALSE; // the window is going to become unmanaged
-
-        /* put them back on the event stack so they end up in the same order */
-        XPutBackEvent(obt_display, &e);
-    }
-
-    return ret;
+    struct ObClientFindDestroyUnmap *find = data;
+    if (e->type == DestroyNotify)
+        return e->xdestroywindow.window == find->window;
+    if (e->type == UnmapNotify && e->xunmap.window == find->window)
+        /* ignore the first $find->ignore_unmaps$ many unmap events */
+        return --find->ignore_unmaps < 0;
+    return FALSE;
 }
 
 gboolean client_validate(ObClient *self)
 {
-    XEvent e;
+    struct ObClientFindDestroyUnmap find;
 
     XSync(obt_display, FALSE); /* get all events on the server */
 
-    if (XCheckTypedWindowEvent(obt_display, self->window, DestroyNotify, &e)) {
-        XPutBackEvent(obt_display, &e);
-        return FALSE;
-    }
-
-    if (!client_validate_unmap(self, 0))
+    find.window = self->window;
+    find.ignore_unmaps = self->ignore_unmaps;
+    if (xqueue_exists_local(find_destroy_unmap, &find))
         return FALSE;
 
     return TRUE;
@@ -3841,6 +3837,8 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    if (!client_validate(self)) return FALSE;
+
     /* we might not focus this window, so if we have modal children which would
        be focused instead, bring them to this desktop */
     client_bring_modal_windows(self);

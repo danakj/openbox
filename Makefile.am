@@ -148,7 +148,9 @@ obt_libobt_la_SOURCES = \
 	obt/prop.c \
 	obt/util.h \
 	obt/xevent.h \
-	obt/xevent.c
+	obt/xevent.c \
+	obt/xqueue.h \
+	obt/xqueue.c
 
 ## openbox ##
 
@@ -441,7 +443,8 @@ obtpubinclude_HEADERS = \
 	obt/prop.h \
 	obt/util.h \
 	obt/version.h \
-	obt/xevent.h
+	obt/xevent.h \
+	obt/xqueue.h
 
 nodist_pkgconfig_DATA = \
 	obrender/obrender-3.5.pc \

@@ -20,6 +20,7 @@
 #include "obt/prop.h"
 #include "obt/internal.h"
 #include "obt/keyboard.h"
+#include "obt/xqueue.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
@@ -30,6 +31,10 @@
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
+
+/* from xqueue.c */
+extern void xqueue_init(void);
+extern void xqueue_destroy(void);
 
 Display* obt_display = NULL;
 
@@ -116,13 +121,19 @@ gboolean obt_display_open(const char *display_name)
     }
     g_free(n);
 
+    if (obt_display)
+        xqueue_init();
+
     return obt_display != NULL;
 }
 
 void obt_display_close(void)
 {
     obt_keyboard_shutdown();
-    if (obt_display) XCloseDisplay(obt_display);
+    if (obt_display) {
+        xqueue_destroy();
+        XCloseDisplay(obt_display);
+    }
 }
 
 static gint xerror_handler(Display *d, XErrorEvent *e)

@@ -26,6 +26,7 @@
 #include "prompt.h"
 #include "debug.h"
 #include "grab.h"
+#include "obt/xqueue.h"
 
 static GHashTable *window_map;
 
@@ -146,16 +147,15 @@ void window_manage_all(void)
     if (children) XFree(children);
 }
 
-static Bool check_unmap(Display *d, XEvent *e, XPointer arg)
+static gboolean check_unmap(XEvent *e, gpointer data)
 {
-    const Window win = *(Window*)arg;
+    const Window win = *(Window*)data;
     return ((e->type == DestroyNotify && e->xdestroywindow.window == win) ||
             (e->type == UnmapNotify && e->xunmap.window == win));
 }
 
 void window_manage(Window win)
 {
-    XEvent e;
     XWindowAttributes attrib;
     gboolean no_manage = FALSE;
     gboolean is_dockapp = FALSE;
@@ -165,12 +165,11 @@ void window_manage(Window win)
 
     /* check if it has already been unmapped by the time we started
        mapping. the grab does a sync so we don't have to here */
-    if (XCheckIfEvent(obt_display, &e, check_unmap, (XPointer)&win)) {
+    if (xqueue_exists_local(check_unmap, &win)) {
         ob_debug("Trying to manage unmapped window. Aborting that.");
         no_manage = TRUE;
     }
-
-    if (!XGetWindowAttributes(obt_display, win, &attrib))
+    else if (!XGetWindowAttributes(obt_display, win, &attrib))
         no_manage = TRUE;
     else {
         XWMHints *wmhints;

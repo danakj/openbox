@@ -40,6 +40,7 @@
 #include "stacking.h"
 #include "ping.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
 
@@ -108,6 +109,7 @@ static Time event_sourcetime;
 /*! The serial of the current X event */
 static gulong event_curserial;
 static gboolean focus_left_screen = FALSE;
+static gboolean waiting_for_focusin = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
 static GSList *ignore_serials = NULL;
 
@@ -288,8 +290,11 @@ static void event_hack_mods(XEvent *e)
         /* compress events */
         {
             XEvent ce;
-            while (XCheckTypedWindowEvent(obt_display, e->xmotion.window,
-                                          e->type, &ce)) {
+            ObtXQueueWindowType wt;
+
+            wt.window = e->xmotion.window;
+            wt.type = MotionNotify;
+            while (xqueue_remove_local(&ce, xqueue_match_window_type, &wt)) {
                 e->xmotion.x = ce.xmotion.x;
                 e->xmotion.y = ce.xmotion.y;
                 e->xmotion.x_root = ce.xmotion.x_root;
@@ -389,12 +394,12 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
     }
 }
 
-static Bool event_look_for_focusin(Display *d, XEvent *e, XPointer arg)
+static gboolean event_look_for_focusin(XEvent *e, gpointer data)
 {
     return e->type == FocusIn && wanted_focusevent(e, FALSE);
 }
 
-static Bool event_look_for_focusin_client(Display *d, XEvent *e, XPointer arg)
+static gboolean event_look_for_focusin_client(XEvent *e, gpointer data)
 {
     return e->type == FocusIn && wanted_focusevent(e, TRUE);
 }
@@ -437,28 +442,9 @@ static void print_focusevent(XEvent *e)
 
 }
 
-static gboolean event_ignore(XEvent *e, ObClient *client)
-{
-    switch(e->type) {
-    case FocusIn:
-        print_focusevent(e);
-        if (!wanted_focusevent(e, FALSE))
-            return TRUE;
-        break;
-    case FocusOut:
-        print_focusevent(e);
-        if (!wanted_focusevent(e, FALSE))
-            return TRUE;
-        break;
-    }
-    return FALSE;
-}
-
 static void event_process(const XEvent *ec, gpointer data)
 {
     XEvent ee, *e;
-    ObEventData *ed = data;
-
     Window window;
     ObClient *client = NULL;
     ObDock *dock = NULL;
@@ -502,21 +488,23 @@ static void event_process(const XEvent *ec, gpointer data)
     event_set_curtime(e);
     event_curserial = e->xany.serial;
     event_hack_mods(e);
-    if (event_ignore(e, client)) {
-        if (ed)
-            ed->ignored = TRUE;
-        return;
-    } else if (ed)
-            ed->ignored = FALSE;
 
     /* deal with it in the kernel */
 
     if (e->type == FocusIn) {
-        if (client &&
-            e->xfocus.detail == NotifyInferior)
-        {
-            ob_debug_type(OB_DEBUG_FOCUS,
-                          "Focus went to the frame window");
+        print_focusevent(e);
+        if (!wanted_focusevent(e, FALSE)) {
+            if (waiting_for_focusin) {
+                /* We were waiting for this FocusIn, since we got a FocusOut
+                   earlier, but it went to a window that isn't a client. */
+                ob_debug_type(OB_DEBUG_FOCUS,
+                              "Focus went to an unmanaged window 0x%x !",
+                              e->xfocus.window);
+                focus_fallback(TRUE, config_focus_under_mouse, TRUE, TRUE);
+            }
+        }
+        else if (client && e->xfocus.detail == NotifyInferior) {
+            ob_debug_type(OB_DEBUG_FOCUS, "Focus went to the frame window");
 
             focus_left_screen = FALSE;
 
@@ -533,8 +521,6 @@ static void event_process(const XEvent *ec, gpointer data)
                  e->xfocus.detail == NotifyInferior ||
                  e->xfocus.detail == NotifyNonlinear)
         {
-            XEvent ce;
-
             ob_debug_type(OB_DEBUG_FOCUS,
                           "Focus went to root or pointer root/none");
 
@@ -557,10 +543,7 @@ static void event_process(const XEvent *ec, gpointer data)
                But if the other focus in is something like PointerRoot then we
                still want to fall back.
             */
-            if (XCheckIfEvent(obt_display, &ce, event_look_for_focusin_client,
-                              NULL))
-            {
-                XPutBackEvent(obt_display, &ce);
+            if (xqueue_exists_local(event_look_for_focusin_client, NULL)) {
                 ob_debug_type(OB_DEBUG_FOCUS,
                               "  but another FocusIn is coming");
             } else {
@@ -593,11 +576,14 @@ static void event_process(const XEvent *ec, gpointer data)
             client_calc_layer(client);
             client_bring_helper_windows(client);
         }
-    } else if (e->type == FocusOut) {
-        XEvent ce;
 
+        waiting_for_focusin = FALSE;
+    } else if (e->type == FocusOut) {
+        print_focusevent(e);
+        if (!wanted_focusevent(e, FALSE))
+            ; /* skip this one */
         /* Look for the followup FocusIn */
-        if (!XCheckIfEvent(obt_display, &ce, event_look_for_focusin, NULL)) {
+        else if (!xqueue_exists_local(event_look_for_focusin, NULL)) {
             /* There is no FocusIn, this means focus went to a window that
                is not being managed, or a window on another screen. */
             Window win, root;
@@ -619,24 +605,16 @@ static void event_process(const XEvent *ec, gpointer data)
             /* nothing is focused */
             focus_set_client(NULL);
         } else {
-            /* Focus moved, so process the FocusIn event */
-            ObEventData ed = { .ignored = FALSE };
-            event_process(&ce, &ed);
-            if (ed.ignored) {
-                /* The FocusIn was ignored, this means it was on a window
-                   that isn't a client. */
-                ob_debug_type(OB_DEBUG_FOCUS,
-                              "Focus went to an unmanaged window 0x%x !",
-                              ce.xfocus.window);
-                focus_fallback(TRUE, config_focus_under_mouse, TRUE, TRUE);
-            }
+            /* Focus moved, so mark that we are waiting to process that
+               FocusIn */
+            waiting_for_focusin = TRUE;
+
+            /* nothing is focused right now, but will be again shortly */
+            focus_set_client(NULL);
         }
 
-        if (client && client != focus_client) {
+        if (client && client != focus_client)
             frame_adjust_focus(client->frame, FALSE);
-            /* focus_set_client(NULL) has already been called in this
-               section or by focus_fallback */
-        }
     }
     else if (client)
         event_handle_client(client, e);
@@ -739,13 +717,15 @@ static void event_process(const XEvent *ec, gpointer data)
     }
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
+    {
         used = event_handle_user_input(client, e);
 
-    if (prompt && !used)
-        used = event_handle_prompt(prompt, e);
+        if (prompt && !used)
+            used = event_handle_prompt(prompt, e);
+    }
 
     /* if something happens and it's not from an XEvent, then we don't know
-       the time */
+       the time, so clear it here until the next event is handled */
     event_curtime = event_sourcetime = CurrentTime;
     event_curserial = 0;
 }
@@ -918,25 +898,48 @@ static gboolean *context_to_button(ObFrame *f, ObFrameContext con, gboolean pres
     }
 }
 
-static void compress_client_message_event(XEvent *e, XEvent *ce, Window window,
-                                          Atom msgtype)
+static gboolean more_client_message_event(Window window, Atom msgtype)
 {
-    /* compress changes into a single change */
-    while (XCheckTypedWindowEvent(obt_display, window, e->type, ce)) {
-        /* XXX: it would be nice to compress ALL messages of a
-           type, not just messages in a row without other
-           message types between. */
-        if (ce->xclient.message_type != msgtype) {
-            XPutBackEvent(obt_display, ce);
-            break;
+    ObtXQueueWindowMessage wm;
+    wm.window = window;
+    wm.message = msgtype;
+    return xqueue_exists_local(xqueue_match_window_message, &wm);
+}
+
+struct ObSkipPropertyChange {
+    Window window;
+    Atom prop;
+};
+
+static gboolean skip_property_change(XEvent *e, gpointer data)
+{
+    const struct ObSkipPropertyChange s = *(struct ObSkipPropertyChange*)data;
+
+    if (e->type == PropertyNotify && e->xproperty.window == s.window) {
+        const Atom a = e->xproperty.atom;
+        const Atom b = s.prop;
+
+        /* these are all updated together */
+        if ((a == OBT_PROP_ATOM(NET_WM_NAME) ||
+             a == OBT_PROP_ATOM(WM_NAME) ||
+             a == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
+             a == OBT_PROP_ATOM(WM_ICON_NAME))
+            &&
+            (b == OBT_PROP_ATOM(NET_WM_NAME) ||
+             b == OBT_PROP_ATOM(WM_NAME) ||
+             b == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
+             b == OBT_PROP_ATOM(WM_ICON_NAME)))
+        {
+            return TRUE;
         }
-        e->xclient = ce->xclient;
+        else if (a == b && a == OBT_PROP_ATOM(NET_WM_ICON))
+            return TRUE;
     }
+    return FALSE;
 }
 
 static void event_handle_client(ObClient *client, XEvent *e)
 {
-    XEvent ce;
     Atom msgtype;
     ObFrameContext con;
     gboolean *but;
@@ -1372,14 +1375,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         msgtype = e->xclient.message_type;
         if (msgtype == OBT_PROP_ATOM(WM_CHANGE_STATE)) {
-            compress_client_message_event(e, &ce, client->window, msgtype);
-            client_set_wm_state(client, e->xclient.data.l[0]);
+            if (!more_client_message_event(client->window, msgtype))
+                client_set_wm_state(client, e->xclient.data.l[0]);
         } else if (msgtype == OBT_PROP_ATOM(NET_WM_DESKTOP)) {
-            compress_client_message_event(e, &ce, client->window, msgtype);
-            if ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
-                (unsigned)e->xclient.data.l[0] == DESKTOP_ALL)
+            if (!more_client_message_event(client->window, msgtype) &&
+                ((unsigned)e->xclient.data.l[0] < screen_num_desktops ||
+                 (unsigned)e->xclient.data.l[0] == DESKTOP_ALL))
+            {
                 client_set_desktop(client, (unsigned)e->xclient.data.l[0],
                                    FALSE, FALSE);
+            }
         } else if (msgtype == OBT_PROP_ATOM(NET_WM_STATE)) {
             gulong ignore_start;
 
@@ -1566,36 +1571,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* validate cuz we query stuff off the client here */
         if (!client_validate(client)) break;
 
-        /* compress changes to a single property into a single change */
-        while (XCheckTypedWindowEvent(obt_display, client->window,
-                                      e->type, &ce)) {
-            Atom a, b;
+        msgtype = e->xproperty.atom;
 
-            /* XXX: it would be nice to compress ALL changes to a property,
-               not just changes in a row without other props between. */
-
-            a = ce.xproperty.atom;
-            b = e->xproperty.atom;
-
-            if (a == b)
-                continue;
-            if ((a == OBT_PROP_ATOM(NET_WM_NAME) ||
-                 a == OBT_PROP_ATOM(WM_NAME) ||
-                 a == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
-                 a == OBT_PROP_ATOM(WM_ICON_NAME))
-                &&
-                (b == OBT_PROP_ATOM(NET_WM_NAME) ||
-                 b == OBT_PROP_ATOM(WM_NAME) ||
-                 b == OBT_PROP_ATOM(NET_WM_ICON_NAME) ||
-                 b == OBT_PROP_ATOM(WM_ICON_NAME))) {
-                continue;
-            }
-            if (a == OBT_PROP_ATOM(NET_WM_ICON) &&
-                b == OBT_PROP_ATOM(NET_WM_ICON))
-                continue;
-
-            XPutBackEvent(obt_display, &ce);
-            break;
+        /* ignore changes to some properties if there is another change
+           coming in the queue */
+        {
+            struct ObSkipPropertyChange s;
+            s.window = client->window;
+            s.prop = msgtype;
+            if (xqueue_exists_local(skip_property_change, &s))
+                break;
         }
 
         msgtype = e->xproperty.atom;
@@ -1974,13 +1959,13 @@ static gboolean event_handle_menu_input(XEvent *ev)
     return ret;
 }
 
-static Bool event_look_for_menu_enter(Display *d, XEvent *ev, XPointer arg)
+static gboolean event_look_for_menu_enter(XEvent *ev, gpointer data)
 {
-    ObMenuFrame *f = (ObMenuFrame*)arg;
+    const ObMenuFrame *f = (ObMenuFrame*)data;
     ObMenuEntryFrame *e;
     return ev->type == EnterNotify &&
         (e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)) &&
-        !e->ignore_enters && e->frame == f;
+        e->frame == f && !e->ignore_enters;
 }
 
 static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
@@ -2005,16 +1990,10 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
         if (ev->xcrossing.detail == NotifyInferior)
             break;
 
-        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window)))
-        {
-            XEvent ce;
-
+        if ((e = g_hash_table_lookup(menu_frame_map, &ev->xcrossing.window))) {
             /* check if an EnterNotify event is coming, and if not, then select
                nothing in the menu */
-            if (XCheckIfEvent(obt_display, &ce, event_look_for_menu_enter,
-                              (XPointer)e->frame))
-                XPutBackEvent(obt_display, &ce);
-            else
+            if (!xqueue_exists_local(event_look_for_menu_enter, e->frame))
                 menu_frame_select(e->frame, NULL, FALSE);
         }
         break;
@@ -2218,16 +2197,19 @@ gboolean event_time_after(guint32 t1, guint32 t2)
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
 }
 
-Bool find_timestamp(Display *d, XEvent *e, XPointer a)
+gboolean find_timestamp(XEvent *e, gpointer data)
 {
     const Time t = event_get_timestamp(e);
-    return t != CurrentTime;
+    if (t != CurrentTime) {
+        event_curtime = t;
+        return TRUE;
+    }
+    else
+        return FALSE;
 }
 
 Time event_time(void)
 {
-    XEvent event;
-
     if (event_curtime) return event_curtime;
 
     /* Some events don't come with timestamps :(
@@ -2240,10 +2222,12 @@ Time event_time(void)
                     8, PropModeAppend, NULL, 0);
 
     /* Grab the first timestamp available */
-    XPeekIfEvent(obt_display, &event, find_timestamp, NULL);
+    xqueue_exists(find_timestamp, NULL);
+
+    /*g_assert(event_curtime != CurrentTime);*/
 
     /* Save the time so we don't have to do this again for this event */
-    return event_curtime = event.xproperty.time;
+    return event_curtime;
 }
 
 Time event_source_time(void)

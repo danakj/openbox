@@ -19,6 +19,7 @@
 
 #include "obt/mainloop.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/util.h"
 
 #ifdef HAVE_STDIO_H
@@ -296,10 +297,8 @@ void obt_main_loop_run(ObtMainLoop *loop)
             loop->signal_fired = FALSE;
 
             sigprocmask(SIG_SETMASK, &oldset, NULL);
-        } else if (loop->display && XPending(loop->display)) {
-            do {
-                XNextEvent(loop->display, &e);
-
+        } else if (loop->display && xqueue_pending_local()) {
+            while (xqueue_next_local(&e) && loop->run) {
                 if (e.type == MappingNotify)
                     XRefreshKeyboardMapping(&e.xmapping);
 
@@ -307,10 +306,9 @@ void obt_main_loop_run(ObtMainLoop *loop)
                     ObtMainLoopXHandlerType *h = it->data;
                     h->func(&e, h->data);
                 }
-            } while (XPending(loop->display) && loop->run);
+            }
         } else {
             /* this only runs if there were no x events received */
-
             timer_dispatch(loop, (GTimeVal**)&wait);
 
             selset = loop->fd_set;

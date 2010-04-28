@@ -32,6 +32,7 @@
 #include "obrender/render.h"
 #include "obrender/theme.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
 
@@ -672,7 +673,8 @@ static void move_with_keys(KeySym sym, guint state)
     XSync(obt_display, FALSE);
     {
         XEvent ce;
-        while (XCheckTypedEvent(obt_display, MotionNotify, &ce));
+        while (xqueue_remove_local(&ce, xqueue_match_type,
+                                   GINT_TO_POINTER(MotionNotify)));
     }
     screen_pointer_pos(&px, &py);
 
@@ -831,7 +833,8 @@ static void resize_with_keys(KeySym sym, guint state)
     XSync(obt_display, FALSE);
     {
         XEvent ce;
-        while (XCheckTypedEvent(obt_display, MotionNotify, &ce));
+        while (xqueue_remove_local(&ce, xqueue_match_type,
+                                   GINT_TO_POINTER(MotionNotify)));
     }
     screen_pointer_pos(&px, &py);
 

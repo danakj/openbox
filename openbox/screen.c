@@ -36,6 +36,7 @@
 #include "obrender/render.h"
 #include "gettext.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/prop.h"
 #include "obt/mainloop.h"
 
@@ -129,14 +130,16 @@ static gboolean replace_wm(void)
 
     /* Wait for old window manager to go away */
     if (current_wm_sn_owner) {
-      XEvent event;
       gulong wait = 0;
       const gulong timeout = G_USEC_PER_SEC * 15; /* wait for 15s max */
+      ObtXQueueWindowType wt;
+
+      wt.window = current_wm_sn_owner;
+      wt.type = DestroyNotify;
 
       while (wait < timeout) {
-          if (XCheckWindowEvent(obt_display, current_wm_sn_owner,
-                                StructureNotifyMask, &event) &&
-              event.type == DestroyNotify)
+          /* Checks the local queue and incoming events for this event */
+          if (xqueue_exists_local(xqueue_match_window_type, &wt))
               break;
           g_usleep(G_USEC_PER_SEC / 10);
           wait += G_USEC_PER_SEC / 10;

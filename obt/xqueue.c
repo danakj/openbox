@@ -78,8 +78,8 @@ static inline void grow(void) {
 
         if (qend < qstart) { /* it wraps around to 0 right now */
             for (i = 0; i <= qend; ++i)
-                q[newsz+i] = q[i];
-            qend = newsz + qend;
+                q[qsz+i] = q[i];
+            qend = qsz + qend;
         }
 
         qsz = newsz;
@@ -113,7 +113,7 @@ static gboolean read_events(gboolean block)
     return sth; /* return if we read anything */
 }
 
-static void pop(gulong p)
+static void pop(const gulong p)
 {
     /* remove the event */
     --qnum;

@@ -126,7 +126,7 @@ static void find_uid_gid(uid_t *u, gid_t **g, guint *n)
     }
     endgrent();
 
-    qsort(*g, sizeof(gid_t), *n, gid_cmp);
+    qsort(*g, *n, sizeof(gid_t), gid_cmp);
 }
 
 ObtPaths* obt_paths_new(void)

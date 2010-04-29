@@ -709,6 +709,9 @@ static void event_process(const XEvent *ec, gpointer data)
         {
             used = event_handle_user_input(client, e);
 
+            if (prompt && !used)
+                used = event_handle_prompt(prompt, e);
+
             if (e->type == ButtonPress) {
                 pressed = e->xbutton.button;
                 pressed_win = e->xbutton.subwindow;

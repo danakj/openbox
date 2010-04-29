@@ -1862,7 +1862,8 @@ static gboolean event_handle_menu_input(XEvent *ev)
 
             else if (sym == XK_Right) {
                 /* Right goes to the selected submenu */
-                if (frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+                if (frame->selected &&
+                    frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
                 {
                     /* make sure it is visible */
                     menu_frame_select(frame, frame->selected, TRUE);

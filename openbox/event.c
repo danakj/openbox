@@ -1725,7 +1725,9 @@ static gboolean event_handle_menu_keyboard(XEvent *ev)
 
         else if (ob_keycode_match(keycode, OB_KEY_RIGHT)) {
             /* Right goes to the selected submenu */
-            if (frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+            if (frame->selected &&
+                frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
+            {
                 /* make sure it is visible */
                 menu_frame_select(frame, frame->selected, TRUE);
                 menu_frame_select_next(frame->child);

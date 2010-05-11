@@ -1061,14 +1061,15 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
 
 static void menu_frame_hide(ObMenuFrame *self)
 {
+    ObMenu *const menu = self->menu;
     GList *it = g_list_find(menu_frame_visible, self);
     gulong ignore_start;
 
     if (!it)
         return;
 
-    if (self->menu->hide_func)
-        self->menu->hide_func(self, self->menu->data);
+    if (menu->hide_func)
+        menu->hide_func(self, menu->data);
 
     if (self->child)
         menu_frame_hide(self->child);
@@ -1095,6 +1096,9 @@ static void menu_frame_hide(ObMenuFrame *self)
     event_end_ignore_all_enters(ignore_start);
 
     menu_frame_free(self);
+
+    if (menu->cleanup_func)
+        menu->cleanup_func(menu, menu->data);
 }
 
 void menu_frame_hide_all(void)

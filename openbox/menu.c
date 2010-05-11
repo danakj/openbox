@@ -654,6 +654,11 @@ void menu_set_execute_func(ObMenu *self, ObMenuExecuteFunc func)
     self->more_menu->execute_func = func; /* keep it in sync */
 }
 
+void menu_set_cleanup_func(ObMenu *self, ObMenuCleanupFunc func)
+{
+    self->cleanup_func = func;
+}
+
 void menu_set_destroy_func(ObMenu *self, ObMenuDestroyFunc func)
 {
     self->destroy_func = func;

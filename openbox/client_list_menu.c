@@ -121,6 +121,16 @@ static void desk_menu_destroy(ObMenu *menu, gpointer data)
     desktop_menus = g_slist_remove(desktop_menus, menu);
 }
 
+static void self_cleanup(ObMenu *menu, gpointer data)
+{
+    menu_clear_entries(menu);
+
+    while (desktop_menus) {
+        menu_free(desktop_menus->data);
+        desktop_menus = g_slist_delete_link(desktop_menus, desktop_menus);
+    }
+}
+
 static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
@@ -203,6 +213,7 @@ void client_list_menu_startup(gboolean reconfig)
 
     menu = menu_new(MENU_NAME, _("Desktops"), TRUE, NULL);
     menu_set_update_func(menu, self_update);
+    menu_set_cleanup_func(menu, self_cleanup);
     menu_set_execute_func(menu, self_execute);
 }
 

@@ -37,6 +37,11 @@ static ObMenu *combined_menu;
 #define ADD_DESKTOP -2
 #define REMOVE_DESKTOP -3
 
+static void self_cleanup(ObMenu *menu, gpointer data)
+{
+    menu_clear_entries(menu);
+}
+
 static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
     ObMenu *menu = frame->menu;
@@ -151,6 +156,7 @@ void client_list_combined_menu_startup(gboolean reconfig)
 
     combined_menu = menu_new(MENU_NAME, _("Windows"), TRUE, NULL);
     menu_set_update_func(combined_menu, self_update);
+    menu_set_cleanup_func(combined_menu, self_cleanup);
     menu_set_execute_func(combined_menu, menu_execute);
 }
 

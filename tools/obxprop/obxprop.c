@@ -28,9 +28,9 @@ gint parse_hex(gchar *s) {
         if (*s >= '0' && *s <='9')
             add = *s-'0';
         else if (*s >= 'A' && *s <='F')
-            add = *s-'A';
+            add = *s-'A'+10;
         else if (*s >= 'a' && *s <='f')
-            add = *s-'a';
+            add = *s-'a'+10;
         else
             break;
 

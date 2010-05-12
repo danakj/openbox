@@ -36,6 +36,7 @@ gint parse_hex(gchar *s) {
 
         result *= 16;
         result += add;
+        ++s;
     }
     return result;
 }

@@ -98,9 +98,9 @@ static gboolean get_all(Display *d, Window win, Atom prop,
                 default:
                     g_assert_not_reached(); /* unhandled size */
                 }
-            *num = ret_items;
-            ret = TRUE;
         }
+        *num = ret_items;
+        ret = TRUE;
         XFree(xdata);
     }
     return ret;
@@ -254,7 +254,7 @@ void show_properties(Display *d, Window w, int argc, char **argv)
                     }
             }
             if (found)
-                g_print("%s(%s) = %s\n", name, type, val);
+                g_print("%s(%s) = %s\n", name, type, (val ? val : ""));
             g_free(val);
         }
 

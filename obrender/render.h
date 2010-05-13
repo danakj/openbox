@@ -54,12 +54,14 @@ typedef guchar  RrPixel8;
 typedef enum {
     RR_RELIEF_FLAT,
     RR_RELIEF_RAISED,
-    RR_RELIEF_SUNKEN
+    RR_RELIEF_SUNKEN,
+    RR_RELIEF_NUM_TYPES
 } RrReliefType;
 
 typedef enum {
     RR_BEVEL_1,
-    RR_BEVEL_2
+    RR_BEVEL_2,
+    RR_BEVEL_NUM_TYPES
 } RrBevelType;
 
 typedef enum {
@@ -72,7 +74,8 @@ typedef enum {
     RR_SURFACE_DIAGONAL,
     RR_SURFACE_CROSS_DIAGONAL,
     RR_SURFACE_PYRAMID,
-    RR_SURFACE_MIRROR_HORIZONTAL
+    RR_SURFACE_MIRROR_HORIZONTAL,
+    RR_SURFACE_NUM_TYPES
 } RrSurfaceColorType;
 
 typedef enum {
@@ -81,13 +84,15 @@ typedef enum {
     RR_TEXTURE_TEXT,
     RR_TEXTURE_LINE_ART,
     RR_TEXTURE_RGBA,
-    RR_TEXTURE_IMAGE
+    RR_TEXTURE_IMAGE,
+    RR_TEXTURE_NUM_TYPES
 } RrTextureType;
 
 typedef enum {
     RR_JUSTIFY_LEFT,
     RR_JUSTIFY_CENTER,
-    RR_JUSTIFY_RIGHT
+    RR_JUSTIFY_RIGHT,
+    RR_JUSITFY_NUM_TYPES
 } RrJustify;
 
 /* Put middle first so it's the default */
@@ -95,7 +100,8 @@ typedef enum {
     RR_ELLIPSIZE_MIDDLE,
     RR_ELLIPSIZE_NONE,
     RR_ELLIPSIZE_START,
-    RR_ELLIPSIZE_END
+    RR_ELLIPSIZE_END,
+    RR_ELLIPSIZE_NUM_TYPES
 } RrEllipsizeMode;
 
 typedef enum {
@@ -103,13 +109,15 @@ typedef enum {
     RR_FONTWEIGHT_NORMAL,
     RR_FONTWEIGHT_SEMIBOLD,
     RR_FONTWEIGHT_BOLD,
-    RR_FONTWEIGHT_ULTRABOLD
+    RR_FONTWEIGHT_ULTRABOLD,
+    RR_FONTWEIGHT_NUM_TYPES
 } RrFontWeight;
 
 typedef enum {
     RR_FONTSLANT_NORMAL,
     RR_FONTSLANT_ITALIC,
-    RR_FONTSLANT_OBLIQUE
+    RR_FONTSLANT_OBLIQUE,
+    RR_FONTSLANT_NUM_TYPES
 } RrFontSlant;
 
 struct _RrSurface {

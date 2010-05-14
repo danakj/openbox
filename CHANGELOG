@@ -1,3 +1,8 @@
+3.4.11.2:
+  * Updated Estonian and Portuguese translations.
+  * Fix a rare crash involving moving fullscreen windows to different monitors
+  * Fix a more common crash involving pressing right in a menu
+
 3.4.11.1:
   * Updated Polish translation.
   * Fixed bug #4519 (Incorrect focus in reused windows).

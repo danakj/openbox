@@ -29,7 +29,7 @@ struct _ObActionsAct;
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);
 
-gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
+gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
                     ObMouseAction mact, struct _ObActionsAct *action);
 void mouse_unbind_all(void);
 

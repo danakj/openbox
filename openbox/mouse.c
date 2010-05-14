@@ -362,22 +362,17 @@ gboolean mouse_event(ObClient *client, XEvent *e)
     return used;
 }
 
-gboolean mouse_bind(const gchar *buttonstr, const gchar *contextstr,
+gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
                     ObMouseAction mact, ObActionsAct *action)
 {
     guint state, button;
-    ObFrameContext context;
     ObMouseBinding *b;
     GSList *it;
 
+    g_assert(context != OB_FRAME_CONTEXT_NONE);
+
     if (!translate_button(buttonstr, &state, &button)) {
         g_message(_("Invalid button \"%s\" in mouse binding"), buttonstr);
-        return FALSE;
-    }
-
-    context = frame_context_from_string(contextstr);
-    if (!context) {
-        g_message(_("Invalid context \"%s\" in mouse binding"), contextstr);
         return FALSE;
     }
 

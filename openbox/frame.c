@@ -1281,6 +1281,50 @@ static void layout_title(ObFrame *self)
         XUnmapWindow(obt_display, self->label);
 }
 
+gboolean frame_next_context_from_string(gchar *names, ObFrameContext *cx)
+{
+    gchar *p, *n;
+
+    if (!*names) /* empty string */
+        return FALSE;
+
+    /* find the first space */
+    for (p = names; *p; p = g_utf8_next_char(p)) {
+        const gunichar c = g_utf8_get_char(p);
+        if (g_unichar_isspace(c)) break;
+    }
+
+    if (p == names) {
+        /* leading spaces in the string */
+        n = g_utf8_next_char(names);
+        if (!frame_next_context_from_string(n, cx))
+            return FALSE;
+    } else {
+        n = p;
+        if (*p) {
+            /* delete the space with null zero(s) */
+            while (n < g_utf8_next_char(p))
+                *(n++) = '\0';
+        }
+
+        *cx = frame_context_from_string(names);
+
+        /* find the next non-space */
+        for (; *n; n = g_utf8_next_char(n)) {
+            const gunichar c = g_utf8_get_char(n);
+            if (!g_unichar_isspace(c)) break;
+        }
+    }
+
+    /* delete everything we just read (copy everything at n to the start of
+       the string */
+    for (p = names; *n; ++p, ++n)
+        *p = *n;
+    *p = *n;
+
+    return TRUE;
+}
+
 ObFrameContext frame_context_from_string(const gchar *name)
 {
     if (!g_ascii_strcasecmp("Desktop", name))

@@ -221,6 +221,16 @@ void frame_release_client(ObFrame *self);
 
 ObFrameContext frame_context_from_string(const gchar *name);
 
+/*! Parses a ObFrameContext from a string of space-separated context names.
+  @names The list of context names, the first of which is removed from the
+         string.
+  @cx The ObFrameContext is returned here.  If an invalid name is found, this
+      is set to OB_FRAME_CONTEXT_NONE.
+  @return TRUE if there was something to read in @names, FALSE if it was an
+          empty input.
+*/
+gboolean frame_next_context_from_string(gchar *names, ObFrameContext *cx);
+
 ObFrameContext frame_context(struct _ObClient *self, Window win,
                              gint x, gint y);
 

@@ -459,7 +459,7 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
-    gchar *contextstr;
+    gchar *cxstr;
     ObMouseAction mact;
 
     mouse_unbind_all();
@@ -482,37 +482,52 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
     n = obt_xml_find_node(node, "context");
     while (n) {
-        if (!obt_xml_attr_string(n, "name", &contextstr))
-            goto next_n;
-        nbut = obt_xml_find_node(n->children, "mousebind");
-        while (nbut) {
-            if (!obt_xml_attr_string(nbut, "button", &buttonstr))
-                goto next_nbut;
-            if (obt_xml_attr_contains(nbut, "action", "press")) {
-                mact = OB_MOUSE_ACTION_PRESS;
-            } else if (obt_xml_attr_contains(nbut, "action", "release")) {
-                mact = OB_MOUSE_ACTION_RELEASE;
-            } else if (obt_xml_attr_contains(nbut, "action", "click")) {
-                mact = OB_MOUSE_ACTION_CLICK;
-            } else if (obt_xml_attr_contains(nbut, "action","doubleclick")) {
-                mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
-            } else if (obt_xml_attr_contains(nbut, "action", "drag")) {
-                mact = OB_MOUSE_ACTION_MOTION;
-            } else
-                goto next_nbut;
-            nact = obt_xml_find_node(nbut->children, "action");
-            while (nact) {
-                ObActionsAct *action;
+        gchar *modcxstr;
+        ObFrameContext cx;
 
-                if ((action = actions_parse(nact)))
-                    mouse_bind(buttonstr, contextstr, mact, action);
-                nact = obt_xml_find_node(nact->next, "action");
+        if (!obt_xml_attr_string(n, "name", &cxstr))
+            goto next_n;
+
+        modcxstr = g_strdup(cxstr); /* make a copy to mutilate */
+        while (frame_next_context_from_string(modcxstr, &cx)) {
+            if (!cx) {
+                g_message(_("Invalid context \"%s\" in mouse binding"),
+                          cxstr);
+                break;
             }
+
+            nbut = obt_xml_find_node(n->children, "mousebind");
+            while (nbut) {
+                if (!obt_xml_attr_string(nbut, "button", &buttonstr))
+                    goto next_nbut;
+                if (obt_xml_attr_contains(nbut, "action", "press"))
+                    mact = OB_MOUSE_ACTION_PRESS;
+                else if (obt_xml_attr_contains(nbut, "action", "release"))
+                    mact = OB_MOUSE_ACTION_RELEASE;
+                else if (obt_xml_attr_contains(nbut, "action", "click"))
+                    mact = OB_MOUSE_ACTION_CLICK;
+                else if (obt_xml_attr_contains(nbut, "action","doubleclick"))
+                    mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
+                else if (obt_xml_attr_contains(nbut, "action", "drag"))
+                    mact = OB_MOUSE_ACTION_MOTION;
+                else
+                    goto next_nbut;
+
+                nact = obt_xml_find_node(nbut->children, "action");
+                while (nact) {
+                    ObActionsAct *action;
+
+                    if ((action = actions_parse(nact)))
+                        mouse_bind(buttonstr, cx, mact, action);
+                    nact = obt_xml_find_node(nact->next, "action");
+                }
+            next_nbut:
             g_free(buttonstr);
-        next_nbut:
             nbut = obt_xml_find_node(nbut->next, "mousebind");
+            }
         }
-        g_free(contextstr);
+        g_free(modcxstr);
+        g_free(cxstr);
     next_n:
         n = obt_xml_find_node(n->next, "context");
     }
@@ -959,8 +974,8 @@ static void bind_default_mouse(void)
     };
 
     for (it = binds; it->button; ++it)
-        mouse_bind(it->button, it->context, it->mact,
-                   actions_parse_string(it->actname));
+        mouse_bind(it->button, frame_context_from_string(it->context),
+                   it->mact, actions_parse_string(it->actname));
 }
 
 void config_startup(ObtXmlInst *i)

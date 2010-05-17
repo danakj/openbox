@@ -147,7 +147,6 @@ void xim_init(void)
     if (g_ascii_islower(aclass[0]))
         aclass[0] = g_ascii_toupper(aclass[0]);
 
-    g_print("Opening Input Method for %s %s\n", aname, aclass);
     xim = XOpenIM(obt_display, NULL, aname, aclass);
 
     if (!xim)

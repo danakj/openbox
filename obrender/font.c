@@ -284,6 +284,8 @@ void RrFontDraw(XftDraw *d, RrTextureText *t, RrRect *area)
     case RR_JUSTIFY_CENTER:
         x += (w - mw) / 2;
         break;
+    case RR_JUSTIFY_NUM_TYPES:
+        g_assert_not_reached();
     }
 
     if (t->shadow_offset_x || t->shadow_offset_y) {

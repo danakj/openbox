@@ -170,6 +170,8 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
             }
             force_transfer = 1;
         break;
+        case RR_TEXTURE_NUM_TYPES:
+            g_assert_not_reached();
         }
     }
 
@@ -377,6 +379,8 @@ void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b)
             case RR_BEVEL_2:
                 *l = *t = *r = *b = 2;
                 break;
+            case RR_BEVEL_NUM_TYPES:
+                g_assert_not_reached();
             }
         } else if (a->surface.border) {
             *l = *t = *r = *b = 1;
@@ -426,6 +430,8 @@ gint RrMinWidth(RrAppearance *a)
             w = MAX(w, MAX(a->texture[i].data.lineart.x1 - l - r,
                            a->texture[i].data.lineart.x2 - l - r));
             break;
+        case RR_TEXTURE_NUM_TYPES:
+            g_assert_not_reached();
         }
     }
 
@@ -481,6 +487,8 @@ gint RrMinHeight(RrAppearance *a)
             h = MAX(h, MAX(a->texture[i].data.lineart.y1 - t - b,
                            a->texture[i].data.lineart.y2 - t - b));
             break;
+        case RR_TEXTURE_NUM_TYPES:
+            g_assert_not_reached();
         }
     }
 

@@ -92,7 +92,7 @@ typedef enum {
     RR_JUSTIFY_LEFT,
     RR_JUSTIFY_CENTER,
     RR_JUSTIFY_RIGHT,
-    RR_JUSITFY_NUM_TYPES
+    RR_JUSTIFY_NUM_TYPES
 } RrJustify;
 
 /* Put middle first so it's the default */

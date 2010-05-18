@@ -383,13 +383,19 @@ static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
 static void actions_interactive_end_act(void)
 {
     if (interactive_act) {
+        ObActionsAct *ia = interactive_act;
+
+        /* set this to NULL first so the i_post() function can't cause this to
+           get called again (if it decides it wants to cancel any ongoing
+           interactive action). */
+        interactive_act = NULL;
+
         ungrab_keyboard();
 
-        if (interactive_act->i_post)
-            interactive_act->i_post(interactive_act->options);
+        if (ia->i_post)
+            ia->i_post(ia->options);
 
-        actions_act_unref(interactive_act);
-        interactive_act = NULL;
+        actions_act_unref(ia);
     }
 }
 

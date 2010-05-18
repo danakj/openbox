@@ -213,6 +213,11 @@ gint main(gint argc, gchar **argv)
                                                XC_top_left_corner);
 
     if (screen_annex()) { /* it will be ours! */
+
+        /* get a timestamp from after taking over as the WM.  if we use the
+           old timestamp to set focus it can fail when replacing another WM. */
+        event_reset_time();
+
         do {
             ObPrompt *xmlprompt = NULL;
 
@@ -317,7 +322,6 @@ gint main(gint argc, gchar **argv)
 
                 /* get all the existing windows */
                 window_manage_all();
-                focus_nothing();
 
                 /* focus what was focused if a wm was already running */
                 if (OBT_PROP_GET32(obt_root(ob_screen),

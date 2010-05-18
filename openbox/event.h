@@ -68,6 +68,11 @@ gboolean event_time_after(guint32 t1, guint32 t2);
   is a time at or after it, but at or before any other events we will process
 */
 Time event_time(void);
+
+/*! Force event_time() to skip the current timestamp and look for the next
+  one. */
+void event_reset_time(void);
+
 /*! A time at which an event happened that caused this current event to be
   generated.  This is a user-provided time and not to be trusted.
   Returns CurrentTime if there was no source time provided.

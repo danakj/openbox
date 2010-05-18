@@ -98,13 +98,13 @@ static gboolean focus_delay_func(gpointer data);
 static gboolean unfocus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
 
-Time event_last_user_time;
+Time event_last_user_time = CurrentTime;
 
 /*! The time of the current X event (if it had a timestamp) */
-static Time event_curtime;
+static Time event_curtime = CurrentTime;
 /*! The source time that started the current X event (user-provided, so not
   to be trusted) */
-static Time event_sourcetime;
+static Time event_sourcetime = CurrentTime;
 
 /*! The serial of the current X event */
 static gulong event_curserial;
@@ -146,10 +146,6 @@ void event_startup(gboolean reconfig)
 #endif
 
     client_add_destroy_notify(focus_delay_client_dest, NULL);
-
-    event_curtime = CurrentTime;
-    event_sourcetime = CurrentTime;
-    event_last_user_time = CurrentTime;
 }
 
 void event_shutdown(gboolean reconfig)
@@ -2210,7 +2206,7 @@ gboolean event_time_after(guint32 t1, guint32 t2)
 gboolean find_timestamp(XEvent *e, gpointer data)
 {
     const Time t = event_get_timestamp(e);
-    if (t != CurrentTime) {
+    if (t > event_curtime) {
         event_curtime = t;
         return TRUE;
     }
@@ -2218,10 +2214,8 @@ gboolean find_timestamp(XEvent *e, gpointer data)
         return FALSE;
 }
 
-Time event_time(void)
+static Time next_time(void)
 {
-    if (event_curtime) return event_curtime;
-
     /* Some events don't come with timestamps :(
        ...but we can get one anyways >:) */
 
@@ -2240,7 +2234,19 @@ Time event_time(void)
     return event_curtime;
 }
 
+Time event_time(void)
+{
+    if (event_curtime) return event_curtime;
+
+    return next_time();
+}
+
 Time event_source_time(void)
 {
     return event_sourcetime;
+}
+
+void event_reset_time(void)
+{
+    next_time();
 }

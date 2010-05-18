@@ -1769,9 +1769,10 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     }
 
     if (self->max_horz && self->max_vert) {
-        /* you can't resize fully maximized windows */
-        self->functions &= ~OB_CLIENT_FUNC_RESIZE;
-        /* kill the handle on fully maxed windows */
+        /* once upon a time you couldn't resize maximized windows, that is not
+           the case any more though !
+
+           but do kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
     }
 
@@ -2889,11 +2890,11 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
        through this code */
     {
         gint basew, baseh, minw, minh;
-        gint incw, inch;
+        gint incw, inch, maxw, maxh;
         gfloat minratio, maxratio;
 
-        incw = self->fullscreen || self->max_horz ? 1 : self->size_inc.width;
-        inch = self->fullscreen || self->max_vert ? 1 : self->size_inc.height;
+        incw = self->size_inc.width;
+        inch = self->size_inc.height;
         minratio = self->fullscreen || (self->max_horz && self->max_vert) ?
             0 : self->min_ratio;
         maxratio = self->fullscreen || (self->max_horz && self->max_vert) ?
@@ -2929,6 +2930,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         *w -= basew;
         *h -= baseh;
 
+        /* the sizes to used for maximized */
+        maxw = *w;
+        maxh = *h;
+
         /* keep to the increments */
         *w /= incw;
         *h /= inch;
@@ -2943,6 +2948,10 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         *w *= incw;
         *h *= inch;
+
+        /* if maximized/fs then don't use the size increments */
+        if (self->fullscreen || self->max_horz) *w = maxw;
+        if (self->fullscreen || self->max_vert) *h = maxh;
 
         *w += basew;
         *h += baseh;
@@ -3081,7 +3090,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        When user = FALSE, then the request is coming from the application
        itself, and we are more strict about when to send a synthetic
        ConfigureNotify.  We strictly follow the rules of the ICCCM sec 4.1.5
-       in this case (if force_reply is true)
+       in this case (or send one if force_reply is true)
 
        When user = TRUE, then the request is coming from "us", like when we
        maximize a window or something.  In this case we are more lenient.  We

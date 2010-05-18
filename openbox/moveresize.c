@@ -51,7 +51,11 @@ XSyncAlarm moveresize_alarm = None;
 
 static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 
+/* starting geometry for the window being moved/resized, so it can be
+   restored */
 static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
+static gboolean was_max_horz, was_max_vert;
+static Rect pre_max_area;
 static gint cur_x, cur_y, cur_w, cur_h;
 static guint button;
 static guint32 corner;
@@ -239,6 +243,9 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     button = b;
     key_resize_edge = -1;
 
+    /* default to not putting max back on cancel */
+    was_max_horz = was_max_vert = FALSE;
+
     /*
       have to change start_cx and start_cy if going to do this..
     if (corner == prop_atoms.net_wm_moveresize_move_keyboard ||
@@ -326,6 +333,28 @@ void moveresize_end(gboolean cancel)
                      (cancel ? start_cw : cur_w),
                      (cancel ? start_ch : cur_h),
                      TRUE, TRUE, FALSE);
+
+    /* restore the client's maximized state. do this after putting the window
+       back in its original spot to minimize visible flicker */
+    if (cancel && (was_max_horz || was_max_vert)) {
+        const gboolean h = moveresize_client->max_horz;
+        const gboolean v = moveresize_client->max_vert;
+
+        client_maximize(moveresize_client, TRUE,
+                        was_max_horz && was_max_vert ? 0 :
+                        (was_max_horz ? 1 : 2));
+
+        /* replace the premax values with the ones we had saved if
+           the client doesn't have any already set */
+        if (was_max_horz && !h) {
+            moveresize_client->pre_max_area.x = pre_max_area.x;
+            moveresize_client->pre_max_area.width = pre_max_area.width;
+        }
+        if (was_max_vert && !v) {
+            moveresize_client->pre_max_area.y = pre_max_area.y;
+            moveresize_client->pre_max_area.height = pre_max_area.height;
+        }
+    }
 
     /* dont edge warp after its ended */
     cancel_edge_warp();
@@ -820,6 +849,33 @@ static void resize_with_keys(KeySym sym, guint state)
         }
     }
 
+    if (moveresize_client->max_horz &&
+        (key_resize_edge == OB_DIRECTION_WEST ||
+         key_resize_edge == OB_DIRECTION_EAST))
+    {
+        /* unmax horz */
+        was_max_horz = TRUE;
+        pre_max_area.x = moveresize_client->pre_max_area.x;
+        pre_max_area.width = moveresize_client->pre_max_area.width;
+
+        moveresize_client->pre_max_area.x = cur_x;
+        moveresize_client->pre_max_area.width = cur_w;
+        client_maximize(moveresize_client, FALSE, 1);
+    }
+    else if (moveresize_client->max_vert &&
+             (key_resize_edge == OB_DIRECTION_NORTH ||
+              key_resize_edge == OB_DIRECTION_SOUTH))
+    {
+        /* unmax vert */
+        was_max_vert = TRUE;
+        pre_max_area.y = moveresize_client->pre_max_area.y;
+        pre_max_area.height = moveresize_client->pre_max_area.height;
+
+        moveresize_client->pre_max_area.y = cur_y;
+        moveresize_client->pre_max_area.height = cur_h;
+        client_maximize(moveresize_client, FALSE, 2);
+    }
+
     calc_resize(TRUE, resist, &dw, &dh, dir);
     if (key_resize_edge == OB_DIRECTION_WEST)
         cur_x -= dw;
@@ -931,6 +987,46 @@ gboolean moveresize_event(XEvent *e)
                 dir = OB_DIRECTION_SOUTHEAST;
             } else
                 g_assert_not_reached();
+
+            /* override the client's max state if desired */
+            if (ABS(dw) >= config_resist_edge) {
+                if (moveresize_client->max_horz) {
+                    /* unmax horz */
+                    was_max_horz = TRUE;
+                    pre_max_area.x = moveresize_client->pre_max_area.x;
+                    pre_max_area.width = moveresize_client->pre_max_area.width;
+
+                    moveresize_client->pre_max_area.x = cur_x;
+                    moveresize_client->pre_max_area.width = cur_w;
+                    client_maximize(moveresize_client, FALSE, 1);
+                }
+            }
+            else if (was_max_horz && !moveresize_client->max_horz) {
+                /* remax horz and put the premax back */
+                client_maximize(moveresize_client, TRUE, 1);
+                moveresize_client->pre_max_area.x = pre_max_area.x;
+                moveresize_client->pre_max_area.width = pre_max_area.width;
+            }
+
+            if (ABS(dh) >= config_resist_edge) {
+                if (moveresize_client->max_vert) {
+                    /* unmax vert */
+                    was_max_vert = TRUE;
+                    pre_max_area.y = moveresize_client->pre_max_area.y;
+                    pre_max_area.height =
+                        moveresize_client->pre_max_area.height;
+
+                    moveresize_client->pre_max_area.y = cur_y;
+                    moveresize_client->pre_max_area.height = cur_h;
+                    client_maximize(moveresize_client, FALSE, 2);
+                }
+            }
+            else if (was_max_vert && !moveresize_client->max_vert) {
+                /* remax vert and put the premax back */
+                client_maximize(moveresize_client, TRUE, 2);
+                moveresize_client->pre_max_area.y = pre_max_area.y;
+                moveresize_client->pre_max_area.height = pre_max_area.height;
+            }
 
             dw -= cur_w - start_cw;
             dh -= cur_h - start_ch;

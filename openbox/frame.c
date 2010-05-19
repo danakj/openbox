@@ -188,6 +188,10 @@ ObFrame *frame_new(ObClient *client)
     self->max_hover = self->close_hover = self->desk_hover =
         self->iconify_hover = self->shade_hover = FALSE;
 
+    /* make sure the size will be different the first time, so the extent hints
+       will be set */
+    STRUT_SET(self->size, -1, -1, -1, -1);
+
     set_theme_statics(self);
 
     return self;

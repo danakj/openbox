@@ -85,7 +85,11 @@ struct _ObFrame
 
     Window    window;
 
-    Strut     size;    /* the size of the frame */
+    /* These are used to prevent flashing when the client window unmaps? */
+    Window    backback;
+    Window    backfront;
+
+    Strut     size;
     Strut     oldsize; /* the size of the frame last told to the client */
     Rect      area;
     gboolean  visible;
@@ -93,87 +97,24 @@ struct _ObFrame
     guint     functions;
     guint     decorations;
 
-    Window    title;
-    Window    label;
-    Window    max;
-    Window    close;
-    Window    desk;
-    Window    shade;
-    Window    icon;
-    Window    iconify;
-    Window    handle;
-    Window    lgrip;
-    Window    rgrip;
-
-    /* These are borders of the frame and its elements */
-    Window    titleleft;
-    Window    titletop;
-    Window    titletopleft;
-    Window    titletopright;
-    Window    titleright;
-    Window    titlebottom;
-    Window    left;
-    Window    right;
-    Window    handleleft;
-    Window    handletop;
-    Window    handleright;
-    Window    handlebottom;
-    Window    lgriptop;
-    Window    lgripleft;
-    Window    lgripbottom;
-    Window    rgriptop;
-    Window    rgripright;
-    Window    rgripbottom;
-    Window    innerleft;    /*!< For drawing the inner client border */
-    Window    innertop;     /*!< For drawing the inner client border */
-    Window    innerright;   /*!< For drawing the inner client border */
-    Window    innerbottom;  /*!< For drawing the inner client border */
-    Window    innerblb;
-    Window    innerbll;
-    Window    innerbrb;
-    Window    innerbrr;
-    Window    backback;     /*!< A colored window shown while resizing */
-    Window    backfront;    /*!< An undrawn-in window, to prevent flashing on
-                                 unmap */
-
-    /* These are resize handles inside the titlebar */
-    Window    topresize;
-    Window    tltresize;
-    Window    tllresize;
-    Window    trtresize;
-    Window    trrresize;
-
     Colormap  colormap;
-
-    gint      icon_on;    /* if the window icon button is on */
-    gint      label_on;   /* if the window title is on */
-    gint      iconify_on; /* if the window iconify button is on */
-    gint      desk_on;    /* if the window all-desktops button is on */
-    gint      shade_on;   /* if the window shade button is on */
-    gint      max_on;     /* if the window maximize button is on */
-    gint      close_on;   /* if the window close button is on */
-
-    gint      width;         /* width of the titlebar and handle */
-    gint      label_width;   /* width of the label in the titlebar */
-    gint      icon_x;        /* x-position of the window icon button */
-    gint      label_x;       /* x-position of the window title */
-    gint      iconify_x;     /* x-position of the window iconify button */
-    gint      desk_x;        /* x-position of the window all-desktops button */
-    gint      shade_x;       /* x-position of the window shade button */
-    gint      max_x;         /* x-position of the window maximize button */
-    gint      close_x;       /* x-position of the window close button */
-    gint      bwidth;        /* border width */
-    gint      cbwidth_l;     /* client border width */
-    gint      cbwidth_t;     /* client border width */
-    gint      cbwidth_r;     /* client border width */
-    gint      cbwidth_b;     /* client border width */
-    gboolean  max_horz;      /* when maxed some decorations are hidden */
-    gboolean  max_vert;      /* when maxed some decorations are hidden */
-    gboolean  shaded;        /* decorations adjust when shaded */
 
     /* the leftmost and rightmost elements in the titlebar */
     ObFrameContext leftmost;
     ObFrameContext rightmost;
+
+    /* the client menu placement code puts the menu under the titlebar but
+       on top of its bottom border right now,
+       so it needs to know the border width. */
+    gint bwidth;
+    /* the amount of space between the client and the bottom decor (handle) */
+    gint cbwidth_b;
+
+    /* if the frame is showing a maximized/shaded state or not,
+       so the client/frame knows if it needs to be adjusted or not */
+    gboolean max_horz;
+    gboolean max_vert;
+    gboolean shaded;
 
     gboolean  max_press;
     gboolean  close_press;

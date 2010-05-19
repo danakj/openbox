@@ -2844,6 +2844,11 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
     Rect desired = {*x, *y, *w, *h};
     frame_rect_to_frame(self->frame, &desired);
 
+    /* XXX make this call a different function that returns frame dimensions
+       without changing the actual frame's state!  Otherwise calling
+       this function without calling client_configure leaves the frame in
+       a totally bogus state ! */
+
     /* make the frame recalculate its dimensions n shit without changing
        anything visible for real, this way the constraints below can work with
        the updated frame dimensions. */
@@ -3021,9 +3026,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     gboolean send_resize_client;
     gboolean moved = FALSE, resized = FALSE, rootmoved = FALSE;
     gboolean fmoved, fresized;
-    guint fdecor = self->frame->decorations;
-    gboolean fhorz = self->frame->max_horz;
-    gboolean fvert = self->frame->max_vert;
+    const guint fdecor = self->frame->decorations;
+    const gboolean fhorz = self->frame->max_horz;
+    const gboolean fvert = self->frame->max_vert;
+    const gboolean fshaded = self->frame->shaded;
     gint logicalw, logicalh;
 
     /* find the new x, y, width, and height (and logical size) */
@@ -3066,6 +3072,8 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     {
         fmoved = fresized = TRUE;
     }
+    if (self->shaded != fshaded)
+        fresized = TRUE;
 
     /* adjust the frame */
     if (fmoved || fresized) {

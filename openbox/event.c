@@ -1633,7 +1633,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
             client_update_title(client);
         } else if (msgtype == OBT_PROP_ATOM(WM_PROTOCOLS)) {
             client_update_protocols(client);
-            client_setup_decor_and_functions(client, TRUE);
         }
         else if (msgtype == OBT_PROP_ATOM(NET_WM_STRUT) ||
                  msgtype == OBT_PROP_ATOM(NET_WM_STRUT_PARTIAL)) {

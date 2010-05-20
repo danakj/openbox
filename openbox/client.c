@@ -1802,8 +1802,8 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
     client_change_allowed_actions(self);
 
     if (reconfig)
-        /* force reconfigure to make sure decorations are updated */
-        client_reconfigure(self, TRUE);
+        /* reconfigure to make sure decorations are updated */
+        client_reconfigure(self, FALSE);
 }
 
 static void client_change_allowed_actions(ObClient *self)

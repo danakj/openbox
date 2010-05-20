@@ -93,6 +93,12 @@ typedef struct _Rect {
     ((o).x < (r).x + (r).width && (o).x + (o).width > (r).x && \
      (o).y < (r).y + (r).height && (o).y + (o).height > (r).y)
 
+#define RECT_ADD(o, a, b) \
+    ((o).x = MIN((a).x, (b).x), \
+     (o).y = MIN((a).y, (b).y), \
+     (o).width = MAX((a).x + (a).width, (b).x + (b).width) - (o).x, \
+     (o).height = MAX((a).y + (a).height, (b).y + (b).height) - (o).y)
+
 /* Sets Rect r to be the intersection of Rect a and b. */
 #define RECT_SET_INTERSECTION(r, a, b) \
     ((r).x = MAX((a).x, (b).x), \

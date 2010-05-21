@@ -3,7 +3,7 @@
 #include <string.h>
 #include <glib.h>
 #include "obtheme.h"
-#include "geom.h"
+#include "openbox/geom.h"
 
 static double variable_lookup(struct variable *in)
 {

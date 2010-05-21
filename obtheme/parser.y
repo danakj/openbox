@@ -10,11 +10,11 @@
 #include <sys/stat.h>
 #include <limits.h>
 #include <unistd.h>
-#include "frame.h"
-#include "misc.h"
-#include "render.h"
+#include "openbox/frame.h"
+#include "openbox/misc.h"
+#include "obrender/render.h"
 #include "obtheme.h"
-#include "obtheme.tab.h"
+#include "parser.h"
 
 YY_DECL;
 

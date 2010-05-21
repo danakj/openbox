@@ -4,11 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include "frame.h"
-#include "misc.h"
-#include "render.h"
+#include "openbox/frame.h"
+#include "openbox/misc.h"
+#include "obrender/render.h"
 #include "obtheme.h"
-#include "obtheme.tab.h"
+#include "parser.h"
 
 int yylex(YYSTYPE *yylval, struct parser_control *pc);
 

@@ -2,8 +2,8 @@
 #define __THEME_PARSE_H__
 
 #include <glib.h>
-#include "frame.h"
-#include "misc.h"
+#include "openbox/frame.h"
+#include "openbox/misc.h"
 
 #undef YY_DECL
 #define YY_DECL int obthemelex(YYSTYPE *yylval, struct parser_control *pc)

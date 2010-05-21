@@ -108,8 +108,9 @@ static GSList *client_search_all_top_parents_internal(ObClient *self,
 static void client_call_notifies(ObClient *self, GSList *list);
 static void client_ping_event(ObClient *self, gboolean dead);
 static void client_prompt_kill(ObClient *self);
-static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
-                                       Time launch_time);
+static gboolean client_can_steal_focus(ObClient *self,
+                                       gboolean allow_other_desktop,
+                                       Time steal_time, Time launch_time);
 
 void client_startup(gboolean reconfig)
 {
@@ -440,7 +441,8 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
     if (activate) {
-        activate = client_can_steal_focus(self, event_time(), launch_time);
+        activate = client_can_steal_focus(self, (settings && settings->focus),
+                                          event_time(), launch_time);
 
         if (!activate) {
             /* if the client isn't stealing focus, then hilite it so the user
@@ -698,7 +700,9 @@ void client_fake_unmanage(ObClient *self)
     g_slice_free(ObClient, self);
 }
 
-static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
+static gboolean client_can_steal_focus(ObClient *self,
+                                       gboolean allow_other_desktop,
+                                       Time steal_time,
                                        Time launch_time)
 {
     gboolean steal;
@@ -720,11 +724,13 @@ static gboolean client_can_steal_focus(ObClient *self, Time steal_time,
                   self->window, steal_time, launch_time,
                   event_last_user_time);
 
-    /* if it's on another desktop */
+    /* if it's on another desktop... */
     if (!(self->desktop == screen_desktop ||
           self->desktop == DESKTOP_ALL) &&
-        /* the timestamp is from before you changed desktops */
-        (!launch_time ||
+        /* and (we dont know when it launched, and we don't want to allow
+           focus stealing from other desktops */
+        ((!launch_time && !allow_other_desktop) ||
+         /* or the timestamp is from before you changed desktops) */
          (screen_desktop_user_time &&
           !event_time_after(launch_time, screen_desktop_user_time))))
     {
@@ -3948,7 +3954,7 @@ void client_activate(ObClient *self, gboolean desktop,
     if ((user && (desktop ||
                   self->desktop == DESKTOP_ALL ||
                   self->desktop == screen_desktop)) ||
-        client_can_steal_focus(self, event_time(), CurrentTime))
+        client_can_steal_focus(self, desktop, event_time(), CurrentTime))
     {
         client_present(self, here, raise, unshade);
     }

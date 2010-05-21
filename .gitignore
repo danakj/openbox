@@ -101,3 +101,7 @@ tests/usertimewin
 data/autostart/openbox-autostart
 data/autostart/autostart
 obrender/rendertest
+ylwrap
+obtheme/parser.c
+obtheme/parser.h
+obtheme/lexer.c

@@ -11,6 +11,8 @@ Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
 Pango 1.10+ library/headers (devel package)
 cvs
+flex
+bison
 
 Optionally you may want:
 X Cursor library/headers (devel package)

@@ -1,32 +1,39 @@
 SUBDIRS = m4 po
 
-docxbmdir       = $(docdir)/xbm
-themedir        = $(datadir)/themes
-localedir       = $(datadir)/locale
-configdir       = $(sysconfdir)/xdg
-rcdir           = $(configdir)/openbox
-xsessionsdir    = $(datadir)/xsessions
-gnomewmfilesdir = $(datadir)/gnome/wm-properties
-pkgconfigdir    = $(libdir)/pkgconfig
-obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
-rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/obrender
-pixmapdir       = $(datadir)/pixmaps
-xsddir          = $(datadir)/openbox
-appsdir         = $(datadir)/applications
+docxbmdir            = $(docdir)/xbm
+themedir             = $(datadir)/themes
+localedir            = $(datadir)/locale
+configdir            = $(sysconfdir)/xdg
+rcdir                = $(configdir)/openbox
+xsessionsdir         = $(datadir)/xsessions
+gnomewmfilesdir      = $(datadir)/gnome/wm-properties
+pkgconfigdir         = $(libdir)/pkgconfig
+obtpubincludedir     = $(includedir)/openbox/@OBT_VERSION@/obt
+obthemepubincludedir = $(includedir)/openbox/@OBTHEME_VERSION@/obrender
+rrpubincludedir      = $(includedir)/openbox/@RR_VERSION@/obrender
+pixmapdir            = $(datadir)/pixmaps
+xsddir               = $(datadir)/openbox
+appsdir              = $(datadir)/applications
 
 theme = Clearlooks
+default_theme = Bomb
 
 AUTOMAKE_OPTIONS = subdir-objects foreign
 
 ACLOCAL_AMFLAGS = -I m4
+AM_YFLAGS = -d
 
 INCLUDES = -I.
 
 check_PROGRAMS = \
 	obrender/rendertest
 
+noinst_PROGRAMS = \
+	obtheme/main
+
 lib_LTLIBRARIES = \
 	obt/libobt.la \
+	obtheme/libobtheme.la \
 	obrender/libobrender.la
 
 bin_PROGRAMS = \
@@ -48,6 +55,42 @@ dist_libexec_SCRIPTS = \
 	data/autostart/openbox-xdg-autostart \
 	data/autostart/openbox-autostart
 
+# generated stuff
+BUILT_SOURCES=obtheme/parser.h
+
+## obtheme ##
+
+obtheme_main_CPPFLAGS = \
+	$(PANGO_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	-DG_LOG_DOMAIN=\"ObTheme-Tester\"
+obtheme_main_LDADD = \
+	obtheme/libobtheme.la \
+	$(GLIB_LIBS) \
+	-lm
+obtheme_main_SOURCES = obtheme/main.c
+
+obtheme_libobtheme_la_CPPFLAGS = \
+	$(X_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(PANGO_CFLAGS) \
+	$(IMLIB2_CFLAGS) \
+	-DG_LOG_DOMAIN=\"ObTheme\" \
+	-DDEFAULT_THEME=\"$(default_theme)\"
+obtheme_libobtheme_la_LDFLAGS = \
+	-version-info $(OBTHEME_CURRENT):$(OBTHEME_REVISION):$(OBTHEME_AGE)
+obtheme_libobtheme_la_LIBADD = \
+	$(X_LIBS) \
+	$(PANGO_LIBS) \
+	$(GLIB_LIBS) \
+	$(IMLIB2_LIBS) \
+	obt/libobt.la
+obtheme_libobtheme_la_SOURCES = \
+	gettext.h \
+	obtheme/obtheme.h \
+	obtheme/obtheme.c \
+	obtheme/lexer.l \
+	obtheme/parser.y
 
 ## obrender ##
 
@@ -175,6 +218,7 @@ openbox_openbox_LDADD = \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \
 	obrender/libobrender.la \
+	obtheme/libobtheme.la \
 	obt/libobt.la
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
@@ -419,6 +463,9 @@ dist_syscrash_theme_DATA= \
 	themes/Syscrash/openbox-3/themerc
 
 ## public headers ##
+
+obthemepubinclude_HEADERS = \
+	obtheme/obtheme.h
 
 rrpubinclude_HEADERS = \
 	obrender/color.h \

@@ -1,0 +1,106 @@
+//#include materials.obtheme
+
+//version(1)
+
+material flat {
+	opacity(1)
+}
+
+material grad {
+	opacity(1)
+	gradient(split)
+}
+
+material none {
+}
+
+theme awesome {
+	style regular_window {
+		decor clientwindow {
+			space {
+				anchor(0, 0, 0)
+				up(0, 1, 0)
+			}
+			geometry {
+//				shapeof(client)
+				box (0, 0, 0) to (client.width, client.height, 0)
+			}
+			material(flat)
+			texture {
+				image(client)
+			}
+
+			decor titlebar {
+				context(titlebar)
+				space {
+					anchor(0, -font.height + 5, 0)
+				}
+				geometry {
+					box (0, 0, 0) to (client.width, font.height + 5, 0)
+				}
+				material(flat)
+
+				decor title {
+					geometry {
+						box (client.width / 4, font.height + 5, 0) to (3*client.width / 4, font.height + 5, 0)
+//						text(client.title)
+//						justify(center)
+					}
+				}
+				decor minbutton {
+					space {
+						anchor(client.width - 20, -10, 0)
+					}
+					geometry {
+						box (0, 0, 0) to (10, 10, 0)
+					}
+					material(none)
+					context(minimize)
+				}
+				decor maxbutton {
+					space {
+						anchor(client.width - 40, -10, 0)
+					}
+					geometry {
+						box (0, 0, 0) to (10, 10, 0)
+					}
+					material(none)
+					context(maximize)
+				}
+			}
+			decor handle {
+				geometry {
+					box (0, 0, 0) to (client.width, 10, 0)
+				}
+				space {
+					anchor(0, client.height, 0)
+					up(0, 1, 0)
+				}
+				decor leftgrip {
+					space {
+						anchor(0, client.height, 0)
+						up(0, 1, 0)
+					}
+					geometry {
+						box (0, 0, 0) to (30, 10, 0)
+					}
+					context(blcorner)
+					cursor(SOUTHWEST)
+				}
+				decor rightgrip {
+					space {
+						anchor(client.width - 30, client.height, 0)
+						up(0, 1, 0)
+					}
+					geometry {
+						box (0, 0, 0) to (30, 10, 0)
+					}
+					context(brcorner)
+					cursor(SOUTHEAST)
+				}
+				context(bottom)
+				cursor(SOUTH)
+			}
+		}
+	}
+}

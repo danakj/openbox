@@ -56,7 +56,10 @@ dist_libexec_SCRIPTS = \
 	data/autostart/openbox-autostart
 
 # generated stuff
-BUILT_SOURCES=obtheme/parser.h
+BUILT_SOURCES=obtheme/parser.h \
+	obtheme/parser.c \
+	obtheme/lexer.c
+
 
 ## obtheme ##
 
@@ -624,6 +627,9 @@ CLEANFILES = \
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc
+
+clean-local:
+	rm -f $(BUILT_SOURCES)
 
 distclean-local:
 	for d in . m4 po obrender parser obt openbox; do \

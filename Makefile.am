@@ -23,6 +23,8 @@ AUTOMAKE_OPTIONS = subdir-objects foreign
 ACLOCAL_AMFLAGS = -I m4
 AM_YFLAGS = -d
 
+AM_LFLAGS = -P$(*F) -olex.yy.c
+
 INCLUDES = -I.
 
 check_PROGRAMS = \

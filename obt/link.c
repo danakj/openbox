@@ -138,6 +138,24 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
                 obt_paths_try_exec(p, v->value.string);
         }
 
+        if ((v = g_hash_table_lookup(keys, "Path"))) {
+            /* steal the string */
+            link->d.app.wdir = v->value.string;
+            v->value.string = NULL;
+        }
+
+        if ((v = g_hash_table_lookup(keys, "Terminal")))
+            link->d.app.term = v->value.boolean;
+
+        if ((v = g_hash_table_lookup(keys, "StartupNotify")))
+            link->d.app.startup = v->value.boolean ?
+                OBT_LINK_APP_STARTUP_PROTOCOL_SUPPORT :
+                OBT_LINK_APP_STARTUP_NO_SUPPORT;
+        else
+            link->d.app.startup = OBT_LINK_APP_STARTUP_LEGACY_SUPPORT;
+
+        /* XXX parse link->d.app.exec to determine link->d.app.open */
+
         /* XXX there's more app specific stuff */
     }
 

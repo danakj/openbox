@@ -80,6 +80,7 @@ static void parse_value_free(ObtDDParseValue *v)
     case OBT_DDPARSE_BOOLEAN:
     case OBT_DDPARSE_NUMERIC:
     case OBT_DDPARSE_ENUM_APPLICATION:
+    case OBT_DDPARSE_ENVIRONMENTS:
         break;
     default:
         g_assert_not_reached();
@@ -181,6 +182,69 @@ static gchar* parse_value_string(const gchar *in,
     }
     *o = '\0';
     return o;
+}
+
+static guint parse_value_environments(const gchar *in,
+                                      const ObtDDParse *const parse,
+                                      gboolean *error)
+{
+    const gchar *s;
+    int i;
+    guint mask = 0;
+
+    s = in;
+    while (*s) {
+        switch (*(s++)) {
+        case 'G':
+            if (strcmp(s, "NOME") == 0) {
+                mask |= OBT_LINK_ENV_GNOME;
+                s += 4;
+            }
+            break;
+        case 'K':
+            if (strcmp(s, "DE") == 0) {
+                mask |= OBT_LINK_ENV_KDE;
+                s += 2;
+            }
+            break;
+        case 'L':
+            if (strcmp(s, "XDE") == 0) {
+                mask |= OBT_LINK_ENV_LXDE;
+                s += 3;
+            }
+            break;
+        case 'R':
+            if (strcmp(s, "OX") == 0) {
+                mask |= OBT_LINK_ENV_ROX;
+                s += 2;
+            }
+            break;
+        case 'X':
+            if (strcmp(s, "FCE") == 0) {
+                mask |= OBT_LINK_ENV_XFCE;
+                s += 3;
+            }
+            break;
+        case 'O':
+            switch (*(s++)) {
+            case 'l':
+                if (strcmp(s, "d") == 0) {
+                    mask |= OBT_LINK_ENV_OLD;
+                    s += 1;
+                }
+                break;
+            case 'P':
+                if (strcmp(s, "ENBOX") == 0) {
+                    mask |= OBT_LINK_ENV_OPENBOX;
+                    s += 5;
+                }
+                break;
+            }
+        }
+        /* find the next string, or the end of the sequence */
+        while (*s && *s != ';') ++s;
+    }
+    return mask;
 }
 
 static gboolean parse_value_boolean(const gchar *in,
@@ -558,6 +622,9 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
             parse_error("Unknown Type", parse, error);
             return FALSE;
         }
+        break;
+    case OBT_DDPARSE_ENVIRONMENTS:
+        v.value.environments = parse_value_environments(val, parse, error);
         break;
     default:
         g_assert_not_reached();

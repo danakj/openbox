@@ -28,6 +28,7 @@ typedef enum {
     OBT_DDPARSE_BOOLEAN,
     OBT_DDPARSE_NUMERIC,
     OBT_DDPARSE_ENUM_APPLICATION,
+    OBT_DDPARSE_ENVIRONMENTS,
     OBT_DDPARSE_NUM_VALUE_TYPES
 } ObtDDParseValueType;
 
@@ -42,6 +43,7 @@ typedef struct _ObtDDParseValue {
         gboolean boolean;
         gfloat numeric;
         guint enumerable;
+        guint environments; /*!< A mask of flags from ObtLinkEnvMask */
     } value;
 } ObtDDParseValue;
 

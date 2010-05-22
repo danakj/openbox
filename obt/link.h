@@ -37,6 +37,18 @@ typedef enum {
 	OBT_LINK_APP_STARTUP_LEGACY_SUPPORT
 } ObtLinkAppStartup;
 
+/*! These bit flags are environments for links.  Some links are used or not
+  used in various environments. */
+typedef enum {
+    OBT_LINK_ENV_OPENBOX = 1 << 0,
+    OBT_LINK_ENV_GNOME   = 1 << 1,
+    OBT_LINK_ENV_KDE     = 1 << 2,
+    OBT_LINK_ENV_LXDE    = 1 << 3,
+    OBT_LINK_ENV_ROX     = 1 << 4,
+    OBT_LINK_ENV_XFCE    = 1 << 5,
+    OBT_LINK_ENV_OLD     = 1 << 6
+} ObtLinkEnvFlags;
+
 typedef enum {
 	/*! The app can be launched with a single local file */
 	OBT_LINK_APP_SINGLE_LOCAL = 1 << 0,

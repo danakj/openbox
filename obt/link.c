@@ -33,6 +33,10 @@ struct _ObtLink {
     gchar *generic; /*!< Generic name for the object (eg Web Browser) */
     gchar *comment; /*!< Comment/description to display for the object */
     gchar *icon; /*!< Name/path for an icon for the object */
+    guint env_required; /*!< The environments that must be present to use this
+                          link. */
+    guint env_restricted; /*!< The environments that must _not_ be present to
+                            use this link. */
 
     union _ObtLinkData {
         struct _ObtLinkApp {
@@ -117,7 +121,15 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
     if ((v = g_hash_table_lookup(keys, "Icon")))
         link->icon = v->value.string, v->value.string = NULL;
 
-    /* XXX handle Only/NotShowIn, better know the current environment */
+    if ((v = g_hash_table_lookup(keys, "OnlyShowIn")))
+        link->env_required = v->value.environments;
+    else
+        link->env_required = 0;
+
+    if ((v = g_hash_table_lookup(keys, "NotShowIn")))
+        link->env_restricted = v->value.environments;
+    else
+        link->env_restricted = 0;
 
     if (link->type == OBT_LINK_TYPE_APPLICATION) {
         if ((v = g_hash_table_lookup(keys, "TryExec"))) {

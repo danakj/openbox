@@ -49,6 +49,9 @@ struct _ObtLink {
                glib has something i can use. */
             gchar **mime; /*!< Mime types the app can open */
 
+            GQuark *categories; /*!< Array of quarks representing the
+                                  application's categories */
+
             ObtLinkAppStartup startup;
             gchar *startup_wmclass;
         } app;
@@ -164,7 +167,21 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
             }
         }
 
-        /* XXX there's more app specific stuff */
+        if ((v = g_hash_table_lookup(keys, "Categories"))) {
+            gulong i;
+            gchar *end;
+
+            link->d.app.categories = g_new(GQuark, v->value.strings.n);
+
+            c = end = v->value.strings.s;
+            for (i = 0; i < v->value.strings.n; ++i) {
+                while (*end) ++end;
+                link->d.app.categories[i] = g_quark_from_string(c);
+                c = end = end+1; /* next */
+            }
+        }
+
+        /* XXX do something with mime types */
     }
     else if (link->type == OBT_LINK_TYPE_URL) {
         v = g_hash_table_lookup(keys, "URL");
@@ -172,6 +189,9 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
         link->d.url.addr = v->value.string;
         v->value.string = NULL;
     }
+
+    /* destroy the parsing info */
+    g_hash_table_destroy(groups);
 
     return link;
 }
@@ -184,6 +204,18 @@ void obt_link_ref(ObtLink *dd)
 void obt_link_unref(ObtLink *dd)
 {
     if (--dd->ref < 1) {
+        g_free(dd->name);
+        g_free(dd->generic);
+        g_free(dd->comment);
+        g_free(dd->icon);
+        if (dd->type == OBT_LINK_TYPE_APPLICATION) {
+            g_free(dd->d.app.exec);
+            g_free(dd->d.app.wdir);
+            g_free(dd->d.app.categories);
+            g_free(dd->d.app.startup_wmclass);
+        }
+        else if (dd->type == OBT_LINK_TYPE_URL)
+            g_free(dd->d.url.addr);
         g_slice_free(ObtLink, dd);
     }
 }

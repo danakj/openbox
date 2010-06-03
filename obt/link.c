@@ -66,45 +66,25 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
     ObtLink *link;
     GHashTable *groups, *keys;
     ObtDDParseGroup *g;
-    ObtDDParseValue *v, *type, *name, *target;
+    ObtDDParseValue *v;
 
+    /* parse the file, and get a hash table of the groups */
     groups = obt_ddparse_file(ddname, paths);
-    if (!groups) return NULL;
+    if (!groups) return NULL; /* parsing failed */
+    /* grab the Desktop Entry group */
     g = g_hash_table_lookup(groups, "Desktop Entry");
-    if (!g) {
-        g_hash_table_destroy(groups);
-        return NULL;
-    }
-
+    g_assert(g != NULL);
+    /* grab the keys that appeared in the Desktop Entry group */
     keys = obt_ddparse_group_keys(g);
 
-    /* check that required keys exist */
-
-    if (!(type = g_hash_table_lookup(keys, "Type")))
-    { g_hash_table_destroy(groups); return NULL; }
-    if (!(name = g_hash_table_lookup(keys, "Name")))
-    { g_hash_table_destroy(groups); return NULL; }
-
-    if (type->value.enumerable == OBT_LINK_TYPE_APPLICATION) {
-        if (!(target = g_hash_table_lookup(keys, "Exec")))
-        { g_hash_table_destroy(groups); return NULL; }
-    }
-    else if (type->value.enumerable == OBT_LINK_TYPE_URL) {
-        if (!(target = g_hash_table_lookup(keys, "URL")))
-        { g_hash_table_destroy(groups); return NULL; }
-    }
-    else
-        target = NULL;
-
-    /* parse all the optional keys and build ObtLink (steal the strings) */
+    /* build the ObtLink (we steal all strings from the parser) */
     link = g_slice_new0(ObtLink);
     link->ref = 1;
-    link->type = type->value.enumerable;
-    if (link->type == OBT_LINK_TYPE_APPLICATION)
-        link->d.app.exec = target->value.string, target->value.string = NULL;
-    else if (link->type == OBT_LINK_TYPE_URL)
-        link->d.url.addr = target->value.string, target->value.string = NULL;
     link->display = TRUE;
+
+    v = g_hash_table_lookup(keys, "Type");
+    g_assert(v);
+    link->type = v->value.enumerable;
 
     if ((v = g_hash_table_lookup(keys, "Hidden")))
         link->deleted = v->value.boolean;
@@ -131,7 +111,31 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
     else
         link->env_restricted = 0;
 
+    /* type-specific keys */
+
     if (link->type == OBT_LINK_TYPE_APPLICATION) {
+        gchar *c;
+        gboolean percent;
+
+        v = g_hash_table_lookup(keys, "Exec");
+        g_assert(v);
+        link->d.app.exec = v->value.string;
+        v->value.string = NULL;
+
+        /* parse link->d.app.exec to determine link->d.app.open */
+        percent = FALSE;
+        for (c = link->d.app.exec; *c; ++c) {
+            if (*c == '%') percent = !percent;
+            if (percent) {
+                switch (*c) {
+                case 'f': link->d.app.open = OBT_LINK_APP_SINGLE_LOCAL; break;
+                case 'F': link->d.app.open = OBT_LINK_APP_MULTI_LOCAL; break;
+                case 'u': link->d.app.open = OBT_LINK_APP_SINGLE_URL; break;
+                case 'U': link->d.app.open = OBT_LINK_APP_MULTI_URL; break;
+                }
+            }
+        }
+
         if ((v = g_hash_table_lookup(keys, "TryExec"))) {
             /* XXX spawn a thread to check TryExec? */
             link->display = link->display &&
@@ -151,16 +155,22 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
             link->d.app.startup = v->value.boolean ?
                 OBT_LINK_APP_STARTUP_PROTOCOL_SUPPORT :
                 OBT_LINK_APP_STARTUP_NO_SUPPORT;
-        else
+        else {
             link->d.app.startup = OBT_LINK_APP_STARTUP_LEGACY_SUPPORT;
-
-        /* XXX parse link->d.app.exec to determine link->d.app.open */
+            if ((v = g_hash_table_lookup(keys, "StartupWMClass"))) {
+                /* steal the string */
+                link->d.app.startup_wmclass = v->value.string;
+                v->value.string = NULL;
+            }
+        }
 
         /* XXX there's more app specific stuff */
     }
-
     else if (link->type == OBT_LINK_TYPE_URL) {
-        /* XXX there's URL specific stuff */
+        v = g_hash_table_lookup(keys, "URL");
+        g_assert(v);
+        link->d.url.addr = v->value.string;
+        v->value.string = NULL;
     }
 
     return link;

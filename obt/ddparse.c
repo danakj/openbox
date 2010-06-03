@@ -35,9 +35,19 @@ typedef gboolean (*ObtDDParseValueFunc)(gchar *key, const gchar *val,
                                         ObtDDParse *parse, gboolean *error);
 
 
+enum {
+    DE_TYPE             = 1 << 0,
+    DE_TYPE_APPLICATION = 1 << 1,
+    DE_TYPE_LINK        = 1 << 2,
+    DE_NAME             = 1 << 3,
+    DE_EXEC             = 1 << 4,
+    DE_URL              = 1 << 5
+};
+
 struct _ObtDDParse {
     gchar *filename;
     gulong lineno;
+    gulong flags;
     ObtDDParseGroup *group;
     /* the key is a group name, the value is a ObtDDParseGroup */
     GHashTable *group_hash;
@@ -69,6 +79,7 @@ static void parse_error(const gchar *m, const ObtDDParse *const parse,
 static void parse_value_free(ObtDDParseValue *v)
 {
     switch (v->type) {
+    case OBT_DDPARSE_EXEC:
     case OBT_DDPARSE_STRING:
     case OBT_DDPARSE_LOCALESTRING:
         g_free(v->value.string); break;
@@ -79,7 +90,7 @@ static void parse_value_free(ObtDDParseValue *v)
         break;
     case OBT_DDPARSE_BOOLEAN:
     case OBT_DDPARSE_NUMERIC:
-    case OBT_DDPARSE_ENUM_APPLICATION:
+    case OBT_DDPARSE_ENUM_TYPE:
     case OBT_DDPARSE_ENVIRONMENTS:
         break;
     default:
@@ -146,7 +157,12 @@ static gchar* parse_value_string(const gchar *in,
     i = in; o = out;
     backslash = FALSE;
     while (i < end) {
-        const gchar *next = locale ? g_utf8_find_next_char(i, end) : i+1;
+        const gchar *next;
+
+        /* find the next character in the string */
+        if (!locale) next = i+1;
+        else if (!(next = g_utf8_find_next_char(i, end))) next = end;
+
         if (backslash) {
             switch(*i) {
             case 's': *o++ = ' '; break;
@@ -181,7 +197,7 @@ static gchar* parse_value_string(const gchar *in,
         i = next;
     }
     *o = '\0';
-    return o;
+    return out;
 }
 
 static guint parse_value_environments(const gchar *in,
@@ -189,7 +205,6 @@ static guint parse_value_environments(const gchar *in,
                                       gboolean *error)
 {
     const gchar *s;
-    int i;
     guint mask = 0;
 
     s = in;
@@ -413,9 +428,10 @@ static void parse_key_value(const gchar *buf, gulong len,
               ((guchar)buf[i] >= '0' && (guchar)buf[i] <= '9') ||
               ((guchar)buf[i] == '-'))) {
             /* not part of the key */
-            keyend = i;
             break;
         }
+    keyend = i;
+
     if (keyend < 1) {
         parse_error("Empty key", parse, error);
         return;
@@ -505,7 +521,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         break;
     case 'E': /* Exec */
         if (strcmp(key+1, "xec")) return FALSE;
-        v.type = OBT_DDPARSE_STRING; break;
+        v.type = OBT_DDPARSE_EXEC; parse->flags |= DE_EXEC; break;
     case 'G': /* GenericName */
         if (strcmp(key+1, "enericName")) return FALSE;
         v.type = OBT_DDPARSE_LOCALESTRING; break;
@@ -522,7 +538,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         switch (key[1]) {
         case 'a': /* Name */
             if (strcmp(key+2, "me")) return FALSE;
-            v.type = OBT_DDPARSE_LOCALESTRING; break;
+            v.type = OBT_DDPARSE_LOCALESTRING; parse->flags |= DE_NAME; break;
         case 'o':
             switch (key[2]) {
             case 'D': /* NoDisplay */
@@ -568,14 +584,14 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
             v.type = OBT_DDPARSE_STRING; break;
         case 'y': /* Type */
             if (strcmp(key+2, "pe")) return FALSE;
-            v.type = OBT_DDPARSE_STRING; break;
+            v.type = OBT_DDPARSE_ENUM_TYPE; parse->flags |= DE_TYPE; break;
         default:
             return FALSE;
         }
         break;
     case 'U': /* URL */
         if (strcmp(key+1, "RL")) return FALSE;
-        v.type = OBT_DDPARSE_STRING; break;
+        v.type = OBT_DDPARSE_STRING; parse->flags |= DE_URL; break;
     case 'V': /* MimeType */
         if (strcmp(key+1, "ersion")) return FALSE;
         v.type = OBT_DDPARSE_STRING; break;
@@ -585,6 +601,57 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
 
     /* parse the value */
     switch (v.type) {
+    case OBT_DDPARSE_EXEC: {
+        gchar *c, *m;
+        gboolean percent;
+        gboolean found;
+
+        v.value.string = parse_value_string(val, FALSE, NULL, parse, error);
+        g_assert(v.value.string);
+
+        /* an exec string can only contain one of the file/url-opening %'s */
+        percent = found = FALSE;
+        for (c = v.value.string; *c; ++c) {
+            if (*c == '%') percent = !percent;
+            if (percent) {
+                switch (*c) {
+                case 'f':
+                case 'F':
+                case 'u':
+                case 'U':
+                    if (found) {
+                        m = g_strdup_printf("Malformed Exec key, "
+                                            "extraneous %%%c", *c);
+                        parse_error(m, parse, error);
+                        g_free(m);
+                    }
+                    found = TRUE;
+                    break;
+                case 'd':
+                case 'D':
+                case 'n':
+                case 'N':
+                case 'v':
+                case 'm':
+                    m = g_strdup_printf("Malformed Exec key, "
+                                        "uses deprecated %%%c", *c);
+                    parse_error(m, parse, NULL); /* just a warning */
+                    g_free(m);
+                    break;
+                case 'i':
+                case 'c':
+                case 'k':
+                    break;
+                default:
+                    m = g_strdup_printf("Malformed Exec key, "
+                                        "uses unknown %%%c", *c);
+                    parse_error(m, parse, NULL); /* just a warning */
+                    g_free(m);
+                }
+            }
+        }
+        break;
+    }
     case OBT_DDPARSE_STRING:
         v.value.string = parse_value_string(val, FALSE, NULL, parse, error);
         g_assert(v.value.string);
@@ -611,11 +678,15 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
     case OBT_DDPARSE_NUMERIC:
         v.value.numeric = parse_value_numeric(val, parse, error);
         break;
-    case OBT_DDPARSE_ENUM_APPLICATION:
-        if (val[0] == 'A' && strcmp(val+1, "pplication") == 0)
+    case OBT_DDPARSE_ENUM_TYPE:
+        if (val[0] == 'A' && strcmp(val+1, "pplication") == 0) {
             v.value.enumerable = OBT_LINK_TYPE_APPLICATION;
-        else if (val[0] == 'L' && strcmp(val+1, "ink") == 0)
+            parse->flags |= DE_TYPE_APPLICATION;
+        }
+        else if (val[0] == 'L' && strcmp(val+1, "ink") == 0) {
             v.value.enumerable = OBT_LINK_TYPE_URL;
+            parse->flags |= DE_TYPE_LINK;
+        }
         else if (val[0] == 'D' && strcmp(val+1, "irectory") == 0)
             v.value.enumerable = OBT_LINK_TYPE_DIRECTORY;
         else {
@@ -663,17 +734,40 @@ GHashTable* obt_ddparse_file(const gchar *name, GSList *paths)
         if ((f = fopen(path, "r"))) {
             parse.filename = path;
             parse.lineno = 1;
-            success = parse_file(f, &parse);
+            parse.flags = 0;
+            if ((success = parse_file(f, &parse))) {
+                /* check that required keys exist */
+
+                if (!(parse.flags & DE_TYPE)) {
+                    g_warning("Missing Type key in %s", path);
+                    success = FALSE;
+                }
+                if (!(parse.flags & DE_NAME)) {
+                    g_warning("Missing Name key in %s", path);
+                    success = FALSE;
+                }
+                if (parse.flags & DE_TYPE_APPLICATION &&
+                    !(parse.flags & DE_EXEC))
+                {
+                    g_warning("Missing Exec key for Application in %s",
+                              path);
+                    success = FALSE;
+                }
+                else if (parse.flags & DE_TYPE_LINK && !(parse.flags & DE_URL))
+                {
+                    g_warning("Missing URL key for Link in %s", path);
+                    success = FALSE;
+                }
+            }
             fclose(f);
         }
         g_free(path);
     }
     if (!success) {
         g_hash_table_destroy(parse.group_hash);
-        return NULL;
+        parse.group_hash = NULL;
     }
-    else
-        return parse.group_hash;
+    return parse.group_hash;
 }
 
 GHashTable* obt_ddparse_group_keys(ObtDDParseGroup *g)

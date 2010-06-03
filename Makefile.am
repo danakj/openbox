@@ -145,6 +145,8 @@ obt_libobt_la_SOURCES = \
 	obt/prop.h \
 	obt/prop.c \
 	obt/util.h \
+	obt/watch.h \
+	obt/watch.c \
 	obt/xqueue.h \
 	obt/xqueue.c
 
@@ -438,6 +440,7 @@ obtpubinclude_HEADERS = \
 	obt/prop.h \
 	obt/util.h \
 	obt/version.h \
+	obt/watch.h \
 	obt/xqueue.h
 
 nodist_pkgconfig_DATA = \

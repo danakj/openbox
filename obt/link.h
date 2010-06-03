@@ -100,7 +100,8 @@ const gchar*  obt_link_app_executable      (ObtLink *e);
 /*! Returns the path in which the application should be run */
 const gchar*  obt_link_app_path            (ObtLink *e);
 gboolean      obt_link_app_run_in_terminal (ObtLink *e);
-const gchar** obt_link_app_mime_types      (ObtLink *e);
+const gchar*const* obt_link_app_mime_types      (ObtLink *e);
+const GQuark* obt_link_app_categories      (ObtLink *e, gulong *n);
 /*! Returns a combination of values in the ObtLinkAppOpen enum,
     specifying if the application can be launched to open one or more files
     and URLs. */

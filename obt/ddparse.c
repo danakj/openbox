@@ -85,7 +85,7 @@ static void parse_value_free(ObtDDParseValue *v)
         g_free(v->value.string); break;
     case OBT_DDPARSE_STRINGS:
     case OBT_DDPARSE_LOCALESTRINGS:
-        g_free(v->value.strings.s);
+        g_strfreev(v->value.strings.a);
         v->value.strings.n = 0;
         break;
     case OBT_DDPARSE_BOOLEAN:
@@ -120,40 +120,39 @@ static void parse_group_free(ObtDDParseGroup *g)
 
 /*! Reads an input string, strips out invalid stuff, and parses
     backslash-stuff.
-    If @nstrings is not NULL, then it splits the output string at ';'
-    characters.  They are all returned in the same string with null zeros
-    between them, @nstrings is set to the number of such strings.
  */
 static gchar* parse_value_string(const gchar *in,
                                  gboolean locale,
-                                 gulong *nstrings,
+                                 gboolean semicolonterminate,
+                                 gulong *len,
                                  const ObtDDParse *const parse,
                                  gboolean *error)
 {
-    const gint bytes = strlen(in);
+    gint bytes;
     gboolean backslash;
     gchar *out, *o;
     const gchar *end, *i;
 
-    g_return_val_if_fail(in != NULL, NULL);
-
-    if (!locale) {
-        end = in + bytes;
-        for (i = in; i < end; ++i) {
-            if ((guchar)*i >= 127 || (guchar)*i < 32) {
-                /* non-control character ascii */
-                end = i;
-                parse_error("Invalid bytes in string", parse, error);
-                break;
-            }
+    /* find the end/size of the string */
+    backslash = FALSE;
+    for (end = in; *end; ++end) {
+        if (semicolonterminate) {
+            if (backslash) backslash = FALSE;
+            else if (*end == '\\') backslash = TRUE;
+            else if (*end == ';') break;
         }
     }
-    else if (!g_utf8_validate(in, bytes, &end))
-        parse_error("Invalid bytes in localestring", parse, error);
+    bytes = end - in;
 
-    if (nstrings) *nstrings = 1;
+    g_return_val_if_fail(in != NULL, NULL);
+
+    if (locale && !g_utf8_validate(in, bytes, &end)) {
+        parse_error("Invalid bytes in localestring", parse, error);
+        bytes = end - in;
+    }
 
     out = g_new(char, bytes + 1);
+    if (len) *len = 0;
     i = in; o = out;
     backslash = FALSE;
     while (i < end) {
@@ -181,22 +180,58 @@ static gchar* parse_value_string(const gchar *in,
         }
         else if (*i == '\\')
             backslash = TRUE;
-        else if (*i == ';' && nstrings) {
-            ++nstrings;
-            *o = '\0';
-        }
-        else if ((guchar)*i == 127 || (guchar)*i < 32) {
+        else if ((guchar)*i >= 127 || (guchar)*i < 32) {
             /* avoid ascii control characters */
             parse_error("Found control character in string", parse, error);
             break;
         }
         else {
-            memcpy(o, i, next-i);
-            o += next-i;
+            const gulong s = next-i;
+            memcpy(o, i, s);
+            o += s;
+            if (len) *len += s;
         }
         i = next;
     }
     *o = '\0';
+    return out;
+}
+
+
+/*! Reads a list of input strings, strips out invalid stuff, and parses
+    backslash-stuff.
+ */
+static gchar** parse_value_strings(const gchar *in,
+                                   gboolean locale,
+                                   gulong *nstrings,
+                                   const ObtDDParse *const parse,
+                                   gboolean *error)
+{
+    gchar **out;
+    const gchar *i;
+
+    out = g_new(gchar*, 1);
+    out[0] = NULL;
+    *nstrings = 0;
+
+    i = in;
+    while (TRUE) {
+        gchar *a;
+        gulong len;
+
+        a = parse_value_string(i, locale, TRUE, &len, parse, error);
+        i += len;
+
+        if (len) {
+            (*nstrings)++;
+            out = g_renew(gchar*, out, *nstrings+1);
+            out[*nstrings-1] = a;
+            out[*nstrings] = NULL;
+        }
+
+        if (!*i) break; /* no more strings */
+        ++i;
+    }
     return out;
 }
 
@@ -606,13 +641,13 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         gboolean percent;
         gboolean found;
 
-        v.value.string = parse_value_string(val, FALSE, NULL, parse, error);
+        v.value.string = parse_value_string(val, FALSE, FALSE, NULL,
+                                            parse, error);
         g_assert(v.value.string);
 
         /* an exec string can only contain one of the file/url-opening %'s */
         percent = found = FALSE;
         for (c = v.value.string; *c; ++c) {
-            if (*c == '%') percent = !percent;
             if (percent) {
                 switch (*c) {
                 case 'f':
@@ -641,6 +676,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
                 case 'i':
                 case 'c':
                 case 'k':
+                case '%':
                     break;
                 default:
                     m = g_strdup_printf("Malformed Exec key, "
@@ -648,28 +684,32 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
                     parse_error(m, parse, NULL); /* just a warning */
                     g_free(m);
                 }
+                percent = FALSE;
             }
+            else if (*c == '%') percent = TRUE;
         }
         break;
     }
     case OBT_DDPARSE_STRING:
-        v.value.string = parse_value_string(val, FALSE, NULL, parse, error);
+        v.value.string = parse_value_string(val, FALSE, FALSE, NULL,
+                                            parse, error);
         g_assert(v.value.string);
         break;
     case OBT_DDPARSE_LOCALESTRING:
-        v.value.string = parse_value_string(val, TRUE, NULL, parse, error);
+        v.value.string = parse_value_string(val, TRUE, FALSE, NULL,
+                                            parse, error);
         g_assert(v.value.string);
         break;
     case OBT_DDPARSE_STRINGS:
-        v.value.strings.s = parse_value_string(val, FALSE, &v.value.strings.n,
-                                               parse, error);
-        g_assert(v.value.strings.s);
+        v.value.strings.a = parse_value_strings(val, FALSE, &v.value.strings.n,
+                                                parse, error);
+        g_assert(v.value.strings.a);
         g_assert(v.value.strings.n);
         break;
     case OBT_DDPARSE_LOCALESTRINGS:
-        v.value.strings.s = parse_value_string(val, TRUE, &v.value.strings.n,
-                                               parse, error);
-        g_assert(v.value.strings.s);
+        v.value.strings.a = parse_value_strings(val, TRUE, &v.value.strings.n,
+                                                parse, error);
+        g_assert(v.value.strings.a);
         g_assert(v.value.strings.n);
         break;
     case OBT_DDPARSE_BOOLEAN:

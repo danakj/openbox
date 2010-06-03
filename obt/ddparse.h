@@ -38,7 +38,7 @@ typedef struct _ObtDDParseValue {
     union _ObtDDParseValueValue {
         gchar *string;
         struct _ObtDDParseValueStrings {
-            gchar *s;
+            gchar **a;
             gulong n;
         } strings;
         gboolean boolean;

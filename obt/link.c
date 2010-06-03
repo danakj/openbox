@@ -51,6 +51,7 @@ struct _ObtLink {
 
             GQuark *categories; /*!< Array of quarks representing the
                                   application's categories */
+            gulong  n_categories; /*!< Number of categories for the app */
 
             ObtLinkAppStartup startup;
             gchar *startup_wmclass;
@@ -128,15 +129,17 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
         /* parse link->d.app.exec to determine link->d.app.open */
         percent = FALSE;
         for (c = link->d.app.exec; *c; ++c) {
-            if (*c == '%') percent = !percent;
             if (percent) {
                 switch (*c) {
                 case 'f': link->d.app.open = OBT_LINK_APP_SINGLE_LOCAL; break;
                 case 'F': link->d.app.open = OBT_LINK_APP_MULTI_LOCAL; break;
                 case 'u': link->d.app.open = OBT_LINK_APP_SINGLE_URL; break;
                 case 'U': link->d.app.open = OBT_LINK_APP_MULTI_URL; break;
+                default: percent = FALSE;
                 }
+                if (percent) break; /* found f/F/u/U */
             }
+            else if (*c == '%') percent = TRUE;
         }
 
         if ((v = g_hash_table_lookup(keys, "TryExec"))) {
@@ -172,11 +175,11 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
             gchar *end;
 
             link->d.app.categories = g_new(GQuark, v->value.strings.n);
+            link->d.app.n_categories = v->value.strings.n;
 
-            c = end = v->value.strings.s;
             for (i = 0; i < v->value.strings.n; ++i) {
-                while (*end) ++end;
-                link->d.app.categories[i] = g_quark_from_string(c);
+                link->d.app.categories[i] =
+                    g_quark_from_string(v->value.strings.a[i]);
                 c = end = end+1; /* next */
             }
         }
@@ -218,4 +221,14 @@ void obt_link_unref(ObtLink *dd)
             g_free(dd->d.url.addr);
         g_slice_free(ObtLink, dd);
     }
+}
+
+const GQuark* obt_link_app_categories(ObtLink *e, gulong *n)
+{
+    g_return_val_if_fail(e != NULL, NULL);
+    g_return_val_if_fail(e->type == OBT_LINK_TYPE_APPLICATION, NULL);
+    g_return_val_if_fail(n != NULL, NULL);
+
+    *n = e->d.app.n_categories;
+    return e->d.app.categories;
 }

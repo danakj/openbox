@@ -231,6 +231,9 @@ void obt_paths_unref(ObtPaths *p)
         for (it = p->autostart_dirs; it; it = g_slist_next(it))
             g_free(it->data);
         g_slist_free(p->autostart_dirs);
+        for (it = p->exec_dirs; it; it = g_slist_next(it))
+            g_free(it->data);
+        g_slist_free(p->exec_dirs);
         g_free(p->config_home);
         g_free(p->data_home);
         g_free(p->cache_home);

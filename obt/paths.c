@@ -237,6 +237,7 @@ void obt_paths_unref(ObtPaths *p)
         g_free(p->config_home);
         g_free(p->data_home);
         g_free(p->cache_home);
+        g_free(p->gid);
 
         g_slice_free(ObtPaths, p);
     }

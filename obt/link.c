@@ -45,8 +45,6 @@ struct _ObtLink {
             gboolean term; /*!< Run the app in a terminal or not */
             ObtLinkAppOpen open;
 
-            /* XXX gchar**? or something better, a mime struct.. maybe
-               glib has something i can use. */
             gchar **mime; /*!< Mime types the app can open */
 
             GQuark *categories; /*!< Array of quarks representing the
@@ -184,7 +182,12 @@ ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
             }
         }
 
-        /* XXX do something with mime types */
+        if ((v = g_hash_table_lookup(keys, "MimeType"))) {
+            /* steal the string array */
+            link->d.app.mime = v->value.strings.a;
+            v->value.strings.a = NULL;
+            v->value.strings.n = 0;
+        }
     }
     else if (link->type == OBT_LINK_TYPE_URL) {
         v = g_hash_table_lookup(keys, "URL");
@@ -214,6 +217,7 @@ void obt_link_unref(ObtLink *dd)
         if (dd->type == OBT_LINK_TYPE_APPLICATION) {
             g_free(dd->d.app.exec);
             g_free(dd->d.app.wdir);
+            g_strfreev(dd->d.app.mime);
             g_free(dd->d.app.categories);
             g_free(dd->d.app.startup_wmclass);
         }

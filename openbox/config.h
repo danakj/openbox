@@ -135,6 +135,8 @@ extern guint config_dock_app_move_modifiers;
 
 /*! The name of the theme */
 extern gchar *config_theme;
+/*! Whether to act as a compositing manager or not */
+extern gboolean config_comp;
 
 /*! Show the one-pixel border after toggleDecor */
 extern gboolean config_theme_keepborder;

@@ -284,6 +284,8 @@ openbox_openbox_SOURCES = \
 	openbox/client_list_combined_menu.h \
 	openbox/client_menu.c \
 	openbox/client_menu.h \
+	openbox/composite.c \
+	openbox/composite.h \
 	openbox/config.c \
 	openbox/config.h \
 	openbox/debug.c \

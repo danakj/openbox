@@ -316,6 +316,7 @@ gint main(gint argc, gchar **argv)
             menu_frame_startup(reconfigure);
             menu_startup(reconfigure);
             prompt_startup(reconfigure);
+            composite_startup(reconfigure);
 
             /* do this after everything is started so no events will get
                missed */
@@ -384,6 +385,7 @@ gint main(gint argc, gchar **argv)
             if (!reconfigure)
                 window_unmanage_all();
 
+            composite_shutdown(reconfigure);
             prompt_shutdown(reconfigure);
             menu_shutdown(reconfigure);
             menu_frame_shutdown(reconfigure);

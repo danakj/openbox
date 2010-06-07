@@ -27,6 +27,7 @@
 #include "openbox.h"
 #include "gettext.h"
 #include "obt/paths.h"
+#include "obt/display.h"
 
 gboolean config_focus_new;
 gboolean config_focus_follow;
@@ -48,6 +49,8 @@ StrutPartial config_margins;
 gchar   *config_theme;
 gboolean config_theme_keepborder;
 guint    config_theme_window_list_icon_size;
+
+gboolean config_comp;
 
 gchar   *config_title_layout;
 
@@ -1009,6 +1012,8 @@ void config_startup(ObtXmlInst *i)
     obt_xml_register(i, "margins", parse_margins, NULL);
 
     config_theme = NULL;
+
+    config_comp = TRUE;
 
     config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");

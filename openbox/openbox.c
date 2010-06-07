@@ -42,6 +42,7 @@
 #include "config.h"
 #include "ping.h"
 #include "prompt.h"
+#include "composite.h"
 #include "gettext.h"
 #include "obrender/render.h"
 #include "obrender/theme.h"

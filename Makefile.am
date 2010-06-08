@@ -134,8 +134,6 @@ obt_libobt_la_SOURCES = \
 	obt/internal.h \
 	obt/keyboard.h \
 	obt/keyboard.c \
-	obt/mainloop.h \
-	obt/mainloop.c \
 	obt/xml.h \
 	obt/xml.c \
 	obt/ddparse.h \
@@ -147,8 +145,6 @@ obt_libobt_la_SOURCES = \
 	obt/prop.h \
 	obt/prop.c \
 	obt/util.h \
-	obt/xevent.h \
-	obt/xevent.c \
 	obt/xqueue.h \
 	obt/xqueue.c
 
@@ -437,13 +433,11 @@ obtpubinclude_HEADERS = \
 	obt/link.h \
 	obt/display.h \
 	obt/keyboard.h \
-	obt/mainloop.h \
 	obt/xml.h \
 	obt/paths.h \
 	obt/prop.h \
 	obt/util.h \
 	obt/version.h \
-	obt/xevent.h \
 	obt/xqueue.h
 
 nodist_pkgconfig_DATA = \

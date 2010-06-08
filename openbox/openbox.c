@@ -46,6 +46,7 @@
 #include "obrender/render.h"
 #include "obrender/theme.h"
 #include "obt/display.h"
+#include "obt/xqueue.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
 #include "obt/xml.h"
@@ -83,7 +84,7 @@
 RrInstance   *ob_rr_inst;
 RrImageCache *ob_rr_icons;
 RrTheme      *ob_rr_theme;
-ObtMainLoop  *ob_main_loop;
+GMainLoop    *ob_main_loop;
 gint          ob_screen;
 gboolean      ob_replace_wm = FALSE;
 gboolean      ob_sm_use = TRUE;
@@ -157,18 +158,18 @@ gint main(gint argc, gchar **argv)
         exit(EXIT_SUCCESS);
     }
 
-    ob_main_loop = obt_main_loop_new();
+    ob_main_loop = g_main_loop_new(NULL, FALSE);
 
     /* set up signal handler */
-    obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler,  NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler,  NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGTTIN, signal_handler, NULL,NULL);
-    obt_main_loop_signal_add(ob_main_loop, SIGTTOU, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler,  NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler,  NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGTTIN, signal_handler, NULL,NULL);
+//  obt_main_loop_signal_add(ob_main_loop, SIGTTOU, signal_handler, NULL,NULL);
 
     ob_screen = DefaultScreen(obt_display);
 
@@ -316,6 +317,10 @@ gint main(gint argc, gchar **argv)
             menu_startup(reconfigure);
             prompt_startup(reconfigure);
 
+            /* do this after everything is started so no events will get
+               missed */
+            xqueue_listen();
+
             if (!reconfigure) {
                 guint32 xid;
                 ObWindow *w;
@@ -367,7 +372,7 @@ gint main(gint argc, gchar **argv)
                 }
             }
 
-            obt_main_loop_run(ob_main_loop);
+            g_main_loop_run(ob_main_loop);
             ob_set_state(reconfigure ?
                          OB_STATE_RECONFIGURING : OB_STATE_EXITING);
 
@@ -741,14 +746,14 @@ void ob_reconfigure(void)
 void ob_exit(gint code)
 {
     exitcode = code;
-    obt_main_loop_exit(ob_main_loop);
+    g_main_loop_quit(ob_main_loop);
 }
 
 void ob_exit_replace(void)
 {
     exitcode = 0;
     being_replaced = TRUE;
-    obt_main_loop_exit(ob_main_loop);
+    g_main_loop_quit(ob_main_loop);
 }
 
 Cursor ob_cursor(ObCursor cursor)

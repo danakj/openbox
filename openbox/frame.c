@@ -41,7 +41,7 @@
                            EnterWindowMask | LeaveWindowMask)
 
 #define FRAME_ANIMATE_ICONIFY_TIME 150000 /* .15 seconds */
-#define FRAME_ANIMATE_ICONIFY_STEP_TIME (G_USEC_PER_SEC / 60) /* 60 Hz */
+#define FRAME_ANIMATE_ICONIFY_STEP_TIME (1000 / 60) /* 60 Hz */
 
 #define FRAME_HANDLE_Y(f) (f->size.top + f->client->area.height + f->cbwidth_b)
 
@@ -1060,8 +1060,8 @@ static gboolean find_reparent(XEvent *e, gpointer data)
 void frame_release_client(ObFrame *self)
 {
     /* if there was any animation going on, kill it */
-    obt_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
-                                      self, FALSE);
+    if (self->iconify_animation_timer)
+        g_source_remove(self->iconify_animation_timer);
 
     /* check if the app has already reparented its window away */
     if (!xqueue_exists_local(find_reparent, self)) {
@@ -1118,7 +1118,7 @@ void frame_release_client(ObFrame *self)
     window_remove(self->rgriptop);
     window_remove(self->rgripbottom);
 
-    obt_main_loop_timeout_remove_data(ob_main_loop, flash_timeout, self, TRUE);
+    if (self->flash_timer) g_source_remove(self->flash_timer);
 }
 
 /* is there anything present between us and the label? */
@@ -1674,12 +1674,9 @@ void frame_flash_start(ObFrame *self)
     self->flash_on = self->focused;
 
     if (!self->flashing)
-        obt_main_loop_timeout_add(ob_main_loop,
-                                  G_USEC_PER_SEC * 0.6,
-                                  flash_timeout,
-                                  self,
-                                  g_direct_equal,
-                                  flash_done);
+        self->flash_timer = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                               600, flash_timeout, self,
+                                               flash_done);
     g_get_current_time(&self->flash_end);
     g_time_val_add(&self->flash_end, G_USEC_PER_SEC * 5);
 
@@ -1837,12 +1834,13 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
     }
 
     if (new_anim) {
-        obt_main_loop_timeout_remove_data(ob_main_loop, frame_animate_iconify,
-                                          self, FALSE);
-        obt_main_loop_timeout_add(ob_main_loop,
-                                  FRAME_ANIMATE_ICONIFY_STEP_TIME,
-                                  frame_animate_iconify, self,
-                                  g_direct_equal, NULL);
+        if (self->iconify_animation_timer)
+            g_source_remove(self->iconify_animation_timer);
+        self->iconify_animation_timer =
+            g_timeout_add_full(G_PRIORITY_DEFAULT,
+                               FRAME_ANIMATE_ICONIFY_STEP_TIME,
+                               frame_animate_iconify, self, NULL);
+                               
 
         /* do the first step */
         frame_animate_iconify(self);

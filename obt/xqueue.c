@@ -318,3 +318,69 @@ gboolean xqueue_pending_local(void)
     if (!qnum) read_events(FALSE);
     return qnum != 0;
 }
+
+typedef struct _ObtXQueueCB {
+    ObtXQueueFunc func;
+    gpointer data;
+} ObtXQueueCB;
+
+static ObtXQueueCB *callbacks = NULL;
+static guint n_callbacks = 0;
+
+static gboolean event_read(GIOChannel *s, GIOCondition cond, gpointer data)
+{
+    XEvent ev;
+
+    while (xqueue_next_local(&ev)) {
+        guint i;
+        for (i = 0; i < n_callbacks; ++i)
+            callbacks[i].func(&ev, callbacks[i].data);
+    }
+
+    return TRUE; /* repeat */
+}
+
+void xqueue_listen(void)
+{
+    GIOChannel *ch;
+
+    g_assert(obt_display != NULL);
+
+    ch = g_io_channel_unix_new(ConnectionNumber(obt_display));
+    g_io_add_watch(ch, G_IO_IN, event_read, NULL);
+    g_io_channel_unref(ch);
+}
+
+void xqueue_add_callback(ObtXQueueFunc f, gpointer data)
+{
+    guint i;
+
+    g_return_if_fail(f != NULL);
+
+    for (i = 0; i < n_callbacks; ++i)
+        if (callbacks[i].func == f && callbacks[i].data == data)
+            return;
+
+    callbacks = g_renew(ObtXQueueCB, callbacks, n_callbacks + 1);
+    callbacks[n_callbacks].func = f;
+    callbacks[n_callbacks].data = data;
+    ++n_callbacks;
+}
+
+void xqueue_remove_callback(ObtXQueueFunc f, gpointer data)
+{
+    guint i;
+
+    g_return_if_fail(f != NULL);
+
+    for (i = 0; i < n_callbacks; ++i) {
+        if (callbacks[i].func == f && callbacks[i].data == data) {
+            /* remove it */
+            for (; i < n_callbacks - 1; ++i)
+                callbacks[i] = callbacks[i+1];
+            callbacks = g_renew(ObtXQueueCB, callbacks, n_callbacks - 1);
+            --n_callbacks;
+            break;
+        }
+    }
+}

@@ -40,6 +40,7 @@
 KeyBindingTree *keyboard_firstnode = NULL;
 static ObPopup *popup = NULL;
 static KeyBindingTree *curpos;
+static guint chain_timer = 0;
 
 static void grab_keys(gboolean grab)
 {
@@ -68,6 +69,11 @@ static gboolean chain_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
+static void chain_done(gpointer data)
+{
+    chain_timer = 0;
+}
+
 static void set_curpos(KeyBindingTree *newpos)
 {
     if (curpos == newpos) return;
@@ -93,7 +99,7 @@ static void set_curpos(KeyBindingTree *newpos)
         a = screen_physical_area_primary(FALSE);
         popup_position(popup, NorthWestGravity, a->x + 10, a->y + 10);
         /* 1 second delay for the popup to show */
-        popup_delay_show(popup, G_USEC_PER_SEC, text);
+        popup_delay_show(popup, 1000, text);
         g_free(text);
     } else {
         popup_hide(popup);
@@ -226,7 +232,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
     if (e->xkey.keycode == config_keyboard_reset_keycode &&
         mods == config_keyboard_reset_state)
     {
-        obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+        if (chain_timer) g_source_remove(chain_timer);
         keyboard_reset_chains(-1);
         return TRUE;
     }
@@ -243,11 +249,12 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
                 menu_frame_hide_all();
 
             if (p->first_child != NULL) { /* part of a chain */
-                obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+                if (chain_timer) g_source_remove(chain_timer);
                 /* 3 second timeout for chains */
-                obt_main_loop_timeout_add(ob_main_loop, 3 * G_USEC_PER_SEC,
-                                          chain_timeout, NULL,
-                                          g_direct_equal, NULL);
+                chain_timer =
+                    g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                       3000, chain_timeout, NULL,
+                                       chain_done);
                 set_curpos(p);
             } else if (p->chroot)         /* an empty chroot */
                 set_curpos(p);
@@ -322,7 +329,7 @@ void keyboard_startup(gboolean reconfig)
 
 void keyboard_shutdown(gboolean reconfig)
 {
-    obt_main_loop_timeout_remove(ob_main_loop, chain_timeout);
+    if (chain_timer) g_source_remove(chain_timer);
 
     keyboard_unbind_all();
     set_curpos(NULL);

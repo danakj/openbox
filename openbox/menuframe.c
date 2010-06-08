@@ -44,6 +44,8 @@ GList *menu_frame_visible;
 GHashTable *menu_frame_map;
 
 static RrAppearance *a_sep;
+static guint submenu_show_timer = 0;
+static guint submenu_hide_timer = 0;
 
 static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
                                               ObMenuFrame *frame);
@@ -1009,8 +1011,8 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, gint x, gint y,
 */
 static void remove_submenu_hide_timeout(ObMenuFrame *child)
 {
-    obt_main_loop_timeout_remove_data(ob_main_loop, submenu_hide_timeout,
-                                      child, FALSE);
+    if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
+    submenu_hide_timer = 0;
 }
 
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
@@ -1107,7 +1109,8 @@ void menu_frame_hide_all(void)
 
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        obt_main_loop_timeout_remove(ob_main_loop, submenu_show_timeout);
+        if (submenu_show_timer) g_source_remove(submenu_show_timer);
+        submenu_show_timer = 0;
     }
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
@@ -1188,7 +1191,8 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
 
     if (config_submenu_show_delay) {
         /* remove any submenu open requests */
-        obt_main_loop_timeout_remove(ob_main_loop, submenu_show_timeout);
+        if (submenu_show_timer) g_source_remove(submenu_show_timer);
+        submenu_show_timer = 0;
     }
 
     self->selected = entry;
@@ -1208,12 +1212,13 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                submenu */
             if (immediate || config_submenu_hide_delay == 0)
                 menu_frame_hide(oldchild);
-            else if (config_submenu_hide_delay > 0)
-                obt_main_loop_timeout_add(ob_main_loop,
-                                          config_submenu_hide_delay * 1000,
-                                          submenu_hide_timeout,
-                                          oldchild, g_direct_equal,
-                                          NULL);
+            else if (config_submenu_hide_delay > 0) {
+                if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
+                submenu_hide_timer =
+                    g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                       config_submenu_hide_delay,
+                                       submenu_hide_timeout, oldchild, NULL);
+            }
         }
     }
 
@@ -1225,12 +1230,15 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
             if (oldchild_entry != self->selected) {
                 if (immediate || config_submenu_hide_delay == 0)
                     menu_entry_frame_show_submenu(self->selected);
-                else if (config_submenu_hide_delay > 0)
-                    obt_main_loop_timeout_add(ob_main_loop,
-                                              config_submenu_show_delay * 1000,
-                                              submenu_show_timeout,
-                                              self->selected, g_direct_equal,
-                                              NULL);
+                else if (config_submenu_hide_delay > 0) {
+                    if (submenu_show_timer)
+                        g_source_remove(submenu_show_timer);
+                    submenu_show_timer =
+                        g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                           config_submenu_show_delay,
+                                           submenu_show_timeout,
+                                           self->selected, NULL);
+                }
             }
             /* hide the grandchildren of this menu. and move the cursor to
                the current menu */

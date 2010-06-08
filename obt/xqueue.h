@@ -87,6 +87,15 @@ gboolean xqueue_exists_local(xqueue_match_func match, gpointer data);
 gboolean xqueue_remove_local(XEvent *event_return,
                              xqueue_match_func match, gpointer data);
 
+typedef void (*ObtXQueueFunc)(const XEvent *ev, gpointer data);
+
+/*! Begin listening for X events in the default GMainContext, and feed them
+  to the registered callback functions, added with xqueue_add_callback(). */
+void xqueue_listen(void);
+
+void xqueue_add_callback(ObtXQueueFunc f, gpointer data);
+void xqueue_remove_callback(ObtXQueueFunc f, gpointer data);
+
 G_END_DECLS
 
 #endif

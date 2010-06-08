@@ -61,9 +61,11 @@ static guint button;
 static guint32 corner;
 static ObDirection edge_warp_dir = -1;
 static gboolean edge_warp_odd = FALSE;
+static guint edge_warp_timer = 0;
 static ObDirection key_resize_edge = -1;
 #ifdef SYNC
 static guint waiting_for_sync;
+static guint sync_timer = 0;
 #endif
 
 static ObPopup *popup = NULL;
@@ -319,7 +321,8 @@ void moveresize_end(gboolean cancel)
             moveresize_alarm = None;
         }
 
-        obt_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
+        if (sync_timer) g_source_remove(sync_timer);
+        sync_timer = 0;
 #endif
     }
 
@@ -433,10 +436,8 @@ static void do_resize(void)
 
             waiting_for_sync = 1;
 
-            obt_main_loop_timeout_remove(ob_main_loop, sync_timeout_func);
-            obt_main_loop_timeout_add(ob_main_loop, G_USEC_PER_SEC * 2,
-                                      sync_timeout_func,
-                                      NULL, NULL, NULL);
+            if (sync_timer) g_source_remove(sync_timer);
+            sync_timer = g_timeout_add(2000, sync_timeout_func, NULL);
         }
 #endif
 
@@ -461,8 +462,10 @@ static gboolean sync_timeout_func(gpointer data)
     ++waiting_for_sync; /* we timed out waiting for our sync... */
     do_resize(); /* ...so let any pending resizes through */
 
-    if (waiting_for_sync > SYNC_TIMEOUTS)
+    if (waiting_for_sync > SYNC_TIMEOUTS) {
+        sync_timer = 0;
         return FALSE; /* don't repeat */
+    }
     else
         return TRUE; /* keep waiting */
 }
@@ -649,10 +652,8 @@ static void do_edge_warp(gint x, gint y)
         cancel_edge_warp();
         if (dir != (ObDirection)-1) {
             edge_warp_odd = TRUE; /* switch on the first timeout */
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_mouse_screenedgetime * 1000,
-                                      edge_warp_delay_func,
-                                      NULL, NULL, NULL);
+            edge_warp_timer = g_timeout_add(config_mouse_screenedgetime,
+                                            edge_warp_delay_func, NULL);
         }
         edge_warp_dir = dir;
     }
@@ -660,7 +661,8 @@ static void do_edge_warp(gint x, gint y)
 
 static void cancel_edge_warp(void)
 {
-    obt_main_loop_timeout_remove(ob_main_loop, edge_warp_delay_func);
+    if (edge_warp_timer) g_source_remove(edge_warp_timer);
+    edge_warp_timer = 0;
 }
 
 static void move_with_keys(KeySym sym, guint state)

@@ -146,11 +146,12 @@ static gboolean popup_show_timeout(gpointer data)
     stacking_raise(INTERNAL_AS_WINDOW(self));
     self->mapped = TRUE;
     self->delay_mapped = FALSE;
+    self->delay_timer = 0;
 
     return FALSE; /* don't repeat */
 }
 
-void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
+void popup_delay_show(ObPopup *self, gulong msec, gchar *text)
 {
     gint l, t, r, b;
     gint x, y, w, h;
@@ -292,12 +293,11 @@ void popup_delay_show(ObPopup *self, gulong usec, gchar *text)
 
     /* do the actual showing */
     if (!self->mapped) {
-        if (usec) {
+        if (msec) {
             /* don't kill previous show timers */
             if (!self->delay_mapped) {
-                obt_main_loop_timeout_add(ob_main_loop, usec,
-                                          popup_show_timeout, self,
-                                          g_direct_equal, NULL);
+                self->delay_timer =
+                    g_timeout_add(msec, popup_show_timeout, self);
                 self->delay_mapped = TRUE;
             }
         } else {
@@ -319,7 +319,8 @@ void popup_hide(ObPopup *self)
 
         event_end_ignore_all_enters(ignore_start);
     } else if (self->delay_mapped) {
-        obt_main_loop_timeout_remove_data(ob_main_loop, popup_show_timeout, self, FALSE);
+        g_source_remove(self->delay_timer);
+        self->delay_timer = 0;
         self->delay_mapped = FALSE;
     }
 }
@@ -365,7 +366,7 @@ void icon_popup_free(ObIconPopup *self)
     }
 }
 
-void icon_popup_delay_show(ObIconPopup *self, gulong usec,
+void icon_popup_delay_show(ObIconPopup *self, gulong msec,
                            gchar *text, RrImage *icon)
 {
     if (icon) {
@@ -378,7 +379,7 @@ void icon_popup_delay_show(ObIconPopup *self, gulong usec,
         self->a_icon->texture[0].type = RR_TEXTURE_NONE;
     }
 
-    popup_delay_show(self->popup, usec, text);
+    popup_delay_show(self->popup, msec, text);
 }
 
 void icon_popup_icon_size_multiplier(ObIconPopup *self, guint wm, guint hm)
@@ -528,7 +529,7 @@ void pager_popup_free(ObPagerPopup *self)
     }
 }
 
-void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
+void pager_popup_delay_show(ObPagerPopup *self, gulong msec,
                             gchar *text, guint desk)
 {
     guint i;
@@ -557,7 +558,7 @@ void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
     self->desks = screen_num_desktops;
     self->curdesk = desk;
 
-    popup_delay_show(self->popup, usec, text);
+    popup_delay_show(self->popup, msec, text);
 }
 
 void pager_popup_icon_size_multiplier(ObPagerPopup *self, guint wm, guint hm)

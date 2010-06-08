@@ -93,7 +93,7 @@ static gboolean is_enter_focus_event_ignored(gulong serial);
 static void event_ignore_enter_range(gulong start, gulong end);
 
 static void focus_delay_dest(gpointer data);
-static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2);
+static void unfocus_delay_dest(gpointer data);
 static gboolean focus_delay_func(gpointer data);
 static gboolean unfocus_delay_func(gpointer data);
 static void focus_delay_client_dest(ObClient *client, gpointer data);
@@ -112,25 +112,34 @@ static gboolean focus_left_screen = FALSE;
 static gboolean waiting_for_focusin = FALSE;
 /*! A list of ObSerialRanges which are to be ignored for mouse enter events */
 static GSList *ignore_serials = NULL;
+static guint focus_delay_timeout_id = 0;
+static ObClient *focus_delay_timeout_client = NULL;
+static guint unfocus_delay_timeout_id = 0;
+static ObClient *unfocus_delay_timeout_client = NULL;
 
 #ifdef USE_SM
-static void ice_handler(gint fd, gpointer conn)
+static gboolean ice_handler(GIOChannel *source, GIOCondition cond,
+                            gpointer conn)
 {
     Bool b;
     IceProcessMessages(conn, NULL, &b);
+    return TRUE; /* don't remove the event source */
 }
 
 static void ice_watch(IceConn conn, IcePointer data, Bool opening,
                       IcePointer *watch_data)
 {
-    static gint fd = -1;
+    static guint id = 0;
 
     if (opening) {
-        fd = IceConnectionNumber(conn);
-        obt_main_loop_fd_add(ob_main_loop, fd, ice_handler, conn, NULL);
-    } else {
-        obt_main_loop_fd_remove(ob_main_loop, fd);
-        fd = -1;
+        GIOChannel *ch;
+
+        ch = g_io_channel_unix_new(IceConnectionNumber(conn));
+        id = g_io_add_watch(ch, G_IO_IN, ice_handler, conn);
+        g_io_channel_unref(ch);
+    } else if (id) {
+        g_source_remove(id);
+        id = 0;
     }
 }
 #endif
@@ -139,7 +148,7 @@ void event_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    obt_main_loop_x_add(ob_main_loop, event_process, NULL, NULL);
+    xqueue_add_callback(event_process, NULL);
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
@@ -806,17 +815,20 @@ void event_enter_client(ObClient *client)
         if (config_focus_delay) {
             ObFocusDelayData *data;
 
-            obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
+            if (focus_delay_timeout_id)
+                g_source_remove(focus_delay_timeout_id);
 
             data = g_slice_new(ObFocusDelayData);
             data->client = client;
             data->time = event_time();
             data->serial = event_curserial;
 
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_focus_delay * 1000,
-                                      focus_delay_func,
-                                      data, focus_delay_cmp, focus_delay_dest);
+            focus_delay_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                        config_focus_delay,
+                                                        focus_delay_func,
+                                                        data,
+                                                        focus_delay_dest);
+            focus_delay_timeout_client = client;
         } else {
             ObFocusDelayData data;
             data.client = client;
@@ -841,17 +853,20 @@ void event_leave_client(ObClient *client)
         if (config_focus_delay) {
             ObFocusDelayData *data;
 
-            obt_main_loop_timeout_remove(ob_main_loop, unfocus_delay_func);
+            if (unfocus_delay_timeout_id)
+                g_source_remove(unfocus_delay_timeout_id);
 
             data = g_slice_new(ObFocusDelayData);
             data->client = client;
             data->time = event_time();
             data->serial = event_curserial;
 
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_focus_delay * 1000,
-                                      unfocus_delay_func,
-                                      data, focus_delay_cmp, focus_delay_dest);
+            unfocus_delay_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                          config_focus_delay,
+                                                          unfocus_delay_func,
+                                                          data,
+                                                          unfocus_delay_dest);
+            unfocus_delay_timeout_client = client;
         } else {
             ObFocusDelayData data;
             data.client = client;
@@ -1060,10 +1075,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                    delay is up */
                 e->xcrossing.detail != NotifyInferior)
             {
-                if (config_focus_delay)
-                    obt_main_loop_timeout_remove_data(ob_main_loop,
-                                                      focus_delay_func,
-                                                      client, FALSE);
+                if (config_focus_delay && focus_delay_timeout_id)
+                    g_source_remove(focus_delay_timeout_id);
                 if (config_unfocus_leave)
                     event_leave_client(client);
             }
@@ -1113,10 +1126,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                               e->xcrossing.serial,
                               (client?client->window:0));
                 if (config_focus_follow) {
-                    if (config_focus_delay)
-                        obt_main_loop_timeout_remove_data(ob_main_loop,
-                                                          unfocus_delay_func,
-                                                          client, FALSE);
+                    if (config_focus_delay && unfocus_delay_timeout_id)
+                        g_source_remove(unfocus_delay_timeout_id);
                     event_enter_client(client);
                 }
             }
@@ -2047,12 +2058,15 @@ static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 static void focus_delay_dest(gpointer data)
 {
     g_slice_free(ObFocusDelayData, data);
+    focus_delay_timeout_id = 0;
+    focus_delay_timeout_client = NULL;
 }
 
-static gboolean focus_delay_cmp(gconstpointer d1, gconstpointer d2)
+static void unfocus_delay_dest(gpointer data)
 {
-    const ObFocusDelayData *f1 = d1;
-    return f1->client == d2;
+    g_slice_free(ObFocusDelayData, data);
+    unfocus_delay_timeout_id = 0;
+    unfocus_delay_timeout_client = NULL;
 }
 
 static gboolean focus_delay_func(gpointer data)
@@ -2082,18 +2096,18 @@ static gboolean unfocus_delay_func(gpointer data)
 
 static void focus_delay_client_dest(ObClient *client, gpointer data)
 {
-    obt_main_loop_timeout_remove_data(ob_main_loop, focus_delay_func,
-                                      client, FALSE);
-    obt_main_loop_timeout_remove_data(ob_main_loop, unfocus_delay_func,
-                                      client, FALSE);
+    if (focus_delay_timeout_client == client && focus_delay_timeout_id)
+        g_source_remove(focus_delay_timeout_id);
+    if (unfocus_delay_timeout_client == client && unfocus_delay_timeout_id)
+        g_source_remove(unfocus_delay_timeout_id);
 }
 
 void event_halt_focus_delay(void)
 {
     /* ignore all enter events up till the event which caused this to occur */
     if (event_curserial) event_ignore_enter_range(1, event_curserial);
-    obt_main_loop_timeout_remove(ob_main_loop, focus_delay_func);
-    obt_main_loop_timeout_remove(ob_main_loop, unfocus_delay_func);
+    if (focus_delay_timeout_id) g_source_remove(focus_delay_timeout_id);
+    if (unfocus_delay_timeout_id) g_source_remove(unfocus_delay_timeout_id);
 }
 
 gulong event_start_ignore_all_enters(void)

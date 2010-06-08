@@ -33,6 +33,8 @@
                               ButtonMotionMask)
 
 static ObDock *dock;
+static guint show_timeout_id;
+static guint hide_timeout_id;
 
 StrutPartial dock_strut;
 
@@ -628,14 +630,18 @@ static gboolean hide_timeout(gpointer data)
     dock->hidden = TRUE;
     dock_configure();
 
+    hide_timeout_id = 0;
+
     return FALSE; /* don't repeat */
 }
 
 static gboolean show_timeout(gpointer data)
 {
-    /* hide */
+    /* show */
     dock->hidden = FALSE;
     dock_configure();
+
+    show_timeout_id = 0;
 
     return FALSE; /* don't repeat */
 }
@@ -644,21 +650,21 @@ void dock_hide(gboolean hide)
 {
     if (!hide) {
         if (dock->hidden && config_dock_hide) {
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_dock_show_delay * 1000,
-                                      show_timeout, NULL,
-                                      g_direct_equal, NULL);
-        } else if (!dock->hidden && config_dock_hide) {
-            obt_main_loop_timeout_remove(ob_main_loop, hide_timeout);
+            show_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                 config_dock_show_delay,
+                                                 show_timeout, NULL, NULL);
+        } else if (!dock->hidden && config_dock_hide && hide_timeout_id) {
+            if (hide_timeout_id) g_source_remove(hide_timeout_id);
+            hide_timeout_id = 0;
         }
     } else {
         if (!dock->hidden && config_dock_hide) {
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_dock_hide_delay * 1000,
-                                      hide_timeout, NULL,
-                                      g_direct_equal, NULL);
-        } else if (dock->hidden && config_dock_hide) {
-            obt_main_loop_timeout_remove(ob_main_loop, show_timeout);
+            hide_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                 config_dock_show_delay,
+                                                 hide_timeout, NULL, NULL);
+        } else if (dock->hidden && config_dock_hide && show_timeout_id) {
+            if (show_timeout_id) g_source_remove(show_timeout_id);
+            show_timeout_id = 0;
         }
     }
 }

@@ -38,7 +38,6 @@
 #include "obt/display.h"
 #include "obt/xqueue.h"
 #include "obt/prop.h"
-#include "obt/mainloop.h"
 
 #include <X11/Xlib.h>
 #ifdef HAVE_UNISTD_H
@@ -71,6 +70,7 @@ Time            screen_desktop_user_time = CurrentTime;
 static Size     screen_physical_size;
 static guint    screen_old_desktop;
 static gboolean screen_desktop_timeout = TRUE;
+static guint    screen_desktop_timer = 0;
 /*! An array of desktops, holding an array of areas per monitor */
 static Rect  *monitor_area = NULL;
 /*! An array of desktops, holding an array of struts */
@@ -80,11 +80,12 @@ static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
 static ObPagerPopup *desktop_popup;
+static guint         desktop_popup_timer = 0;
 static gboolean      desktop_popup_perm;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
-#define REMEMBER_LAST_DESKTOP_TIME 750000
+#define REMEMBER_LAST_DESKTOP_TIME 750
 
 static gboolean replace_wm(void)
 {
@@ -601,7 +602,8 @@ static void screen_fallback_focus(void)
 static gboolean last_desktop_func(gpointer data)
 {
     screen_desktop_timeout = TRUE;
-    return FALSE;
+    screen_desktop_timer = 0;
+    return FALSE; /* don't repeat */
 }
 
 void screen_set_desktop(guint num, gboolean dofocus)
@@ -683,9 +685,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
         }
     }
     screen_desktop_timeout = FALSE;
-    obt_main_loop_timeout_remove(ob_main_loop, last_desktop_func);
-    obt_main_loop_timeout_add(ob_main_loop, REMEMBER_LAST_DESKTOP_TIME,
-                              last_desktop_func, NULL, NULL, NULL);
+    if (screen_desktop_timer) g_source_remove(screen_desktop_timer);
+    screen_desktop_timer = g_timeout_add(REMEMBER_LAST_DESKTOP_TIME,
+                                         last_desktop_func, NULL);
 
     ob_debug("Moving to desktop %d", num+1);
 
@@ -937,6 +939,7 @@ static guint translate_row_col(guint r, guint c)
 static gboolean hide_desktop_popup_func(gpointer data)
 {
     pager_popup_hide(desktop_popup);
+    desktop_popup_timer = 0;
     return FALSE; /* don't repeat */
 }
 
@@ -959,21 +962,21 @@ void screen_show_desktop_popup(guint d, gboolean perm)
                           MAX(a->width/3, POPUP_WIDTH));
     pager_popup_show(desktop_popup, screen_desktop_names[d], d);
 
-    obt_main_loop_timeout_remove(ob_main_loop, hide_desktop_popup_func);
+    if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
+    desktop_popup_timer = 0;
     if (!perm && !desktop_popup_perm)
         /* only hide if its not already being show permanently */
-        obt_main_loop_timeout_add(ob_main_loop,
-                                  config_desktop_popup_time * 1000,
-                                  hide_desktop_popup_func, desktop_popup,
-                                  g_direct_equal, NULL);
+        desktop_popup_timer = g_timeout_add(config_desktop_popup_time,
+                                            hide_desktop_popup_func,
+                                            desktop_popup);
     if (perm)
         desktop_popup_perm = TRUE;
 }
 
 void screen_hide_desktop_popup(void)
 {
-    obt_main_loop_timeout_remove_data(ob_main_loop, hide_desktop_popup_func,
-                                      desktop_popup, FALSE);
+    if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
+    desktop_popup_timer = 0;
     pager_popup_hide(desktop_popup);
     desktop_popup_perm = FALSE;
 }

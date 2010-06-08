@@ -486,10 +486,10 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
             menu_can_hide = TRUE;
         else {
             menu_can_hide = FALSE;
-            obt_main_loop_timeout_add(ob_main_loop,
-                                      config_menu_hide_delay * 1000,
-                                      menu_hide_delay_func,
-                                      NULL, g_direct_equal, NULL);
+            g_timeout_add_full(G_PRIORITY_DEFAULT,
+                               config_menu_hide_delay,
+                               menu_hide_delay_func,
+                               NULL, NULL);
         }
     }
 }

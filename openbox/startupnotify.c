@@ -20,6 +20,7 @@
 #include "startupnotify.h"
 #include "gettext.h"
 #include "event.h"
+#include "obt/xqueue.h"
 
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
@@ -67,7 +68,7 @@ void sn_startup(gboolean reconfig)
                                         sn_event_func, NULL, NULL);
     sn_launcher = sn_launcher_context_new(sn_display, ob_screen);
 
-    obt_main_loop_x_add(ob_main_loop, sn_handler, NULL, NULL);
+    xqueue_add_callback(sn_handler, NULL);
 }
 
 void sn_shutdown(gboolean reconfig)
@@ -76,7 +77,7 @@ void sn_shutdown(gboolean reconfig)
 
     if (reconfig) return;
 
-    obt_main_loop_x_remove(ob_main_loop, sn_handler);
+    xqueue_remove_callback(sn_handler, NULL);
 
     for (it = sn_waits; it; it = g_slist_next(it))
         sn_startup_sequence_unref((SnStartupSequence*)it->data);
@@ -139,10 +140,9 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         sn_waits = g_slist_prepend(sn_waits, seq);
         /* 20 second timeout for apps to start if the launcher doesn't
            have a timeout */
-        obt_main_loop_timeout_add(ob_main_loop, 20 * G_USEC_PER_SEC,
-                                  sn_wait_timeout, seq,
-                                  g_direct_equal,
-                                  (GDestroyNotify)sn_startup_sequence_unref);
+        g_timeout_add_full(G_PRIORITY_DEFAULT,
+                           20 * 1000, sn_wait_timeout, seq,
+                           (GDestroyNotify)sn_startup_sequence_unref);
         change = TRUE;
         break;
     case SN_MONITOR_EVENT_CHANGED:
@@ -153,8 +153,7 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
     case SN_MONITOR_EVENT_CANCELED:
         if ((seq = sequence_find(sn_startup_sequence_get_id(seq)))) {
             sn_waits = g_slist_remove(sn_waits, seq);
-            obt_main_loop_timeout_remove_data(ob_main_loop, sn_wait_timeout,
-                                              seq, FALSE);
+            g_source_remove_by_user_data(seq);
             change = TRUE;
         }
         break;
@@ -260,10 +259,9 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
 
     /* 20 second timeout for apps to start */
     sn_launcher_context_ref(sn_launcher);
-    obt_main_loop_timeout_add(ob_main_loop, 20 * G_USEC_PER_SEC,
-                              sn_launch_wait_timeout, sn_launcher,
-                              g_direct_equal,
-                              (GDestroyNotify)sn_launcher_context_unref);
+    g_timeout_add_full(G_PRIORITY_DEFAULT,
+                       20 * 1000, sn_launch_wait_timeout, sn_launcher,
+                       (GDestroyNotify)sn_launcher_context_unref);
 
     setenv("DESKTOP_STARTUP_ID", id, TRUE);
 

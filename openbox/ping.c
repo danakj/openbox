@@ -22,7 +22,6 @@
 #include "event.h"
 #include "debug.h"
 #include "openbox.h"
-#include "obt/mainloop.h"
 #include "obt/prop.h"
 
 typedef struct _ObPingTarget
@@ -30,13 +29,14 @@ typedef struct _ObPingTarget
     ObClient *client;
     ObPingEventHandler h;
     guint32 id;
+    guint loopid;
     gint waiting;
 } ObPingTarget;
 
 static GHashTable *ping_ids     = NULL;
 static guint32     ping_next_id = 1;
 
-#define PING_TIMEOUT (G_USEC_PER_SEC * 3)
+#define PING_TIMEOUT 3000 /* in MS */
 /*! Warn the user after this many PING_TIMEOUT intervals */
 #define PING_TIMEOUT_WARN 2
 
@@ -79,8 +79,8 @@ void ping_start(struct _ObClient *client, ObPingEventHandler h)
     t->client = client;
     t->h = h;
 
-    obt_main_loop_timeout_add(ob_main_loop, PING_TIMEOUT, ping_timeout,
-                              t, g_direct_equal, NULL);
+    t->loopid = g_timeout_add_full(G_PRIORITY_DEFAULT, PING_TIMEOUT,
+                                   ping_timeout, t, NULL);
     /* act like we just timed out immediately, to start the pinging process
        now instead of after the first delay.  this makes sure the client
        ends up in the ping_ids hash table now. */
@@ -158,8 +158,7 @@ static void ping_end(ObClient *client, gpointer data)
     if ((t = g_hash_table_find(ping_ids, find_client, client))) {
         g_hash_table_remove(ping_ids, &t->id);
 
-        obt_main_loop_timeout_remove_data(ob_main_loop, ping_timeout,
-                                          t, FALSE);
+        g_source_remove(t->loopid);
 
         g_slice_free(ObPingTarget, t);
     }

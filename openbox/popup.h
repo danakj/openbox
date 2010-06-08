@@ -53,6 +53,7 @@ struct _ObPopup
     guint iconhm; /* icon height multiplier. multipled by the normal height */
     gboolean mapped;
     gboolean delay_mapped;
+    guint delay_timer;
 
     void (*draw_icon)(gint x, gint y, gint w, gint h, gpointer data);
     gpointer draw_icon_data;
@@ -99,7 +100,7 @@ void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num);
 void popup_set_text_align(ObPopup *self, RrJustify align);
 
 #define popup_show(s, t) popup_delay_show((s),0,(t))
-void popup_delay_show(ObPopup *self, gulong usec, gchar *text);
+void popup_delay_show(ObPopup *self, gulong msec, gchar *text);
 void popup_hide(ObPopup *self);
 
 RrAppearance *popup_icon_appearance(ObPopup *self);
@@ -109,7 +110,7 @@ ObIconPopup *icon_popup_new(void);
 void icon_popup_free(ObIconPopup *self);
 
 #define icon_popup_show(s, t, i) icon_popup_delay_show((s),0,(t),(i))
-void icon_popup_delay_show(ObIconPopup *self, gulong usec,
+void icon_popup_delay_show(ObIconPopup *self, gulong msec,
                            gchar *text, RrImage *icon);
 #define icon_popup_hide(p) popup_hide((p)->popup)
 #define icon_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))
@@ -128,7 +129,7 @@ ObPagerPopup *pager_popup_new(void);
 void pager_popup_free(ObPagerPopup *self);
 
 #define pager_popup_show(s, t, d) pager_popup_delay_show((s),0,(t),(d))
-void pager_popup_delay_show(ObPagerPopup *self, gulong usec,
+void pager_popup_delay_show(ObPagerPopup *self, gulong msec,
                             gchar *text, guint desk);
 #define pager_popup_hide(p) popup_hide((p)->popup)
 #define pager_popup_position(p, g, x, y) popup_position((p)->popup,(g),(x),(y))

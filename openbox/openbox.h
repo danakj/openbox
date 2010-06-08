@@ -23,7 +23,6 @@
 
 #include "obrender/render.h"
 #include "obrender/theme.h"
-#include "obt/mainloop.h"
 #include "obt/display.h"
 
 #include <glib.h>
@@ -32,7 +31,7 @@ extern RrInstance *ob_rr_inst;
 extern RrImageCache *ob_rr_icons;
 extern RrTheme    *ob_rr_theme;
 
-extern ObtMainLoop *ob_main_loop;
+extern GMainLoop *ob_main_loop;
 
 /*! The number of the screen on which we're running */
 extern gint     ob_screen;

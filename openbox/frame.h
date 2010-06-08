@@ -190,12 +190,14 @@ struct _ObFrame
     gboolean  flashing;
     gboolean  flash_on;
     GTimeVal  flash_end;
+    guint     flash_timer;
 
     /*! Is the frame currently in an animation for iconify or restore.
       0 means that it is not animating. > 0 means it is animating an iconify.
       < 0 means it is animating a restore.
     */
     gint iconify_animation_going;
+    guint iconify_animation_timer;
     GTimeVal  iconify_animation_end;
 };
 

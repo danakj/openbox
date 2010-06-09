@@ -40,6 +40,8 @@ typedef enum {
 
 /* list of ObWindow*s in stacking order from highest to lowest */
 extern GList *stacking_list;
+/* list of ObWindow*s in stacking order from lowest to highest */
+extern GList *stacking_list_tail;
 
 /*! Sets the window stacking list on the root window from the
   stacking_list */

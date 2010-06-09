@@ -29,6 +29,7 @@
 #include "obt/prop.h"
 
 GList  *stacking_list = NULL;
+GList  *stacking_list_tail = NULL;
 /*! When true, stacking changes will not be reflected on the screen.  This is
   to freeze the on-screen stacking order while a window is being temporarily
   raised during focus cycling */
@@ -403,6 +404,7 @@ void stacking_raise(ObWindow *window)
         do_raise(wins);
         g_list_free(wins);
     }
+    stacking_list_tail = g_list_last(stacking_list);
 }
 
 void stacking_lower(ObWindow *window)
@@ -418,6 +420,7 @@ void stacking_lower(ObWindow *window)
         do_lower(wins);
         g_list_free(wins);
     }
+    stacking_list_tail = g_list_last(stacking_list);
 }
 
 void stacking_below(ObWindow *window, ObWindow *below)
@@ -432,6 +435,7 @@ void stacking_below(ObWindow *window, ObWindow *below)
     before = g_list_next(g_list_find(stacking_list, below));
     do_restack(wins, before);
     g_list_free(wins);
+    stacking_list_tail = g_list_last(stacking_list);
 }
 
 void stacking_add(ObWindow *win)
@@ -444,6 +448,7 @@ void stacking_add(ObWindow *win)
     stacking_list = g_list_append(stacking_list, win);
 
     stacking_raise(win);
+    /* stacking_list_tail set by stacking_raise() */
 }
 
 static GList *find_highest_relative(ObClient *client)
@@ -556,6 +561,7 @@ void stacking_add_nonintrusive(ObWindow *win)
     wins = g_list_append(NULL, win);
     do_restack(wins, it_below);
     g_list_free(wins);
+    stacking_list_tail = g_list_last(stacking_list);
 }
 
 /*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it

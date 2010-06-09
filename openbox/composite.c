@@ -303,6 +303,9 @@ static gboolean composite(gpointer data)
         else
             attribs[1] = GLX_TEXTURE_FORMAT_RGB_EXT;
 
+        if (win->pixmap == None)
+            win->pixmap = XCompositeNameWindowPixmap(obt_display, window_top(win));
+
         if (win->gpixmap == None)
             win->gpixmap = obcomp.CreatePixmap(obt_display, obcomp.PixmapConfig[win->depth], win->pixmap, attribs);
 

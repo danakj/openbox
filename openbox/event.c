@@ -624,11 +624,12 @@ static void event_process(const XEvent *ec, gpointer data)
 #ifdef USE_COMPOSITING
     else if ((e->type == ConfigureNotify || e->type == MapNotify)
              && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {
-        if (obwin->pixmap != None)
+        if (obwin->pixmap != None) {
             XFreePixmap(obt_display, obwin->pixmap);
-        obwin->pixmap = XCompositeNameWindowPixmap(obt_display, window_top(obwin));
+            obwin->pixmap = None;
+        }
         if (obwin->gpixmap != None) {
-            XFreePixmap(obt_display, obwin->gpixmap);
+            glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
             obwin->gpixmap = None;
         }
 

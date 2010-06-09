@@ -129,7 +129,7 @@ void window_remove(Window xwin)
         if (win->damage)
             XDamageDestroy(obt_display, win->damage);
         if (win->gpixmap)
-            XFreePixmap(obt_display, win->gpixmap);
+            glXDestroyGLXPixmap(obt_display, win->gpixmap);
         if (win->pixmap)
             XFreePixmap(obt_display, win->pixmap);
         if (win->texture)

@@ -1723,6 +1723,13 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
         break;
     }
 
+    /* If the client has no decor from its type (which never changes) then
+       don't allow the user to "undecorate" the window.  Otherwise, allow them
+       to, even if there are motif hints removing the decor, because those
+       may change these days (e.g. chromium) */
+    if (self->decorations == 0)
+        self->functions &= ~OB_CLIENT_FUNC_UNDECORATE;
+
     /* Mwm Hints are applied subtractively to what has already been chosen for
        decor and functionality */
     if (self->mwmhints.flags & OB_MWM_FLAG_DECORATIONS) {
@@ -1781,11 +1788,6 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
            but do kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
     }
-
-    /* If there are no decorations to remove, don't allow the user to try
-       toggle the state */
-    if (self->decorations == 0)
-        self->functions &= ~OB_CLIENT_FUNC_UNDECORATE;
 
     /* finally, the user can have requested no decorations, which overrides
        everything (but doesnt give it a border if it doesnt have one) */

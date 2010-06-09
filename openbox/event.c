@@ -621,6 +621,21 @@ static void event_process(const XEvent *ec, gpointer data)
         if (client && client != focus_client)
             frame_adjust_focus(client->frame, FALSE);
     }
+#ifdef USE_COMPOSITING
+    else if ((e->type == ConfigureNotify || e->type == MapNotify)
+             && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+        if (obwin->pixmap != None)
+            XFreePixmap(obt_display, obwin->pixmap);
+        obwin->pixmap = XCompositeNameWindowPixmap(obt_display, window_top(obwin));
+        if (obwin->gpixmap != None) {
+            XFreePixmap(obt_display, obwin->gpixmap);
+            obwin->gpixmap = None;
+        }
+
+//XXX actually need to check if this was just a move and not re-make the pmap!
+//printf("win %d has pixmap %d\n", window_top(obwin), obwin->pixmap);
+    }
+#endif
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)

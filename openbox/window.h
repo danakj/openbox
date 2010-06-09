@@ -24,6 +24,12 @@
 #include <X11/Xlib.h>
 #include <glib.h>
 
+#ifdef USE_COMPOSITING
+#include <X11/extensions/Xdamage.h>
+#include <GL/gl.h>
+#include <GL/glx.h>
+#endif
+
 typedef struct _ObWindow         ObWindow;
 typedef struct _ObInternalWindow ObInternalWindow;
 
@@ -39,6 +45,13 @@ typedef enum {
    struct */
 struct _ObWindow {
     ObWindowClass type;
+#ifdef USE_COMPOSITING
+    GLuint texture;
+    Pixmap pixmap;
+    GLXPixmap gpixmap;
+    Damage damage;
+    int depth;
+#endif
 };
 
 #define WINDOW_IS_MENUFRAME(win) \

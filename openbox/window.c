@@ -94,12 +94,48 @@ void window_add(Window *xwin, ObWindow *win)
 {
     g_assert(xwin != NULL);
     g_assert(win != NULL);
+#ifdef USE_COMPOSITING
+    XWindowAttributes wattrib;
+    Status ret;
+
+    if (win->type != OB_WINDOW_CLASS_PROMPT) {
+        win->damage = XDamageCreate(obt_display, window_top(win), XDamageReportNonEmpty);
+
+        XCompositeRedirectWindow(obt_display, window_top(win), CompositeRedirectManual);
+
+        win->pixmap = None;
+        glGenTextures(1, &win->texture);
+        ret = XGetWindowAttributes(obt_display, window_top(win), &wattrib);
+        g_assert(ret != BadDrawable);
+        g_assert(ret != BadWindow);
+
+        win->depth = wattrib.depth;
+    }
+#endif
     g_hash_table_insert(window_map, xwin, win);
 }
 
 void window_remove(Window xwin)
 {
     g_assert(xwin != None);
+#ifdef USE_COMPOSITING
+    ObWindow *win;
+    win = window_find(xwin);
+    if (!win) {
+        printf("Compositor tried to clean up a window, but it was not there.\n");
+        return;
+    }
+    if (win->type != OB_WINDOW_CLASS_PROMPT) {
+        if (win->damage)
+            XDamageDestroy(obt_display, win->damage);
+        if (win->gpixmap)
+            XFreePixmap(obt_display, win->gpixmap);
+        if (win->pixmap)
+            XFreePixmap(obt_display, win->pixmap);
+        if (win->texture)
+            glDeleteTextures(1, &win->texture);
+    }
+#endif
     g_hash_table_remove(window_map, &xwin);
 }
 

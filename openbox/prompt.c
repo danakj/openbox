@@ -159,7 +159,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
     self->data = data;
     self->default_result = default_result;
     self->cancel_result = cancel_result;
-    self->super.type = OB_WINDOW_CLASS_PROMPT;
+    self->super.super.type = OB_WINDOW_CLASS_PROMPT;
     self->super.window = XCreateWindow(obt_display, obt_root(ob_screen),
                                        0, 0, 1, 1, 0,
                                        CopyFromParent, InputOutput,

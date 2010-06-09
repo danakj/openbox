@@ -95,7 +95,7 @@ void      window_remove(Window xwin);
 
 /* Internal openbox-owned windows like the alt-tab popup */
 struct _ObInternalWindow {
-    ObWindowClass type;
+    ObWindow super;
     Window window;
 };
 

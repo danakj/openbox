@@ -84,6 +84,7 @@ struct _ObFrame
     struct _ObClient *client;
 
     Window    window;
+    gint      depth;
 
     /* These are used to prevent flashing when the client window unmaps? */
     Window    backback;

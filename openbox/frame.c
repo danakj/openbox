@@ -53,11 +53,11 @@ static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
 static void frame_adjust_cursors(ObFrame *self);
 
-static Window createWindow(Window parent, Visual *visual,
+static Window createWindow(Window parent, Visual *visual, int depth,
                            gulong mask, XSetWindowAttributes *attrib)
 {
     return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
-                         (visual ? 32 : RrDepth(ob_rr_inst)), InputOutput,
+                         (depth ? depth : RrDepth(ob_rr_inst)), InputOutput,
                          (visual ? visual : RrVisual(ob_rr_inst)),
                          mask, attrib);
 
@@ -107,7 +107,8 @@ ObFrame *frame_new(ObClient *client)
         attrib.background_pixel = BlackPixel(obt_display, ob_screen);
         attrib.border_pixel = BlackPixel(obt_display, ob_screen);
     }
-    self->window = createWindow(obt_root(ob_screen), visual,
+    self->depth = visual ? 32 : RrDepth(ob_rr_inst);
+    self->window = createWindow(obt_root(ob_screen), visual, self->depth,
                                 mask, &attrib);
 
     /* create the visible decor windows */
@@ -119,8 +120,8 @@ ObFrame *frame_new(ObClient *client)
         attrib.colormap = RrColormap(ob_rr_inst);
     }
 
-    self->backback = createWindow(self->window, NULL, mask, &attrib);
-    self->backfront = createWindow(self->backback, NULL, mask, &attrib);
+    self->backback = createWindow(self->window, NULL, 0, mask, &attrib);
+    self->backfront = createWindow(self->backback, NULL, 0, mask, &attrib);
     XMapWindow(obt_display, self->backback);
     XMapWindow(obt_display, self->backfront);
 

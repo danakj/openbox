@@ -31,9 +31,9 @@
 ObPopup *popup_new(void)
 {
     XSetWindowAttributes attrib;
-    ObPopup *self = g_slice_new0(ObPopup);
+    ObPopup *self;
 
-    self->obwin.type = OB_WINDOW_CLASS_INTERNAL;
+    self = window_new(OB_WINDOW_CLASS_INTERNAL, ObPopup);
     self->gravity = NorthWestGravity;
     self->x = self->y = self->textw = self->h = 0;
     self->a_bg = RrAppearanceCopy(ob_rr_theme->osd_bg);
@@ -41,10 +41,12 @@ ObPopup *popup_new(void)
     self->iconwm = self->iconhm = 1;
 
     attrib.override_redirect = True;
+    self->depth = RrDepth(ob_rr_inst);
     self->bg = XCreateWindow(obt_display, obt_root(ob_screen),
-                             0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
+                             0, 0, 1, 1, 0, self->depth,
                              InputOutput, RrVisual(ob_rr_inst),
                              CWOverrideRedirect, &attrib);
+    self->layer = OB_STACKING_LAYER_INTERNAL;
 
     self->text = XCreateWindow(obt_display, self->bg,
                                0, 0, 1, 1, 0, RrDepth(ob_rr_inst),
@@ -55,6 +57,11 @@ ObPopup *popup_new(void)
                      RrColorPixel(ob_rr_theme->osd_border_color));
 
     XMapWindow(obt_display, self->text);
+
+    window_set_abstract(INTERNAL_AS_WINDOW(self),
+                        &self->bg,      /* top level window */
+                        &self->layer,   /* stacking layer */
+                        &self->depth);  /* window depth */
 
     stacking_add(INTERNAL_AS_WINDOW(self));
     window_add(&self->bg, INTERNAL_AS_WINDOW(self));
@@ -72,7 +79,7 @@ void popup_free(ObPopup *self)
         RrAppearanceFree(self->a_text);
         window_remove(self->bg);
         stacking_remove(self);
-        g_slice_free(ObPopup, self);
+        window_free(INTERNAL_AS_WINDOW(self));
     }
 }
 

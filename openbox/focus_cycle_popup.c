@@ -65,8 +65,10 @@ struct _ObFocusCyclePopupTarget
 
 struct _ObFocusCyclePopup
 {
-    ObWindow obwin;
+    ObWindow super;
     Window bg;
+    gint depth;
+    ObStackingLayer layer;
 
     /* This is used when the popup is in icon mode */
     Window icon_mode_text;
@@ -95,7 +97,7 @@ struct _ObFocusCyclePopup
 };
 
 /*! This popup shows all possible windows */
-static ObFocusCyclePopup popup;
+static ObFocusCyclePopup *popup;
 /*! This popup shows a single window */
 static ObIconPopup *single_popup;
 
@@ -107,11 +109,12 @@ static gboolean popup_setup    (ObFocusCyclePopup *p,
 static void     popup_render   (ObFocusCyclePopup *p,
                                 const ObClient *c);
 
-static Window create_window(Window parent, guint bwidth, gulong mask,
+static Window create_window(Window parent, guint bwidth, gint depth,
+                            gulong mask,
                             XSetWindowAttributes *attr)
 {
     return XCreateWindow(obt_display, parent, 0, 0, 1, 1, bwidth,
-                         RrDepth(ob_rr_inst), InputOutput,
+                         (depth ? depth : RrDepth(ob_rr_inst)), InputOutput,
                          RrVisual(ob_rr_inst), mask, attr);
 }
 
@@ -122,54 +125,57 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     single_popup = icon_popup_new();
 
-    popup.obwin.type = OB_WINDOW_CLASS_INTERNAL;
-    popup.a_bg = RrAppearanceCopy(ob_rr_theme->osd_bg);
-    popup.a_hilite_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
-    popup.a_text = RrAppearanceCopy(ob_rr_theme->osd_unhilite_label);
-    popup.a_icon = RrAppearanceCopy(ob_rr_theme->a_clear);
-    popup.a_arrow = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
+    popup = window_new(OB_WINDOW_CLASS_INTERNAL, ObFocusCyclePopup);
+    popup->a_bg = RrAppearanceCopy(ob_rr_theme->osd_bg);
+    popup->a_hilite_text = RrAppearanceCopy(ob_rr_theme->osd_hilite_label);
+    popup->a_text = RrAppearanceCopy(ob_rr_theme->osd_unhilite_label);
+    popup->a_icon = RrAppearanceCopy(ob_rr_theme->a_clear);
+    popup->a_arrow = RrAppearanceCopy(ob_rr_theme->a_clear_tex);
 
-    popup.a_hilite_text->surface.parent = popup.a_bg;
-    popup.a_text->surface.parent = popup.a_bg;
-    popup.a_icon->surface.parent = popup.a_bg;
+    popup->a_hilite_text->surface.parent = popup->a_bg;
+    popup->a_text->surface.parent = popup->a_bg;
+    popup->a_icon->surface.parent = popup->a_bg;
 
-    popup.a_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    popup.a_hilite_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    popup->a_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
+    popup->a_hilite_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
 
     /* 2 textures. texture[0] is the icon.  texture[1] is the hilight, and
        may or may not be used */
-    RrAppearanceAddTextures(popup.a_icon, 2);
+    RrAppearanceAddTextures(popup->a_icon, 2);
 
-    RrAppearanceClearTextures(popup.a_icon);
-    popup.a_icon->texture[0].type = RR_TEXTURE_IMAGE;
+    RrAppearanceClearTextures(popup->a_icon);
+    popup->a_icon->texture[0].type = RR_TEXTURE_IMAGE;
 
-    RrAppearanceClearTextures(popup.a_arrow);
-    popup.a_arrow->texture[0].type = RR_TEXTURE_MASK;
-    popup.a_arrow->texture[0].data.mask.color =
+    RrAppearanceClearTextures(popup->a_arrow);
+    popup->a_arrow->texture[0].type = RR_TEXTURE_MASK;
+    popup->a_arrow->texture[0].data.mask.color =
         ob_rr_theme->osd_text_active_color;
 
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
-    popup.bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
-                             CWOverrideRedirect | CWBorderPixel, &attrib);
+    popup->depth = RrDepth(ob_rr_inst);
+    popup->bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
+                              popup->depth,
+                              CWOverrideRedirect | CWBorderPixel, &attrib);
+    popup->layer = OB_STACKING_LAYER_INTERNAL;
 
     /* create the text window used for the icon-mode popup */
-    popup.icon_mode_text = create_window(popup.bg, 0, 0, NULL);
+    popup->icon_mode_text = create_window(popup->bg, 0, 0, 0, NULL);
 
     /* create the windows for the up and down arrows */
-    popup.list_mode_up = create_window(popup.bg, 0, 0, NULL);
-    popup.list_mode_down = create_window(popup.bg, 0, 0, NULL);
+    popup->list_mode_up = create_window(popup->bg, 0, 0, 0, NULL);
+    popup->list_mode_down = create_window(popup->bg, 0, 0, 0, NULL);
 
-    popup.targets = NULL;
-    popup.n_targets = 0;
-    popup.last_target = NULL;
+    popup->targets = NULL;
+    popup->n_targets = 0;
+    popup->last_target = NULL;
 
     /* set up the hilite texture for the icon */
-    popup.a_icon->texture[1].data.rgba.width = HILITE_SIZE;
-    popup.a_icon->texture[1].data.rgba.height = HILITE_SIZE;
-    popup.a_icon->texture[1].data.rgba.alpha = 0xff;
+    popup->a_icon->texture[1].data.rgba.width = HILITE_SIZE;
+    popup->a_icon->texture[1].data.rgba.height = HILITE_SIZE;
+    popup->a_icon->texture[1].data.rgba.alpha = 0xff;
     p = g_new(RrPixel32, HILITE_SIZE * HILITE_SIZE);
-    popup.a_icon->texture[1].data.rgba.data = p;
+    popup->a_icon->texture[1].data.rgba.data = p;
 
     /* create the hilite under the target icon */
     {
@@ -203,19 +209,24 @@ void focus_cycle_popup_startup(gboolean reconfig)
             }
     }
 
-    stacking_add(INTERNAL_AS_WINDOW(&popup));
-    window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
+    window_set_abstract(INTERNAL_AS_WINDOW(popup),
+                        &popup->bg,
+                        &popup->layer,
+                        &popup->depth);
+
+    stacking_add(INTERNAL_AS_WINDOW(popup));
+    window_add(&popup->bg, INTERNAL_AS_WINDOW(popup));
 }
 
 void focus_cycle_popup_shutdown(gboolean reconfig)
 {
     icon_popup_free(single_popup);
 
-    window_remove(popup.bg);
+    window_remove(popup->bg);
     stacking_remove(INTERNAL_AS_WINDOW(&popup));
 
-    while(popup.targets) {
-        ObFocusCyclePopupTarget *t = popup.targets->data;
+    while(popup->targets) {
+        ObFocusCyclePopupTarget *t = popup->targets->data;
 
         RrImageUnref(t->icon);
         g_free(t->text);
@@ -223,22 +234,24 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
         XDestroyWindow(obt_display, t->textwin);
         g_slice_free(ObFocusCyclePopupTarget, t);
 
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
+        popup->targets = g_list_delete_link(popup->targets, popup->targets);
     }
 
-    g_free(popup.a_icon->texture[1].data.rgba.data);
-    popup.a_icon->texture[1].data.rgba.data = NULL;
+    g_free(popup->a_icon->texture[1].data.rgba.data);
+    popup->a_icon->texture[1].data.rgba.data = NULL;
 
-    XDestroyWindow(obt_display, popup.list_mode_up);
-    XDestroyWindow(obt_display, popup.list_mode_down);
-    XDestroyWindow(obt_display, popup.icon_mode_text);
-    XDestroyWindow(obt_display, popup.bg);
+    XDestroyWindow(obt_display, popup->list_mode_up);
+    XDestroyWindow(obt_display, popup->list_mode_down);
+    XDestroyWindow(obt_display, popup->icon_mode_text);
+    XDestroyWindow(obt_display, popup->bg);
 
-    RrAppearanceFree(popup.a_arrow);
-    RrAppearanceFree(popup.a_icon);
-    RrAppearanceFree(popup.a_hilite_text);
-    RrAppearanceFree(popup.a_text);
-    RrAppearanceFree(popup.a_bg);
+    RrAppearanceFree(popup->a_arrow);
+    RrAppearanceFree(popup->a_icon);
+    RrAppearanceFree(popup->a_hilite_text);
+    RrAppearanceFree(popup->a_text);
+    RrAppearanceFree(popup->a_bg);
+
+    window_free(INTERNAL_AS_WINDOW(popup));
 }
 
 static void popup_target_free(ObFocusCyclePopupTarget *t)
@@ -323,8 +336,8 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                     t->text = text;
                     t->icon = client_icon(t->client);
                     RrImageRef(t->icon); /* own the icon so it won't go away */
-                    t->iconwin = create_window(p->bg, 0, 0, NULL);
-                    t->textwin = create_window(p->bg, 0, 0, NULL);
+                    t->iconwin = create_window(p->bg, 0, 0, 0, NULL);
+                    t->textwin = create_window(p->bg, 0, 0, 0, NULL);
 
                     p->targets = g_list_prepend(p->targets, t);
                     ++n;
@@ -356,12 +369,12 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 
 static void popup_cleanup(void)
 {
-    while(popup.targets) {
-        popup_target_free(popup.targets->data);
-        popup.targets = g_list_delete_link(popup.targets, popup.targets);
+    while(popup->targets) {
+        popup_target_free(popup->targets->data);
+        popup->targets = g_list_delete_link(popup->targets, popup->targets);
     }
-    popup.n_targets = 0;
-    popup.last_target = NULL;
+    popup->n_targets = 0;
+    popup->last_target = NULL;
 }
 
 static gchar *popup_get_name(ObClient *c)
@@ -559,9 +572,9 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
             /* position the text */
             XMoveResizeWindow(obt_display, p->icon_mode_text,
                               icon_mode_textx, icon_mode_texty, textw, texth);
-            XMapWindow(obt_display, popup.icon_mode_text);
+            XMapWindow(obt_display, popup->icon_mode_text);
         } else {
-            XUnmapWindow(obt_display, popup.icon_mode_text);
+            XUnmapWindow(obt_display, popup->icon_mode_text);
 
             up_arrow_x = (w - ob_rr_theme->up_arrow_mask->width) / 2;
             up_arrow_y = t;
@@ -715,20 +728,20 @@ void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
     }
 
     /* do this stuff only when the dialog is first showing */
-    if (!popup.mapped) {
-        popup_setup(&popup, TRUE, FALSE, linear);
+    if (!popup->mapped) {
+        popup_setup(popup, TRUE, FALSE, linear);
         /* this is fixed once the dialog is shown */
-        popup.mode = mode;
+        popup->mode = mode;
     }
-    g_assert(popup.targets != NULL);
+    g_assert(popup->targets != NULL);
 
-    popup_render(&popup, c);
+    popup_render(popup, c);
 
-    if (!popup.mapped) {
+    if (!popup->mapped) {
         /* show the dialog */
-        XMapWindow(obt_display, popup.bg);
+        XMapWindow(obt_display, popup->bg);
         XFlush(obt_display);
-        popup.mapped = TRUE;
+        popup->mapped = TRUE;
         screen_hide_desktop_popup();
     }
 }
@@ -739,12 +752,12 @@ void focus_cycle_popup_hide(void)
 
     ignore_start = event_start_ignore_all_enters();
 
-    XUnmapWindow(obt_display, popup.bg);
+    XUnmapWindow(obt_display, popup->bg);
     XFlush(obt_display);
 
     event_end_ignore_all_enters(ignore_start);
 
-    popup.mapped = FALSE;
+    popup->mapped = FALSE;
 
     popup_cleanup();
 }
@@ -766,7 +779,7 @@ void focus_cycle_popup_single_show(struct _ObClient *c)
         icon_popup_height(single_popup, POPUP_HEIGHT);
         icon_popup_min_width(single_popup, POPUP_WIDTH);
         icon_popup_max_width(single_popup, MAX(a->width/3, POPUP_WIDTH));
-        icon_popup_text_width(single_popup, popup.maxtextw);
+        icon_popup_text_width(single_popup, popup->maxtextw);
     }
 
     text = popup_get_name(c);
@@ -782,10 +795,10 @@ void focus_cycle_popup_single_hide(void)
 
 gboolean focus_cycle_popup_is_showing(ObClient *c)
 {
-    if (popup.mapped) {
+    if (popup->mapped) {
         GList *it;
 
-        for (it = popup.targets; it; it = g_list_next(it)) {
+        for (it = popup->targets; it; it = g_list_next(it)) {
             ObFocusCyclePopupTarget *t = it->data;
             if (t->client == c)
                 return TRUE;
@@ -798,7 +811,7 @@ static ObClient* popup_revert(ObClient *target)
 {
     GList *it, *itt;
 
-    for (it = popup.targets; it; it = g_list_next(it)) {
+    for (it = popup->targets; it; it = g_list_next(it)) {
         ObFocusCyclePopupTarget *t = it->data;
         if (t->client == target) {
             /* move to a previous window if possible */
@@ -826,21 +839,21 @@ ObClient* focus_cycle_popup_refresh(ObClient *target,
                                     gboolean redraw,
                                     gboolean linear)
 {
-    if (!popup.mapped) return NULL;
+    if (!popup->mapped) return NULL;
 
     if (!focus_cycle_valid(target))
         target = popup_revert(target);
 
-    redraw = popup_setup(&popup, TRUE, TRUE, linear) && redraw;
+    redraw = popup_setup(popup, TRUE, TRUE, linear) && redraw;
 
-    if (!target && popup.targets)
-        target = ((ObFocusCyclePopupTarget*)popup.targets->data)->client;
+    if (!target && popup->targets)
+        target = ((ObFocusCyclePopupTarget*)popup->targets->data)->client;
 
     if (target && redraw) {
-        popup.mapped = FALSE;
-        popup_render(&popup, target);
+        popup->mapped = FALSE;
+        popup_render(popup, target);
         XFlush(obt_display);
-        popup.mapped = TRUE;
+        popup->mapped = TRUE;
     }
 
     return target;

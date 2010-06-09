@@ -32,65 +32,64 @@
 
 static struct
 {
-    ObInternalWindow top;
-    ObInternalWindow left;
-    ObInternalWindow right;
-    ObInternalWindow bottom;
+    ObInternalWindow *top;
+    ObInternalWindow *left;
+    ObInternalWindow *right;
+    ObInternalWindow *bottom;
 } focus_indicator;
 
 static RrAppearance *a_focus_indicator;
 static RrColor      *color_white;
 static gboolean      visible;
 
-static Window create_window(Window parent, gulong mask,
+static Window create_window(Window parent, gint depth, gulong mask,
                             XSetWindowAttributes *attrib)
 {
     return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
-                         RrDepth(ob_rr_inst), InputOutput,
-                         RrVisual(ob_rr_inst), mask, attrib);
+                         depth, InputOutput,
+                         0, mask, attrib);
 
 }
 
 void focus_cycle_indicator_startup(gboolean reconfig)
 {
+    Window w;
+    gint depth;
     XSetWindowAttributes attr;
 
     visible = FALSE;
 
     if (reconfig) return;
 
-    focus_indicator.top.super.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.left.super.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.right.super.type = OB_WINDOW_CLASS_INTERNAL;
-    focus_indicator.bottom.super.type = OB_WINDOW_CLASS_INTERNAL;
-
+    depth = RrDepth(ob_rr_inst);
     attr.override_redirect = True;
     attr.background_pixel = BlackPixel(obt_display, ob_screen);
-    focus_indicator.top.window =
-        create_window(obt_root(ob_screen),
-                      CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.left.window =
-        create_window(obt_root(ob_screen),
-                      CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.right.window =
-        create_window(obt_root(ob_screen),
-                      CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.bottom.window =
-        create_window(obt_root(ob_screen),
-                      CWOverrideRedirect | CWBackPixel, &attr);
 
-    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.top));
-    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.left));
-    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.right));
-    stacking_add(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
-    window_add(&focus_indicator.top.window,
-               INTERNAL_AS_WINDOW(&focus_indicator.top));
-    window_add(&focus_indicator.left.window,
-               INTERNAL_AS_WINDOW(&focus_indicator.left));
-    window_add(&focus_indicator.right.window,
-               INTERNAL_AS_WINDOW(&focus_indicator.right));
-    window_add(&focus_indicator.bottom.window,
-               INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+    w = create_window(obt_root(ob_screen), depth,
+                      CWOverrideRedirect | CWBackPixel, &attr);
+    focus_indicator.top = window_internal_new(w, depth);
+    w = create_window(obt_root(ob_screen), depth,
+                      CWOverrideRedirect | CWBackPixel, &attr);
+    focus_indicator.left = window_internal_new(w, depth);
+    w = create_window(obt_root(ob_screen), depth,
+                      CWOverrideRedirect | CWBackPixel, &attr);
+    focus_indicator.right = window_internal_new(w, depth);
+    w = create_window(obt_root(ob_screen), depth,
+                      CWOverrideRedirect | CWBackPixel, &attr);
+    focus_indicator.bottom = window_internal_new(w, depth);
+
+    stacking_add(INTERNAL_AS_WINDOW(focus_indicator.top));
+    stacking_add(INTERNAL_AS_WINDOW(focus_indicator.left));
+    stacking_add(INTERNAL_AS_WINDOW(focus_indicator.right));
+    stacking_add(INTERNAL_AS_WINDOW(focus_indicator.bottom));
+    window_add(&focus_indicator.top->window,
+               INTERNAL_AS_WINDOW(focus_indicator.top));
+    window_add(&focus_indicator.left->window,
+               INTERNAL_AS_WINDOW(focus_indicator.left));
+    window_add(&focus_indicator.right->window,
+               INTERNAL_AS_WINDOW(focus_indicator.right));
+    window_add(&focus_indicator.bottom->window,
+               INTERNAL_AS_WINDOW(focus_indicator.bottom));
 
     color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
 
@@ -117,20 +116,25 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
     RrAppearanceFree(a_focus_indicator);
 
-    window_remove(focus_indicator.top.window);
-    window_remove(focus_indicator.left.window);
-    window_remove(focus_indicator.right.window);
-    window_remove(focus_indicator.bottom.window);
+    window_remove(focus_indicator.top->window);
+    window_remove(focus_indicator.left->window);
+    window_remove(focus_indicator.right->window);
+    window_remove(focus_indicator.bottom->window);
 
-    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.top));
-    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.left));
-    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.right));
-    stacking_remove(INTERNAL_AS_WINDOW(&focus_indicator.bottom));
+    stacking_remove(INTERNAL_AS_WINDOW(focus_indicator.top));
+    stacking_remove(INTERNAL_AS_WINDOW(focus_indicator.left));
+    stacking_remove(INTERNAL_AS_WINDOW(focus_indicator.right));
+    stacking_remove(INTERNAL_AS_WINDOW(focus_indicator.bottom));
 
-    XDestroyWindow(obt_display, focus_indicator.top.window);
-    XDestroyWindow(obt_display, focus_indicator.left.window);
-    XDestroyWindow(obt_display, focus_indicator.right.window);
-    XDestroyWindow(obt_display, focus_indicator.bottom.window);
+    XDestroyWindow(obt_display, focus_indicator.top->window);
+    XDestroyWindow(obt_display, focus_indicator.left->window);
+    XDestroyWindow(obt_display, focus_indicator.right->window);
+    XDestroyWindow(obt_display, focus_indicator.bottom->window);
+
+    window_free(INTERNAL_AS_WINDOW(focus_indicator.top));
+    window_free(INTERNAL_AS_WINDOW(focus_indicator.left));
+    window_free(INTERNAL_AS_WINDOW(focus_indicator.right));
+    window_free(INTERNAL_AS_WINDOW(focus_indicator.bottom));
 }
 
 void focus_cycle_update_indicator(ObClient *c)
@@ -147,10 +151,10 @@ void focus_cycle_draw_indicator(ObClient *c)
         /* kill enter events cause by this unmapping */
         ignore_start = event_start_ignore_all_enters();
 
-        XUnmapWindow(obt_display, focus_indicator.top.window);
-        XUnmapWindow(obt_display, focus_indicator.left.window);
-        XUnmapWindow(obt_display, focus_indicator.right.window);
-        XUnmapWindow(obt_display, focus_indicator.bottom.window);
+        XUnmapWindow(obt_display, focus_indicator.top->window);
+        XUnmapWindow(obt_display, focus_indicator.left->window);
+        XUnmapWindow(obt_display, focus_indicator.right->window);
+        XUnmapWindow(obt_display, focus_indicator.bottom->window);
 
         event_end_ignore_all_enters(ignore_start);
 
@@ -176,7 +180,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         /* kill enter events cause by this moving */
         ignore_start = event_start_ignore_all_enters();
 
-        XMoveResizeWindow(obt_display, focus_indicator.top.window,
+        XMoveResizeWindow(obt_display, focus_indicator.top->window,
                           x, y, w, h);
         a_focus_indicator->texture[0].data.lineart.x1 = 0;
         a_focus_indicator->texture[0].data.lineart.y1 = h-1;
@@ -194,7 +198,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         a_focus_indicator->texture[3].data.lineart.y1 = h-1;
         a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
         a_focus_indicator->texture[3].data.lineart.y2 = h-1;
-        RrPaint(a_focus_indicator, focus_indicator.top.window,
+        RrPaint(a_focus_indicator, focus_indicator.top->window,
                 w, h);
 
         x = c->frame->area.x;
@@ -202,7 +206,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         w = wl;
         h = c->frame->area.height;
 
-        XMoveResizeWindow(obt_display, focus_indicator.left.window,
+        XMoveResizeWindow(obt_display, focus_indicator.left->window,
                           x, y, w, h);
         a_focus_indicator->texture[0].data.lineart.x1 = w-1;
         a_focus_indicator->texture[0].data.lineart.y1 = 0;
@@ -220,7 +224,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
         a_focus_indicator->texture[3].data.lineart.x2 = w-1;
         a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
-        RrPaint(a_focus_indicator, focus_indicator.left.window,
+        RrPaint(a_focus_indicator, focus_indicator.left->window,
                 w, h);
 
         x = c->frame->area.x + c->frame->area.width - wr;
@@ -228,7 +232,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         w = wr;
         h = c->frame->area.height ;
 
-        XMoveResizeWindow(obt_display, focus_indicator.right.window,
+        XMoveResizeWindow(obt_display, focus_indicator.right->window,
                           x, y, w, h);
         a_focus_indicator->texture[0].data.lineart.x1 = 0;
         a_focus_indicator->texture[0].data.lineart.y1 = 0;
@@ -246,7 +250,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
         a_focus_indicator->texture[3].data.lineart.x2 = 0;
         a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
-        RrPaint(a_focus_indicator, focus_indicator.right.window,
+        RrPaint(a_focus_indicator, focus_indicator.right->window,
                 w, h);
 
         x = c->frame->area.x;
@@ -254,7 +258,7 @@ void focus_cycle_draw_indicator(ObClient *c)
         w = c->frame->area.width;
         h = wb;
 
-        XMoveResizeWindow(obt_display, focus_indicator.bottom.window,
+        XMoveResizeWindow(obt_display, focus_indicator.bottom->window,
                           x, y, w, h);
         a_focus_indicator->texture[0].data.lineart.x1 = 0;
         a_focus_indicator->texture[0].data.lineart.y1 = 0;
@@ -272,13 +276,13 @@ void focus_cycle_draw_indicator(ObClient *c)
         a_focus_indicator->texture[3].data.lineart.y1 = 0;
         a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
         a_focus_indicator->texture[3].data.lineart.y2 = 0;
-        RrPaint(a_focus_indicator, focus_indicator.bottom.window,
+        RrPaint(a_focus_indicator, focus_indicator.bottom->window,
                 w, h);
 
-        XMapWindow(obt_display, focus_indicator.top.window);
-        XMapWindow(obt_display, focus_indicator.left.window);
-        XMapWindow(obt_display, focus_indicator.right.window);
-        XMapWindow(obt_display, focus_indicator.bottom.window);
+        XMapWindow(obt_display, focus_indicator.top->window);
+        XMapWindow(obt_display, focus_indicator.left->window);
+        XMapWindow(obt_display, focus_indicator.right->window);
+        XMapWindow(obt_display, focus_indicator.bottom->window);
 
         event_end_ignore_all_enters(ignore_start);
 

@@ -82,8 +82,7 @@ void dock_startup(gboolean reconfig)
     STRUT_PARTIAL_SET(dock_strut, 0, 0, 0, 0,
                       0, 0, 0, 0, 0, 0, 0, 0);
 
-    dock = g_slice_new0(ObDock);
-    dock->obwin.type = OB_WINDOW_CLASS_DOCK;
+    dock = window_new(OB_WINDOW_CLASS_DOCK, ObDock);
 
     dock->hidden = TRUE;
 
@@ -93,9 +92,10 @@ void dock_startup(gboolean reconfig)
     attrib.event_mask = DOCK_EVENT_MASK;
     attrib.override_redirect = True;
     attrib.do_not_propagate_mask = DOCK_NOPROPAGATEMASK;
+    dock->depth = RrDepth(ob_rr_inst);
     dock->frame = XCreateWindow(obt_display, obt_root(ob_screen),
                                 0, 0, 1, 1, 0,
-                                RrDepth(ob_rr_inst), InputOutput,
+                                dock->depth, InputOutput,
                                 RrVisual(ob_rr_inst),
                                 CWOverrideRedirect | CWEventMask |
                                 CWDontPropagate,
@@ -108,6 +108,11 @@ void dock_startup(gboolean reconfig)
     /* Setting the window type so xcompmgr can tell what it is */
     OBT_PROP_SET32(dock->frame, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK));
+
+    window_set_abstract(DOCK_AS_WINDOW(dock),
+                        &dock->frame,         /* top level window */
+                        &config_dock_layer,   /* stacking layer */
+                        &dock->depth);        /* window depth */
 
     window_add(&dock->frame, DOCK_AS_WINDOW(dock));
     stacking_add(DOCK_AS_WINDOW(dock));
@@ -131,7 +136,7 @@ void dock_shutdown(gboolean reconfig)
     RrAppearanceFree(dock->a_frame);
     window_remove(dock->frame);
     stacking_remove(dock);
-    g_slice_free(ObDock, dock);
+    window_free(DOCK_AS_WINDOW(dock));
     dock = NULL;
 }
 

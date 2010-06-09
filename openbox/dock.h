@@ -33,9 +33,10 @@ typedef struct _ObDockApp ObDockApp;
 
 struct _ObDock
 {
-    ObWindow obwin;
+    ObWindow super;
 
     Window frame;
+    int depth;
     RrAppearance *a_frame;
 
     /* actual position (when not auto-hidden) */

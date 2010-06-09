@@ -221,8 +221,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* create the ObClient struct, and populate it from the hints on the
        window */
-    self = g_slice_new0(ObClient);
-    self->obwin.type = OB_WINDOW_CLASS_CLIENT;
+    self = window_new(OB_WINDOW_CLASS_CLIENT, ObClient);
     self->window = window;
     self->prompt = prompt;
     self->managed = TRUE;
@@ -253,6 +252,11 @@ void client_manage(Window window, ObPrompt *prompt)
 
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
+
+    window_set_abstract(CLIENT_AS_WINDOW(self),
+                        &self->frame->window, /* top level window */
+                        &self->layer,         /* stacking layer */
+                        &self->frame->depth); /* window depth */
 
     frame_grab_client(self->frame);
 
@@ -507,7 +511,7 @@ ObClient *client_fake_manage(Window window)
 
     /* do this minimal stuff to figure out the client's decorations */
 
-    self = g_slice_new0(ObClient);
+    self = window_new(OB_WINDOW_CLASS_CLIENT, ObClient);
     self->window = window;
 
     client_get_all(self, FALSE);
@@ -520,6 +524,13 @@ ObClient *client_fake_manage(Window window)
 
     client_apply_startup_state(self, self->area.x, self->area.y,
                                self->area.width, self->area.height);
+
+    window_set_abstract(CLIENT_AS_WINDOW(self),
+                        &self->frame->window, /* top level window */
+                        &self->layer,         /* stacking layer */
+                        &self->frame->depth); /* window depth */
+
+    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
     ob_debug("gave extents left %d right %d top %d bottom %d",
              self->frame->size.left, self->frame->size.right,
@@ -684,7 +695,7 @@ void client_unmanage(ObClient *self)
     g_free(self->role);
     g_free(self->client_machine);
     g_free(self->sm_client_id);
-    g_slice_free(ObClient, self);
+    window_free(CLIENT_AS_WINDOW(self));
 }
 
 void client_fake_unmanage(ObClient *self)
@@ -692,7 +703,7 @@ void client_fake_unmanage(ObClient *self)
     /* this is all that got allocated to get the decorations */
 
     frame_free(self->frame);
-    g_slice_free(ObClient, self);
+    window_free(CLIENT_AS_WINDOW(self));
 }
 
 static gboolean client_can_steal_focus(ObClient *self,

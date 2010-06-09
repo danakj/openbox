@@ -34,8 +34,10 @@ typedef struct _ObPagerPopup ObPagerPopup;
 
 struct _ObPopup
 {
-    ObWindow obwin;
+    ObWindow super;
     Window bg;
+    ObStackingLayer layer;
+    gint depth;
 
     Window text;
 

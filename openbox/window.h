@@ -46,12 +46,23 @@ typedef enum {
    struct */
 struct _ObWindow {
     ObWindowClass type;
+    gsize size;
+
+    /* abstract values implemented by subclasses */
+
+    /*! Points to the top level Xwindow for the ObWindow */
+    const Window *top;
+    /*! Points to the stacking layer for the ObWindow */
+    const ObStackingLayer *layer;
+    /*! Points to the position and size occupied by the ObWindow */
+    /*! Points to the depth of the ObWindow */
+    const int *depth;
+
 #ifdef USE_COMPOSITING
     GLuint texture;
     Pixmap pixmap;
     GLXPixmap gpixmap;
     Damage damage;
-    int depth;
     Rect comp_area;
     gboolean mapped;
 #endif
@@ -89,18 +100,34 @@ struct _ObPrompt;
 void window_startup (gboolean reconfig);
 void window_shutdown(gboolean reconfig);
 
-Window          window_top  (ObWindow *self);
-ObStackingLayer window_layer(ObWindow *self);
+#define window_new(c, t) ((t*)window_new_size((c), sizeof(t)))
+ObWindow* window_new_size(ObWindowClass type, gsize size);
+/*! A subclass of ObWindow must call this to set these pointers during the
+  initialization/creation phase, so that the ObWindow can be used */
+void      window_set_abstract(ObWindow *self,
+                              const Window *top,
+                              const ObStackingLayer *layer,
+                              const int *depth);
+void      window_free(ObWindow *self);
 
 ObWindow* window_find  (Window xwin);
 void      window_add   (Window *xwin, ObWindow *win);
 void      window_remove(Window xwin);
 
+#define window_top(w) (*((ObWindow*)w)->top)
+#define window_layer(w) (*((ObWindow*)w)->layer)
+#define window_area(w) (*((ObWindow*)w)->area)
+#define window_depth(w) (*((ObWindow*)w)->depth)
+
 /* Internal openbox-owned windows like the alt-tab popup */
 struct _ObInternalWindow {
     ObWindow super;
     Window window;
+    ObStackingLayer layer;
+    int depth;
 };
+
+ObInternalWindow* window_internal_new(Window window, int depth);
 
 void window_manage_all(void);
 void window_manage(Window win);

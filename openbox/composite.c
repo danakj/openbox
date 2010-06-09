@@ -302,7 +302,7 @@ static gboolean composite(gpointer data)
                 continue;
         }
 
-        if (win->depth == 32)
+        if (window_depth(win) == 32)
             attribs[1] = GLX_TEXTURE_FORMAT_RGBA_EXT;
         else
             attribs[1] = GLX_TEXTURE_FORMAT_RGB_EXT;
@@ -311,7 +311,10 @@ static gboolean composite(gpointer data)
             win->pixmap = XCompositeNameWindowPixmap(obt_display, window_top(win));
 
         if (win->gpixmap == None)
-            win->gpixmap = obcomp.CreatePixmap(obt_display, obcomp.PixmapConfig[win->depth], win->pixmap, attribs);
+            win->gpixmap =
+                obcomp.CreatePixmap(obt_display,
+                                    obcomp.PixmapConfig[window_depth(win)],
+                                    win->pixmap, attribs);
 
         glBindTexture(GL_TEXTURE_2D, win->texture);
 gettimeofday(&start, NULL);

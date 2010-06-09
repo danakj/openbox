@@ -71,7 +71,7 @@ typedef enum
 
 struct _ObClient
 {
-    ObWindow obwin;
+    ObWindow super;
     Window  window;
     gboolean managed;
 

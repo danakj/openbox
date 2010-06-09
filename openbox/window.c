@@ -48,41 +48,64 @@ void window_shutdown(gboolean reconfig)
     g_hash_table_destroy(window_map);
 }
 
-Window window_top(ObWindow *self)
+ObWindow* window_new_size(ObWindowClass type, gsize size)
 {
-    switch (self->type) {
-    case OB_WINDOW_CLASS_MENUFRAME:
-        return WINDOW_AS_MENUFRAME(self)->window;
-    case OB_WINDOW_CLASS_DOCK:
-        return WINDOW_AS_DOCK(self)->frame;
-    case OB_WINDOW_CLASS_CLIENT:
-        return WINDOW_AS_CLIENT(self)->frame->window;
-    case OB_WINDOW_CLASS_INTERNAL:
-        return WINDOW_AS_INTERNAL(self)->window;
-    case OB_WINDOW_CLASS_PROMPT:
-        return WINDOW_AS_PROMPT(self)->super.window;
-    }
-    g_assert_not_reached();
-    return None;
+    ObWindow *self;
+
+    g_assert(size >= sizeof(ObWindow));
+    self = g_slice_alloc0(size);
+    self->size = size;
+    self->type = type;
+
+#ifdef USE_COMPOSITING
+    glGenTextures(1, &self->texture);
+#endif
+
+    return self;
 }
 
-ObStackingLayer window_layer(ObWindow *self)
+void window_set_abstract(ObWindow *self,
+                         const Window *top,
+                         const ObStackingLayer *layer,
+                         const int *depth)
 {
-    switch (self->type) {
-    case OB_WINDOW_CLASS_DOCK:
-        return config_dock_layer;
-    case OB_WINDOW_CLASS_CLIENT:
-        return ((ObClient*)self)->layer;
-    case OB_WINDOW_CLASS_MENUFRAME:
-    case OB_WINDOW_CLASS_INTERNAL:
-        return OB_STACKING_LAYER_INTERNAL;
-    case OB_WINDOW_CLASS_PROMPT:
-        /* not used directly for stacking, prompts are managed as clients */
-        g_assert_not_reached();
-        break;
+    self->top = top;
+    self->layer = layer;
+    self->depth = depth;
+
+    /* set up any things in ObWindow that require use of the abstract pointers
+       now */
+
+#ifdef USE_COMPOSITING
+    if (self->type != OB_WINDOW_CLASS_PROMPT) {
+        self->damage = XDamageCreate(obt_display, *self->top,
+                                     XDamageReportNonEmpty);
+
+        XCompositeRedirectWindow(obt_display, *self->top,
+                                 CompositeRedirectManual);
     }
-    g_assert_not_reached();
-    return None;
+#endif
+}
+
+void window_free(ObWindow *self)
+{
+    /* The abstract pointers must not be used here, they are likely invalid
+       by now ! */
+
+#ifdef USE_COMPOSITING
+    if (self->type != OB_WINDOW_CLASS_PROMPT) {
+        if (self->damage)
+            XDamageDestroy(obt_display, self->damage);
+        if (self->gpixmap)
+            glXDestroyPixmap(obt_display, self->gpixmap);
+        if (self->pixmap)
+            XFreePixmap(obt_display, self->pixmap);
+        if (self->texture)
+            glDeleteTextures(1, &self->texture);
+    }
+#endif
+
+    g_slice_free1(self->size, self);
 }
 
 ObWindow* window_find(Window xwin)
@@ -94,49 +117,28 @@ void window_add(Window *xwin, ObWindow *win)
 {
     g_assert(xwin != NULL);
     g_assert(win != NULL);
-#ifdef USE_COMPOSITING
-    XWindowAttributes wattrib;
-    Status ret;
-
-    if (win->type != OB_WINDOW_CLASS_PROMPT) {
-        win->damage = XDamageCreate(obt_display, window_top(win), XDamageReportNonEmpty);
-
-        XCompositeRedirectWindow(obt_display, window_top(win), CompositeRedirectManual);
-
-        win->pixmap = None;
-        glGenTextures(1, &win->texture);
-        ret = XGetWindowAttributes(obt_display, window_top(win), &wattrib);
-        g_assert(ret != BadDrawable);
-        g_assert(ret != BadWindow);
-
-        win->depth = wattrib.depth;
-    }
-#endif
     g_hash_table_insert(window_map, xwin, win);
 }
 
 void window_remove(Window xwin)
 {
     g_assert(xwin != None);
-#ifdef USE_COMPOSITING
-    ObWindow *win;
-    win = window_find(xwin);
-    if (!win) {
-        printf("Compositor tried to clean up a window, but it was not there.\n");
-        return;
-    }
-    if (win->type != OB_WINDOW_CLASS_PROMPT) {
-        if (win->damage)
-            XDamageDestroy(obt_display, win->damage);
-        if (win->gpixmap)
-            glXDestroyGLXPixmap(obt_display, win->gpixmap);
-        if (win->pixmap)
-            XFreePixmap(obt_display, win->pixmap);
-        if (win->texture)
-            glDeleteTextures(1, &win->texture);
-    }
-#endif
     g_hash_table_remove(window_map, &xwin);
+}
+
+ObInternalWindow* window_internal_new(Window window, int depth)
+{
+    ObInternalWindow *self;
+
+    self = window_new(OB_WINDOW_CLASS_INTERNAL, ObInternalWindow);
+    self->window = window;
+    self->layer = OB_STACKING_LAYER_INTERNAL;
+    self->depth = depth;
+    window_set_abstract(INTERNAL_AS_WINDOW(self),
+                        &self->window,
+                        &self->layer,
+                        &self->depth);
+    return self;
 }
 
 void window_manage_all(void)

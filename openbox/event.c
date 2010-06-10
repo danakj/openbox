@@ -622,34 +622,37 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
     }
 #ifdef USE_COMPOSITING
-    else if ((e->type == CreateNotify) && obwin
-             && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+    else if ((e->type == CreateNotify) && obwin &&
+             obwin->type != OB_WINDOW_CLASS_PROMPT &&
+             e->xcreatewindow.window == window_top(obwin))
+    {
         XCreateWindowEvent const *xe = &e->xcreatewindow;
-        if (xe->window == window_top(obwin)) {
-            obwin->mapped = 0;
-            RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
-            if (!obwin->texture) glGenTextures(1, &obwin->texture);
-        }
-    } else if ((e->type == ConfigureNotify || e->type == MapNotify)
-             && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+        obwin->mapped = 0;
+        RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
+        if (!obwin->texture) glGenTextures(1, &obwin->texture);
+    }
+    else if ((obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) &&
+               ((e->type == ConfigureNotify &&
+                 e->xconfigure.window == window_top(obwin)) ||
+                (e->type == MapNotify &&
+                 e->xmap.window == window_top(obwin))))
+    {
         gboolean pixchange = FALSE;
 
         if (e->type == ConfigureNotify) {
             XConfigureEvent const *xe = &e->xconfigure;
-            if (xe->window == window_top(obwin)) {
-                if ((obwin->comp_area.width != xe->width)
-                    || (obwin->comp_area.height != xe->height))
-                    pixchange = TRUE;
-                RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
+            if (obwin->comp_area.width != xe->width ||
+                obwin->comp_area.height != xe->height)
+            {
+                pixchange = TRUE;
             }
+            RECT_SET(obwin->comp_area, xe->x, xe->y,
+                     xe->width, xe->height);
         }
 
         if (e->type == MapNotify) {
-            XMapEvent const *xe = &e->xmap;
-            if (xe->window == window_top(obwin)) {
-                pixchange = TRUE;
-                obwin->mapped = TRUE;
-            }
+            pixchange = TRUE;
+            obwin->mapped = TRUE;
         }
 
         if (pixchange) {
@@ -662,10 +665,11 @@ static void event_process(const XEvent *ec, gpointer data)
                 obwin->gpixmap = None;
             }
         }
-    } else if ((e->type == UnmapNotify) && obwin
-             && obwin->type != OB_WINDOW_CLASS_PROMPT) {
-            if (e->xunmap.window == window_top(obwin))
-                obwin->mapped = FALSE;
+    } else if ((e->type == UnmapNotify) && obwin &&
+               obwin->type != OB_WINDOW_CLASS_PROMPT &&
+               e->xunmap.window == window_top(obwin))
+    {
+        obwin->mapped = FALSE;
     }
 #endif
     else if (client)

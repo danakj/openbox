@@ -92,7 +92,7 @@ void window_free(ObWindow *self)
         if (self->damage)
             XDamageDestroy(obt_display, self->damage);
         if (self->gpixmap)
-            glXDestroyPixmap(obt_display, self->gpixmap);
+            glXDestroyGLXPixmap(obt_display, self->gpixmap);
         if (self->pixmap)
             XFreePixmap(obt_display, self->pixmap);
         if (self->texture)

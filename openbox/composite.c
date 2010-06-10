@@ -351,7 +351,7 @@ static gboolean composite(gpointer data)
 
 //    for (it = stacking_list; it; it = g_list_next(it)) {
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
-        gint d;
+        gint d, x, y, w, h;
 
         win = it->data;
         if (win->type == OB_WINDOW_CLASS_PROMPT)
@@ -398,21 +398,20 @@ time_fix(&dif);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        x = win->area.x;
+        y = win->area.y;
+        w = win->area.width + win->border * 2;
+        h = win->area.height + win->border * 2;
+
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0);
-        glVertex3f(win->comp_area.x, win->comp_area.y, 0.0);
+        glVertex3f(x, y, 0.0);
         glTexCoord2f(0, 1);
-        glVertex3f(win->comp_area.x,
-                   win->comp_area.y + win->comp_area.height,
-                   0.0);
+        glVertex3f(x, y + h, 0.0);
         glTexCoord2f(1, 1);
-        glVertex3f(win->comp_area.x + win->comp_area.width,
-                   win->comp_area.y + win->comp_area.height,
-                   0.0);
+        glVertex3f(x + w, y + h, 0.0);
         glTexCoord2f(1, 0);
-        glVertex3f(win->comp_area.x + win->comp_area.width,
-                   win->comp_area.y,
-                   0.0);
+        glVertex3f(x + w, y, 0.0);
         glEnd();
     }
     glXSwapBuffers(obt_display, obcomp.overlay);

@@ -628,7 +628,8 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         XCreateWindowEvent const *xe = &e->xcreatewindow;
         obwin->mapped = 0;
-        RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
+        RECT_SET(obwin->area, xe->x, xe->y, xe->width, xe->height);
+        obwin->border = xe->border_width;
         if (!obwin->texture) glGenTextures(1, &obwin->texture);
     }
     else if ((obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) &&
@@ -641,13 +642,15 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (e->type == ConfigureNotify) {
             XConfigureEvent const *xe = &e->xconfigure;
-            if (obwin->comp_area.width != xe->width ||
-                obwin->comp_area.height != xe->height)
+            if (obwin->area.width != xe->width ||
+                obwin->area.height != xe->height ||
+                obwin->border != xe->border_width)
             {
                 pixchange = TRUE;
             }
-            RECT_SET(obwin->comp_area, xe->x, xe->y,
+            RECT_SET(obwin->area, xe->x, xe->y,
                      xe->width, xe->height);
+            obwin->border = xe->border_width;
         }
 
         if (e->type == MapNotify) {

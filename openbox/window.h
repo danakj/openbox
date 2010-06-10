@@ -63,7 +63,8 @@ struct _ObWindow {
     Pixmap pixmap;
     GLXPixmap gpixmap;
     Damage damage;
-    Rect comp_area;
+    Rect area;
+    gint border;
     gboolean mapped;
 #endif
 };

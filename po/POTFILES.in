@@ -6,6 +6,7 @@ openbox/client.c
 openbox/client_list_combined_menu.c
 openbox/client_list_menu.c
 openbox/client_menu.c
+openbox/composite.c
 openbox/config.c
 openbox/debug.c
 openbox/keyboard.c

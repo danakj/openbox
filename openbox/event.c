@@ -628,6 +628,7 @@ static void event_process(const XEvent *ec, gpointer data)
         if (xe->window == window_top(obwin)) {
             obwin->mapped = 0;
             RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
+            if (!obwin->texture) glGenTextures(1, &obwin->texture);
         }
     } else if ((e->type == ConfigureNotify || e->type == MapNotify)
              && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {

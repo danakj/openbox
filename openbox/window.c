@@ -56,11 +56,6 @@ ObWindow* window_new_size(ObWindowClass type, gsize size)
     self = g_slice_alloc0(size);
     self->size = size;
     self->type = type;
-
-#ifdef USE_COMPOSITING
-    glGenTextures(1, &self->texture);
-#endif
-
     return self;
 }
 

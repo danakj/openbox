@@ -656,13 +656,13 @@ static void event_process(const XEvent *ec, gpointer data)
         }
 
         if (pixchange) {
-            if (obwin->pixmap != None) {
-                XFreePixmap(obt_display, obwin->pixmap);
-                obwin->pixmap = None;
-            }
             if (obwin->gpixmap != None) {
                 glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
                 obwin->gpixmap = None;
+            }
+            if (obwin->pixmap != None) {
+                XFreePixmap(obt_display, obwin->pixmap);
+                obwin->pixmap = None;
             }
         }
     } else if ((e->type == UnmapNotify) && obwin &&

@@ -71,7 +71,7 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     g_assert(g >= 0 && g < 256);
     g_assert(b >= 0 && b < 256);
 
-    key = (r << 24) + (g << 16) + (b << 8);
+    key = (r << 24) + (g << 16) + (b << 8) + (0xff << 0);
 #ifndef NO_COLOR_CACHE
     if ((out = g_hash_table_lookup(RrColorHash(inst), &key))) {
         out->refcount++;
@@ -350,7 +350,8 @@ gint RrColorBlue(const RrColor *c)
 
 gulong RrColorPixel(const RrColor *c)
 {
-    return c->pixel;
+    /* make pixels opaque in 32-bit visuals */
+    return c->pixel | 0xff << 24;
 }
 
 GC RrColorGC(RrColor *c)

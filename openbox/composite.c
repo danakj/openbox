@@ -60,7 +60,6 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth, GLXFBConfig *o
     int i, value, has_alpha;
 
     for (i = 0; i < count; i++) {
-
         vi = glXGetVisualFromFBConfig(obt_display, in[i]);
         if (vi == NULL)
             continue;
@@ -229,7 +228,7 @@ void composite_startup(gboolean reconfig)
 
     memset(&obcomp.PixmapConfig, 0, sizeof(obcomp.PixmapConfig));
 
-    for (i = 0; i < MAX_DEPTH + 1; i++) {
+    for (i = 1; i < MAX_DEPTH + 1; i++) {
         get_best_fbcon(fbcs, count, i, &obcomp.PixmapConfig[i]);
     }
 
@@ -291,12 +290,17 @@ static gboolean composite(gpointer data)
 //    for (it = stacking_list; it; it = g_list_next(it)) {
     for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
         win = it->data;
-        if (win->type != OB_WINDOW_CLASS_CLIENT)
+        if (win->type == OB_WINDOW_CLASS_PROMPT)
             continue;
 
-        client = WINDOW_AS_CLIENT(win);
-        if (client->desktop != screen_desktop)
+        if (!win->mapped)
             continue;
+
+        if (win->type == OB_WINDOW_CLASS_CLIENT) {
+            client = WINDOW_AS_CLIENT(win);
+            if (client->desktop != screen_desktop)
+                continue;
+        }
 
         if (win->depth == 32)
             attribs[1] = GLX_TEXTURE_FORMAT_RGBA_EXT;
@@ -325,13 +329,13 @@ time_fix(&dif);
 
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0);
-        glVertex3f(client->frame->area.x, client->frame->area.y, 0.0);
+        glVertex3f(win->comp_area.x, win->comp_area.y, 0.0);
         glTexCoord2f(0, 1);
-        glVertex3f(client->frame->area.x, client->frame->area.y + client->frame->area.height, 0.0);
+        glVertex3f(win->comp_area.x, win->comp_area.y + win->comp_area.height, 0.0);
         glTexCoord2f(1, 1);
-        glVertex3f(client->frame->area.x + client->frame->area.width, client->frame->area.y + client->frame->area.height, 0.0);
+        glVertex3f(win->comp_area.x + win->comp_area.width, win->comp_area.y + win->comp_area.height, 0.0);
         glTexCoord2f(1, 0);
-        glVertex3f(client->frame->area.x + client->frame->area.width, client->frame->area.y, 0.0);
+        glVertex3f(win->comp_area.x + win->comp_area.width, win->comp_area.y, 0.0);
         glEnd();
     }
     glXSwapBuffers(obt_display, obcomp.overlay);

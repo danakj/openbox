@@ -20,6 +20,7 @@
 #define __window_h
 
 #include "stacking.h"
+#include "geom.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
@@ -51,6 +52,8 @@ struct _ObWindow {
     GLXPixmap gpixmap;
     Damage damage;
     int depth;
+    Rect comp_area;
+    gboolean mapped;
 #endif
 };
 

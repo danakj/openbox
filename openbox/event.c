@@ -43,7 +43,7 @@
 #include "obt/xqueue.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
-
+#include "geom.h"
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <glib.h>
@@ -622,19 +622,49 @@ static void event_process(const XEvent *ec, gpointer data)
             frame_adjust_focus(client->frame, FALSE);
     }
 #ifdef USE_COMPOSITING
-    else if ((e->type == ConfigureNotify || e->type == MapNotify)
-             && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {
-        if (obwin->pixmap != None) {
-            XFreePixmap(obt_display, obwin->pixmap);
-            obwin->pixmap = None;
+    else if ((e->type == CreateNotify) && obwin
+             && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+        XCreateWindowEvent const *xe = &e->xcreatewindow;
+        if (xe->window == window_top(obwin)) {
+            obwin->mapped = 0;
+            RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
         }
-        if (obwin->gpixmap != None) {
-            glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
-            obwin->gpixmap = None;
+    } else if ((e->type == ConfigureNotify || e->type == MapNotify)
+             && obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+        gboolean pixchange = FALSE;
+
+        if (e->type == ConfigureNotify) {
+            XConfigureEvent const *xe = &e->xconfigure;
+            if (xe->window == window_top(obwin)) {
+                if ((obwin->comp_area.width != xe->width)
+                    || (obwin->comp_area.height != xe->height))
+                    pixchange = TRUE;
+                RECT_SET(obwin->comp_area, xe->x, xe->y, xe->width, xe->height);
+            }
         }
 
-//XXX actually need to check if this was just a move and not re-make the pmap!
-//printf("win %d has pixmap %d\n", window_top(obwin), obwin->pixmap);
+        if (e->type == MapNotify) {
+            XMapEvent const *xe = &e->xmap;
+            if (xe->window == window_top(obwin)) {
+                pixchange = TRUE;
+                obwin->mapped = TRUE;
+            }
+        }
+
+        if (pixchange) {
+            if (obwin->pixmap != None) {
+                XFreePixmap(obt_display, obwin->pixmap);
+                obwin->pixmap = None;
+            }
+            if (obwin->gpixmap != None) {
+                glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
+                obwin->gpixmap = None;
+            }
+        }
+    } else if ((e->type == UnmapNotify) && obwin
+             && obwin->type != OB_WINDOW_CLASS_PROMPT) {
+            if (e->xunmap.window == window_top(obwin))
+                obwin->mapped = FALSE;
     }
 #endif
     else if (client)

@@ -94,8 +94,11 @@ void window_free(ObWindow *self)
 
 #ifdef USE_COMPOSITING
     if (self->type != OB_WINDOW_CLASS_PROMPT) {
-        if (self->damage)
+        if (self->damage) {
+            obt_display_ignore_errors(TRUE);
             XDamageDestroy(obt_display, self->damage);
+            obt_display_ignore_errors(FALSE);
+        }
         if (self->gpixmap)
             glXDestroyPixmap(obt_display, self->gpixmap);
         if (self->pixmap)

@@ -336,6 +336,8 @@ static gboolean composite(gpointer data)
     int attribs[] = {
         GLX_TEXTURE_FORMAT_EXT,
         None,
+        GLX_TEXTURE_TARGET_EXT,
+        GLX_TEXTURE_2D_EXT,
         None
     };
     struct timeval start, end, dif;

@@ -413,6 +413,7 @@ time_fix(&dif);
         glTexCoord2f(1, 0);
         glVertex3f(x + w, y, 0.0);
         glEnd();
+        obcomp.ReleaseTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
     }
     glXSwapBuffers(obt_display, obcomp.overlay);
     glFinish();

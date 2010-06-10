@@ -62,7 +62,10 @@ struct ObCompositor {
     Window overlay;
 
     GLXContext ctx;
-    GLXFBConfig PixmapConfig[MAX_DEPTH + 1]; // need a [32]
+    struct ObCompositeFBConfig {
+        GLXFBConfig fbc; /* the fbconfig */
+        gint tf;         /* texture format */
+    } PixmapConfig[MAX_DEPTH + 1]; // need a [32]
 
     gboolean need_redraw;
     const Rect *screendims;

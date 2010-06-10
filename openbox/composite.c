@@ -54,11 +54,18 @@ static gboolean composite_need_redraw(void)
     return TRUE;
 }
 
-static void get_best_fbcon(GLXFBConfig *in, int count, int depth, GLXFBConfig *out)
+static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
+                           struct ObCompositeFBConfig *out)
 {
     GLXFBConfig best = 0;
     XVisualInfo *vi;
-    int i, value, has_alpha;
+    int i, value, alpha, stencil, depthb;
+    gboolean rgba, db;
+
+    rgba = FALSE;
+    db = TRUE;
+    stencil = G_MAXSHORT;
+    depthb = G_MAXSHORT;
 
     for (i = 0; i < count; i++) {
         vi = glXGetVisualFromFBConfig(obt_display, in[i]);
@@ -71,18 +78,47 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth, GLXFBConfig *o
         if (value != depth)
             continue;
 
+        obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_ALPHA_SIZE, &alpha);
+        obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_BUFFER_SIZE, &value);
+
+        /* the buffer size should equal the depth or else the buffer size minus
+           the alpha size should */
+        if (value != depth && value - alpha != depth) continue;
+
         value = 0;
         if (depth == 32) {
-            obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_BIND_TO_TEXTURE_RGBA_EXT, &value);
+            obcomp.GetFBConfigAttrib(obt_display, in[i],
+                                     GLX_BIND_TO_TEXTURE_RGBA_EXT, &value);
+            rgba = TRUE;
         }
         if (!value) {
-            obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_BIND_TO_TEXTURE_RGB_EXT, &value);
+            if (rgba) continue; /* a different one has rgba, prefer that */
+
+            obcomp.GetFBConfigAttrib(obt_display, in[i],
+                                     GLX_BIND_TO_TEXTURE_RGB_EXT, &value);
         }
         if (!value) // neither bind to texture?  no dice
             continue;
+
+        /* get no doublebuffer if possible */
+        obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_DOUBLEBUFFER, &value);
+        if (value && !db) continue;
+        db = value;
+
+        /* get the smallest stencil buffer */
+        obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_STENCIL_SIZE, &value);
+        if (value > stencil) continue;
+        stencil = value;
+
+        /* get the smallest depth buffer */
+        obcomp.GetFBConfigAttrib(obt_display, in[i], GLX_DEPTH_SIZE, &value);
+        if (value > depthb) continue;
+        depthb = value;
+
         best = in[i];
     }
-    *out = best;
+    out->fbc = best;
+    out->tf = rgba ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT;
 }
 #endif
 
@@ -236,8 +272,10 @@ void composite_startup(gboolean reconfig)
     if (count)
         XFree(fbcs);
 
-    printf("Best visual for 24bpp was 0x%x\n", obcomp.PixmapConfig[24]);
-    printf("Best visual for 32bpp was 0x%x\n", obcomp.PixmapConfig[32]);
+    printf("Best visual for 24bpp was 0x%lx\n",
+           (gulong)obcomp.PixmapConfig[24].fbc);
+    printf("Best visual for 32bpp was 0x%lx\n",
+           (gulong)obcomp.PixmapConfig[32].fbc);
 
     g_idle_add(composite, NULL);
 
@@ -282,7 +320,6 @@ static gboolean composite(gpointer data)
     GList *it;
     ObWindow *win;
     ObClient *client;
-    static int i;
 
 //    if (!obcomp.need_redraw)
 //        return;
@@ -303,10 +340,7 @@ static gboolean composite(gpointer data)
                 continue;
         }
 
-        if (window_depth(win) == 32)
-            attribs[1] = GLX_TEXTURE_FORMAT_RGBA_EXT;
-        else
-            attribs[1] = GLX_TEXTURE_FORMAT_RGB_EXT;
+        attribs[1] = obcomp.PixmapConfig[window_depth(win)].tf;
 
         if (win->pixmap == None)
             win->pixmap = XCompositeNameWindowPixmap(obt_display, window_top(win));
@@ -314,7 +348,7 @@ static gboolean composite(gpointer data)
         if (win->gpixmap == None)
             win->gpixmap =
                 obcomp.CreatePixmap(obt_display,
-                                    obcomp.PixmapConfig[window_depth(win)],
+                                    obcomp.PixmapConfig[window_depth(win)].fbc,
                                     win->pixmap, attribs);
 
         glBindTexture(GL_TEXTURE_2D, win->texture);

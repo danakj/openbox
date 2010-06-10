@@ -145,6 +145,9 @@ void composite_startup(gboolean reconfig)
     if (reconfig) return;
     if (!config_comp) return;
 
+    if (ob_comp_indirect)
+        setenv("LIBGL_ALWAYS_INDIRECT", "1", True);
+
     config_comp = FALSE;
 
     root = RootWindow(obt_display, ob_screen);
@@ -253,7 +256,7 @@ void composite_startup(gboolean reconfig)
         return;
     }
 
-    obcomp.ctx = glXCreateContext(obt_display, vi, NULL, True);
+    obcomp.ctx = glXCreateContext(obt_display, vi, NULL, !ob_comp_indirect);
     XFree(vi);
 
     fbcs = obcomp.GetFBConfigs(obt_display, ob_screen, &count);

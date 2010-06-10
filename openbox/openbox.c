@@ -93,6 +93,7 @@ gchar        *ob_sm_id = NULL;
 gchar        *ob_sm_save_file = NULL;
 gboolean      ob_sm_restore = TRUE;
 gboolean      ob_debug_xinerama = FALSE;
+gboolean      ob_comp_indirect = FALSE;
 const gchar  *ob_locale_msg = NULL;
 
 static ObState   state;
@@ -532,6 +533,7 @@ static void print_help(void)
        fine to leave it as FILE though. */
     g_print(_("  --config-file FILE  Specify the path to the config file to use\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
+    g_print(_("  --indirect          Use indirect rendering for composite\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
     g_print(_("  --restart           Restart Openbox\n"));
@@ -648,6 +650,9 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--debug-xinerama")) {
             ob_debug_xinerama = TRUE;
+        }
+        else if (!strcmp(argv[i], "--indirect")) {
+            ob_comp_indirect = TRUE;
         }
         else if (!strcmp(argv[i], "--reconfigure")) {
             remote_control = 1;

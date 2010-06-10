@@ -54,6 +54,7 @@ gboolean obt_display_extension_composite = FALSE;
 gint     obt_display_extension_composite_basep;
 gboolean obt_display_extension_damage    = FALSE;
 gint     obt_display_extension_damage_basep;
+gint     obt_display_extension_damage_error;
 gboolean obt_display_extension_render    = FALSE;
 gint     obt_display_extension_render_basep;
 gboolean obt_display_extension_fixes     = FALSE;
@@ -140,7 +141,7 @@ gboolean obt_display_open(const char *display_name)
 
         obt_display_extension_damage =
             XDamageQueryExtension(d, &obt_display_extension_damage_basep,
-                                  &junk);
+                                  &obt_display_extension_damage_error);
         if (!obt_display_extension_damage)
             g_message("X Damage extension is not present on the server");
 
@@ -184,8 +185,12 @@ static gint xerror_handler(Display *d, XErrorEvent *e)
 
     XGetErrorText(d, e->error_code, errtxt, 127);
     if (!xerror_ignore) {
-        if (e->error_code == BadWindow)
-            /*g_debug(_("X Error: %s\n"), errtxt)*/;
+        if (e->error_code == BadWindow ||
+            (obt_display_extension_damage &&
+             e->error_code - obt_display_extension_damage_error == BadDamage))
+        {
+            /*g_error("X Error: %d '%s'", e->error_code, errtxt);*/
+        }
         else
             g_error("X Error: %s", errtxt);
     } else

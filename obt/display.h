@@ -63,6 +63,7 @@ extern gboolean obt_display_extension_composite;
 extern gint     obt_display_extension_composite_basep;
 extern gboolean obt_display_extension_damage;
 extern gint     obt_display_extension_damage_basep;
+extern gint     obt_display_extension_damage_error;
 extern gboolean obt_display_extension_render;
 extern gint     obt_display_extension_render_basep;
 extern gboolean obt_display_extension_fixes;

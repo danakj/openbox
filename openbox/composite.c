@@ -360,7 +360,8 @@ static gboolean composite(gpointer data)
 
         if (win->type == OB_WINDOW_CLASS_CLIENT) {
             client = WINDOW_AS_CLIENT(win);
-            if (client->desktop != screen_desktop)
+            if ((client->desktop != screen_desktop)
+                && (client->desktop != DESKTOP_ALL))
                 continue;
         }
 

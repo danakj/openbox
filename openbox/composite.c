@@ -378,6 +378,11 @@ time_fix(&dif);
     }
     glXSwapBuffers(obt_display, obcomp.overlay);
     glFinish();
+    GLenum gler;
+    while ((gler = glGetError()) != GL_NO_ERROR) {
+        printf("gl error %d\n", gler);
+    }
+    
     obcomp.need_redraw = 0;
 #endif
     return TRUE;

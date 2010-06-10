@@ -22,6 +22,7 @@
 #include "obt/display.h"
 #include "openbox.h"
 #include "screen.h"
+#include "event.h"
 #include "client.h"
 #include "frame.h"
 #include "geom.h"

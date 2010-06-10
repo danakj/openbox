@@ -39,6 +39,7 @@ typedef enum {
     OB_WINDOW_CLASS_DOCK,
     OB_WINDOW_CLASS_CLIENT,
     OB_WINDOW_CLASS_INTERNAL,
+    OB_WINDOW_CLASS_UNMANAGED,
     OB_WINDOW_CLASS_PROMPT
 } ObWindowClass;
 
@@ -66,6 +67,7 @@ struct _ObWindow {
     Rect area;
     gint border;
     gboolean mapped;
+    gboolean redir;
 #endif
 };
 
@@ -77,6 +79,8 @@ struct _ObWindow {
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_CLIENT)
 #define WINDOW_IS_INTERNAL(win) \
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_INTERNAL)
+#define WINDOW_IS_UNMANAGED(win) \
+    (((ObWindow*)win)->type == OB_WINDOW_CLASS_UNMANAGED)
 #define WINDOW_IS_PROMPT(win) \
     (((ObWindow*)win)->type == OB_WINDOW_CLASS_PROMPT)
 
@@ -90,12 +94,14 @@ struct _ObPrompt;
 #define WINDOW_AS_DOCK(win) ((struct _ObDock*)win)
 #define WINDOW_AS_CLIENT(win) ((struct _ObClient*)win)
 #define WINDOW_AS_INTERNAL(win) ((struct _ObInternalWindow*)win)
+#define WINDOW_AS_UNMANAGED(win) ((struct _ObUnmanaged*)win)
 #define WINDOW_AS_PROMPT(win) ((struct _ObPrompt*)win)
 
 #define MENUFRAME_AS_WINDOW(menu) ((ObWindow*)menu)
 #define DOCK_AS_WINDOW(dock) ((ObWindow*)dock)
 #define CLIENT_AS_WINDOW(client) ((ObWindow*)client)
 #define INTERNAL_AS_WINDOW(intern) ((ObWindow*)intern)
+#define UNMANAGED_AS_WINDOW(um) ((ObWindow*)um)
 #define PROMPT_AS_WINDOW(prompt) ((ObWindow*)prompt)
 
 void window_startup (gboolean reconfig);
@@ -109,6 +115,10 @@ void      window_set_abstract(ObWindow *self,
                               const Window *top,
                               const ObStackingLayer *layer,
                               const int *depth);
+/*! A subclass of ObWindow must call this when it is going to be destroying
+  itself, but _before_ it destroys the members it sets in
+  window_set_abstract() */
+void      window_cleanup(ObWindow *self);
 void      window_free(ObWindow *self);
 
 ObWindow* window_find  (Window xwin);

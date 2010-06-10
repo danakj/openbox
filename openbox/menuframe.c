@@ -152,6 +152,8 @@ void menu_frame_free(ObMenuFrame *self)
             self->entries = g_list_delete_link(self->entries, self->entries);
         }
 
+        window_cleanup(MENUFRAME_AS_WINDOW(self));
+
         stacking_remove(MENUFRAME_AS_WINDOW(self));
         window_remove(self->window);
 

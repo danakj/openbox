@@ -116,6 +116,11 @@ void focus_cycle_indicator_shutdown(gboolean reconfig)
 
     RrAppearanceFree(a_focus_indicator);
 
+    window_cleanup(INTERNAL_AS_WINDOW(focus_indicator.top));
+    window_cleanup(INTERNAL_AS_WINDOW(focus_indicator.left));
+    window_cleanup(INTERNAL_AS_WINDOW(focus_indicator.right));
+    window_cleanup(INTERNAL_AS_WINDOW(focus_indicator.bottom));
+
     window_remove(focus_indicator.top->window);
     window_remove(focus_indicator.left->window);
     window_remove(focus_indicator.right->window);

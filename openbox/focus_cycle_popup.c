@@ -222,6 +222,8 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
 {
     icon_popup_free(single_popup);
 
+    window_cleanup(INTERNAL_AS_WINDOW(popup));
+
     window_remove(popup->bg);
     stacking_remove(INTERNAL_AS_WINDOW(&popup));
 

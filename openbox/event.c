@@ -38,6 +38,7 @@
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"
+#include "unmanaged.h"
 #include "ping.h"
 #include "obt/display.h"
 #include "obt/xqueue.h"
@@ -88,6 +89,7 @@ static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
+static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e);
 static gboolean event_handle_user_input(ObClient *client, XEvent *e);
 static gboolean is_enter_focus_event_ignored(gulong serial);
 static void event_ignore_enter_range(gulong start, gulong end);
@@ -457,6 +459,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObWindow *obwin = NULL;
     ObMenuFrame *menu = NULL;
     ObPrompt *prompt = NULL;
+    ObUnmanaged *um = NULL;
     gboolean used;
 
     /* make a copy we can mangle */
@@ -484,6 +487,9 @@ static void event_process(const XEvent *ec, gpointer data)
             break;
         case OB_WINDOW_CLASS_PROMPT:
             prompt = WINDOW_AS_PROMPT(obwin);
+            break;
+        case OB_WINDOW_CLASS_UNMANAGED:
+            um = WINDOW_AS_UNMANAGED(obwin);
             break;
         }
     }
@@ -621,16 +627,22 @@ static void event_process(const XEvent *ec, gpointer data)
         if (client && client != focus_client)
             frame_adjust_focus(client->frame, FALSE);
     }
-#ifdef USE_COMPOSITING
-    else if ((e->type == CreateNotify) && obwin &&
-             obwin->type != OB_WINDOW_CLASS_PROMPT &&
-             e->xcreatewindow.window == window_top(obwin))
-    {
+    else if (e->type == CreateNotify) {
         XCreateWindowEvent const *xe = &e->xcreatewindow;
-        obwin->mapped = 0;
-        RECT_SET(obwin->area, xe->x, xe->y, xe->width, xe->height);
-        obwin->border = xe->border_width;
-        if (!obwin->texture) glGenTextures(1, &obwin->texture);
+
+        if (!obwin && xe->parent == obt_root(ob_screen))
+            obwin = UNMANAGED_AS_WINDOW(unmanaged_new(xe->window));
+
+        if (obwin && xe->window == window_top(obwin) &&
+            obwin->type != OB_WINDOW_CLASS_PROMPT)
+        {
+            obwin->mapped = 0;
+            RECT_SET(obwin->area, xe->x, xe->y, xe->width, xe->height);
+            obwin->border = xe->border_width;
+#ifdef USE_COMPOSITING
+            if (!obwin->texture) glGenTextures(1, &obwin->texture);
+#endif
+        }
     }
     else if ((obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) &&
                ((e->type == ConfigureNotify &&
@@ -659,6 +671,7 @@ static void event_process(const XEvent *ec, gpointer data)
         }
 
         if (pixchange) {
+#ifdef USE_COMPOSITING
             if (obwin->gpixmap != None) {
                 glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
                 obwin->gpixmap = None;
@@ -667,6 +680,7 @@ static void event_process(const XEvent *ec, gpointer data)
                 XFreePixmap(obt_display, obwin->pixmap);
                 obwin->pixmap = None;
             }
+#endif
         }
     } else if ((e->type == UnmapNotify) && obwin &&
                obwin->type != OB_WINDOW_CLASS_PROMPT &&
@@ -674,7 +688,8 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         obwin->mapped = FALSE;
     }
-#endif
+    else if (um)
+        event_handle_unmanaged(um, e);
     else if (client)
         event_handle_client(client, e);
     else if (dockapp)
@@ -685,8 +700,6 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_menu(menu, e);
     else if (window == obt_root(ob_screen))
         event_handle_root(e);
-    else if (e->type == MapRequest)
-        window_manage(window);
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
@@ -1408,6 +1421,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             break;
         }
         client_unmanage(client);
+        unmanaged_new(e->xunmap.window);
         break;
     case DestroyNotify:
         ob_debug("DestroyNotify for window 0x%x", client->window);
@@ -1426,6 +1440,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
         ob_debug("ReparentNotify for window 0x%x", client->window);
         client_unmanage(client);
+        unmanaged_new(e->xreparent.window);
         break;
     case MapRequest:
         ob_debug("MapRequest for 0x%lx", client->window);
@@ -1778,6 +1793,22 @@ static void event_handle_dock(ObDock *s, XEvent *e)
         /* don't hide when moving into a dock app */
         if (e->xcrossing.detail != NotifyInferior)
             dock_hide(TRUE);
+        break;
+    }
+}
+
+static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
+{
+    Window w;
+
+    switch (e->type) {
+    case DestroyNotify:
+        unmanaged_destroy(um);
+        break;
+    case MapRequest:
+        w = window_top(um);
+        unmanaged_destroy(um);
+        window_manage(w);
         break;
     }
 }

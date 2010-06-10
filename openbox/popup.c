@@ -73,6 +73,7 @@ void popup_free(ObPopup *self)
     if (self) {
         popup_hide(self); /* make sure it's not showing or is being delayed and
                              will be shown */
+        window_cleanup(INTERNAL_AS_WINDOW(self));
         XDestroyWindow(obt_display, self->bg);
         XDestroyWindow(obt_display, self->text);
         RrAppearanceFree(self->a_bg);

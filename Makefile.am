@@ -347,6 +347,8 @@ openbox_openbox_SOURCES = \
 	openbox/startupnotify.h \
 	openbox/translate.c \
 	openbox/translate.h \
+	openbox/unmanaged.c \
+	openbox/unmanaged.h \
 	openbox/window.c \
 	openbox/window.h
 

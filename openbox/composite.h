@@ -27,6 +27,8 @@
 
 #include "geom.h"
 
+struct _ObWindow;
+
 #define MAX_DEPTH 32
 
 typedef GLXPixmap (*CreatePixmapT)(Display *display,
@@ -74,5 +76,7 @@ struct ObCompositor {
 
 void composite_startup(gboolean reconfig);
 void composite_shutdown(gboolean reconfig);
+Window composite_overlay(void);
+void composite_redir(struct _ObWindow *w, gboolean on);
 
 #endif

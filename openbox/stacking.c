@@ -74,7 +74,11 @@ static void do_restack(GList *wins, GList *before)
     g_assert(wins);
     /* pls only restack stuff in the same layer at a time */
     for (it = wins; it; it = next) {
+        while (it && window_layer(it->data) == OB_STACKING_LAYER_ALL)
+            it = g_list_next(it);
         next = g_list_next(it);
+        while (next && window_layer(next->data) == OB_STACKING_LAYER_ALL)
+            next = g_list_next(next);
         if (!next) break;
         g_assert (window_layer(it->data) == window_layer(next->data));
     }
@@ -101,7 +105,11 @@ static void do_restack(GList *wins, GList *before)
 #ifdef DEBUG
     /* some debug checking of the stacking list's order */
     for (it = stacking_list; ; it = next) {
+        while (it && window_layer(it->data) == OB_STACKING_LAYER_ALL)
+            it = g_list_next(it);
         next = g_list_next(it);
+        while (next && window_layer(next->data) == OB_STACKING_LAYER_ALL)
+            next = g_list_next(next);
         if (!next) break;
         g_assert(window_layer(it->data) >= window_layer(next->data));
     }
@@ -445,10 +453,13 @@ void stacking_add(ObWindow *win)
     /* don't add windows that are being unmanaged ! */
     if (WINDOW_IS_CLIENT(win)) g_assert(WINDOW_AS_CLIENT(win)->managed);
 
-    stacking_list = g_list_append(stacking_list, win);
-
-    stacking_raise(win);
-    /* stacking_list_tail set by stacking_raise() */
+    if (WINDOW_IS_UNMANAGED(win))
+        stacking_list = g_list_prepend(stacking_list, win);
+    else {
+        stacking_list = g_list_append(stacking_list, win);
+        stacking_raise(win);
+        /* stacking_list_tail set by stacking_raise() */
+    }
 }
 
 static GList *find_highest_relative(ObClient *client)

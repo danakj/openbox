@@ -24,6 +24,7 @@
 #include "screen.h"
 #include "event.h"
 #include "client.h"
+#include "window.h"
 #include "frame.h"
 #include "geom.h"
 #include "gettext.h"
@@ -417,6 +418,7 @@ time_fix(&dif);
     }
     glXSwapBuffers(obt_display, obcomp.overlay);
     glFinish();
+    usleep(10000);
     GLenum gler;
     while ((gler = glGetError()) != GL_NO_ERROR) {
         printf("gl error %d\n", gler);
@@ -426,3 +428,32 @@ time_fix(&dif);
 #endif
     return TRUE;
 }
+
+Window composite_overlay(void)
+{
+#ifdef USE_COMPOSITING
+    return obcomp.overlay;
+#else
+    return 0;
+#endif
+}
+
+void composite_redir(ObWindow *w, gboolean on)
+{
+#ifdef USE_COMPOSITING
+    if (on) {
+        if (w->redir) return;
+        XCompositeRedirectWindow(obt_display, window_top(w),
+                                 CompositeRedirectManual);
+        w->redir = TRUE;
+    }
+    else {
+        if (!w->redir) return;
+        XCompositeUnredirectWindow(obt_display, window_top(w),
+                                   CompositeRedirectManual);
+        w->redir = FALSE;
+    }
+#endif
+}
+        
+

@@ -35,7 +35,8 @@ typedef enum {
     OB_STACKING_LAYER_ABOVE,            /*!< 3 - normal windows w/ above */
     OB_STACKING_LAYER_FULLSCREEN,       /*!< 4 - fullscreeen windows */
     OB_STACKING_LAYER_INTERNAL,         /*!< 5 - openbox windows/menus */
-    OB_NUM_STACKING_LAYERS
+    OB_NUM_STACKING_LAYERS,
+    OB_STACKING_LAYER_ALL = 0xffffffff  /*!< 0xffffffff - unmamnaged windows */
 } ObStackingLayer;
 
 /* list of ObWindow*s in stacking order from highest to lowest */

@@ -563,6 +563,8 @@ void client_unmanage(ObClient *self)
        don't generate more events */
     XSelectInput(obt_display, self->window, NoEventMask);
 
+    window_cleanup(CLIENT_AS_WINDOW(self));
+
     /* ignore enter events from the unmap so it doesnt mess with the focus */
     if (!config_focus_under_mouse)
         ignore_start = event_start_ignore_all_enters();
@@ -702,6 +704,7 @@ void client_fake_unmanage(ObClient *self)
 {
     /* this is all that got allocated to get the decorations */
 
+    window_cleanup(CLIENT_AS_WINDOW(self));
     frame_free(self->frame);
     window_free(CLIENT_AS_WINDOW(self));
 }

@@ -73,13 +73,17 @@ void window_set_abstract(ObWindow *self,
 
 #ifdef USE_COMPOSITING
     if (self->type != OB_WINDOW_CLASS_PROMPT) {
-        self->damage = XDamageCreate(obt_display, *self->top,
+        self->damage = XDamageCreate(obt_display, window_top(self),
                                      XDamageReportNonEmpty);
-
-        XCompositeRedirectWindow(obt_display, *self->top,
-                                 CompositeRedirectManual);
     }
 #endif
+
+    composite_redir(self, TRUE);
+}
+
+void window_cleanup(ObWindow *self)
+{
+    composite_redir(self, FALSE);
 }
 
 void window_free(ObWindow *self)

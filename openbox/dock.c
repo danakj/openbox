@@ -130,6 +130,8 @@ void dock_shutdown(gboolean reconfig)
         return;
     }
 
+    window_cleanup(DOCK_AS_WINDOW(dock));
+
     g_hash_table_destroy(dock->dock_map);
 
     XDestroyWindow(obt_display, dock->frame);

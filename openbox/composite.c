@@ -373,11 +373,15 @@ static gboolean composite(gpointer data)
         if (win->pixmap == None)
             win->pixmap = XCompositeNameWindowPixmap(obt_display,
                                                      window_top(win));
+        if (win->pixmap == None)
+            continue;
 
         if (win->gpixmap == None)
             win->gpixmap = obcomp.CreatePixmap(obt_display,
                                                obcomp.PixmapConfig[d].fbc,
                                                win->pixmap, attribs);
+        if (win->gpixmap == None)
+            continue;
 
         glBindTexture(GL_TEXTURE_2D, win->texture);
 gettimeofday(&start, NULL);

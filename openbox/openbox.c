@@ -122,6 +122,8 @@ gint main(gint argc, gchar **argv)
     ob_set_state(OB_STATE_STARTING);
 
     ob_debug_startup();
+    ob_debug_enable(OB_DEBUG_CM, TRUE); /* composite debug enabled by default
+                                           for now */
 
     /* initialize the locale */
     if (!(ob_locale_msg = setlocale(LC_MESSAGES, "")))

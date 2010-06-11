@@ -153,6 +153,7 @@ static inline void log_argv(ObDebugType type,
     case OB_DEBUG_FOCUS:    prefix = "(FOCUS) ";           break;
     case OB_DEBUG_APP_BUGS: prefix = "(APPLICATION BUG) "; break;
     case OB_DEBUG_SM:       prefix = "(SESSION) ";         break;
+    case OB_DEBUG_CM:       prefix = "(COMPOSITE) ";       break;
     default:                prefix = NULL;                 break;
     }
 

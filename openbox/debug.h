@@ -31,6 +31,7 @@ typedef enum {
     OB_DEBUG_FOCUS,
     OB_DEBUG_APP_BUGS,
     OB_DEBUG_SM,
+    OB_DEBUG_CM,
     OB_DEBUG_TYPE_NUM
 } ObDebugType;
 

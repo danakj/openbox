@@ -39,6 +39,6 @@ typedef enum
 } ObPlaceMonitor;
 
 gboolean place_client(struct _ObClient *client, gint *x, gint *y,
-                      struct _ObAppSettings *settings);
+                      gint w, gint h, struct _ObAppSettings *settings);
 
 #endif

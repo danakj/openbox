@@ -128,9 +128,10 @@ static Rect **pick_head(ObClient *c)
     return area;
 }
 
-static gboolean place_random(ObClient *client, gint *x, gint *y)
+static gboolean place_random(ObClient *client, gint *x, gint *y,
+                             gint w, gint h)
 {
-    gint l, r, t, b;
+    gint l, r, t, b, fw, fh;
     Rect **areas;
     guint i;
 
@@ -138,10 +139,13 @@ static gboolean place_random(ObClient *client, gint *x, gint *y)
     i = (config_place_monitor != OB_PLACE_MONITOR_ANY) ?
         0 : g_random_int_range(0, screen_num_monitors);
 
+    fw = w + client->frame->size.left + client->frame->size.right;
+    fh = h + client->frame->size.top + client->frame->size.bottom;
+
     l = areas[i]->x;
     t = areas[i]->y;
-    r = areas[i]->x + areas[i]->width - client->frame->area.width;
-    b = areas[i]->y + areas[i]->height - client->frame->area.height;
+    r = areas[i]->x + areas[i]->width - fw;
+    b = areas[i]->y + areas[i]->height - fh;
 
     if (r > l) *x = g_random_int_range(l, r + 1);
     else       *x = areas[i]->x;
@@ -228,7 +232,7 @@ enum {
     IGNORE_END        = 7
 };
 
-static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
+static gboolean place_nooverlap(ObClient *c, gint *x, gint *y, gint w, gint h)
 {
     Rect **areas;
     gint ignore;
@@ -308,8 +312,10 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
             for (sit = spaces; sit; sit = g_slist_next(sit)) {
                 Rect *r = sit->data;
 
-                if (r->width >= c->frame->area.width &&
-                    r->height >= c->frame->area.height &&
+                const gint fw = w + c->frame->size.left + c->frame->size.right;
+                const gint fh = h + c->frame->size.top + c->frame->size.bottom;
+
+                if (r->width >= fw && r->height >= fh &&
                     r->width * r->height > maxsize)
                 {
                     maxsize = r->width * r->height;
@@ -320,12 +326,15 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
             if (maxit) {
                 Rect *r = maxit->data;
 
+                const gint fw = w + c->frame->size.left + c->frame->size.right;
+                const gint fh = h + c->frame->size.top + c->frame->size.bottom;
+
                 /* center it in the area */
                 *x = r->x;
                 *y = r->y;
                 if (config_place_center) {
-                    *x += (r->width - c->frame->area.width) / 2;
-                    *y += (r->height - c->frame->area.height) / 2;
+                    *x += (r->width - fw) / 2;
+                    *y += (r->height - fh) / 2;
                 }
                 ret = TRUE;
             }
@@ -343,11 +352,15 @@ static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
     return ret;
 }
 
-static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
+static gboolean place_under_mouse(ObClient *client, gint *x, gint *y,
+                                  gint w, gint h)
 {
     gint l, r, t, b;
     gint px, py;
     Rect *area;
+
+    const gint fw = w + client->frame->size.left + client->frame->size.right;
+    const gint fh = h + client->frame->size.top + client->frame->size.bottom;
 
     if (!screen_pointer_pos(&px, &py))
         return FALSE;
@@ -355,8 +368,8 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 
     l = area->x;
     t = area->y;
-    r = area->x + area->width - client->frame->area.width;
-    b = area->y + area->height - client->frame->area.height;
+    r = area->x + area->width - fw;
+    b = area->y + area->height - fh;
 
     *x = px - client->area.width / 2 - client->frame->size.left;
     *x = MIN(MAX(*x, l), r);
@@ -369,9 +382,12 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 }
 
 static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
-                                      ObAppSettings *settings)
+                                      gint w, gint h, ObAppSettings *settings)
 {
     Rect *screen = NULL;
+
+    const gint fw = w + client->frame->size.left + client->frame->size.right;
+    const gint fh = h + client->frame->size.top + client->frame->size.bottom;
 
     if (!settings || (settings && !settings->pos_given))
         return FALSE;
@@ -402,8 +418,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
     else if (settings->position.x.opposite)
-        *x = screen->x + screen->width - client->frame->area.width -
-            settings->position.x.pos;
+        *x = screen->x + screen->width - fw - settings->position.x.pos;
     else
         *x = screen->x + settings->position.x.pos;
     if (settings->position.x.denom)
@@ -412,8 +427,7 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     if (settings->position.y.center)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
     else if (settings->position.y.opposite)
-        *y = screen->y + screen->height - client->frame->area.height -
-            settings->position.y.pos;
+        *y = screen->y + screen->height - fh - settings->position.y.pos;
     else
         *y = screen->y + settings->position.y.pos;
     if (settings->position.y.denom)
@@ -423,7 +437,8 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     return TRUE;
 }
 
-static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
+static gboolean place_transient_splash(ObClient *client, gint *x, gint *y,
+                                       gint w, gint h)
 {
     if (client->type == OB_CLIENT_TYPE_DIALOG) {
         GSList *it;
@@ -446,8 +461,12 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
                 }
             }
             if (!first) {
-                *x = ((r + 1 - l) - client->frame->area.width) / 2 + l;
-                *y = ((b + 1 - t) - client->frame->area.height) / 2 + t;
+                const gint fw = w + client->frame->size.left +
+                    client->frame->size.right;
+                const gint fh = h + client->frame->size.top +
+                    client->frame->size.bottom;
+                *x = ((r + 1 - l) - fw) / 2 + l;
+                *y = ((b + 1 - t) - fh) / 2 + t;
                 return TRUE;
             }
         }
@@ -459,10 +478,15 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
         Rect **areas;
         guint i;
 
+        const gint fw = w + client->frame->size.left +
+            client->frame->size.right;
+        const gint fh = h + client->frame->size.top +
+            client->frame->size.bottom;
+
         areas = pick_head(client);
 
-        *x = (areas[0]->width - client->frame->area.width) / 2 + areas[0]->x;
-        *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
+        *x = (areas[0]->width - fw) / 2 + areas[0]->x;
+        *y = (areas[0]->height - fh) / 2 + areas[0]->y;
 
         for (i = 0; i < screen_num_monitors; ++i)
             g_slice_free(Rect, areas[i]);
@@ -475,7 +499,7 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 
 /*! Return TRUE if openbox chose the position for the window, and FALSE if
   the application chose it */
-gboolean place_client(ObClient *client, gint *x, gint *y,
+gboolean place_client(ObClient *client, gint *x, gint *y, gint w, gint h,
                       ObAppSettings *settings)
 {
     gboolean ret;
@@ -489,12 +513,12 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
         return FALSE;
 
     /* try a number of methods */
-    ret = place_per_app_setting(client, x, y, settings) ||
-        place_transient_splash(client, x, y) ||
+    ret = place_per_app_setting(client, x, y, w, h, settings) ||
+        place_transient_splash(client, x, y, w, h) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
-         place_under_mouse(client, x, y)) ||
-        place_nooverlap(client, x, y) ||
-        place_random(client, x, y);
+         place_under_mouse(client, x, y, w, h)) ||
+        place_nooverlap(client, x, y, w, h) ||
+        place_random(client, x, y, w, h);
     g_assert(ret);
 
     /* get where the client should be */

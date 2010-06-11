@@ -308,13 +308,20 @@ void client_manage(Window window, ObPrompt *prompt)
     /* remove the client's border */
     XSetWindowBorderWidth(obt_display, self->window, 0);
 
-    /* adjust the frame to the client's size before showing or placing
-       the window */
+    /* set up the frame for its original dimensions before trying to place the
+       window */
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
     frame_adjust_client_area(self->frame);
 
     /* where the frame was placed is where the window was originally */
     place = self->area;
+
+    /* but make sure the width/height are valid */
+    {
+        gint l;
+        client_try_configure(self, &place.x, &place.y,
+                             &place.width, &place.height, &l, &l, FALSE);
+    }
 
     /* figure out placement for the window if the window is new */
     if (ob_state() == OB_STATE_RUNNING) {
@@ -334,7 +341,8 @@ void client_manage(Window window, ObPrompt *prompt)
                      "program + user specified" :
                      "BADNESS !?")))), place.width, place.height);
 
-        obplaced = place_client(self, &place.x, &place.y, settings);
+        obplaced = place_client(self, &place.x, &place.y,
+                                place.width, place.height, settings);
 
         /* watch for buggy apps that ask to be placed at (0,0) when there is
            a strut there */

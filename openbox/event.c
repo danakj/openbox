@@ -686,10 +686,10 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         obwin->mapped = FALSE;
     }
-    else if (um)
-        event_handle_unmanaged(um, e);
     else if (client)
         event_handle_client(client, e);
+    else if (um)
+        event_handle_unmanaged(um, e);
     else if (dockapp)
         event_handle_dockapp(dockapp, e);
     else if (dock)

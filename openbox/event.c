@@ -730,26 +730,6 @@ static void event_process(const XEvent *ec, gpointer data)
             client_fake_unmanage(c);
         }
     }
-    else if (e->type == ConfigureRequest) {
-        /* unhandled configure requests must be used to configure the
-           window directly */
-        XWindowChanges xwc;
-
-        xwc.x = e->xconfigurerequest.x;
-        xwc.y = e->xconfigurerequest.y;
-        xwc.width = e->xconfigurerequest.width;
-        xwc.height = e->xconfigurerequest.height;
-        xwc.border_width = e->xconfigurerequest.border_width;
-        xwc.sibling = e->xconfigurerequest.above;
-        xwc.stack_mode = e->xconfigurerequest.detail;
-
-        /* we are not to be held responsible if someone sends us an
-           invalid request! */
-        obt_display_ignore_errors(TRUE);
-        XConfigureWindow(obt_display, window,
-                         e->xconfigurerequest.value_mask, &xwc);
-        obt_display_ignore_errors(FALSE);
-    }
 #ifdef SYNC
     else if (obt_display_extension_sync &&
              e->type == obt_display_extension_sync_basep + XSyncAlarmNotify)
@@ -1806,6 +1786,7 @@ static void event_handle_dock(ObDock *s, XEvent *e)
 static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
 {
     Window w;
+    XWindowChanges xwc;
 
     switch (e->type) {
     case PropertyNotify:
@@ -1819,6 +1800,22 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
         w = window_top(um);
         unmanaged_destroy(um);
         window_manage(w);
+        break;
+    case ConfigureRequest:
+        xwc.x = e->xconfigurerequest.x;
+        xwc.y = e->xconfigurerequest.y;
+        xwc.width = e->xconfigurerequest.width;
+        xwc.height = e->xconfigurerequest.height;
+        xwc.border_width = e->xconfigurerequest.border_width;
+        xwc.sibling = e->xconfigurerequest.above;
+        xwc.stack_mode = e->xconfigurerequest.detail;
+
+        /* we are not to be held responsible if someone sends us an
+           invalid request! */
+        obt_display_ignore_errors(TRUE);
+        XConfigureWindow(obt_display, e->xconfigurerequest.window,
+                         e->xconfigurerequest.value_mask, &xwc);
+        obt_display_ignore_errors(FALSE);
         break;
     }
 }

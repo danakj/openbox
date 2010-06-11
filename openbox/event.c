@@ -161,7 +161,14 @@ void event_startup(gboolean reconfig)
 
 void event_shutdown(gboolean reconfig)
 {
+    GSList *it;
+
     if (reconfig) return;
+
+    for (it = ignore_serials; it; it = g_slist_next(it))
+        g_slice_free(ObSerialRange, it->data);
+    g_slist_free(ignore_serials);
+    ignore_serials = NULL;
 
 #ifdef USE_SM
     IceRemoveConnectionWatch(ice_watch, NULL);

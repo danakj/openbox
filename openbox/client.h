@@ -120,6 +120,8 @@ struct _ObClient
     gchar *wm_command;
     /*! The PID of the process which owns the window */
     pid_t pid;
+    /*! The opacity for the window. 0 is transparent, 0xffffffff is opaque */
+    guint32 alpha;
 
     /*! The application that created the window */
     gchar *name;
@@ -633,6 +635,8 @@ void client_update_strut(ObClient *self);
 void client_update_icons(ObClient *self);
 /*! Updates the window's icon geometry (where to iconify to/from) */
 void client_update_icon_geometry(ObClient *self);
+/*! Updates the window's opacity */
+void client_update_opacity(ObClient *client);
 
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).

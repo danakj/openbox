@@ -290,6 +290,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER);
 #endif
     supported[i++] = OBT_PROP_ATOM(NET_WM_PID);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY);
     supported[i++] = OBT_PROP_ATOM(NET_WM_PING);
 
     supported[i++] = OBT_PROP_ATOM(KDE_WM_CHANGE_STATE);

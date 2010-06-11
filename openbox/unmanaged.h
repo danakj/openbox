@@ -30,4 +30,6 @@ void unmanaged_destroy(ObUnmanaged *self);
 
 void unmanaged_destroy_all(void);
 
+void unmanaged_update_opacity(ObUnmanaged *self);
+
 #endif

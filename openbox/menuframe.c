@@ -136,7 +136,8 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
     window_set_abstract(MENUFRAME_AS_WINDOW(self),
                         &self->window,        /* top level window */
                         &self->layer,         /* stacking layer */
-                        &self->depth);        /* window depth */
+                        &self->depth,         /* window depth */
+                        NULL);                /* opacity */
 
     window_add(&self->window, MENUFRAME_AS_WINDOW(self));
     stacking_add(MENUFRAME_AS_WINDOW(self));

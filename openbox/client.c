@@ -253,10 +253,15 @@ void client_manage(Window window, ObPrompt *prompt)
     /* create the decoration frame for the client window */
     self->frame = frame_new(self);
 
+    /* this must occur after the frame exists, since we copy the opacity value
+       onto the frame */
+    client_update_opacity(self);
+
     window_set_abstract(CLIENT_AS_WINDOW(self),
                         &self->frame->window, /* top level window */
                         &self->layer,         /* stacking layer */
-                        &self->frame->depth); /* window depth */
+                        &self->frame->depth,  /* window depth */
+                        &self->alpha);        /* opacity */
 
     frame_grab_client(self->frame);
 
@@ -528,7 +533,8 @@ ObClient *client_fake_manage(Window window)
     window_set_abstract(CLIENT_AS_WINDOW(self),
                         &self->frame->window, /* top level window */
                         &self->layer,         /* stacking layer */
-                        &self->frame->depth); /* window depth */
+                        &self->frame->depth,  /* window depth */
+                        NULL);                /* opacity */
 
     frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
 
@@ -2249,6 +2255,21 @@ void client_update_icon_geometry(ObClient *self)
                      MAX(data[2],0), MAX(data[3],0));
         g_free(data);
     }
+}
+
+void client_update_opacity(ObClient *self)
+{
+    /* The alpha value is to be copied from the client onto its top-level
+       window for third-party compositing managers to see */
+    if (!OBT_PROP_GET32(self->window, NET_WM_WINDOW_OPACITY, CARDINAL,
+                        &self->alpha))
+    {
+        self->alpha = 0xffffffff;
+        OBT_PROP_ERASE(self->frame->window, NET_WM_WINDOW_OPACITY);
+    }
+    else
+        OBT_PROP_SET32(self->frame->window, NET_WM_WINDOW_OPACITY, CARDINAL,
+                       self->alpha);
 }
 
 static void client_get_session_ids(ObClient *self)

@@ -212,7 +212,8 @@ void focus_cycle_popup_startup(gboolean reconfig)
     window_set_abstract(INTERNAL_AS_WINDOW(popup),
                         &popup->bg,
                         &popup->layer,
-                        &popup->depth);
+                        &popup->depth,
+                        NULL);
 
     stacking_add(INTERNAL_AS_WINDOW(popup));
     window_add(&popup->bg, INTERNAL_AS_WINDOW(popup));

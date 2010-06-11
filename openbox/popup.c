@@ -61,7 +61,8 @@ ObPopup *popup_new(void)
     window_set_abstract(INTERNAL_AS_WINDOW(self),
                         &self->bg,      /* top level window */
                         &self->layer,   /* stacking layer */
-                        &self->depth);  /* window depth */
+                        &self->depth,   /* window depth */
+                        NULL);          /* opacity */
 
     stacking_add(INTERNAL_AS_WINDOW(self));
     window_add(&self->bg, INTERNAL_AS_WINDOW(self));

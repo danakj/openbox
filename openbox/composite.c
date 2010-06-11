@@ -562,6 +562,9 @@ static gboolean composite(gpointer data)
         w = win->area.width + win->border * 2;
         h = win->area.height + win->border * 2;
 
+        if (win->alpha && *win->alpha < 0xffffffff)
+            glColor4ui(0xffffffff, 0xffffffff, 0xffffffff, *win->alpha);
+
         glBegin(GL_QUADS);
         glTexCoord2f(0, 0);
         glVertex3f(x, y, 0.0);
@@ -572,6 +575,10 @@ static gboolean composite(gpointer data)
         glTexCoord2f(1, 0);
         glVertex3f(x + w, y, 0.0);
         glEnd();
+
+        if (win->alpha && *win->alpha < 0xffffffff)
+            glColor4f(1.0, 1.0, 1.0, 1.0);
+
         cglXReleaseTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
     }
 
@@ -579,7 +586,7 @@ static gboolean composite(gpointer data)
     glFinish();
 
     if (ob_comp_indirect)
-        g_usleep(5000);
+        g_usleep(1000);
 
 #ifdef DEBUG
     {

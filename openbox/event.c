@@ -1754,6 +1754,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 moveresize_end(FALSE);
             client_update_sync_request_counter(client);
         }
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY))
+            client_update_opacity(client);
 #endif
         break;
     case ColormapNotify:
@@ -1806,6 +1808,10 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
     Window w;
 
     switch (e->type) {
+    case PropertyNotify:
+        if (e->xproperty.atom == OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY))
+            unmanaged_update_opacity(um);
+        break;
     case DestroyNotify:
         unmanaged_destroy(um);
         break;

@@ -20,13 +20,14 @@
 #include "composite.h"
 #include "window.h"
 #include "obt/display.h"
+#include "obt/prop.h"
 
 struct _ObUnmanaged {
     ObWindow super;
-    Window win;
+    Window window;
     ObStackingLayer layer;
     gint depth;
-
+    guint32 alpha;
 };
 
 static GSList *unmanaged_list = NULL;
@@ -44,16 +45,22 @@ ObUnmanaged* unmanaged_new(Window w)
         return NULL;
 
     self = window_new(OB_WINDOW_CLASS_UNMANAGED, ObUnmanaged);
-    self->win = w;
+    self->window = w;
     self->layer = OB_STACKING_LAYER_ALL;
     self->depth = at.depth;
+    self->alpha = 0xffffffff;
+
+    XSelectInput(obt_display, self->window, PropertyChangeMask);
+
+    unmanaged_update_opacity(self);
     
     window_set_abstract(UNMANAGED_AS_WINDOW(self),
-                        &self->win,
+                        &self->window,
                         &self->layer,
-                        &self->depth);
+                        &self->depth,
+                        &self->alpha);
 
-    window_add(&self->win, UNMANAGED_AS_WINDOW(self));
+    window_add(&self->window, UNMANAGED_AS_WINDOW(self));
     stacking_add(UNMANAGED_AS_WINDOW(self));
     unmanaged_list = g_slist_prepend(unmanaged_list, self);
 
@@ -62,10 +69,12 @@ ObUnmanaged* unmanaged_new(Window w)
 
 void unmanaged_destroy(ObUnmanaged *self)
 {
+    XSelectInput(obt_display, self->window, NoEventMask);
+
     window_cleanup(UNMANAGED_AS_WINDOW(self));
     unmanaged_list = g_slist_remove(unmanaged_list, self);
     stacking_remove(UNMANAGED_AS_WINDOW(self));
-    window_remove(self->win);
+    window_remove(self->window);
     window_free(UNMANAGED_AS_WINDOW(self));
 }
 
@@ -73,4 +82,11 @@ void unmanaged_destroy_all(void)
 {
     while (unmanaged_list)
         unmanaged_destroy(unmanaged_list->data);
+}
+
+void unmanaged_update_opacity(ObUnmanaged *self)
+{
+    if (!OBT_PROP_GET32(self->window, NET_WM_WINDOW_OPACITY, CARDINAL,
+                        &self->alpha))
+        self->alpha = 0xffffffff;
 }

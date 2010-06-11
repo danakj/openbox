@@ -64,11 +64,15 @@ ObWindow* window_new_size(ObWindowClass type, gsize size)
 void window_set_abstract(ObWindow *self,
                          const Window *top,
                          const ObStackingLayer *layer,
-                         const int *depth)
+                         const int *depth,
+                         const guint32 *alpha)
 {
+    g_assert(!self->top && !self->layer && !self->depth && !self->alpha);
+
     self->top = top;
     self->layer = layer;
     self->depth = depth;
+    self->alpha = alpha;
 
     /* set up any things in ObWindow that require use of the abstract pointers
        now */
@@ -126,9 +130,10 @@ ObInternalWindow* window_internal_new(Window window, int depth)
     self->layer = OB_STACKING_LAYER_INTERNAL;
     self->depth = depth;
     window_set_abstract(INTERNAL_AS_WINDOW(self),
-                        &self->window,
-                        &self->layer,
-                        &self->depth);
+                        &self->window, /* top-most window */
+                        &self->layer,  /* stacking layer */
+                        &self->depth,  /* window depth */
+                        NULL);         /* opacity */
     return self;
 }
 

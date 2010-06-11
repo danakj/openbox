@@ -112,7 +112,8 @@ void dock_startup(gboolean reconfig)
     window_set_abstract(DOCK_AS_WINDOW(dock),
                         &dock->frame,         /* top level window */
                         &config_dock_layer,   /* stacking layer */
-                        &dock->depth);        /* window depth */
+                        &dock->depth,         /* window depth */
+                        NULL);
 
     window_add(&dock->frame, DOCK_AS_WINDOW(dock));
     stacking_add(DOCK_AS_WINDOW(dock));

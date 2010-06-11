@@ -55,9 +55,12 @@ struct _ObWindow {
     const Window *top;
     /*! Points to the stacking layer for the ObWindow */
     const ObStackingLayer *layer;
-    /*! Points to the position and size occupied by the ObWindow */
     /*! Points to the depth of the ObWindow */
     const int *depth;
+    /*! Points to the alpha the ObWindow.
+      0xffffffff is completely transparent, 0 is opaque.  If this is NULL,
+      then the window will be considered opaque. */
+    const guint32 *alpha;
 
 #ifdef USE_COMPOSITING
     GLuint texture;
@@ -114,7 +117,8 @@ ObWindow* window_new_size(ObWindowClass type, gsize size);
 void      window_set_abstract(ObWindow *self,
                               const Window *top,
                               const ObStackingLayer *layer,
-                              const int *depth);
+                              const int *depth,
+                              const guint32 *alpha);
 /*! A subclass of ObWindow must call this when it is going to be destroying
   itself, but _before_ it destroys the members it sets in
   window_set_abstract() */

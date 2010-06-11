@@ -1672,7 +1672,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 break;
         }
 
-        msgtype = e->xproperty.atom;
         if (msgtype == XA_WM_NORMAL_HINTS) {
             int x, y, w, h, lw, lh;
 

@@ -371,6 +371,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                                                      (gpointer) settings);
             g_free(name);
             g_free(class);
+            g_free(type_str);
             g_free(role);
             g_free(title);
             name = class = role = title = NULL;

@@ -26,16 +26,25 @@
 struct _ObWindow;
 
 extern Window composite_overlay;
+/*! The atom for the selection we hold on the screen to claim ourselves as the
+  current composite manager */
+extern Atom composite_cm_atom;
 
 void composite_startup(gboolean reconfig);
 void composite_shutdown(gboolean reconfig);
 
-/*! Draw everything */
-void composite(void);
+/*! Turn composite on */
+gboolean composite_enable(void);
+/*! Turn composite off */
+void composite_disable(void);
 
-/*! Turn composite redirection on or off for a window */
-void composite_redir(struct _ObWindow *w, gboolean on);
 /*! Called when the screen changes its size */
 void composite_resize(void);
+
+void composite_window_setup(struct _ObWindow *w);
+void composite_window_cleanup(struct _ObWindow *w);
+
+/*! Called when a window's pixmaps become invalid and need to be destroyed */
+void composite_window_invalid(struct _ObWindow *w);
 
 #endif

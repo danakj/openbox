@@ -678,18 +678,8 @@ static void event_process(const XEvent *ec, gpointer data)
             obwin->mapped = TRUE;
         }
 
-        if (pixchange) {
-#ifdef USE_COMPOSITING
-            if (obwin->gpixmap != None) {
-                glXDestroyGLXPixmap(obt_display, obwin->gpixmap);
-                obwin->gpixmap = None;
-            }
-            if (obwin->pixmap != None) {
-                XFreePixmap(obt_display, obwin->pixmap);
-                obwin->pixmap = None;
-            }
-#endif
-        }
+        if (pixchange)
+            composite_window_invalid(obwin);
     } else if ((e->type == UnmapNotify) && obwin &&
                obwin->type != OB_WINDOW_CLASS_PROMPT &&
                e->xunmap.window == window_top(obwin))
@@ -819,8 +809,15 @@ static void event_handle_root(XEvent *e)
 
     switch(e->type) {
     case SelectionClear:
-        ob_debug("Another WM has requested to replace us. Exiting.");
-        ob_exit_replace();
+        if (e->xselectionclear.selection == screen_wm_sn_atom) {
+            ob_debug("Another WM has requested to replace us. Exiting.");
+            ob_exit_replace();
+        }
+        else if (e->xselectionclear.selection == composite_cm_atom) {
+            ob_debug("Another composite manager has requested to replace us. Disabling composite.");
+            composite_disable();
+            config_comp = FALSE;
+        }
         break;
 
     case ClientMessage:
@@ -870,7 +867,6 @@ static void event_handle_root(XEvent *e)
         XRRUpdateConfiguration(e);
 #endif
         screen_resize();
-        composite_resize();
         break;
     default:
         ;

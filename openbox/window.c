@@ -73,19 +73,12 @@ void window_set_abstract(ObWindow *self,
     /* set up any things in ObWindow that require use of the abstract pointers
        now */
 
-#ifdef USE_COMPOSITING
-    if (self->type != OB_WINDOW_CLASS_PROMPT) {
-        self->damage = XDamageCreate(obt_display, window_top(self),
-                                     XDamageReportNonEmpty);
-    }
-#endif
-
-    composite_redir(self, TRUE);
+    composite_window_setup(self);
 }
 
 void window_cleanup(ObWindow *self)
 {
-    composite_redir(self, FALSE);
+    composite_window_cleanup(self);
 }
 
 void window_free(ObWindow *self)
@@ -93,25 +86,22 @@ void window_free(ObWindow *self)
     /* The abstract pointers must not be used here, they are likely invalid
        by now ! */
 
-#ifdef USE_COMPOSITING
-    if (self->type != OB_WINDOW_CLASS_PROMPT) {
-        if (self->damage)
-            XDamageDestroy(obt_display, self->damage);
-        if (self->gpixmap)
-            glXDestroyGLXPixmap(obt_display, self->gpixmap);
-        if (self->pixmap)
-            XFreePixmap(obt_display, self->pixmap);
-        if (self->texture)
-            glDeleteTextures(1, &self->texture);
-    }
-#endif
-
     g_slice_free1(self->size, self);
 }
 
 ObWindow* window_find(Window xwin)
 {
     return g_hash_table_lookup(window_map, &xwin);
+}
+
+void wfe(gpointer k, gpointer v, gpointer data)
+{
+    ((ObWindowForeachFunc)data)(v);
+}
+
+void window_foreach(ObWindowForeachFunc func)
+{
+    g_hash_table_foreach(window_map, wfe, func);
 }
 
 void window_add(Window *xwin, ObWindow *win)

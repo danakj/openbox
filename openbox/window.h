@@ -125,6 +125,10 @@ ObWindow* window_find  (Window xwin);
 void      window_add   (Window *xwin, ObWindow *win);
 void      window_remove(Window xwin);
 
+typedef void (*ObWindowForeachFunc)(ObWindow *w);
+
+void      window_foreach(ObWindowForeachFunc func);
+
 #define window_top(w) (*((ObWindow*)w)->top)
 #define window_layer(w) (*((ObWindow*)w)->layer)
 #define window_area(w) (*((ObWindow*)w)->area)

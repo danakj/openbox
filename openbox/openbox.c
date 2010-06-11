@@ -304,11 +304,12 @@ gint main(gint argc, gchar **argv)
                anything that calls stacking_add */
             sn_startup(reconfigure);
             window_startup(reconfigure);
+            composite_startup(reconfigure);
             focus_startup(reconfigure);
+            screen_startup(reconfigure);
             focus_cycle_startup(reconfigure);
             focus_cycle_indicator_startup(reconfigure);
             focus_cycle_popup_startup(reconfigure);
-            screen_startup(reconfigure);
             grab_startup(reconfigure);
             group_startup(reconfigure);
             ping_startup(reconfigure);
@@ -320,7 +321,12 @@ gint main(gint argc, gchar **argv)
             menu_frame_startup(reconfigure);
             menu_startup(reconfigure);
             prompt_startup(reconfigure);
-            composite_startup(reconfigure);
+
+            /* turn compositing on/off */
+            if (!config_comp)
+                composite_disable();
+            else
+                config_comp = composite_enable();
 
             /* do this after everything is started so no events will get
                missed */
@@ -389,7 +395,6 @@ gint main(gint argc, gchar **argv)
             if (!reconfigure)
                 window_unmanage_all();
 
-            composite_shutdown(reconfigure);
             prompt_shutdown(reconfigure);
             menu_shutdown(reconfigure);
             menu_frame_shutdown(reconfigure);
@@ -401,11 +406,12 @@ gint main(gint argc, gchar **argv)
             ping_shutdown(reconfigure);
             group_shutdown(reconfigure);
             grab_shutdown(reconfigure);
-            screen_shutdown(reconfigure);
             focus_cycle_popup_shutdown(reconfigure);
             focus_cycle_indicator_shutdown(reconfigure);
             focus_cycle_shutdown(reconfigure);
+            screen_shutdown(reconfigure);
             focus_shutdown(reconfigure);
+            composite_shutdown(reconfigure);
             window_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);

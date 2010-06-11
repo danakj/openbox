@@ -67,6 +67,7 @@ ObDesktopLayout screen_desktop_layout;
 gchar         **screen_desktop_names;
 Window          screen_support_win;
 Time            screen_desktop_user_time = CurrentTime;
+Atom            screen_wm_sn_atom = None;
 
 static Size     screen_physical_size;
 static guint    screen_old_desktop;
@@ -91,15 +92,14 @@ static gboolean      desktop_popup_perm;
 static gboolean replace_wm(void)
 {
     gchar *wm_sn;
-    Atom wm_sn_atom;
     Window current_wm_sn_owner;
     Time timestamp;
 
     wm_sn = g_strdup_printf("WM_S%d", ob_screen);
-    wm_sn_atom = XInternAtom(obt_display, wm_sn, FALSE);
+    screen_wm_sn_atom = XInternAtom(obt_display, wm_sn, FALSE);
     g_free(wm_sn);
 
-    current_wm_sn_owner = XGetSelectionOwner(obt_display, wm_sn_atom);
+    current_wm_sn_owner = XGetSelectionOwner(obt_display, screen_wm_sn_atom);
     if (current_wm_sn_owner == screen_support_win)
         current_wm_sn_owner = None;
     if (current_wm_sn_owner) {
@@ -121,10 +121,12 @@ static gboolean replace_wm(void)
 
     timestamp = event_time();
 
-    XSetSelectionOwner(obt_display, wm_sn_atom, screen_support_win,
+    XSetSelectionOwner(obt_display, screen_wm_sn_atom, screen_support_win,
                        timestamp);
 
-    if (XGetSelectionOwner(obt_display, wm_sn_atom) != screen_support_win) {
+    if (XGetSelectionOwner(obt_display, screen_wm_sn_atom) !=
+        screen_support_win)
+    {
         g_message(_("Could not acquire window manager selection on screen %d"),
                   ob_screen);
         return FALSE;
@@ -155,7 +157,7 @@ static gboolean replace_wm(void)
 
     /* Send client message indicating that we are now the WM */
     obt_prop_message(ob_screen, obt_root(ob_screen), OBT_PROP_ATOM(MANAGER),
-                     timestamp, wm_sn_atom, screen_support_win, 0, 0,
+                     timestamp, screen_wm_sn_atom, screen_support_win, 0, 0,
                      SubstructureNotifyMask);
 
     return TRUE;
@@ -173,7 +175,7 @@ gboolean screen_annex(void)
     attrib.event_mask = PropertyChangeMask;
     screen_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
                                        -100, -100, 1, 1, 0,
-                                       CopyFromParent, InputOutput,
+                                       CopyFromParent, InputOnly,
                                        CopyFromParent,
                                        CWEventMask | CWOverrideRedirect,
                                        &attrib);
@@ -503,6 +505,7 @@ void screen_resize(void)
 
     screen_update_areas();
     dock_configure();
+    composite_resize();
 
     for (it = client_list; it; it = g_list_next(it))
         client_move_onscreen(it->data, FALSE);

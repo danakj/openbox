@@ -40,6 +40,9 @@ extern gboolean screen_showing_desktop;
 extern Window screen_support_win;
 /*! The last time at which the user changed desktops */
 extern Time screen_desktop_user_time;
+/*! The atom for the selection we hold on the screen to claim ourselves as the
+  current window manager */
+extern Atom screen_wm_sn_atom;
 
 typedef struct ObDesktopLayout {
     ObOrientation orientation;

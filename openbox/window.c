@@ -21,6 +21,8 @@
 #include "config.h"
 #include "dock.h"
 #include "client.h"
+#include "unmanaged.h"
+#include "composite.h"
 #include "frame.h"
 #include "openbox.h"
 #include "prompt.h"
@@ -248,4 +250,5 @@ void window_unmanage_all(void)
 {
     dock_unmanage_all();
     client_unmanage_all();
+    unmanaged_destroy_all();
 }

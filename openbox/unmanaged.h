@@ -28,4 +28,6 @@ typedef struct _ObUnmanaged ObUnmanaged;
 ObUnmanaged* unmanaged_new(Window w);
 void unmanaged_destroy(ObUnmanaged *self);
 
+void unmanaged_destroy_all(void);
+
 #endif

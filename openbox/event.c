@@ -38,6 +38,7 @@
 #include "moveresize.h"
 #include "group.h"
 #include "stacking.h"
+#include "composite.h"
 #include "unmanaged.h"
 #include "ping.h"
 #include "obt/display.h"
@@ -869,6 +870,7 @@ static void event_handle_root(XEvent *e)
         XRRUpdateConfiguration(e);
 #endif
         screen_resize();
+        composite_resize();
         break;
     default:
         ;

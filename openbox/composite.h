@@ -20,63 +20,22 @@
 #ifndef __composite_h
 #define __composite_h
 
-#ifdef USE_COMPOSITING
+#include <X11/Xlib.h>
 #include <glib.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
-
-#include "geom.h"
 
 struct _ObWindow;
 
-#define MAX_DEPTH 32
-
-typedef GLXPixmap (*CreatePixmapT)(Display *display,
-                                   GLXFBConfig config,
-                                   int attribute,
-                                   int *value);
-
-typedef void (*BindTexImageT)(Display *display,
-                              GLXDrawable drawable,
-                              int buffer,
-                              int *attriblist);
-
-typedef void (*ReleaseTexImageT)(Display *display,
-                                 GLXDrawable drawable,
-                                 int buffer);
-
-typedef GLXFBConfig *(*GetFBConfigsT) (Display *display,
-                                       int screen,
-                                       int *nElements);
-
-typedef int (*GetFBConfigAttribT) (Display *display,
-                                   GLXFBConfig config,
-                                   int attribute,
-                                   int *value);
-
-struct ObCompositor {
-    CreatePixmapT CreatePixmap;
-    BindTexImageT BindTexImage;
-    ReleaseTexImageT ReleaseTexImage;
-    GetFBConfigsT GetFBConfigs;
-    GetFBConfigAttribT GetFBConfigAttrib;
-
-    Window overlay;
-
-    GLXContext ctx;
-    struct ObCompositeFBConfig {
-        GLXFBConfig fbc; /* the fbconfig */
-        gint tf;         /* texture format */
-    } PixmapConfig[MAX_DEPTH + 1]; // need a [32]
-
-    gboolean need_redraw;
-    const Rect *screendims;
-};
-#endif
+extern Window composite_overlay;
 
 void composite_startup(gboolean reconfig);
 void composite_shutdown(gboolean reconfig);
-Window composite_overlay(void);
+
+/*! Draw everything */
+void composite(void);
+
+/*! Turn composite redirection on or off for a window */
 void composite_redir(struct _ObWindow *w, gboolean on);
+/*! Called when the screen changes its size */
+void composite_resize(void);
 
 #endif

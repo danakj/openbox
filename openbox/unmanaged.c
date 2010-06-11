@@ -29,12 +29,14 @@ struct _ObUnmanaged {
 
 };
 
+static GSList *unmanaged_list = NULL;
+
 ObUnmanaged* unmanaged_new(Window w)
 {
     XWindowAttributes at;
     ObUnmanaged *self;
 
-    if (w == composite_overlay())
+    if (w == composite_overlay)
         return NULL;
     if (!XGetWindowAttributes(obt_display, w, &at))
         return NULL;        
@@ -53,6 +55,7 @@ ObUnmanaged* unmanaged_new(Window w)
 
     window_add(&self->win, UNMANAGED_AS_WINDOW(self));
     stacking_add(UNMANAGED_AS_WINDOW(self));
+    unmanaged_list = g_slist_prepend(unmanaged_list, self);
 
     return self;
 }
@@ -60,7 +63,14 @@ ObUnmanaged* unmanaged_new(Window w)
 void unmanaged_destroy(ObUnmanaged *self)
 {
     window_cleanup(UNMANAGED_AS_WINDOW(self));
+    unmanaged_list = g_slist_remove(unmanaged_list, self);
     stacking_remove(UNMANAGED_AS_WINDOW(self));
     window_remove(self->win);
     window_free(UNMANAGED_AS_WINDOW(self));
+}
+
+void unmanaged_destroy_all(void)
+{
+    while (unmanaged_list)
+        unmanaged_destroy(unmanaged_list->data);
 }

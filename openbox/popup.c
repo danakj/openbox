@@ -148,6 +148,7 @@ static gboolean popup_show_timeout(gpointer data)
     self->delay_mapped = FALSE;
     self->delay_timer = 0;
 
+    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 

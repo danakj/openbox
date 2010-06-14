@@ -2079,6 +2079,7 @@ static gboolean focus_delay_func(gpointer data)
     if (client_focus(d->client) && config_focus_raise)
         stacking_raise(CLIENT_AS_WINDOW(d->client));
     event_curtime = old;
+    XFlush(obt_display);
     return FALSE; /* no repeat */
 }
 
@@ -2091,6 +2092,7 @@ static gboolean unfocus_delay_func(gpointer data)
     event_curserial = d->serial;
     focus_nothing();
     event_curtime = old;
+    XFlush(obt_display);
     return FALSE; /* no repeat */
 }
 

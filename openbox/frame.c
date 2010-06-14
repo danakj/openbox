@@ -1663,6 +1663,7 @@ static gboolean flash_timeout(gpointer data)
         self->focused = FALSE;
     }
 
+    XFlush(obt_display);
     return TRUE; /* go again */
 }
 
@@ -1760,11 +1761,11 @@ static gboolean frame_animate_iconify(gpointer p)
     }
 
     XMoveResizeWindow(obt_display, self->window, x, y, w, h);
-    XFlush(obt_display);
 
     if (time == 0)
         frame_end_iconify_animation(self);
 
+    XFlush(obt_display);
     return time > 0; /* repeat until we're out of time */
 }
 

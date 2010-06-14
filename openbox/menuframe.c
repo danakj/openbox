@@ -1158,6 +1158,7 @@ static gboolean submenu_show_timeout(gpointer data)
 {
     g_assert(menu_frame_visible);
     menu_entry_frame_show_submenu((ObMenuEntryFrame*)data);
+    XFlush(obt_display);
     return FALSE;
 }
 
@@ -1165,6 +1166,7 @@ static gboolean submenu_hide_timeout(gpointer data)
 {
     g_assert(menu_frame_visible);
     menu_frame_hide((ObMenuFrame*)data);
+    XFlush(obt_display);
     return FALSE;
 }
 

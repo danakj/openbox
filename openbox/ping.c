@@ -148,6 +148,7 @@ static gboolean ping_timeout(gpointer data)
 
     ++t->waiting;
 
+    XFlush(obt_display);
     return TRUE; /* repeat */
 }
 

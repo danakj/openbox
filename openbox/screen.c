@@ -940,6 +940,7 @@ static gboolean hide_desktop_popup_func(gpointer data)
 {
     pager_popup_hide(desktop_popup);
     desktop_popup_timer = 0;
+    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 

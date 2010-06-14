@@ -190,7 +190,7 @@ ObFrame *frame_new(ObClient *client)
 
     /* make sure the size will be different the first time, so the extent hints
        will be set */
-    STRUT_SET(self->size, -1, -1, -1, -1);
+    STRUT_SET(self->oldsize, -1, -1, -1, -1);
 
     set_theme_statics(self);
 
@@ -330,10 +330,6 @@ void frame_adjust_shape(ObFrame *self)
 void frame_adjust_area(ObFrame *self, gboolean moved,
                        gboolean resized, gboolean fake)
 {
-    Strut oldsize;
-
-    oldsize = self->size;
-
     if (resized) {
         /* do this before changing the frame's status like max_horz max_vert */
         frame_adjust_cursors(self);
@@ -849,7 +845,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             frame_adjust_shape(self);
         }
 
-        if (!STRUT_EQUAL(self->size, oldsize)) {
+        if (!STRUT_EQUAL(self->size, self->oldsize)) {
             gulong vals[4];
             vals[0] = self->size.left;
             vals[1] = self->size.right;
@@ -859,6 +855,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                             CARDINAL, vals, 4);
             OBT_PROP_SETA32(self->client->window, KDE_NET_WM_FRAME_STRUT,
                             CARDINAL, vals, 4);
+            self->oldsize = self->size;
         }
 
         /* if this occurs while we are focus cycling, the indicator needs to

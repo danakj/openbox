@@ -84,7 +84,8 @@ struct _ObFrame
 
     Window    window;
 
-    Strut     size;
+    Strut     size;    /* the size of the frame */
+    Strut     oldsize; /* the size of the frame last told to the client */
     Rect      area;
     gboolean  visible;
 

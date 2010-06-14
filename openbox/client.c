@@ -245,11 +245,6 @@ void client_manage(Window window, ObPrompt *prompt)
        that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
 
-    /* now we have all of the window's information so we can set this up.
-       do this before creating the frame, so it can tell that we are still
-       mapping and doesn't go applying things right away */
-    client_setup_decor_and_functions(self, FALSE);
-
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically, unless we are managing
        an internal ObPrompt window  */
@@ -520,11 +515,11 @@ ObClient *client_fake_manage(Window window)
        uses too. this returns a shallow copy that needs to be freed */
     settings = client_get_settings_state(self);
 
-    client_setup_decor_and_functions(self, FALSE);
-
     /* create the decoration frame for the client window and adjust its size */
     self->frame = frame_new(self);
-    frame_adjust_area(self->frame, FALSE, TRUE, TRUE);
+
+    client_apply_startup_state(self, self->area.x, self->area.y,
+                               self->area.width, self->area.height);
 
     ob_debug("gave extents left %d right %d top %d bottom %d",
              self->frame->size.left, self->frame->size.right,
@@ -1103,8 +1098,15 @@ static void client_get_all(ObClient *self, gboolean real)
     client_get_mwm_hints(self);
     /* this can change the mwmhints for special cases */
     client_get_type_and_transientness(self);
-    client_get_state(self);
     client_update_normal_hints(self);
+
+    /* set up the decor/functions before getting the state.  the states may
+       affect which functions are available, but we want to know the maximum
+       decor/functions are available to this window, so we can then apply them
+       in client_apply_startup_state() */
+    client_setup_decor_and_functions(self, FALSE);
+
+    client_get_state(self);
 
     /* get the session related properties, these can change decorations
        from per-app settings */
@@ -2734,8 +2736,6 @@ static void client_apply_startup_state(ObClient *self,
 
     if (iconic)
         client_iconify(self, TRUE, FALSE, TRUE);
-    if (fullscreen)
-        client_fullscreen(self, TRUE);
     if (undecorated)
         client_set_undecorated(self, TRUE);
     if (shaded)
@@ -2749,6 +2749,10 @@ static void client_apply_startup_state(ObClient *self,
         client_maximize(self, TRUE, 2);
     else if (max_horz)
         client_maximize(self, TRUE, 1);
+
+    /* fullscreen removes the ability to apply other states */
+    if (fullscreen)
+        client_fullscreen(self, TRUE);
 
     /* if the window hasn't been configured yet, then do so now, in fact the
        x,y,w,h may _not_ be the same as the area rect, which can end up

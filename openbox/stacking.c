@@ -571,17 +571,16 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
 {
     GList *it;
     gboolean occluded = FALSE;
-    gboolean found = FALSE;
 
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
         return occluded;
 
-    for (it = stacking_list; it;
-         it = (found ? g_list_previous(it) :g_list_next(it)))
+    for (it = g_list_previous(g_list_find(stacking_list, client)); it;
+         it = g_list_previous(it))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found && !c->iconic &&
+            if (!c->iconic &&
                 (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
                  c->desktop == client->desktop) &&
                 !client_search_transient(client, c))
@@ -602,8 +601,6 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
                         break; /* we past its layer */
                 }
             }
-            else if (c == client)
-                found = TRUE;
         }
     return occluded;
 }
@@ -615,16 +612,16 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
 {
     GList *it;
     gboolean occludes = FALSE;
-    gboolean found = FALSE;
 
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
         return occludes;
 
-    for (it = stacking_list; it; it = g_list_next(it))
+    for (it = g_list_next(g_list_find(stacking_list, client));
+         it; it = g_list_next(it))
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            if (found && !c->iconic &&
+            if (!c->iconic &&
                 (c->desktop == DESKTOP_ALL || client->desktop == DESKTOP_ALL ||
                  c->desktop == client->desktop) &&
                 !client_search_transient(c, client))
@@ -645,8 +642,6 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
                         break; /* we past its layer */
                 }
             }
-            else if (c == client)
-                found = TRUE;
         }
     return occludes;
 }

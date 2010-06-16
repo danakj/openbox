@@ -9,6 +9,6 @@ xlibs=@X_LIBS@
 Name: Obt
 Description: Openbox Toolkit Library
 Version: @OBT_VERSION@
-Requires: glib-2.0
+Requires: glib-2.0 libxml-2.0
 Libs: -L${libdir} -lobt ${xlibs}
 Cflags: -I${includedir}/openbox/@OBT_VERSION@ ${xcflags}

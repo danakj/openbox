@@ -214,6 +214,7 @@ openbox_openbox_CPPFLAGS = \
 	$(PANGO_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(LIBSN_CFLAGS) \
+	$(XCOMPOSITE_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
@@ -225,6 +226,7 @@ openbox_openbox_LDADD = \
 	$(X_LIBS) \
 	$(XCURSOR_LIBS) \
 	$(LIBSN_LIBS) \
+	$(XCOMPOSITE_LIBS) \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \

@@ -128,11 +128,10 @@ gboolean obt_display_open(const char *display_name)
         if (XCompositeQueryExtension(d, &obt_display_extension_composite_basep,
                                      &junk))
         {
-            gint major = 0, minor = 2;
-            XCompositeQueryVersion(d, &major, &minor);
             /* Version 0.2 is the first version to have the
                XCompositeNameWindowPixmap() request. */
-            if (major > 0 || minor >= 2)
+            gint major = 0, minor = 2;
+            if (XCompositeQueryVersion(d, &major, &minor))
                 obt_display_extension_composite = TRUE;
         }
         if (!obt_display_extension_composite)

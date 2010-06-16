@@ -513,9 +513,13 @@ static gboolean composite(gpointer data)
             if (obt_display_error_occured) {
                 ob_debug_type(OB_DEBUG_CM,
                               "Error in XCompositeNameWindowPixmap for "
-                              "window 0x%x\n", window_top(win));
+                              "window 0x%x", window_top(win));
+                /* it can error but still return an ID, which will cause an
+                   error to occur if you try to free it etc */
                 if (win->pixmap) {
+                    obt_display_ignore_errors(TRUE);
                     XFreePixmap(obt_display, win->pixmap);
+                    obt_display_ignore_errors(FALSE);
                     win->pixmap = None;
                 }
             }
@@ -531,9 +535,13 @@ static gboolean composite(gpointer data)
                 GLX_TEXTURE_2D_EXT,
                 None
             };
+            obt_display_ignore_errors(TRUE);
             win->gpixmap = cglXCreatePixmap(obt_display,
                                             pixmap_config[d].fbc,
                                             win->pixmap, attribs);
+            obt_display_ignore_errors(FALSE);
+            if (obt_display_error_occured)
+                g_assert(0 && "ERROR CREATING GLX PIXMAP FROM NAMED PIXMAP");
         }
         if (win->gpixmap == None)
             continue;
@@ -542,7 +550,11 @@ static gboolean composite(gpointer data)
 #ifdef DEBUG
         gettimeofday(&start, NULL);
 #endif
+        obt_display_ignore_errors(TRUE);
         cglXBindTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT, NULL);
+        obt_display_ignore_errors(FALSE);
+        if (obt_display_error_occured)
+            g_assert(0 && "ERROR BINDING GLX PIXMAP");
 #ifdef DEBUG
         gettimeofday(&end, NULL);
         dif.tv_sec = end.tv_sec - start.tv_sec;
@@ -579,7 +591,11 @@ static gboolean composite(gpointer data)
         if (win->alpha && *win->alpha < 0xffffffff)
             glColor4f(1.0, 1.0, 1.0, 1.0);
 
+        obt_display_ignore_errors(TRUE);
         cglXReleaseTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
+        obt_display_ignore_errors(FALSE);
+        if (obt_display_error_occured)
+            g_assert(0 && "ERROR RELEASING GLX PIXMAP");
     }
 
     glXSwapBuffers(obt_display, composite_overlay);

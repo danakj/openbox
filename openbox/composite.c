@@ -36,8 +36,9 @@
 #include <glib.h>
 
 #ifdef USE_COMPOSITING
+#  include <GL/glew.h>
+#  include <GL/glxew.h>
 #  include <GL/gl.h>
-#  include <GL/glx.h>
 #endif
 #ifdef DEBUG
 #  include <sys/time.h>
@@ -49,27 +50,6 @@ Atom   composite_cm_atom = None;
 #ifdef USE_COMPOSITING
 #define MAX_DEPTH 32
 
-typedef GLXPixmap    (*CreatePixmapT)     (Display *display,
-                                           GLXFBConfig config,
-                                           int attribute,
-                                           int *value);
-typedef void        (*DestroyPixmapT)     (Display *display,
-                                           GLXPixmap pixmap);
-typedef void         (*BindTexImageT)     (Display *display,
-                                           GLXDrawable drawable,
-                                           int buffer,
-                                           int *attriblist);
-typedef void         (*ReleaseTexImageT)  (Display *display,
-                                           GLXDrawable drawable,
-                                           int buffer);
-typedef GLXFBConfig* (*GetFBConfigsT)     (Display *display,
-                                           int screen,
-                                           int *nElements);
-typedef int          (*GetFBConfigAttribT)(Display *display,
-                                           GLXFBConfig config,
-                                           int attribute,
-                                           int *value);
-
 typedef struct _ObCompositeFBConfig {
     GLXFBConfig fbc; /* the fbconfig */
     gint tf;         /* texture format */
@@ -79,13 +59,6 @@ typedef struct _ObCompositeFBConfig {
 static void composite_window_redir(struct _ObWindow *w);
 /*! Turn composite redirection off for a window */
 static void composite_window_unredir(struct _ObWindow *w);
-
-static CreatePixmapT cglXCreatePixmap = NULL;
-static DestroyPixmapT cglXDestroyPixmap = NULL;
-static BindTexImageT cglXBindTexImage = NULL;
-static ReleaseTexImageT cglXReleaseTexImage = NULL;
-static GetFBConfigsT cglXGetFBConfigs = NULL;
-static GetFBConfigAttribT cglXGetFBConfigAttrib = NULL;
 
 static GLXContext composite_ctx = NULL;
 static ObCompositeFBConfig pixmap_config[MAX_DEPTH + 1]; /* depth is index */
@@ -135,8 +108,8 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
         if (value != depth)
             continue;
 
-        cglXGetFBConfigAttrib(obt_display, in[i], GLX_ALPHA_SIZE, &alpha);
-        cglXGetFBConfigAttrib(obt_display, in[i], GLX_BUFFER_SIZE, &value);
+        glXGetFBConfigAttrib(obt_display, in[i], GLX_ALPHA_SIZE, &alpha);
+        glXGetFBConfigAttrib(obt_display, in[i], GLX_BUFFER_SIZE, &value);
 
         /* the buffer size should equal the depth or else the buffer size minus
            the alpha size should */
@@ -144,31 +117,31 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
 
         value = 0;
         if (depth == 32) {
-            cglXGetFBConfigAttrib(obt_display, in[i],
+            glXGetFBConfigAttrib(obt_display, in[i],
                                   GLX_BIND_TO_TEXTURE_RGBA_EXT, &value);
             rgba = TRUE;
         }
         if (!value) {
             if (rgba) continue; /* a different one has rgba, prefer that */
 
-            cglXGetFBConfigAttrib(obt_display, in[i],
+            glXGetFBConfigAttrib(obt_display, in[i],
                                   GLX_BIND_TO_TEXTURE_RGB_EXT, &value);
         }
         if (!value) // neither bind to texture?  no dice
             continue;
 
         /* get no doublebuffer if possible */
-        cglXGetFBConfigAttrib(obt_display, in[i], GLX_DOUBLEBUFFER, &value);
+        glXGetFBConfigAttrib(obt_display, in[i], GLX_DOUBLEBUFFER, &value);
         if (value && !db) continue;
         db = value;
 
         /* get the smallest stencil buffer */
-        cglXGetFBConfigAttrib(obt_display, in[i], GLX_STENCIL_SIZE, &value);
+        glXGetFBConfigAttrib(obt_display, in[i], GLX_STENCIL_SIZE, &value);
         if (value > stencil) continue;
         stencil = value;
 
         /* get the smallest depth buffer */
-        cglXGetFBConfigAttrib(obt_display, in[i], GLX_DEPTH_SIZE, &value);
+        glXGetFBConfigAttrib(obt_display, in[i], GLX_DEPTH_SIZE, &value);
         if (value > depthb) continue;
         depthb = value;
 
@@ -224,7 +197,6 @@ gboolean composite_enable(void)
     XserverRegion xr;
     XVisualInfo tmp, *vi;
     GLXFBConfig *fbcs;
-    const char *glstring;
 
     if (composite_enabled()) return TRUE;
 
@@ -235,112 +207,23 @@ gboolean composite_enable(void)
         g_message(
             _("Failed to enable composite. The %s extension is missing."),
             "XComposite");
+        composite_disable();
         return FALSE;
     }
     if (!obt_display_extension_damage) {
         g_message(
             _("Failed to enable composite. The %s extension is missing."),
             "XDamage");
+        composite_disable();
         return FALSE;
     }
     if (!obt_display_extension_fixes) {
         g_message(
             _("Failed to enable composite. The %s extension is missing."),
             "XFixes");
-        return FALSE;
-    }
-
-    /* Check for the required glX functions */
-
-    cglXCreatePixmap = (CreatePixmapT)
-        glXGetProcAddress((const unsigned char*)"glXCreatePixmap");
-    if (!cglXCreatePixmap) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXCreatePixmap");
-        return FALSE;
-    }
-    cglXDestroyPixmap = (DestroyPixmapT)
-        glXGetProcAddress((const unsigned char*)"glXDestroyPixmap");
-    if (!cglXDestroyPixmap) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXDestroyPixmap");
-        return FALSE;
-    }
-    cglXBindTexImage = (BindTexImageT)
-        glXGetProcAddress((const unsigned char*)"glXBindTexImageEXT");
-    if (!cglXBindTexImage) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXBindTexImage");
-        return FALSE;
-    }
-    cglXReleaseTexImage = (ReleaseTexImageT)
-        glXGetProcAddress((const unsigned char*)"glXReleaseTexImageEXT");
-    if (!cglXReleaseTexImage) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXReleaseTexImage");
-        return FALSE;
-    }
-    cglXGetFBConfigs = (GetFBConfigsT)glXGetProcAddress(
-        (const unsigned char*)"glXGetFBConfigs");
-    if (!cglXGetFBConfigs) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXGetFBConfigs");
-        return FALSE;
-    }
-    cglXGetFBConfigAttrib = (GetFBConfigAttribT)glXGetProcAddress(
-        (const unsigned char*)"glXGetFBConfigAttrib");
-    if (!cglXGetFBConfigAttrib) {
-        g_message(_("Failed to enable composite. %s unavailable."),
-                  "glXGetFBConfigAttrib");
-        return FALSE;
-    }
-
-    /* Check for required GLX extensions */
-
-    glstring = glXQueryExtensionsString(obt_display, ob_screen);
-    if (!strstr(glstring, "GLX_EXT_texture_from_pixmap")) {
-        g_message(_("Failed to enable composite. %s is not present."),
-                  "GLX_EXT_texture_from_pixmap");
-        return FALSE;
-    }
-
-    /* Check for FBconfigs */
-
-    fbcs = cglXGetFBConfigs(obt_display, ob_screen, &count);
-    if (!count) {
-        g_message(_("Failed to enable composite. No valid FBConfigs."));
-        return FALSE;
-    }
-    memset(&pixmap_config, 0, sizeof(pixmap_config));
-    for (i = 1; i < MAX_DEPTH + 1; i++)
-        get_best_fbcon(fbcs, count, i, &pixmap_config[i]);
-    if (count) XFree(fbcs);
-
-    /* Attempt to take over as composite manager.  There can only be one. */
-
-    if (!composite_annex()) {
-        g_message(_("Failed to enable composite. Another composite manager is running."));
-        return FALSE;
-    }
-
-    /* From here on, if initializing composite fails, make sure you call
-       composite_disable() ! */
-
-    /* Set up the overlay window */
-
-    composite_overlay = XCompositeGetOverlayWindow(obt_display,
-                                                   obt_root(ob_screen));
-    if (!composite_overlay) {
-        g_message(_("Failed to enable composite. Unable to get overlay window from X server"));
         composite_disable();
         return FALSE;
     }
-    xr = XFixesCreateRegion(obt_display, NULL, 0);
-    XFixesSetWindowShapeRegion(obt_display, composite_overlay, ShapeBounding,
-                               0, 0, 0);
-    XFixesSetWindowShapeRegion(obt_display, composite_overlay, ShapeInput,
-                               0, 0, xr);
-    XFixesDestroyRegion(obt_display, xr);
 
     /* Make sure the root window's visual is acceptable for our GLX needs
        and create a GLX context with it */
@@ -383,6 +266,65 @@ gboolean composite_enable(void)
         return FALSE;
     }
 
+    /* Attempt to take over as composite manager.  There can only be one. */
+
+    if (!composite_annex()) {
+        g_message(_("Failed to enable composite. Another composite manager is running."));
+        composite_disable();
+        return FALSE;
+    }
+
+    /* Set up the overlay window */
+
+    composite_overlay = XCompositeGetOverlayWindow(obt_display,
+                                                   obt_root(ob_screen));
+    if (!composite_overlay) {
+        g_message(_("Failed to enable composite. Unable to get overlay window from X server"));
+        composite_disable();
+        return FALSE;
+    }
+    xr = XFixesCreateRegion(obt_display, NULL, 0);
+    XFixesSetWindowShapeRegion(obt_display, composite_overlay, ShapeBounding,
+                               0, 0, 0);
+    XFixesSetWindowShapeRegion(obt_display, composite_overlay, ShapeInput,
+                               0, 0, xr);
+    XFixesDestroyRegion(obt_display, xr);
+
+    /* Need a current GL context before GLEW works. */
+
+    glXMakeCurrent(obt_display, composite_overlay, composite_ctx);
+
+    /* init GLEW */
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        g_message(_("Failed to enable composite.  GLEW init failed."));
+        composite_disable();
+        return FALSE;
+    }
+
+    /* Check for required GLX extensions */
+
+    if (!GLXEW_EXT_texture_from_pixmap) {
+        g_message(_("Failed to enable composite. %s is not present."),
+                  "GLX_EXT_texture_from_pixmap");
+        composite_disable();
+        return FALSE;
+    }
+
+    /* Check for FBconfigs */
+//XXX: Technically we should test for GL 1.3 before using this, but that
+//disqualifies some drivers that support parts of GL 1.3 yet report GL 1.2
+    fbcs = glXGetFBConfigs(obt_display, ob_screen, &count);
+    if (!count) {
+        g_message(_("Failed to enable composite. No valid FBConfigs."));
+        composite_disable();
+        return FALSE;
+    }
+    memset(&pixmap_config, 0, sizeof(pixmap_config));
+    for (i = 1; i < MAX_DEPTH + 1; i++)
+        get_best_fbcon(fbcs, count, i, &pixmap_config[i]);
+    if (count) XFree(fbcs);
+
     printf("Best visual for 24bpp was 0x%lx\n",
            (gulong)pixmap_config[24].fbc);
     printf("Best visual for 32bpp was 0x%lx\n",
@@ -393,7 +335,6 @@ gboolean composite_enable(void)
     /* register our screen redraw callback */
     composite_idle_source = g_idle_add(composite, NULL);
 
-    glXMakeCurrent(obt_display, composite_overlay, composite_ctx);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glXSwapBuffers(obt_display, composite_overlay);
     glMatrixMode(GL_PROJECTION);
@@ -536,9 +477,9 @@ static gboolean composite(gpointer data)
                 None
             };
             obt_display_ignore_errors(TRUE);
-            win->gpixmap = cglXCreatePixmap(obt_display,
-                                            pixmap_config[d].fbc,
-                                            win->pixmap, attribs);
+            win->gpixmap = glXCreatePixmap(obt_display,
+                                           pixmap_config[d].fbc,
+                                           win->pixmap, attribs);
             obt_display_ignore_errors(FALSE);
             if (obt_display_error_occured)
                 g_assert(0 && "ERROR CREATING GLX PIXMAP FROM NAMED PIXMAP");
@@ -551,7 +492,7 @@ static gboolean composite(gpointer data)
         gettimeofday(&start, NULL);
 #endif
         obt_display_ignore_errors(TRUE);
-        cglXBindTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT, NULL);
+        glXBindTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT, NULL);
         obt_display_ignore_errors(FALSE);
         if (obt_display_error_occured)
             g_assert(0 && "ERROR BINDING GLX PIXMAP");
@@ -592,7 +533,7 @@ static gboolean composite(gpointer data)
             glColor4f(1.0, 1.0, 1.0, 1.0);
 
         obt_display_ignore_errors(TRUE);
-        cglXReleaseTexImage(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
+        glXReleaseTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
         obt_display_ignore_errors(FALSE);
         if (obt_display_error_occured)
             g_assert(0 && "ERROR RELEASING GLX PIXMAP");
@@ -673,7 +614,7 @@ void composite_window_cleanup(ObWindow *w)
 void composite_window_invalid(ObWindow *w)
 {
     if (w->gpixmap) {
-        cglXDestroyPixmap(obt_display, w->gpixmap);
+        glXDestroyPixmap(obt_display, w->gpixmap);
         w->gpixmap = None;
     }
     if (w->pixmap) {

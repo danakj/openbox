@@ -27,8 +27,9 @@
 
 #ifdef USE_COMPOSITING
 #include <X11/extensions/Xdamage.h>
+#include <GL/glew.h>
+#include <GL/glxew.h>
 #include <GL/gl.h>
-#include <GL/glx.h>
 #endif
 
 typedef struct _ObWindow         ObWindow;

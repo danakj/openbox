@@ -246,6 +246,10 @@ if test "$enable_compositing" = yes; then
   AC_SUBST(XDAMAGE_CFLAGS)
   AC_SUBST(XDAMAGE_LIBS)
 
+  PKG_CHECK_MODULES(GLEW, [glew])
+  AC_SUBST(GLEW_CFLAGS)
+  AC_SUBST(GLEW_LIBS)
+
   AC_MSG_CHECKING(for GL_CFLAGS)
   AC_ARG_WITH(gl-cflags, [  --with-gl-cflags=CFLAGS ],
                          [GL_CFLAGS="$withval"],

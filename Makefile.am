@@ -162,6 +162,7 @@ obt_libobt_la_CPPFLAGS = \
 	$(XRENDER_CFLAGS) \
 	$(XDAMAGE_CFLAGS) \
 	$(XCOMPOSITE_CFLAGS) \
+        $(GLEW_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DG_LOG_DOMAIN=\"Obt\" \
@@ -179,6 +180,7 @@ obt_libobt_la_LIBADD = \
 	$(XRENDER_LIBS) \
 	$(XDAMAGE_LIBS) \
 	$(XCOMPOSITE_LIBS) \
+        $(GLEW_LIBS) \
 	$(GLIB_LIBS) \
 	$(XML_LIBS)
 obt_libobt_la_SOURCES = \
@@ -215,6 +217,7 @@ openbox_openbox_CPPFLAGS = \
 	$(GLIB_CFLAGS) \
 	$(LIBSN_CFLAGS) \
 	$(XCOMPOSITE_CFLAGS) \
+        $(GLEW_CFLAGS) \
 	$(XML_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DDATADIR=\"$(datadir)\" \
@@ -227,6 +230,7 @@ openbox_openbox_LDADD = \
 	$(XCURSOR_LIBS) \
 	$(LIBSN_LIBS) \
 	$(XCOMPOSITE_LIBS) \
+        $(GLEW_LIBS) \
 	$(XML_LIBS) \
 	$(EFENCE_LIBS) \
 	$(LIBINTL) \

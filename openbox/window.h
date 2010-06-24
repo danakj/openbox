@@ -48,7 +48,7 @@ typedef enum {
    struct */
 struct _ObWindow {
     ObWindowClass type;
-    gsize size;
+    gsize bytes;
 
     /* abstract values implemented by subclasses */
 

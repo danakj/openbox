@@ -56,7 +56,7 @@ ObWindow* window_new_size(ObWindowClass type, gsize size)
 
     g_assert(size >= sizeof(ObWindow));
     self = g_slice_alloc0(size);
-    self->size = size;
+    self->bytes = size;
     self->type = type;
     return self;
 }
@@ -90,7 +90,7 @@ void window_free(ObWindow *self)
     /* The abstract pointers must not be used here, they are likely invalid
        by now ! */
 
-    g_slice_free1(self->size, self);
+    g_slice_free1(self->bytes, self);
 }
 
 ObWindow* window_find(Window xwin)

@@ -30,6 +30,7 @@
 #include "frame.h"
 #include "event.h"
 #include "focus.h"
+#include "composite.h"
 #include "focus_cycle.h"
 #include "popup.h"
 #include "version.h"

@@ -649,8 +649,11 @@ static void composite_window_unredir(ObWindow *w)
 {
     if (!w->redir) return;
 
+    /* this call can cause a BadValue error */
+    obt_display_ignore_errors(TRUE);
     XCompositeUnredirectWindow(obt_display, window_redir(w),
                                CompositeRedirectManual);
+    obt_display_ignore_errors(FALSE);
     w->is_redir = FALSE;
 }
 

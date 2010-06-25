@@ -335,6 +335,14 @@ gboolean composite_enable(void)
     /* register our screen redraw callback */
     composite_idle_source = g_idle_add(composite, NULL);
 
+    //Attempt to enable vsync
+    if (GLXEW_EXT_swap_control) {
+        GLXDrawable drawable = glXGetCurrentDrawable();
+        glXSwapIntervalEXT(obt_display, drawable, 1);
+    } else {
+        ob_debug_type(OB_DEBUG_CM, "Vsync control not available.");
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glXSwapBuffers(obt_display, composite_overlay);
     glMatrixMode(GL_PROJECTION);

@@ -38,6 +38,9 @@ gboolean composite_enable(void);
 /*! Turn composite off */
 void composite_disable(void);
 
+/*! Flag need for a redraw */
+void composite_dirty(void);
+
 /*! Called when the screen changes its size */
 void composite_resize(void);
 

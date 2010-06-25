@@ -64,6 +64,7 @@ static GLXContext composite_ctx = NULL;
 static ObCompositeFBConfig pixmap_config[MAX_DEPTH + 1]; /* depth is index */
 static guint composite_idle_source = 0;
 static gboolean need_redraw = FALSE;
+static gboolean animating = FALSE;
 static Window composite_support_win = None;
 #ifdef DEBUG
 static gboolean composite_started = FALSE;
@@ -149,6 +150,11 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
     }
     out->fbc = best;
     out->tf = rgba ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT;
+}
+
+void composite_dirty(void)
+{
+    need_redraw = 1;
 }
 
 static gboolean composite_annex(void)
@@ -427,11 +433,12 @@ static gboolean composite(gpointer data)
     struct timeval start, end, dif;
     GList *it;
     ObWindow *win;
-    ObClient *client = NULL;
+    ObClient *client;
 
     if (!composite_enabled()) return FALSE;
 
-/*    if (!need_redraw) return FALSE; */
+    if (!animating && !need_redraw)
+        return animating;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -450,7 +457,7 @@ static gboolean composite(gpointer data)
             client = WINDOW_AS_CLIENT(win);
             if (!client->frame->visible)
                 continue;
-        }
+        } else client = NULL;
 
         d = window_depth(win);
 
@@ -638,8 +645,8 @@ static gboolean composite(gpointer data)
     }
 #endif
 
-    need_redraw = 0;
-    return TRUE;
+    need_redraw = FALSE;
+    return animating;
 }
 
 static void composite_window_redir(ObWindow *w)
@@ -674,8 +681,8 @@ void composite_window_setup(ObWindow *w)
 #endif
 
     obt_display_ignore_errors(TRUE);
-    w->damage = XDamageCreate(obt_display, window_top(w),
-                              XDamageReportNonEmpty);
+    w->damage = XDamageCreate(obt_display, window_redir(w),
+                              XDamageReportRawRectangles);
     obt_display_ignore_errors(FALSE);
     glGenTextures(1, &w->texture);
 
@@ -723,6 +730,7 @@ void composite_disable        (void)          {}
 void composite_window_setup   (ObWindow *w)   {}
 void composite_window_cleanup (ObWindow *w)   {}
 void composite_window_invalid (ObWindow *w)   {}
+void composite_dirty          (void)          {}
 
 void composite_enable(void)
 {

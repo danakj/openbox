@@ -232,6 +232,13 @@ static Window event_get_window(XEvent *e)
             window = None;
         } else
 #endif
+#ifdef USE_COMPOSITING
+        if (e->type == obt_display_extension_damage_basep + XDamageNotify)
+        {
+            XDamageNotifyEvent *d = (XDamageNotifyEvent *)e;
+            window = d->drawable;
+        } else
+#endif
             window = e->xany.window;
     }
     return window;
@@ -1757,6 +1764,7 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
 
     switch (e->type) {
     case ConfigureNotify:
+        composite_dirty();
         if (e->xconfigure.send_event) break;
 
         if (e->xconfigure.window == window_redir(wi)) {
@@ -1805,6 +1813,7 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
         break;
 
     case MapNotify:
+        composite_dirty();
         if (e->xmap.window == window_redir(wi)) {
             wi->mapped = TRUE;
             pixchange = TRUE;
@@ -1812,24 +1821,33 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
         }
         break;
     case UnmapNotify:
+        composite_dirty();
         if (e->xunmap.window == window_top(wi)) {
             wi->mapped = FALSE;
             used = TRUE;
         }
         break;
     default:
-#ifdef SHAPE
 #ifdef USE_COMPOSITING
+#ifdef SHAPE
         if (obt_display_extension_shape &&
             e->type == obt_display_extension_shape_basep + ShapeNotify)
         {
             XShapeEvent *s = (XShapeEvent*)e;
+            composite_dirty();
             if (s->window == window_redir(wi) && s->kind == ShapeBounding) {
                 window_adjust_redir_shape(wi);
                 used = FALSE; /* let other people get this event also */
             }
         }
 #endif
+        if (obt_display_extension_damage &&
+            e->type == obt_display_extension_damage_basep + XDamageNotify)
+        {
+            XDamageNotifyEvent *ev = (XDamageNotifyEvent *)e;
+            composite_dirty();
+            used = TRUE;
+        }
 #endif
     }
     if (pixchange)

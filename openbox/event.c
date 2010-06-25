@@ -203,6 +203,9 @@ static Window event_get_window(XEvent *e)
     case DestroyNotify:
         window = e->xdestroywindow.window;
         break;
+    case ReparentNotify:
+        window = e->xreparent.window;
+        break;
     case ConfigureRequest:
         window = e->xconfigurerequest.window;
         break;
@@ -636,11 +639,15 @@ static void event_process(const XEvent *ec, gpointer data)
         if (client && client != focus_client)
             frame_adjust_focus(client->frame, FALSE);
     }
-    else if (e->type == CreateNotify) {
-        XCreateWindowEvent const *xe = &e->xcreatewindow;
-
-        if (!obwin && xe->parent == obt_root(ob_screen))
-            obwin = UNMANAGED_AS_WINDOW(unmanaged_new(xe->window));
+    else if (e->type == CreateNotify &&
+             !obwin && e->xcreatewindow.parent == obt_root(ob_screen))
+    {
+        obwin = UNMANAGED_AS_WINDOW(unmanaged_new(e->xcreatewindow.window));
+    }
+    else if (e->type == ReparentNotify &&
+             !obwin && e->xreparent.parent == obt_root(ob_screen))
+    {
+        obwin = UNMANAGED_AS_WINDOW(unmanaged_new(e->xreparent.window));
     }
     else if (obwin && event_handle_window(obwin, e))
         /* handled it ! */;
@@ -1847,6 +1854,9 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
         w = window_top(um);
         unmanaged_destroy(um);
         window_manage(w);
+        break;
+    case ReparentNotify:
+        unmanaged_destroy(um);
         break;
     case ConfigureRequest:
         xwc.x = e->xconfigurerequest.x;

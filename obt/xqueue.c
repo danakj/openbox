@@ -327,7 +327,7 @@ typedef struct _ObtXQueueCB {
 static ObtXQueueCB *callbacks = NULL;
 static guint n_callbacks = 0;
 
-static gboolean event_read(GIOChannel *s, GIOCondition cond, gpointer data)
+static gboolean event_read(GSource *source, GSourceFunc callback, gpointer data)
 {
     XEvent ev;
 
@@ -340,15 +340,39 @@ static gboolean event_read(GIOChannel *s, GIOCondition cond, gpointer data)
     return TRUE; /* repeat */
 }
 
+static gboolean x_source_prepare(GSource *source, gint *timeout)
+{
+    *timeout = -1;
+    return XPending(obt_display);
+}
+
+static gboolean x_source_check(GSource *source)
+{
+    return XPending(obt_display);
+}
+
+struct x_source {
+    GSource source;
+
+    GPollFD pfd;
+};
+
+static GSourceFuncs x_source_funcs = {
+    x_source_prepare,
+    x_source_check,
+    event_read,
+    NULL
+};
+
 void xqueue_listen(void)
 {
-    GIOChannel *ch;
+    GSource *source = g_source_new(&x_source_funcs, sizeof(struct x_source));
+    struct x_source *x_source = (struct x_source *)source;
+    GPollFD *pfd = &x_source->pfd;
 
-    g_assert(obt_display != NULL);
-
-    ch = g_io_channel_unix_new(ConnectionNumber(obt_display));
-    g_io_add_watch(ch, G_IO_IN, event_read, NULL);
-    g_io_channel_unref(ch);
+    *pfd = (GPollFD){ ConnectionNumber(obt_display), G_IO_IN, G_IO_IN };
+    g_source_add_poll(source, pfd);
+    g_source_attach(source, NULL);
 }
 
 void xqueue_add_callback(ObtXQueueFunc f, gpointer data)

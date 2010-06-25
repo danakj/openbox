@@ -1848,15 +1848,21 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
             unmanaged_update_opacity(um);
         break;
     case DestroyNotify:
+        ob_debug("DestroyNotify for unmanaged 0x%lx", window_top(um));
         unmanaged_destroy(um);
         break;
     case MapRequest:
+        ob_debug("MapRequest for unmanaged 0x%lx", window_top(um));
         w = window_top(um);
         unmanaged_destroy(um);
         window_manage(w);
         break;
     case ReparentNotify:
-        unmanaged_destroy(um);
+        /* when we unmanage something it causes a reparent notify also */
+        if (e->xreparent.parent != obt_root(ob_screen)) {
+            ob_debug("ReparentNotify for unmanaged 0x%lx", window_top(um));
+            unmanaged_destroy(um);
+        }
         break;
     case ConfigureRequest:
         xwc.x = e->xconfigurerequest.x;

@@ -223,7 +223,7 @@ void window_manage_all(void)
         if (window_find(children[i])) continue; /* skip our own windows */
         if (XGetWindowAttributes(obt_display, children[i], &attrib)) {
             if (attrib.map_state == IsUnmapped)
-                ;
+                unmanaged_new(children[i]);
             else
                 window_manage(children[i]);
         }

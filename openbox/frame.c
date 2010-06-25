@@ -510,7 +510,9 @@ void frame_grab_client(ObFrame *self)
        send a mapnotify or we create race conditions.
     */
 
-    /* reparent the client to the frame */
+    /* reparent the client to the frame
+       (it should go to 0,0 as the window's redirected "area" is initialized
+       to this value) */
     XReparentWindow(obt_display, self->client->window, self->window, 0, 0);
 
     /*

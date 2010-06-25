@@ -257,8 +257,11 @@ void client_manage(Window window, ObPrompt *prompt)
        onto the frame */
     client_update_opacity(self);
 
+    window_set_top_area(CLIENT_AS_WINDOW(self),
+                        &self->area, self->border_width);
     window_set_abstract(CLIENT_AS_WINDOW(self),
                         &self->frame->window, /* top level window */
+                        &self->window,        /* composite redir window */
                         &self->layer,         /* stacking layer */
                         &self->frame->depth,  /* window depth */
                         &self->alpha);        /* opacity */
@@ -540,6 +543,7 @@ ObClient *client_fake_manage(Window window)
 
     window_set_abstract(CLIENT_AS_WINDOW(self),
                         &self->frame->window, /* top level window */
+                        &self->window,        /* composite redir window */
                         &self->layer,         /* stacking layer */
                         &self->frame->depth,  /* window depth */
                         NULL);                /* opacity */
@@ -1201,7 +1205,7 @@ static void client_get_area(ObClient *self)
     POINT_SET(self->root_pos, wattrib.x, wattrib.y);
     self->border_width = wattrib.border_width;
 
-    ob_debug("client area: %d %d  %d %d  bw %d", wattrib.x, wattrib.y,
+    ob_debug("client area: %d,%d  %dx%d  bw %d", wattrib.x, wattrib.y,
              wattrib.width, wattrib.height, wattrib.border_width);
 }
 

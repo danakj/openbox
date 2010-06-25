@@ -26,6 +26,8 @@
 
 void framerender_frame(ObFrame *self)
 {
+    if (CLIENT_AS_WINDOW(self->client)->redir)
+        return; /* being rendered with composite */
     if (frame_iconify_animating(self))
         return; /* delay redrawing until the animation is done */
     if (!self->need_render)

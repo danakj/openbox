@@ -42,10 +42,12 @@ static RrAppearance *a_focus_indicator;
 static RrColor      *color_white;
 static gboolean      visible;
 
-static Window create_window(Window parent, gint depth, gulong mask,
+static Window create_window(Window parent, const Rect *r, gint border,
+                            gint depth, gulong mask,
                             XSetWindowAttributes *attrib)
 {
-    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
+    return XCreateWindow(obt_display, parent,
+                         r->x, r->y, r->width, r->height, border,
                          depth, InputOutput,
                          0, mask, attrib);
 
@@ -56,6 +58,8 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     Window w;
     gint depth;
     XSetWindowAttributes attr;
+    const Rect r = {0, 0, 1, 1};
+    const gint b = 0;
 
     visible = FALSE;
 
@@ -65,18 +69,18 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     attr.override_redirect = True;
     attr.background_pixel = BlackPixel(obt_display, ob_screen);
 
-    w = create_window(obt_root(ob_screen), depth,
+    w = create_window(obt_root(ob_screen), &r, b, depth,
                       CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.top = window_internal_new(w, depth);
-    w = create_window(obt_root(ob_screen), depth,
+    focus_indicator.top = window_internal_new(w, &r, b, depth);
+    w = create_window(obt_root(ob_screen), &r, b, depth,
                       CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.left = window_internal_new(w, depth);
-    w = create_window(obt_root(ob_screen), depth,
+    focus_indicator.left = window_internal_new(w, &r, b, depth);
+    w = create_window(obt_root(ob_screen), &r, b, depth,
                       CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.right = window_internal_new(w, depth);
-    w = create_window(obt_root(ob_screen), depth,
+    focus_indicator.right = window_internal_new(w, &r, b, depth);
+    w = create_window(obt_root(ob_screen), &r, b, depth,
                       CWOverrideRedirect | CWBackPixel, &attr);
-    focus_indicator.bottom = window_internal_new(w, depth);
+    focus_indicator.bottom = window_internal_new(w, &r, b, depth);
 
     stacking_add(INTERNAL_AS_WINDOW(focus_indicator.top));
     stacking_add(INTERNAL_AS_WINDOW(focus_indicator.left));

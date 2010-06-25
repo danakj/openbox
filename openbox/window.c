@@ -63,13 +63,19 @@ ObWindow* window_new_size(ObWindowClass type, gsize size)
 
 void window_set_abstract(ObWindow *self,
                          const Window *top,
+                         const Window *redir,
                          const ObStackingLayer *layer,
                          const int *depth,
                          const guint32 *alpha)
 {
-    g_assert(!self->top && !self->layer && !self->depth && !self->alpha);
+    g_assert(!self->top && !self->redir && !self->layer && !self->depth &&
+             !self->alpha);
+#ifdef USE_COMPOSITING
+    g_assert(self->area.width > 0 && self->area.height > 0);
+#endif
 
     self->top = top;
+    self->redir = redir;
     self->layer = layer;
     self->depth = depth;
     self->alpha = alpha;
@@ -78,6 +84,17 @@ void window_set_abstract(ObWindow *self,
        now */
 
     composite_window_setup(self);
+}
+
+void window_set_top_area(ObWindow *self, const Rect *r, gint border)
+{
+    g_assert(!self->top);
+
+#ifdef USE_COMPOSITING
+    self->toparea = *r;
+    self->topborder = border;
+    RECT_SET(self->area, 0, 0, self->toparea.width, self->toparea.height);
+#endif
 }
 
 void window_cleanup(ObWindow *self)
@@ -121,7 +138,8 @@ void window_remove(Window xwin)
     g_hash_table_remove(window_map, &xwin);
 }
 
-ObInternalWindow* window_internal_new(Window window, int depth)
+ObInternalWindow* window_internal_new(Window window, const Rect *area,
+                                      gint border, gint depth)
 {
     ObInternalWindow *self;
 
@@ -129,8 +147,10 @@ ObInternalWindow* window_internal_new(Window window, int depth)
     self->window = window;
     self->layer = OB_STACKING_LAYER_INTERNAL;
     self->depth = depth;
+    window_set_top_area(INTERNAL_AS_WINDOW(self), area, border);
     window_set_abstract(INTERNAL_AS_WINDOW(self),
                         &self->window, /* top-most window */
+                        &self->window, /* composite redir window */
                         &self->layer,  /* stacking layer */
                         &self->depth,  /* window depth */
                         NULL);         /* opacity */

@@ -36,6 +36,7 @@ ObUnmanaged* unmanaged_new(Window w)
 {
     XWindowAttributes at;
     ObUnmanaged *self;
+    Rect r;
 
     if (w == composite_overlay)
         return NULL;
@@ -53,8 +54,11 @@ ObUnmanaged* unmanaged_new(Window w)
     XSelectInput(obt_display, self->window, PropertyChangeMask);
 
     unmanaged_update_opacity(self);
-    
+
+    RECT_SET(r, at.x, at.y, at.width, at.height);
+    window_set_top_area(UNMANAGED_AS_WINDOW(self), &r, at.border_width);
     window_set_abstract(UNMANAGED_AS_WINDOW(self),
+                        &self->window,
                         &self->window,
                         &self->layer,
                         &self->depth,

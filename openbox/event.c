@@ -555,7 +555,7 @@ static void event_process(const XEvent *ec, gpointer data)
                window unmap -> get focusout
                window map -> send focusin
                get first focus out -> fall back to something (new window
-                 hasn't received focus yet, so something else) -> send focusin
+               hasn't received focus yet, so something else) -> send focusin
                which means the "something else" is the last thing to get a
                focusin sent to it, so the new window doesn't end up with focus.
 
@@ -640,37 +640,64 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (!obwin && xe->parent == obt_root(ob_screen))
             obwin = UNMANAGED_AS_WINDOW(unmanaged_new(xe->window));
-
-        if (obwin && xe->window == window_top(obwin) &&
-            obwin->type != OB_WINDOW_CLASS_PROMPT)
-        {
-            obwin->mapped = 0;
-            RECT_SET(obwin->area, xe->x, xe->y, xe->width, xe->height);
-            obwin->border = xe->border_width;
-#ifdef USE_COMPOSITING
-            if (!obwin->texture) glGenTextures(1, &obwin->texture);
-#endif
-        }
     }
     else if ((obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) &&
-               ((e->type == ConfigureNotify &&
-                 e->xconfigure.window == window_top(obwin)) ||
-                (e->type == MapNotify &&
-                 e->xmap.window == window_top(obwin))))
+             ((e->type == ConfigureNotify &&
+               /* for configure notify, track the position/size of
+                  both the top-level window and the redir window (when
+                  it is not the top-level window) */
+               e->xconfigure.send_event == FALSE &&
+               ((e->xconfigure.window == window_redir(obwin) &&
+                 window_redir(obwin) != window_top(obwin)) ||
+                (e->xconfigure.window == window_top(obwin)))) ||
+              (e->type == MapNotify &&
+               e->xmap.window == window_redir(obwin))))
     {
         gboolean pixchange = FALSE;
 
         if (e->type == ConfigureNotify) {
             XConfigureEvent const *xe = &e->xconfigure;
-            if (obwin->area.width != xe->width ||
-                obwin->area.height != xe->height ||
-                obwin->border != xe->border_width)
-            {
-                pixchange = TRUE;
+
+            if (xe->window == window_redir(obwin)) {
+                int x, y, w, h;
+
+                /* if the redir window's size changes.. */
+                if (obwin->area.width != xe->width ||
+                    obwin->area.height != xe->height ||
+                    /* or its border changes.. (assume only the top-level
+                       window will ever have a border) */
+                    (window_top(obwin) == window_redir(obwin) &&
+                     obwin->topborder != xe->border_width))
+                {
+                    /* ..then need to change the pixmap */
+                    pixchange = TRUE;
+                }
+
+                /* set the redir window's area */
+                if (window_redir(obwin) == window_top(obwin)) {
+                    /* same window then its area fills the whole top level
+                       window */
+                    x = 0;
+                    y = 0;
+                    w = xe->width + xe->border_width * 2;
+                    h = xe->height + xe->border_width * 2;
+                }
+                else {
+                    /* different window then it is inside the top level
+                       window */
+                    x = xe->x;
+                    y = xe->y;
+                    w = xe->width;
+                    h = xe->height;
+                }
+                RECT_SET(obwin->area, x, y, w, h);
             }
-            RECT_SET(obwin->area, xe->x, xe->y,
-                     xe->width, xe->height);
-            obwin->border = xe->border_width;
+
+            /* set the top window's area/border */
+            if (xe->window == window_top(obwin)) {
+                RECT_SET(obwin->toparea, xe->x, xe->y, xe->width, xe->height);
+                obwin->topborder = xe->border_width;
+            }
         }
 
         if (e->type == MapNotify) {
@@ -680,9 +707,10 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (pixchange)
             composite_window_invalid(obwin);
-    } else if ((e->type == UnmapNotify) && obwin &&
-               obwin->type != OB_WINDOW_CLASS_PROMPT &&
-               e->xunmap.window == window_top(obwin))
+    }
+    else if ((e->type == UnmapNotify) && obwin &&
+             obwin->type != OB_WINDOW_CLASS_PROMPT &&
+             e->xunmap.window == window_top(obwin))
     {
         obwin->mapped = FALSE;
     }

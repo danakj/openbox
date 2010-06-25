@@ -32,6 +32,8 @@ ObPopup *popup_new(void)
 {
     XSetWindowAttributes attrib;
     ObPopup *self;
+    const Rect r = {0, 0, 1, 1};
+    const gint b = 0;
 
     self = window_new(OB_WINDOW_CLASS_INTERNAL, ObPopup);
     self->gravity = NorthWestGravity;
@@ -43,7 +45,7 @@ ObPopup *popup_new(void)
     attrib.override_redirect = True;
     self->depth = RrDepth(ob_rr_inst);
     self->bg = XCreateWindow(obt_display, obt_root(ob_screen),
-                             0, 0, 1, 1, 0, self->depth,
+                             r.x, r.y, r.width, r.height, b, self->depth,
                              InputOutput, RrVisual(ob_rr_inst),
                              CWOverrideRedirect, &attrib);
     self->layer = OB_STACKING_LAYER_INTERNAL;
@@ -58,8 +60,10 @@ ObPopup *popup_new(void)
 
     XMapWindow(obt_display, self->text);
 
+    window_set_top_area(INTERNAL_AS_WINDOW(self), &r, b);
     window_set_abstract(INTERNAL_AS_WINDOW(self),
                         &self->bg,      /* top level window */
+                        &self->bg,      /* composite redir window */
                         &self->layer,   /* stacking layer */
                         &self->depth,   /* window depth */
                         NULL);          /* opacity */

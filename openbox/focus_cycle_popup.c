@@ -109,19 +109,18 @@ static gboolean popup_setup    (ObFocusCyclePopup *p,
 static void     popup_render   (ObFocusCyclePopup *p,
                                 const ObClient *c);
 
-static Window create_window(Window parent, guint bwidth, gint depth,
-                            gulong mask,
-                            XSetWindowAttributes *attr)
+static inline Window create_window(Window parent)
 {
-    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, bwidth,
-                         (depth ? depth : RrDepth(ob_rr_inst)), InputOutput,
-                         RrVisual(ob_rr_inst), mask, attr);
+    return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
+                         RrDepth(ob_rr_inst), InputOutput,
+                         RrVisual(ob_rr_inst), 0, NULL);
 }
 
 void focus_cycle_popup_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
     RrPixel32 *p;
+    const Rect r = {0, 0, 1, 1};
 
     single_popup = icon_popup_new();
 
@@ -154,17 +153,19 @@ void focus_cycle_popup_startup(gboolean reconfig)
     attrib.override_redirect = True;
     attrib.border_pixel=RrColorPixel(ob_rr_theme->osd_border_color);
     popup->depth = RrDepth(ob_rr_inst);
-    popup->bg = create_window(obt_root(ob_screen), ob_rr_theme->obwidth,
-                              popup->depth,
+    popup->bg = XCreateWindow(obt_display, obt_root(ob_screen),
+                              r.x, r.y, r.width, r.height,
+                              ob_rr_theme->obwidth, popup->depth,
+                              InputOutput, RrVisual(ob_rr_inst),
                               CWOverrideRedirect | CWBorderPixel, &attrib);
     popup->layer = OB_STACKING_LAYER_INTERNAL;
 
     /* create the text window used for the icon-mode popup */
-    popup->icon_mode_text = create_window(popup->bg, 0, 0, 0, NULL);
+    popup->icon_mode_text = create_window(popup->bg);
 
     /* create the windows for the up and down arrows */
-    popup->list_mode_up = create_window(popup->bg, 0, 0, 0, NULL);
-    popup->list_mode_down = create_window(popup->bg, 0, 0, 0, NULL);
+    popup->list_mode_up = create_window(popup->bg);
+    popup->list_mode_down = create_window(popup->bg);
 
     popup->targets = NULL;
     popup->n_targets = 0;
@@ -209,7 +210,9 @@ void focus_cycle_popup_startup(gboolean reconfig)
             }
     }
 
+    window_set_top_area(INTERNAL_AS_WINDOW(popup), &r, ob_rr_theme->obwidth);
     window_set_abstract(INTERNAL_AS_WINDOW(popup),
+                        &popup->bg,
                         &popup->bg,
                         &popup->layer,
                         &popup->depth,
@@ -339,8 +342,8 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
                     t->text = text;
                     t->icon = client_icon(t->client);
                     RrImageRef(t->icon); /* own the icon so it won't go away */
-                    t->iconwin = create_window(p->bg, 0, 0, 0, NULL);
-                    t->textwin = create_window(p->bg, 0, 0, 0, NULL);
+                    t->iconwin = create_window(p->bg);
+                    t->textwin = create_window(p->bg);
 
                     p->targets = g_list_prepend(p->targets, t);
                     ++n;

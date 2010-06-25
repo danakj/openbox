@@ -435,7 +435,7 @@ static gboolean composite(gpointer data)
         if (win->type == OB_WINDOW_CLASS_PROMPT)
             continue;
 
-        if (!win->mapped)
+        if (!win->mapped || !win->is_redir)
             continue;
 
         if (win->type == OB_WINDOW_CLASS_CLIENT) {
@@ -449,12 +449,13 @@ static gboolean composite(gpointer data)
         if (win->pixmap == None) {
             obt_display_ignore_errors(TRUE);
             win->pixmap = XCompositeNameWindowPixmap(obt_display,
-                                                     window_top(win));
+                                                     window_redir(win));
             obt_display_ignore_errors(FALSE);
             if (obt_display_error_occured) {
                 ob_debug_type(OB_DEBUG_CM,
                               "Error in XCompositeNameWindowPixmap for "
-                              "window 0x%x", window_top(win));
+                              "window 0x%x of 0x%x",
+                              window_redir(win), window_top(win));
                 /* it can error but still return an ID, which will cause an
                    error to occur if you try to free it etc */
                 if (win->pixmap) {
@@ -510,10 +511,10 @@ static gboolean composite(gpointer data)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        x = win->area.x;
-        y = win->area.y;
-        w = win->area.width + win->border * 2;
-        h = win->area.height + win->border * 2;
+        x = win->toparea.x + win->area.x;
+        y = win->toparea.y + win->area.y;
+        w = win->area.width;
+        h = win->area.height;
 
         if (win->alpha && *win->alpha < 0xffffffff)
             glColor4ui(0xffffffff, 0xffffffff, 0xffffffff, *win->alpha);
@@ -562,18 +563,20 @@ static void composite_window_redir(ObWindow *w)
 {
     if (!composite_enabled()) return;
 
-    if (w->redir) return;
-    XCompositeRedirectWindow(obt_display, window_top(w),
+    if (w->is_redir) return;
+
+    XCompositeRedirectWindow(obt_display, window_redir(w),
                              CompositeRedirectManual);
-    w->redir = TRUE;
+    w->is_redir = TRUE;
 }
 
 static void composite_window_unredir(ObWindow *w)
 {
     if (!w->redir) return;
-    XCompositeUnredirectWindow(obt_display, window_top(w),
+
+    XCompositeUnredirectWindow(obt_display, window_redir(w),
                                CompositeRedirectManual);
-    w->redir = FALSE;
+    w->is_redir = FALSE;
 }
 
 void composite_window_setup(ObWindow *w)
@@ -586,6 +589,7 @@ void composite_window_setup(ObWindow *w)
 
     w->damage = XDamageCreate(obt_display, window_top(w),
                               XDamageReportNonEmpty);
+    glGenTextures(1, &w->texture);
 
     composite_window_redir(w);
 }
@@ -599,7 +603,6 @@ void composite_window_cleanup(ObWindow *w)
 #endif
 
     composite_window_unredir(w);
-
     composite_window_invalid(w);
     if (w->damage) {
         XDamageDestroy(obt_display, w->damage);

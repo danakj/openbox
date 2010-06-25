@@ -58,6 +58,8 @@ static gboolean window_comp(Window *w1, Window *w2) { return *w1 == *w2; }
 void dock_startup(gboolean reconfig)
 {
     XSetWindowAttributes attrib;
+    const Rect r = {0, 0, 1, 1};
+    const gint b = 0;
 
     if (reconfig) {
         GList *it;
@@ -94,7 +96,7 @@ void dock_startup(gboolean reconfig)
     attrib.do_not_propagate_mask = DOCK_NOPROPAGATEMASK;
     dock->depth = RrDepth(ob_rr_inst);
     dock->frame = XCreateWindow(obt_display, obt_root(ob_screen),
-                                0, 0, 1, 1, 0,
+                                r.x, r.y, r.width, r.height, b,
                                 dock->depth, InputOutput,
                                 RrVisual(ob_rr_inst),
                                 CWOverrideRedirect | CWEventMask |
@@ -109,8 +111,10 @@ void dock_startup(gboolean reconfig)
     OBT_PROP_SET32(dock->frame, NET_WM_WINDOW_TYPE, ATOM,
                    OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DOCK));
 
+    window_set_top_area(DOCK_AS_WINDOW(dock), &r, b);
     window_set_abstract(DOCK_AS_WINDOW(dock),
                         &dock->frame,         /* top level window */
+                        &dock->frame,         /* composite redir window */
                         &config_dock_layer,   /* stacking layer */
                         &dock->depth,         /* window depth */
                         NULL);

@@ -54,6 +54,8 @@ struct _ObWindow {
 
     /*! Points to the top level Xwindow for the ObWindow */
     const Window *top;
+    /*! Points to the topmost window that should be redirected for composite */
+    const Window *redir;
     /*! Points to the stacking layer for the ObWindow */
     const ObStackingLayer *layer;
     /*! Points to the depth of the ObWindow */
@@ -68,10 +70,11 @@ struct _ObWindow {
     Pixmap pixmap;
     GLXPixmap gpixmap;
     Damage damage;
-    Rect area;
-    gint border;
+    Rect area; /* area of the redirected window */
+    Rect toparea; /* area of the top-level window */
+    gint topborder; /* the border around the top-level window */
     gboolean mapped;
-    gboolean redir;
+    gboolean is_redir;
 #endif
 };
 
@@ -117,9 +120,13 @@ ObWindow* window_new_size(ObWindowClass type, gsize size);
   initialization/creation phase, so that the ObWindow can be used */
 void      window_set_abstract(ObWindow *self,
                               const Window *top,
+                              const Window *redir,
                               const ObStackingLayer *layer,
                               const int *depth,
                               const guint32 *alpha);
+/*! A subclass of ObWindow must call this before setting its top-level
+  window, to the top-level window's initial position/size/border */
+void      window_set_top_area(ObWindow *self, const Rect *r, gint border);
 /*! A subclass of ObWindow must call this when it is going to be destroying
   itself, but _before_ it destroys the members it sets in
   window_set_abstract() */
@@ -135,6 +142,7 @@ typedef void (*ObWindowForeachFunc)(ObWindow *w);
 void      window_foreach(ObWindowForeachFunc func);
 
 #define window_top(w) (*((ObWindow*)w)->top)
+#define window_redir(w) (*((ObWindow*)w)->redir)
 #define window_layer(w) (*((ObWindow*)w)->layer)
 #define window_area(w) (*((ObWindow*)w)->area)
 #define window_depth(w) (*((ObWindow*)w)->depth)
@@ -147,7 +155,8 @@ struct _ObInternalWindow {
     int depth;
 };
 
-ObInternalWindow* window_internal_new(Window window, int depth);
+ObInternalWindow* window_internal_new(Window window, const Rect *area,
+                                      gint border, gint depth);
 
 void window_manage_all(void);
 void window_manage(Window win);

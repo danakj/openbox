@@ -56,11 +56,11 @@ static void menu_frame_hide(ObMenuFrame *self);
 
 static gboolean submenu_hide_timeout(gpointer data);
 
-static Window createWindow(Window parent, gint depth, gulong mask,
+static Window createWindow(Window parent, gulong mask,
                            XSetWindowAttributes *attrib)
 {
     return XCreateWindow(obt_display, parent, 0, 0, 1, 1, 0,
-                         (depth ? depth : RrDepth(ob_rr_inst)), InputOutput,
+                         RrDepth(ob_rr_inst), InputOutput,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 
@@ -109,6 +109,8 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 {
     ObMenuFrame *self;
     XSetWindowAttributes attr;
+    const Rect r = {0, 0, 1, 1};
+    const gint b = 0;
 
     self = window_new(OB_WINDOW_CLASS_MENUFRAME, ObMenuFrame);
     self->menu = menu;
@@ -119,8 +121,10 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 
     attr.event_mask = FRAME_EVENTMASK;
     self->depth = RrDepth(ob_rr_inst);
-    self->window = createWindow(obt_root(ob_screen), self->depth,
-                                CWEventMask, &attr);
+    self->window = XCreateWindow(obt_display, obt_root(ob_screen),
+                                 r.x, r.y, r.width, r.height, b, self->depth,
+                                 InputOutput, RrVisual(ob_rr_inst),
+                                 CWEventMask, &attr);
     self->layer =  OB_STACKING_LAYER_INTERNAL;
 
     /* make it a popup menu type window */
@@ -133,8 +137,10 @@ ObMenuFrame* menu_frame_new(ObMenu *menu, guint show_from, ObClient *client)
 
     self->a_items = RrAppearanceCopy(ob_rr_theme->a_menu);
 
+    window_set_top_area(MENUFRAME_AS_WINDOW(self), &r, b);
     window_set_abstract(MENUFRAME_AS_WINDOW(self),
                         &self->window,        /* top level window */
+                        &self->window,        /* composite redir window */
                         &self->layer,         /* stacking layer */
                         &self->depth,         /* window depth */
                         NULL);                /* opacity */
@@ -186,16 +192,16 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     menu_entry_ref(entry);
 
     attr.event_mask = ENTRY_EVENTMASK;
-    self->window = createWindow(self->frame->window, 0, CWEventMask, &attr);
-    self->text = createWindow(self->window, 0, 0, NULL);
+    self->window = createWindow(self->frame->window, CWEventMask, &attr);
+    self->text = createWindow(self->window, 0, NULL);
     g_hash_table_insert(menu_frame_map, &self->window, self);
     g_hash_table_insert(menu_frame_map, &self->text, self);
     if (entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
-        self->icon = createWindow(self->window, 0, 0, NULL);
+        self->icon = createWindow(self->window, 0, NULL);
         g_hash_table_insert(menu_frame_map, &self->icon, self);
     }
     if (entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
-        self->bullet = createWindow(self->window, 0, 0, NULL);
+        self->bullet = createWindow(self->window, 0, NULL);
         g_hash_table_insert(menu_frame_map, &self->bullet, self);
     }
 

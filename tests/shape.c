@@ -28,9 +28,10 @@ int main () {
   Window     win;
   XEvent     report;
   XEvent     msg;
-  int        x=50,y=50,h=100,w=400;
+  int        x=00,y=00,h=100,w=400;
   XWMHints   hint;
   XRectangle xrect;
+  XSetWindowAttributes at;
 
   display = XOpenDisplay(NULL);
 
@@ -39,9 +40,10 @@ int main () {
     return 0;
   }
 
+  at.override_redirect = True;
   win = XCreateWindow(display, RootWindow(display, 0),
 		      x, y, w, h, 10, CopyFromParent, CopyFromParent,
-		      CopyFromParent, 0, NULL);
+		      CopyFromParent, CWOverrideRedirect, &at);
   xrect.x = 10;
   xrect.y = 10;
   xrect.width = w - 20;
@@ -50,10 +52,42 @@ int main () {
                           ShapeBounding, 0, 0, &xrect, 1,
                           ShapeSet, Unsorted);
 
+  xrect.x = -10;
+  xrect.y = -10;
+  xrect.width = w+20;
+  xrect.height = 10;
+  XShapeCombineRectangles(display, win,
+                          ShapeBounding, 0, 0, &xrect, 1,
+                          ShapeUnion, Unsorted);
+
   XSetWindowBackground(display,win,BlackPixel(display,0));
+  XSetWindowBorder(display, win, WhitePixel(display, 0));
 
   XMapWindow(display, win);
   XFlush(display);
+
+  sleep(3);
+
+  w *= 2;
+  h *= 2;
+  XResizeWindow(display, win, w, h);
+  xrect.x = 10;
+  xrect.y = 10;
+  xrect.width = w - 20;
+  xrect.height = h - 20;
+  XShapeCombineRectangles(display, win,
+                          ShapeBounding, 0, 0, &xrect, 1,
+                          ShapeSet, Unsorted);
+
+  xrect.x = -10;
+  xrect.y = -10;
+  xrect.width = w+20;
+  xrect.height = 10;
+  XShapeCombineRectangles(display, win,
+                          ShapeBounding, 0, 0, &xrect, 1,
+                          ShapeUnion, Unsorted);
+  XFlush(display);
+
 
   while (1) {
     XNextEvent(display, &report);

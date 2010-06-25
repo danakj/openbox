@@ -662,8 +662,10 @@ void composite_window_setup(ObWindow *w)
     g_assert(composite_started);
 #endif
 
+    obt_display_ignore_errors(TRUE);
     w->damage = XDamageCreate(obt_display, window_top(w),
                               XDamageReportNonEmpty);
+    obt_display_ignore_errors(FALSE);
     glGenTextures(1, &w->texture);
 
     composite_window_redir(w);

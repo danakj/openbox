@@ -52,6 +52,9 @@ ObUnmanaged* unmanaged_new(Window w)
     self->alpha = 0xffffffff;
 
     XSelectInput(obt_display, self->window, PropertyChangeMask);
+#ifdef SHAPE
+    XShapeSelectInput(obt_display, self->window, ShapeNotifyMask);
+#endif
 
     unmanaged_update_opacity(self);
 

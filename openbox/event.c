@@ -85,6 +85,7 @@ typedef struct
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_input(XEvent *e);
+static gboolean event_handle_window(ObWindow *w, XEvent *e);
 static void event_handle_menu(ObMenuFrame *frame, XEvent *e);
 static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
@@ -641,79 +642,8 @@ static void event_process(const XEvent *ec, gpointer data)
         if (!obwin && xe->parent == obt_root(ob_screen))
             obwin = UNMANAGED_AS_WINDOW(unmanaged_new(xe->window));
     }
-    else if ((obwin && obwin->type != OB_WINDOW_CLASS_PROMPT) &&
-             ((e->type == ConfigureNotify &&
-               /* for configure notify, track the position/size of
-                  both the top-level window and the redir window (when
-                  it is not the top-level window) */
-               e->xconfigure.send_event == FALSE &&
-               ((e->xconfigure.window == window_redir(obwin) &&
-                 window_redir(obwin) != window_top(obwin)) ||
-                (e->xconfigure.window == window_top(obwin)))) ||
-              (e->type == MapNotify &&
-               e->xmap.window == window_redir(obwin))))
-    {
-        gboolean pixchange = FALSE;
-
-        if (e->type == ConfigureNotify) {
-            XConfigureEvent const *xe = &e->xconfigure;
-
-            if (xe->window == window_redir(obwin)) {
-                int x, y, w, h;
-
-                /* if the redir window's size changes.. */
-                if (obwin->area.width != xe->width ||
-                    obwin->area.height != xe->height ||
-                    /* or its border changes.. (assume only the top-level
-                       window will ever have a border) */
-                    (window_top(obwin) == window_redir(obwin) &&
-                     obwin->topborder != xe->border_width))
-                {
-                    /* ..then need to change the pixmap */
-                    pixchange = TRUE;
-                }
-
-                /* set the redir window's area */
-                if (window_redir(obwin) == window_top(obwin)) {
-                    /* same window then its area fills the whole top level
-                       window */
-                    x = 0;
-                    y = 0;
-                    w = xe->width + xe->border_width * 2;
-                    h = xe->height + xe->border_width * 2;
-                }
-                else {
-                    /* different window then it is inside the top level
-                       window */
-                    x = xe->x;
-                    y = xe->y;
-                    w = xe->width;
-                    h = xe->height;
-                }
-                RECT_SET(obwin->area, x, y, w, h);
-            }
-
-            /* set the top window's area/border */
-            if (xe->window == window_top(obwin)) {
-                RECT_SET(obwin->toparea, xe->x, xe->y, xe->width, xe->height);
-                obwin->topborder = xe->border_width;
-            }
-        }
-
-        if (e->type == MapNotify) {
-            pixchange = TRUE;
-            obwin->mapped = TRUE;
-        }
-
-        if (pixchange)
-            composite_window_invalid(obwin);
-    }
-    else if ((e->type == UnmapNotify) && obwin &&
-             obwin->type != OB_WINDOW_CLASS_PROMPT &&
-             e->xunmap.window == window_top(obwin))
-    {
-        obwin->mapped = FALSE;
-    }
+    else if (obwin && event_handle_window(obwin, e))
+        /* handled it ! */;
     else if (client)
         event_handle_client(client, e);
     else if (um)
@@ -1773,15 +1703,16 @@ static void event_handle_client(ObClient *client, XEvent *e)
         ;
 #ifdef SHAPE
         {
-            int kind;
+            int kind = -1;
             if (obt_display_extension_shape &&
-                e->type == obt_display_extension_shape_basep)
+                e->type == obt_display_extension_shape_basep + ShapeNotify)
             {
                 switch (((XShapeEvent*)e)->kind) {
                     case ShapeBounding:
-                    case ShapeClip:
                         client->shaped = ((XShapeEvent*)e)->shaped;
                         kind = ShapeBounding;
+                        break;
+                    case ShapeClip:
                         break;
                     case ShapeInput:
                         client->shaped_input = ((XShapeEvent*)e)->shaped;
@@ -1790,7 +1721,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     default:
                         g_assert_not_reached();
                 }
-                frame_adjust_shape_kind(client->frame, kind);
+                if (kind) frame_adjust_shape_kind(client->frame, kind);
             }
         }
 #endif
@@ -1809,6 +1740,94 @@ static void event_handle_dock(ObDock *s, XEvent *e)
             dock_hide(TRUE);
         break;
     }
+}
+
+static gboolean event_handle_window(ObWindow *wi, XEvent *e)
+{
+    gboolean used = FALSE, pixchange = FALSE;
+
+    if (wi->type == OB_WINDOW_CLASS_PROMPT) return used;
+
+    switch (e->type) {
+    case ConfigureNotify:
+        if (e->xconfigure.send_event) break;
+
+        if (e->xconfigure.window == window_redir(wi)) {
+            XConfigureEvent const *xe = &e->xconfigure;
+            const gboolean same_window = window_top(wi) == window_redir(wi);
+            int x, y, w, h;
+
+            /* if the redir window's size changes.. */
+            if (wi->area.width != xe->width || wi->area.height != xe->height ||
+                /* or its border changes.. (assume only the top-level
+                   window will ever have a border) */
+                (same_window && wi->topborder != xe->border_width))
+            {
+                /* ..then need to change the pixmap */
+                pixchange = TRUE;
+            }
+
+            /* set the redir window's area */
+            if (same_window) {
+                /* same window then its area fills the whole top level
+                   window */
+                x = -xe->border_width;
+                y = -xe->border_width;
+                w = xe->width + xe->border_width * 2;
+                h = xe->height + xe->border_width * 2;
+            }
+            else {
+                /* different window then it is inside the top level
+                   window */
+                x = xe->x;
+                y = xe->y;
+                w = xe->width;
+                h = xe->height;
+            }
+            RECT_SET(wi->area, x, y, w, h);
+            used = TRUE;
+        }
+
+        /* set the top window's area/border */
+        if (e->xconfigure.window == window_top(wi)) {
+            XConfigureEvent const *xe = &e->xconfigure;
+            RECT_SET(wi->toparea, xe->x, xe->y, xe->width, xe->height);
+            wi->topborder = xe->border_width;
+            used = TRUE;
+        }
+        break;
+
+    case MapNotify:
+        if (e->xmap.window == window_redir(wi)) {
+            wi->mapped = TRUE;
+            pixchange = TRUE;
+            used = TRUE;
+        }
+        break;
+    case UnmapNotify:
+        if (e->xunmap.window == window_top(wi)) {
+            wi->mapped = FALSE;
+            used = TRUE;
+        }
+        break;
+    default:
+#ifdef SHAPE
+#ifdef USE_COMPOSITING
+        if (obt_display_extension_shape &&
+            e->type == obt_display_extension_shape_basep + ShapeNotify)
+        {
+            XShapeEvent *s = (XShapeEvent*)e;
+            if (s->window == window_redir(wi) && s->kind == ShapeBounding) {
+                window_adjust_redir_shape(wi);
+                used = FALSE; /* let other people get this event also */
+            }
+        }
+#endif
+#endif
+    }
+    if (pixchange)
+        composite_window_invalid(wi);
+    return used;
 }
 
 static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)

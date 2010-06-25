@@ -73,6 +73,8 @@ struct _ObWindow {
     Rect area; /* area of the redirected window */
     Rect toparea; /* area of the top-level window */
     gint topborder; /* the border around the top-level window */
+    XRectangle *rects; /* rects that make up the shape of the window */
+    gint n_rects; /* number of objects in @rects */
     gboolean mapped;
     gboolean is_redir;
 #endif
@@ -146,6 +148,8 @@ void      window_foreach(ObWindowForeachFunc func);
 #define window_layer(w) (*((ObWindow*)w)->layer)
 #define window_area(w) (*((ObWindow*)w)->area)
 #define window_depth(w) (*((ObWindow*)w)->depth)
+
+void window_adjust_redir_shape(ObWindow *self);
 
 /* Internal openbox-owned windows like the alt-tab popup */
 struct _ObInternalWindow {

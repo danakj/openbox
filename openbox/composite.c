@@ -493,7 +493,8 @@ static gboolean composite(gpointer data)
         gettimeofday(&start, NULL);
 #endif
         obt_display_ignore_errors(TRUE);
-        glXBindTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT, NULL);
+        glXBindTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT,
+                           NULL);
         obt_display_ignore_errors(FALSE);
         if (obt_display_error_occured)
             g_assert(0 && "ERROR BINDING GLX PIXMAP");
@@ -511,8 +512,8 @@ static gboolean composite(gpointer data)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        x = win->toparea.x + win->area.x;
-        y = win->toparea.y + win->area.y;
+        x = win->toparea.x + win->topborder + win->area.x;
+        y = win->toparea.y + win->topborder + win->area.y;
         w = win->area.width;
         h = win->area.height;
 
@@ -520,14 +521,46 @@ static gboolean composite(gpointer data)
             glColor4ui(0xffffffff, 0xffffffff, 0xffffffff, *win->alpha);
 
         glBegin(GL_QUADS);
-        glTexCoord2f(0, 0);
-        glVertex3f(x, y, 0.0);
-        glTexCoord2f(0, 1);
-        glVertex3f(x, y + h, 0.0);
-        glTexCoord2f(1, 1);
-        glVertex3f(x + w, y + h, 0.0);
-        glTexCoord2f(1, 0);
-        glVertex3f(x + w, y, 0.0);
+        if (!win->n_rects) {
+            glTexCoord2f(0, 0);
+            glVertex3f(x, y, 0.0);
+            glTexCoord2f(0, 1);
+            glVertex3f(x, y + h, 0.0);
+            glTexCoord2f(1, 1);
+            glVertex3f(x + w, y + h, 0.0);
+            glTexCoord2f(1, 0);
+            glVertex3f(x + w, y, 0.0);
+        }
+        else {
+            gint i;
+            /* the border is not included in the shape rect coords */
+            const gint sb = window_top(win) == window_redir(win) ?
+                win->topborder : 0;
+
+
+            for (i = 0; i < win->n_rects; ++i) {
+                const gint xb = win->rects[i].x + sb;
+                const gint yb = win->rects[i].y + sb;
+                const gint wb = win->rects[i].width;
+                const gint hb = win->rects[i].height;
+
+                glTexCoord2d((GLdouble)xb/w,
+                             (GLdouble)yb/h);
+                glVertex3f(x + xb, y + yb, 0.0f);
+
+                glTexCoord2d((GLdouble)xb/w,
+                             (GLdouble)(yb+hb)/h);
+                glVertex3f(x + xb, y + yb + hb, 0.0f);
+
+                glTexCoord2d((GLdouble)(xb+wb)/w,
+                             (GLdouble)(yb+hb)/h);
+                glVertex3f(x + xb + wb, y + yb + hb, 0.0f);
+
+                glTexCoord2d((GLdouble)(xb+wb)/w,
+                             (GLdouble)yb/h);
+                glVertex3f(x + xb + wb, y + yb, 0.0f);
+            }
+        }
         glEnd();
 
         if (win->alpha && *win->alpha < 0xffffffff)

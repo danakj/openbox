@@ -83,6 +83,21 @@ void window_set_abstract(ObWindow *self,
     /* set up any things in ObWindow that require use of the abstract pointers
        now */
 
+#ifdef SHAPE
+#ifdef USE_COMPOSITING
+    {
+        gint foo;
+        guint ufoo;
+        gint s;
+
+        XShapeQueryExtents(obt_display, window_redir(self), &s, &foo,
+                           &foo, &ufoo, &ufoo, &foo, &foo, &foo, &ufoo,
+                           &ufoo);
+        if (s) window_adjust_redir_shape(self);
+    }
+#endif
+#endif
+
     composite_window_setup(self);
 }
 
@@ -93,7 +108,9 @@ void window_set_top_area(ObWindow *self, const Rect *r, gint border)
 #ifdef USE_COMPOSITING
     self->toparea = *r;
     self->topborder = border;
-    RECT_SET(self->area, 0, 0, self->toparea.width, self->toparea.height);
+    RECT_SET(self->area, -border, -border,
+             self->toparea.width + border * 2,
+             self->toparea.height + border * 2);
 #endif
 }
 
@@ -107,6 +124,7 @@ void window_free(ObWindow *self)
     /* The abstract pointers must not be used here, they are likely invalid
        by now ! */
 
+    if (self->rects) XFree(self->rects);
     g_slice_free1(self->bytes, self);
 }
 
@@ -136,6 +154,19 @@ void window_remove(Window xwin)
 {
     g_assert(xwin != None);
     g_hash_table_remove(window_map, &xwin);
+}
+
+void window_adjust_redir_shape(ObWindow *self)
+{
+#ifdef USE_COMPOSITING
+#ifdef SHAPE
+    gint ord;
+    if (self->rects)
+        XFree(self->rects);
+    self->rects = XShapeGetRectangles(obt_display, window_redir(self),
+                                      ShapeBounding, &self->n_rects, &ord);
+#endif
+#endif
 }
 
 ObInternalWindow* window_internal_new(Window window, const Rect *area,

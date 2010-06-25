@@ -419,7 +419,7 @@ static gboolean composite(gpointer data)
     struct timeval start, end, dif;
     GList *it;
     ObWindow *win;
-    ObClient *client;
+    ObClient *client = NULL;
 
     if (!composite_enabled()) return FALSE;
 
@@ -565,6 +565,48 @@ static gboolean composite(gpointer data)
 
         if (win->alpha && *win->alpha < 0xffffffff)
             glColor4f(1.0, 1.0, 1.0, 1.0);
+
+        if (client && (client->frame->decorations & OB_FRAME_DECOR_BORDER)) {
+            int a, b, c, d;
+            a = client->frame->size.left;
+            b = client->frame->size.right;
+            c = client->frame->size.top;
+            d = client->frame->size.bottom;
+            if (client->frame->focused)
+                glColor4f(ob_rr_theme->frame_focused_border_color->r/255.0,
+                          ob_rr_theme->frame_focused_border_color->g/255.0,
+                          ob_rr_theme->frame_focused_border_color->b/255.0,
+                          0.5);
+            else
+                glColor4f(ob_rr_theme->frame_unfocused_border_color->r/255.0,
+                          ob_rr_theme->frame_unfocused_border_color->g/255.0,
+                          ob_rr_theme->frame_unfocused_border_color->b/255.0,
+                          0.5);
+            glDisable(GL_TEXTURE_2D);
+            glBegin(GL_QUADS);
+            glVertex3f(x - a, y - c, 0.0);
+            glVertex3f(x + w, y - c, 0.0);
+            glVertex3f(x + w, y, 0.0);
+            glVertex3f(x - a, y, 0.0);
+
+            glVertex3f(x + w, y - c, 0.0);
+            glVertex3f(x + w + b, y - c, 0.0);
+            glVertex3f(x + w + b, y + h + d, 0.0);
+            glVertex3f(x + w, y + h + d, 0.0);
+
+            glVertex3f(x - a, y + h + d, 0.0);
+            glVertex3f(x + w, y + h + d, 0.0);
+            glVertex3f(x + w, y + h, 0.0);
+            glVertex3f(x - a, y + h, 0.0);
+
+            glVertex3f(x - a, y, 0.0);
+            glVertex3f(x, y, 0.0);
+            glVertex3f(x, y + h, 0.0);
+            glVertex3f(x - a, y + h, 0.0);
+            glEnd();
+            glEnable(GL_TEXTURE_2D);
+            glColor4f(1.0, 1.0, 1.0, 1.0);
+        }
 
         obt_display_ignore_errors(TRUE);
         glXReleaseTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);

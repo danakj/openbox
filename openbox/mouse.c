@@ -66,6 +66,7 @@ ObFrameContext mouse_button_frame_context(ObFrameContext context,
     case OB_FRAME_CONTEXT_MOVE_RESIZE:
     case OB_FRAME_CONTEXT_LEFT:
     case OB_FRAME_CONTEXT_RIGHT:
+    case OB_FRAME_CONTEXT_DOCK:
         break;
     case OB_FRAME_CONTEXT_ROOT:
         x = OB_FRAME_CONTEXT_DESKTOP;

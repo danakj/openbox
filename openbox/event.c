@@ -1759,6 +1759,7 @@ static void event_handle_dock(ObDock *s, XEvent *e)
 static gboolean event_handle_window(ObWindow *wi, XEvent *e)
 {
     gboolean used = FALSE, pixchange = FALSE;
+    gboolean same_window;
 
     if (wi->type == OB_WINDOW_CLASS_PROMPT) return used;
 
@@ -1767,9 +1768,15 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
         composite_dirty();
         if (e->xconfigure.send_event) break;
 
-        if (e->xconfigure.window == window_redir(wi)) {
+        same_window = window_top(wi) == window_redir(wi);
+
+        if (e->xconfigure.window == window_redir(wi) &&
+            /* if the redir != top window, but the event came from the root,
+               then the redir window used to be a child of the root but is not
+               anymore.  so don't use it for the redirect window */
+            (same_window || e->xconfigure.event != obt_root(ob_screen)))
+        {
             XConfigureEvent const *xe = &e->xconfigure;
-            const gboolean same_window = window_top(wi) == window_redir(wi);
             int x, y, w, h;
 
             /* if the redir window's size changes.. */

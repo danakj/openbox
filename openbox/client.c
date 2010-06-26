@@ -283,12 +283,12 @@ void client_manage(Window window, ObPrompt *prompt)
     if (ob_state() != OB_STATE_STARTING &&
         (!self->session || self->session->focused) &&
         /* this means focus=true for window is same as config_focus_new=true */
-        ((config_focus_new || (settings && settings->focus == 1)) ||
+        ((config_focus_new || settings->focus == 1) ||
          client_search_focus_tree_full(self)) &&
         /* NET_WM_USER_TIME 0 when mapping means don't focus */
         (user_time != 0) &&
         /* this checks for focus=false for the window */
-        (!settings || settings->focus != 0) &&
+        settings->focus != 0 &&
         focus_valid_target(self, self->desktop,
                            FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
                            settings->focus == 1))
@@ -368,7 +368,7 @@ void client_manage(Window window, ObPrompt *prompt)
                              (self->type == OB_CLIENT_TYPE_DIALOG ||
                               self->type == OB_CLIENT_TYPE_SPLASH ||
                               (!((self->positioned & USPosition) ||
-                                 (settings && settings->pos_given)) &&
+                                 settings->pos_given) &&
                                client_normal(self) &&
                                !self->session &&
                                /* don't move oldschool fullscreen windows to
@@ -436,7 +436,7 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug_type(OB_DEBUG_FOCUS, "Going to try activate new window? %s",
                   activate ? "yes" : "no");
     if (activate) {
-        activate = client_can_steal_focus(self, (settings && settings->focus),
+        activate = client_can_steal_focus(self, settings->focus,
                                           event_time(), launch_time);
 
         if (!activate) {

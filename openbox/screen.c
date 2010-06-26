@@ -54,6 +54,12 @@
                         ButtonPressMask | ButtonReleaseMask | \
                         SubstructureNotifyMask)
 
+#define SSW_X -100
+#define SSW_Y -100
+#define SSW_W 1
+#define SSW_H 1
+#define SSW_B 0
+
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm(void);
 static void     screen_tell_ksplash(void);
@@ -171,14 +177,12 @@ gboolean screen_annex(void)
     pid_t pid;
     gint i, num_support;
     gulong *supported;
-    const Rect r = {-100, -100, 1, 1};
-    const gint b = 0;
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
     attrib.event_mask = PropertyChangeMask;
     screen_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
-                                       r.x, r.y, r.width, r.height, b, 0,
+                                       SSW_X, SSW_Y, SSW_W, SSW_H, SSW_B, 0,
                                        InputOnly, CopyFromParent,
                                        CWEventMask | CWOverrideRedirect,
                                        &attrib);
@@ -200,10 +204,6 @@ gboolean screen_annex(void)
         XDestroyWindow(obt_display, screen_support_win);
         return FALSE;
     }
-
-    screen_support_obwin = window_internal_new(screen_support_win, &r, b, 0);
-    screen_support_obwin->layer = OB_STACKING_LAYER_TOPMOST;
-    stacking_set_topmost(INTERNAL_AS_WINDOW(screen_support_obwin));
 
     screen_set_root_cursor();
 
@@ -369,6 +369,16 @@ void screen_startup(gboolean reconfig)
     gchar **names = NULL;
     guint32 d;
     gboolean namesexist = FALSE;
+    const Rect r = {SSW_X, SSW_Y, SSW_W, SSW_H};
+
+    if (!reconfig) {
+        screen_support_obwin = window_internal_new(screen_support_win,
+                                                   &r, SSW_B, 0);
+        screen_support_obwin->layer = OB_STACKING_LAYER_TOPMOST;
+        stacking_set_topmost(INTERNAL_AS_WINDOW(screen_support_obwin));
+        window_add(&screen_support_win,
+                   INTERNAL_AS_WINDOW(screen_support_obwin));
+    }
 
     desktop_popup = pager_popup_new();
     desktop_popup_perm = FALSE;
@@ -484,6 +494,7 @@ void screen_shutdown(gboolean reconfig)
 
     XDestroyWindow(obt_display, screen_support_win);
     stacking_remove(INTERNAL_AS_WINDOW(screen_support_obwin));
+    window_remove(screen_support_win);
     window_free(INTERNAL_AS_WINDOW(screen_support_obwin));
 
     g_strfreev(screen_desktop_names);

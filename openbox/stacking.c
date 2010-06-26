@@ -511,6 +511,7 @@ void stacking_add(ObWindow *win)
 
     if (WINDOW_IS_UNMANAGED(win)) {
         ObUNode *n = g_slice_new(ObUNode);
+        g_assert(window_top(win) != screen_support_win);
         n->um = WINDOW_AS_UNMANAGED(win);
         n->belowme = stacking_list;
         stacking_ulist = g_list_prepend(stacking_ulist, n);

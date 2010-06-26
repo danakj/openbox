@@ -28,6 +28,7 @@ struct _ObUnmanaged {
     ObStackingLayer layer;
     gint depth;
     guint32 alpha;
+    gboolean output;
 };
 
 static GSList *unmanaged_list = NULL;
@@ -41,28 +42,29 @@ ObUnmanaged* unmanaged_new(Window w)
     if (w == composite_overlay)
         return NULL;
     if (!XGetWindowAttributes(obt_display, w, &at))
-        return NULL;        
-    if (at.class == InputOnly)
         return NULL;
 
     self = window_new(OB_WINDOW_CLASS_UNMANAGED, ObUnmanaged);
     self->window = w;
-    self->layer = OB_STACKING_LAYER_ALL;
+    self->layer = OB_STACKING_LAYER_INVALID;
     self->depth = at.depth;
     self->alpha = 0xffffffff;
+    self->output = at.class != InputOnly;
+
+    self->super.mapped = at.map_state != IsUnmapped;
 
     XSelectInput(obt_display, self->window, PropertyChangeMask);
 #ifdef SHAPE
     XShapeSelectInput(obt_display, self->window, ShapeNotifyMask);
 #endif
 
-    unmanaged_update_opacity(self);
+    if (self->output) unmanaged_update_opacity(self);
 
     RECT_SET(r, at.x, at.y, at.width, at.height);
     window_set_top_area(UNMANAGED_AS_WINDOW(self), &r, at.border_width);
     window_set_abstract(UNMANAGED_AS_WINDOW(self),
                         &self->window,
-                        &self->window,
+                        (self->output ? &self->window : NULL),
                         &self->layer,
                         &self->depth,
                         &self->alpha);

@@ -142,7 +142,7 @@ void dock_shutdown(gboolean reconfig)
     XDestroyWindow(obt_display, dock->frame);
     RrAppearanceFree(dock->a_frame);
     window_remove(dock->frame);
-    stacking_remove(dock);
+    stacking_remove(DOCK_AS_WINDOW(dock));
     window_free(DOCK_AS_WINDOW(dock));
     dock = NULL;
 }

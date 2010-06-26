@@ -144,7 +144,7 @@ typedef void (*ObWindowForeachFunc)(ObWindow *w);
 void      window_foreach(ObWindowForeachFunc func);
 
 #define window_top(w) (*((ObWindow*)w)->top)
-#define window_redir(w) (*((ObWindow*)w)->redir)
+#define window_redir(w) (((ObWindow*)w)->redir ? *((ObWindow*)w)->redir : None)
 #define window_layer(w) (*((ObWindow*)w)->layer)
 #define window_area(w) (*((ObWindow*)w)->area)
 #define window_depth(w) (*((ObWindow*)w)->depth)

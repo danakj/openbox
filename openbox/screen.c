@@ -70,6 +70,7 @@ Window          screen_support_win;
 Time            screen_desktop_user_time = CurrentTime;
 Atom            screen_wm_sn_atom = None;
 
+static ObInternalWindow *screen_support_obwin;
 static Size     screen_physical_size;
 static guint    screen_old_desktop;
 static gboolean screen_desktop_timeout = TRUE;
@@ -170,14 +171,15 @@ gboolean screen_annex(void)
     pid_t pid;
     gint i, num_support;
     gulong *supported;
+    const Rect r = {-100, -100, 1, 1};
+    const gint b = 0;
 
     /* create the netwm support window */
     attrib.override_redirect = TRUE;
     attrib.event_mask = PropertyChangeMask;
     screen_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
-                                       -100, -100, 1, 1, 0,
-                                       CopyFromParent, InputOnly,
-                                       CopyFromParent,
+                                       r.x, r.y, r.width, r.height, b, 0,
+                                       InputOnly, CopyFromParent,
                                        CWEventMask | CWOverrideRedirect,
                                        &attrib);
     XMapWindow(obt_display, screen_support_win);
@@ -198,6 +200,10 @@ gboolean screen_annex(void)
         XDestroyWindow(obt_display, screen_support_win);
         return FALSE;
     }
+
+    screen_support_obwin = window_internal_new(screen_support_win, &r, b, 0);
+    screen_support_obwin->layer = OB_STACKING_LAYER_TOPMOST;
+    stacking_set_topmost(INTERNAL_AS_WINDOW(screen_support_obwin));
 
     screen_set_root_cursor();
 
@@ -477,6 +483,8 @@ void screen_shutdown(gboolean reconfig)
     OBT_PROP_ERASE(obt_root(ob_screen), NET_SHOWING_DESKTOP);
 
     XDestroyWindow(obt_display, screen_support_win);
+    stacking_remove(INTERNAL_AS_WINDOW(screen_support_obwin));
+    window_free(INTERNAL_AS_WINDOW(screen_support_obwin));
 
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;

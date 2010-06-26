@@ -60,13 +60,13 @@ static void composite_window_redir(struct _ObWindow *w);
 /*! Turn composite redirection off for a window */
 static void composite_window_unredir(struct _ObWindow *w);
 
-static GLXContext composite_ctx = NULL;
+static GLXContext          composite_ctx = NULL;
 static ObCompositeFBConfig pixmap_config[MAX_DEPTH + 1]; /* depth is index */
-static gboolean composite_enabled = FALSE;
-static guint composite_idle_source = 0;
-static gboolean need_redraw = FALSE;
-static gboolean animating = FALSE;
-static Window composite_support_win = None;
+static gboolean            composite_enabled = FALSE;
+static guint               composite_idle_source = 0;
+static gboolean            need_redraw = FALSE;
+static gboolean            animating = FALSE;
+static Window              composite_support_win = None;
 #ifdef DEBUG
 static gboolean composite_started = FALSE;
 #endif
@@ -169,7 +169,7 @@ static gboolean composite_annex(void)
     g_assert(composite_support_win == None);
 
     attrib.override_redirect = TRUE;
-    composite_support_win = XCreateWindow(obt_display, obt_root(ob_screen),
+    composite_support_win = XCreateWindow(obt_display, screen_support_win,
                                           -100, -100, 1, 1, 0,
                                           CopyFromParent, InputOnly,
                                           CopyFromParent,
@@ -181,14 +181,22 @@ static gboolean composite_annex(void)
     g_free(astr);
 
     cm_owner = XGetSelectionOwner(obt_display, composite_cm_atom);
-    if (cm_owner != None) return FALSE;
+    if (cm_owner != None) {
+        XDestroyWindow(obt_display, composite_support_win);
+        composite_support_win = None;
+        return FALSE;
+    }
 
     timestamp = event_time();
     XSetSelectionOwner(obt_display, composite_cm_atom, composite_support_win,
                        timestamp);
 
     cm_owner = XGetSelectionOwner(obt_display, composite_cm_atom);
-    if (cm_owner != composite_support_win) return FALSE;
+    if (cm_owner != composite_support_win) {
+        XDestroyWindow(obt_display, composite_support_win);
+        composite_support_win = None;
+        return FALSE;
+    }
 
     /* Send client message indicating that we are now the CM */
     obt_prop_message(ob_screen, obt_root(ob_screen), OBT_PROP_ATOM(MANAGER),
@@ -440,9 +448,9 @@ void composite_resize(void)
 static gboolean composite(gpointer data)
 {
     struct timeval start, end, dif;
-    GList *it;
     ObWindow *win;
     ObClient *client;
+    ObStackingIter *it;
 
     if (!composite_enabled) {
         composite_idle_source = 0;
@@ -457,13 +465,9 @@ static gboolean composite(gpointer data)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-/* XXX for (it = stacking_list_last; it; it = g_list_previous(it)) { */
-    for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
+    it = stacking_iter_tail();
+    for (; (win = stacking_iter_win(it)); stacking_iter_prev(it)) {
         gint d, x, y, w, h;
-
-        win = it->data;
-        if (win->type == OB_WINDOW_CLASS_PROMPT)
-            continue;
 
         if (!win->mapped || !win->is_redir)
             continue;
@@ -644,6 +648,7 @@ static gboolean composite(gpointer data)
         if (obt_display_error_occured)
             g_assert(0 && "ERROR RELEASING GLX PIXMAP");
     }
+    stacking_iter_free(it);
 
     glXSwapBuffers(obt_display, composite_overlay);
     glFinish();

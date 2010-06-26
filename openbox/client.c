@@ -78,7 +78,7 @@ static void client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
 static void client_save_app_rule_values(ObClient *self);
-static void client_get_area(ObClient *self);
+static gboolean client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
@@ -211,14 +211,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Managing window: 0x%lx", window);
 
-    /* choose the events we want to receive on the CLIENT window
-       (ObPrompt windows can request events too) */
-    attrib_set.event_mask = CLIENT_EVENTMASK |
-        (prompt ? prompt->event_mask : 0);
-    attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
-    XChangeWindowAttributes(obt_display, window,
-                            CWEventMask|CWDontPropagate, &attrib_set);
-
     /* create the ObClient struct, and populate it from the hints on the
        window */
     self = window_new(OB_WINDOW_CLASS_CLIENT, ObClient);
@@ -230,6 +222,21 @@ void client_manage(Window window, ObPrompt *prompt)
     self->wmstate = WithdrawnState; /* make sure it gets updated first time */
     self->gravity = NorthWestGravity;
     self->desktop = screen_num_desktops; /* always an invalid value */
+
+    /* this is needed for the frame to set itself up */
+    if (!client_get_area(self)) {
+        ob_debug("Failed to manage window %lx, could not get area", window);
+        window_free(CLIENT_AS_WINDOW(self));
+        return;
+    }
+
+    /* choose the events we want to receive on the CLIENT window
+       (ObPrompt windows can request events too) */
+    attrib_set.event_mask = CLIENT_EVENTMASK |
+        (prompt ? prompt->event_mask : 0);
+    attrib_set.do_not_propagate_mask = CLIENT_NOPROPAGATEMASK;
+    XChangeWindowAttributes(obt_display, window,
+                            CWEventMask|CWDontPropagate, &attrib_set);
 
     /* get all the stuff off the window */
     client_get_all(self, TRUE);
@@ -530,6 +537,13 @@ ObClient *client_fake_manage(Window window)
     self = window_new(OB_WINDOW_CLASS_CLIENT, ObClient);
     self->window = window;
 
+    /* this is needed for the frame to set itself up */
+    if (!client_get_area(self)) {
+        ob_debug("Failed to manage window %lx, could not get area", window);
+        window_free(CLIENT_AS_WINDOW(self));
+        return NULL;
+    }
+
     client_get_all(self, FALSE);
     /* per-app settings override stuff, and return the settings for other
        uses too. this returns a shallow copy that needs to be freed */
@@ -615,7 +629,7 @@ void client_unmanage(ObClient *self)
     self->kill_prompt = NULL;
 
     client_list = g_list_remove(client_list, self);
-    stacking_remove(self);
+    stacking_remove(CLIENT_AS_WINDOW(self));
     window_remove(self->window);
 
     /* once the client is out of the list, update the struts to remove its
@@ -1122,9 +1136,6 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
 
 static void client_get_all(ObClient *self, gboolean real)
 {
-    /* this is needed for the frame to set itself up */
-    client_get_area(self);
-
     /* these things can change the decor and functions of the window */
 
     client_get_mwm_hints(self);
@@ -1193,13 +1204,12 @@ static void client_get_startup_id(ObClient *self)
                           NET_STARTUP_ID, utf8, &self->startup_id);
 }
 
-static void client_get_area(ObClient *self)
+static gboolean client_get_area(ObClient *self)
 {
     XWindowAttributes wattrib;
-    Status ret;
 
-    ret = XGetWindowAttributes(obt_display, self->window, &wattrib);
-    g_assert(ret != BadWindow);
+    if (!XGetWindowAttributes(obt_display, self->window, &wattrib))
+        return FALSE;
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
     POINT_SET(self->root_pos, wattrib.x, wattrib.y);
@@ -1207,6 +1217,7 @@ static void client_get_area(ObClient *self)
 
     ob_debug("client area: %d,%d  %dx%d  bw %d", wattrib.x, wattrib.y,
              wattrib.width, wattrib.height, wattrib.border_width);
+    return TRUE;
 }
 
 static void client_get_desktop(ObClient *self)

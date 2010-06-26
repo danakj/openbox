@@ -25,15 +25,78 @@
 #include "frame.h"
 #include "window.h"
 #include "event.h"
+#include "unmanaged.h"
 #include "debug.h"
 #include "obt/prop.h"
 
+/*! A node holding an unmanaged window for the secondary list stacking_ulist */
+typedef struct _ObUNode {
+    ObUnmanaged *um;
+    /*! Points to the node in stacking_list which is the highest window in
+      the list below this window */
+    GList *belowme;
+} ObUNode;
+
+/* A list of managed ObWindow*s in stacking order from highest to lowest */
 GList  *stacking_list = NULL;
-GList  *stacking_list_tail = NULL;
+/*! A list of unmanaged windows in OBUNode objects in stacking order from
+  highest to lowest */
+GList  *stacking_ulist = NULL;
+
+static GHashTable *stacking_map = NULL;
+static GHashTable *stacking_umap = NULL;
 /*! When true, stacking changes will not be reflected on the screen.  This is
   to freeze the on-screen stacking order while a window is being temporarily
   raised during focus cycling */
 static gboolean pause_changes = FALSE;
+
+static void list_split(GList **l1, GList **l2)
+{
+    if (*l1 == *l2) *l2 = NULL;
+    else if (*l2) {
+        if ((*l2)->prev) (*l2)->prev->next = NULL;
+        (*l2)->prev = NULL;
+    }
+}
+
+static GList* list_insert_link_before(GList *list, GList *before, GList *link)
+{
+    /* split the list at 'before' */
+    if (before) {
+        if (before->prev) before->prev->next = NULL;
+        before->prev = NULL;
+        /* and stick it at the front of the 'before' list */
+        link = g_list_concat(link, before);
+        /* if before is the whole list, then we have replaced the list */
+        if (before == list) list = NULL;
+    }
+    /* append the node and the rest of the list back onto the original list */
+    return g_list_concat(list, link);
+}
+
+void stacking_startup(gboolean reconfig)
+{
+    if (reconfig) return;
+    stacking_map = g_hash_table_new(g_int_hash, g_int_equal);
+    stacking_umap = g_hash_table_new(g_int_hash, g_int_equal);
+}
+
+void stacking_shutdown(gboolean reconfig)
+{
+    if (reconfig) return;
+    g_hash_table_destroy(stacking_map);
+    stacking_map = NULL;
+    g_hash_table_destroy(stacking_umap);
+    stacking_umap = NULL;
+}
+
+void stacking_set_topmost(ObWindow *win)
+{
+    g_assert(win && stacking_list == NULL);
+    g_assert(WINDOW_IS_INTERNAL(win));
+    g_assert(window_layer(win) == OB_STACKING_LAYER_TOPMOST);
+    stacking_list = g_list_prepend(stacking_list, win);
+}
 
 void stacking_set_list(void)
 {
@@ -74,11 +137,9 @@ static void do_restack(GList *wins, GList *before)
     g_assert(wins);
     /* pls only restack stuff in the same layer at a time */
     for (it = wins; it; it = next) {
-        while (it && window_layer(it->data) == OB_STACKING_LAYER_ALL)
-            it = g_list_next(it);
         next = g_list_next(it);
-        while (next && window_layer(next->data) == OB_STACKING_LAYER_ALL)
-            next = g_list_next(next);
+        /* and there should be no unmanaged windows in the stacking_list */
+        g_assert(!WINDOW_IS_UNMANAGED(it->data));
         if (!next) break;
         g_assert (window_layer(it->data) == window_layer(next->data));
     }
@@ -88,28 +149,27 @@ static void do_restack(GList *wins, GList *before)
 
     win = g_new(Window, g_list_length(wins) + 1);
 
-    if (before == stacking_list)
-        win[0] = screen_support_win;
-    else if (!before)
+    g_assert(before != stacking_list);
+
+    if (!before)
         win[0] = window_top(g_list_last(stacking_list)->data);
     else
         win[0] = window_top(g_list_previous(before)->data);
 
     for (i = 1, it = wins; it; ++i, it = g_list_next(it)) {
         win[i] = window_top(it->data);
-        g_assert(win[i] != None); /* better not call stacking shit before
-                                     setting your top level window value */
-        stacking_list = g_list_insert_before(stacking_list, before, it->data);
+        /* don't call stacking shit before setting your top level window */
+        g_assert(win[i] != None);
     }
+
+    list_split(&stacking_list, &before);
+    stacking_list = g_list_concat(stacking_list, g_list_concat(wins, before));
 
 #ifdef DEBUG
     /* some debug checking of the stacking list's order */
     for (it = stacking_list; ; it = next) {
-        while (it && window_layer(it->data) == OB_STACKING_LAYER_ALL)
-            it = g_list_next(it);
         next = g_list_next(it);
-        while (next && window_layer(next->data) == OB_STACKING_LAYER_ALL)
-            next = g_list_next(next);
+        g_assert(window_layer(it->data) != OB_STACKING_LAYER_INVALID);
         if (!next) break;
         g_assert(window_layer(it->data) >= window_layer(next->data));
     }
@@ -157,8 +217,7 @@ void stacking_restore(void)
     gulong start;
 
     win = g_new(Window, g_list_length(stacking_list) + 1);
-    win[0] = screen_support_win;
-    for (i = 1, it = stacking_list; it; ++i, it = g_list_next(it))
+    for (i = 0, it = stacking_list; it; ++i, it = g_list_next(it))
         win[i] = window_top(it->data);
     start = event_start_ignore_all_enters();
     XRestackWindows(obt_display, win, i);
@@ -170,15 +229,16 @@ void stacking_restore(void)
 
 static void do_raise(GList *wins)
 {
-    GList *it;
+    GList *it, *next;
     GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
     gint i;
 
-    for (it = wins; it; it = g_list_next(it)) {
-        ObStackingLayer l;
+    for (it = wins; it; it = next) {
+        const ObStackingLayer l = window_layer(it->data);
 
-        l = window_layer(it->data);
-        layer[l] = g_list_append(layer[l], it->data);
+        next = g_list_next(it);
+        wins = g_list_remove_link(wins, it); /* remove it from wins */
+        layer[l] = g_list_concat(layer[l], it); /* stick it in the layer */
     }
 
     it = stacking_list;
@@ -190,22 +250,22 @@ static void do_raise(GList *wins)
                     break;
             }
             do_restack(layer[i], it);
-            g_list_free(layer[i]);
         }
     }
 }
 
 static void do_lower(GList *wins)
 {
-    GList *it;
+    GList *it, *next;
     GList *layer[OB_NUM_STACKING_LAYERS] = {NULL};
     gint i;
 
-    for (it = wins; it; it = g_list_next(it)) {
-        ObStackingLayer l;
+    for (it = wins; it; it = next) {
+        const ObStackingLayer l = window_layer(it->data);
 
-        l = window_layer(it->data);
-        layer[l] = g_list_append(layer[l], it->data);
+        next = g_list_next(it);
+        wins = g_list_remove_link(wins, it); /* remove it from wins */
+        layer[l] = g_list_concat(layer[l], it); /* stick it in the layer */
     }
 
     it = stacking_list;
@@ -217,14 +277,13 @@ static void do_lower(GList *wins)
                     break;
             }
             do_restack(layer[i], it);
-            g_list_free(layer[i]);
         }
     }
 }
 
 static void restack_windows(ObClient *selected, gboolean raise)
 {
-    GList *it, *last, *below, *above, *next;
+    GList *it, *last, *below, *above, *next, *selit;
     GList *wins = NULL;
 
     GList *group_helpers = NULL;
@@ -243,9 +302,9 @@ static void restack_windows(ObClient *selected, gboolean raise)
     }
 
     /* remove first so we can't run into ourself */
-    it = g_list_find(stacking_list, selected);
-    g_assert(it);
-    stacking_list = g_list_delete_link(stacking_list, it);
+    selit = g_list_find(stacking_list, selected);
+    g_assert(selit);
+    stacking_list = g_list_remove_link(stacking_list, selit);
 
     /* go from the bottom of the stacking list up. don't move any other windows
        when lowering, we call this for each window independently */
@@ -255,6 +314,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
 
             if (WINDOW_IS_CLIENT(it->data)) {
                 ObClient *ch = it->data;
+                GList **addto = NULL;
 
                 /* only move windows in the same stacking layer */
                 if (ch->layer == selected->layer &&
@@ -264,24 +324,28 @@ static void restack_windows(ObClient *selected, gboolean raise)
                 {
                     if (client_is_direct_child(selected, ch)) {
                         if (ch->modal)
-                            modals = g_list_prepend(modals, ch);
+                            addto = &modals;
                         else
-                            trans = g_list_prepend(trans, ch);
+                            addto = &trans;
                     }
                     else if (client_helper(ch)) {
                         if (selected->transient) {
                             /* helpers do not stay above transient windows */
                             continue;
                         }
-                        group_helpers = g_list_prepend(group_helpers, ch);
+                        addto = &group_helpers;
                     }
                     else {
                         if (ch->modal)
-                            group_modals = g_list_prepend(group_modals, ch);
+                            addto = &group_modals;
                         else
-                            group_trans = g_list_prepend(group_trans, ch);
+                            addto = &group_trans;
                     }
-                    stacking_list = g_list_delete_link(stacking_list, it);
+                    g_assert(addto != NULL);
+                    /* move it from the stacking list onto the front of the
+                       list pointed at by addto */
+                    stacking_list = g_list_remove_link(stacking_list, it);
+                    *addto = g_list_concat(it, *addto);
                 }
             }
         }
@@ -294,7 +358,7 @@ static void restack_windows(ObClient *selected, gboolean raise)
     wins = g_list_concat(wins, group_helpers);
 
     /* put the selected window right below these children */
-    wins = g_list_append(wins, selected);
+    wins = g_list_concat(wins, selit);
 
     /* if selected window is transient for group then raise it above others */
     if (selected->transient_for_group) {
@@ -375,7 +439,6 @@ static void restack_windows(ObClient *selected, gboolean raise)
     wins = g_list_concat(group_modals, wins);
 
     do_restack(wins, below);
-    g_list_free(wins);
 
     /* lower our parents after us, so they go below us */
     if (!raise && selected->parents) {
@@ -406,13 +469,10 @@ void stacking_raise(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         restack_windows(selected, TRUE);
     } else {
-        GList *wins;
-        wins = g_list_append(NULL, window);
-        stacking_list = g_list_remove(stacking_list, window);
-        do_raise(wins);
-        g_list_free(wins);
+        GList *selit = g_list_find(stacking_list, window);
+        stacking_list = g_list_remove_link(stacking_list, selit);
+        do_raise(selit);
     }
-    stacking_list_tail = g_list_last(stacking_list);
 }
 
 void stacking_lower(ObWindow *window)
@@ -422,43 +482,65 @@ void stacking_lower(ObWindow *window)
         selected = WINDOW_AS_CLIENT(window);
         restack_windows(selected, FALSE);
     } else {
-        GList *wins;
-        wins = g_list_append(NULL, window);
-        stacking_list = g_list_remove(stacking_list, window);
-        do_lower(wins);
-        g_list_free(wins);
+        GList *selit = g_list_find(stacking_list, window);
+        stacking_list = g_list_remove_link(stacking_list, selit);
+        do_lower(selit);
     }
-    stacking_list_tail = g_list_last(stacking_list);
 }
 
 void stacking_below(ObWindow *window, ObWindow *below)
 {
-    GList *wins, *before;
+    GList *selit, *before;
 
     if (window_layer(window) != window_layer(below))
         return;
 
-    wins = g_list_append(NULL, window);
-    stacking_list = g_list_remove(stacking_list, window);
+    selit = g_list_find(stacking_list, window);
+    stacking_list = g_list_remove_link(stacking_list, selit);
     before = g_list_next(g_list_find(stacking_list, below));
-    do_restack(wins, before);
-    g_list_free(wins);
-    stacking_list_tail = g_list_last(stacking_list);
+    do_restack(selit, before);
 }
 
 void stacking_add(ObWindow *win)
 {
-    g_assert(screen_support_win != None); /* make sure I dont break this in the
-                                             future */
+    /* the topmost window should already be present */
+    g_assert(stacking_list != NULL);
+
     /* don't add windows that are being unmanaged ! */
     if (WINDOW_IS_CLIENT(win)) g_assert(WINDOW_AS_CLIENT(win)->managed);
 
-    if (WINDOW_IS_UNMANAGED(win))
-        stacking_list = g_list_prepend(stacking_list, win);
+    if (WINDOW_IS_UNMANAGED(win)) {
+        ObUNode *n = g_slice_new(ObUNode);
+        n->um = WINDOW_AS_UNMANAGED(win);
+        n->belowme = stacking_list;
+        stacking_ulist = g_list_prepend(stacking_ulist, n);
+        g_hash_table_insert(stacking_umap, &window_top(win), stacking_ulist);
+    }
     else {
-        stacking_list = g_list_append(stacking_list, win);
+        GList *newit = g_list_append(NULL, win);
+        stacking_list = g_list_concat(stacking_list, newit);
         stacking_raise(win);
-        /* stacking_list_tail set by stacking_raise() */
+        g_hash_table_insert(stacking_map, &window_top(win), newit);
+    }
+}
+
+void stacking_remove(ObWindow *win)
+{
+    if (WINDOW_IS_UNMANAGED(win)) {
+        GList *it;
+        for (it = stacking_ulist; it; it = g_list_next(it)) {
+            ObUNode *n = it->data;
+            if (n->um == WINDOW_AS_UNMANAGED(win)) {
+                stacking_ulist = g_list_delete_link(stacking_ulist, it);
+                g_slice_free(ObUNode, n);
+                break;
+            }
+        }
+        g_hash_table_remove(stacking_umap, &window_top(win));
+    }
+    else {
+        stacking_list = g_list_remove(stacking_list, win);
+        g_hash_table_remove(stacking_map, &window_top(win));
     }
 }
 
@@ -508,7 +590,7 @@ void stacking_add_nonintrusive(ObWindow *win)
     ObClient *client;
     GList *it_below = NULL; /* this client will be below us */
     GList *it_above;
-    GList *wins;
+    GList *newit;
 
     if (!WINDOW_IS_CLIENT(win)) {
         stacking_add(win); /* no special rules for others */
@@ -569,10 +651,9 @@ void stacking_add_nonintrusive(ObWindow *win)
             break;
     }
 
-    wins = g_list_append(NULL, win);
-    do_restack(wins, it_below);
-    g_list_free(wins);
-    stacking_list_tail = g_list_last(stacking_list);
+    newit = g_list_append(NULL, win);
+    do_restack(newit, it_below);
+    g_hash_table_insert(stacking_map, &window_top(win), newit);
 }
 
 /*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it
@@ -723,4 +804,162 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
         break;
     }
     return ret;
+}
+
+void stacking_unmanaged_above_notify(ObUnmanaged *win, Window above)
+{
+    GList *aboveit, *winit, *uit, *mit;
+    ObUNode *un, *an;
+
+    g_assert(WINDOW_IS_UNMANAGED(win));
+
+    winit = g_hash_table_lookup(stacking_umap, &window_top(win));
+
+    if (!above) {
+        /* at the very bottom of the stacking order */
+        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+        stacking_ulist = list_insert_link_before(stacking_ulist, NULL, winit);
+        un = winit->data;
+        un->belowme = NULL;
+    }
+    else if ((aboveit = g_hash_table_lookup(stacking_map, &above))) {
+        /* directly above a managed window, so put it at the bottom of
+           any siblings which are also above it */
+
+        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+        un = winit->data;
+        un->belowme = aboveit;
+
+        /* go through the managed windows in the stacking list from top to
+           bottom.
+           follow along in the list of unmanaged windows, until we come to the
+           managed window @winit is now above.  then keep moving through the
+           unmanaged windows until we find something above a different
+           managed window, and insert @winit into the unmanaged list before it.
+        */
+        mit = stacking_list;
+        uit = stacking_ulist;
+        for (; mit; mit = g_list_next(mit)) {
+            /* skip thru the unmanged windows above 'mit' */
+            while (uit && ((ObUNode*)uit->data)->belowme == mit)
+                uit = g_list_next(uit);
+            if (mit == aboveit) {
+                /* @win is above 'mit', so stick it in the unmanaged list
+                   before 'uit' (the first window above something lower in the
+                   managed stacking list */
+                stacking_ulist = list_insert_link_before(stacking_ulist,
+                                                         uit, winit);
+                break; /* done */
+            }
+        }
+    }
+    else if ((aboveit = g_hash_table_lookup(stacking_umap, &above))) {
+        /* directly above another unmanaged window, put it in that position
+           in the stacking_ulist */
+
+        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+        stacking_ulist = list_insert_link_before(stacking_ulist,
+                                                 aboveit, winit);
+        /* we share the same neighbour in stacking_list */
+        un = winit->data;
+        an = aboveit->data;
+        un->belowme = an->belowme;
+    }
+}
+
+struct _ObStackingIter {
+    GList *mit, *uit, *mitprev, *uitprev;
+};
+
+ObStackingIter* stacking_iter_head(void)
+{
+    ObStackingIter *it = g_slice_new(ObStackingIter);
+    it->mit = stacking_list;
+    it->mitprev = NULL;
+    it->uit = stacking_ulist;
+    it->uitprev = NULL;
+    return it;
+}
+
+ObStackingIter* stacking_iter_tail(void)
+{
+    ObStackingIter *it = g_slice_new(ObStackingIter);
+    it->uit = g_list_last(stacking_ulist);
+    if (it->uit && ((ObUNode*)it->uit->data)->belowme == NULL) {
+        /* it is below all managed windows */
+        it->uitprev = g_list_previous(it->uit);
+        it->mit = NULL;
+        it->mitprev = g_list_last(stacking_list);
+    }
+    else {
+        /* it is above some managed window */
+        it->uitprev = it->uit;
+        it->uit = NULL;
+        it->mit = g_list_last(stacking_list);
+        it->mitprev = it->mit ? g_list_previous(it->mit) : NULL;
+    }
+    return it;
+}
+
+/*! Returns 1 if it->mit is the current, and 2 if it->uit is. */
+static gint stacking_iter_current(ObStackingIter *it)
+{
+    if (!it->uit)
+        return 1;
+    else {
+        ObUNode *un = it->uit->data;
+        if (un->belowme == it->mit) return 2;
+        else return 1;
+    }
+}
+
+void stacking_iter_next(ObStackingIter *it)
+{
+    g_assert(it->mit || it->uit); /* went past the end of the list */
+
+    if (!it->uit) it->mit = g_list_next(it->mit);
+    else {
+        gint at = stacking_iter_current(it);
+        if (at == 1) {
+            it->mitprev = it->mit;
+            it->mit = g_list_next(it->mit);
+        }
+        else {
+            it->uitprev = it->uit;
+            it->uit = g_list_next(it->uit);
+        }
+    }
+}
+
+void stacking_iter_prev(ObStackingIter *it)
+{
+    g_assert(it->mit || it->uit); /* went past the end of the list */
+
+    /* if the prev unmanged points at the managed, it should be the
+       previous position */
+    if (it->uitprev && ((ObUNode*)it->uitprev->data)->belowme == it->mit) {
+        it->uit = it->uitprev;
+        it->uitprev = g_list_previous(it->uitprev);
+    }
+    else {
+        it->mit = it->mitprev;
+        if (it->mitprev) it->mitprev = g_list_previous(it->mitprev);
+        if (!it->mit) it->uit = NULL;
+    }
+}
+
+ObWindow* stacking_iter_win(ObStackingIter *it)
+{
+    gint at;
+
+    if (!it->mit && !it->uit) return NULL;
+
+    at = stacking_iter_current(it);
+    if (at == 1) return it->mit->data; /* list of ObWindow */
+    else return UNMANAGED_AS_WINDOW(((ObUNode*)it->uit->data)->um);
+}
+
+void stacking_iter_free(ObStackingIter *it)
+{
+    g_slice_free(ObStackingIter, it);
 }

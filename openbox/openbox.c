@@ -35,6 +35,7 @@
 #include "frame.h"
 #include "framerender.h"
 #include "keyboard.h"
+#include "stacking.h"
 #include "mouse.h"
 #include "menuframe.h"
 #include "grab.h"
@@ -303,6 +304,7 @@ gint main(gint argc, gchar **argv)
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             sn_startup(reconfigure);
+            stacking_startup(reconfigure);
             window_startup(reconfigure);
             composite_startup(reconfigure);
             focus_startup(reconfigure);
@@ -413,6 +415,7 @@ gint main(gint argc, gchar **argv)
             focus_shutdown(reconfigure);
             composite_shutdown(reconfigure);
             window_shutdown(reconfigure);
+            stacking_shutdown(reconfigure);
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();

@@ -25,24 +25,31 @@
 
 struct _ObWindow;
 struct _ObClient;
+struct _ObUnmanaged;
+
+typedef struct _ObStackingIter ObStackingIter;
 
 /*! The possible stacking layers a client window can be a part of */
 typedef enum {
     OB_STACKING_LAYER_INVALID,
-    OB_STACKING_LAYER_DESKTOP,          /*!< 0 - desktop windows */
-    OB_STACKING_LAYER_BELOW,            /*!< 1 - normal windows w/ below */
-    OB_STACKING_LAYER_NORMAL,           /*!< 2 - normal windows */
-    OB_STACKING_LAYER_ABOVE,            /*!< 3 - normal windows w/ above */
-    OB_STACKING_LAYER_FULLSCREEN,       /*!< 4 - fullscreeen windows */
-    OB_STACKING_LAYER_INTERNAL,         /*!< 5 - openbox windows/menus */
+    OB_STACKING_LAYER_DESKTOP,          /*!< 1 - desktop windows */
+    OB_STACKING_LAYER_BELOW,            /*!< 2 - normal windows w/ below */
+    OB_STACKING_LAYER_NORMAL,           /*!< 3 - normal windows */
+    OB_STACKING_LAYER_ABOVE,            /*!< 4 - normal windows w/ above */
+    OB_STACKING_LAYER_FULLSCREEN,       /*!< 5 - fullscreeen windows */
+    OB_STACKING_LAYER_INTERNAL,         /*!< 6 - openbox windows/menus */
+    OB_STACKING_LAYER_TOPMOST,          /*!< 7 - topmost window */
     OB_NUM_STACKING_LAYERS,
-    OB_STACKING_LAYER_ALL = 0xffffffff  /*!< 0xffffffff - unmamnaged windows */
 } ObStackingLayer;
 
-/* list of ObWindow*s in stacking order from highest to lowest */
 extern GList *stacking_list;
 /* list of ObWindow*s in stacking order from lowest to highest */
 extern GList *stacking_list_tail;
+
+void stacking_startup(gboolean reconfig);
+void stacking_shutdown(gboolean reconfig);
+
+void stacking_set_topmost(struct _ObWindow *win);
 
 /*! Sets the window stacking list on the root window from the
   stacking_list */
@@ -50,7 +57,7 @@ void stacking_set_list(void);
 
 void stacking_add(struct _ObWindow *win);
 void stacking_add_nonintrusive(struct _ObWindow *win);
-#define stacking_remove(win) stacking_list = g_list_remove(stacking_list, win);
+void stacking_remove(struct _ObWindow *win);
 
 /*! Raises a window above all others in its stacking layer */
 void stacking_raise(struct _ObWindow *window);
@@ -82,5 +89,14 @@ void stacking_below(struct _ObWindow *window, struct _ObWindow *below);
 gboolean stacking_restack_request(struct _ObClient *client,
                                   struct _ObClient *sibling,
                                   gint detail);
+
+void stacking_unmanaged_above_notify(struct _ObUnmanaged *win, Window above);
+
+ObStackingIter* stacking_iter_head(void);
+ObStackingIter* stacking_iter_tail(void);
+void stacking_iter_next(ObStackingIter *it);
+void stacking_iter_prev(ObStackingIter *it);
+struct _ObWindow* stacking_iter_win(ObStackingIter *it);
+void stacking_iter_free(ObStackingIter *it);
 
 #endif

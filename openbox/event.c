@@ -85,7 +85,7 @@ typedef struct
 static void event_process(const XEvent *e, gpointer data);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_input(XEvent *e);
-static gboolean event_handle_window(ObWindow *w, XEvent *e);
+static void event_handle_window(ObWindow *w, XEvent *e);
 static void event_handle_menu(ObMenuFrame *frame, XEvent *e);
 static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
 static void event_handle_dock(ObDock *s, XEvent *e);
@@ -521,6 +521,8 @@ static void event_process(const XEvent *ec, gpointer data)
 
     /* deal with it in the kernel */
 
+    if (obwin) event_handle_window(obwin, e);
+
     if (e->type == FocusIn) {
         print_focusevent(e);
         if (!wanted_focusevent(e, FALSE)) {
@@ -656,8 +658,6 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         obwin = UNMANAGED_AS_WINDOW(unmanaged_new(e->xreparent.window));
     }
-    else if (obwin && event_handle_window(obwin, e))
-        /* handled it ! */;
     else if (client)
         event_handle_client(client, e);
     else if (um)
@@ -1756,12 +1756,12 @@ static void event_handle_dock(ObDock *s, XEvent *e)
     }
 }
 
-static gboolean event_handle_window(ObWindow *wi, XEvent *e)
+static void event_handle_window(ObWindow *wi, XEvent *e)
 {
-    gboolean used = FALSE, pixchange = FALSE;
+    gboolean pixchange = FALSE;
     gboolean same_window;
 
-    if (wi->type == OB_WINDOW_CLASS_PROMPT) return used;
+    if (wi->type == OB_WINDOW_CLASS_PROMPT) return;
 
     switch (e->type) {
     case ConfigureNotify:
@@ -1807,7 +1807,6 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
                 h = xe->height;
             }
             RECT_SET(wi->area, x, y, w, h);
-            used = TRUE;
         }
 
         /* set the top window's area/border */
@@ -1815,8 +1814,8 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
             XConfigureEvent const *xe = &e->xconfigure;
             RECT_SET(wi->toparea, xe->x, xe->y, xe->width, xe->height);
             wi->topborder = xe->border_width;
-            used = TRUE;
         }
+
         break;
 
     case MapNotify:
@@ -1824,14 +1823,12 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
         if (e->xmap.window == window_redir(wi)) {
             wi->mapped = TRUE;
             pixchange = TRUE;
-            used = TRUE;
         }
         break;
     case UnmapNotify:
         composite_dirty();
         if (e->xunmap.window == window_top(wi)) {
             wi->mapped = FALSE;
-            used = TRUE;
         }
         break;
     default:
@@ -1844,7 +1841,6 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
             composite_dirty();
             if (s->window == window_redir(wi) && s->kind == ShapeBounding) {
                 window_adjust_redir_shape(wi);
-                used = FALSE; /* let other people get this event also */
             }
         }
 #endif
@@ -1853,13 +1849,11 @@ static gboolean event_handle_window(ObWindow *wi, XEvent *e)
         {
             XDamageNotifyEvent *ev = (XDamageNotifyEvent *)e;
             composite_dirty();
-            used = TRUE;
         }
 #endif
     }
     if (pixchange)
         composite_window_invalid(wi);
-    return used;
 }
 
 static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
@@ -1905,6 +1899,9 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
                          e->xconfigurerequest.value_mask, &xwc);
         obt_display_ignore_errors(FALSE);
         break;
+    case ConfigureNotify:
+        /* XXX check if above changed */
+        stacking_unmanaged_above_notify(um, e->xconfigure.above);
     }
 }
 

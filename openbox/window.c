@@ -85,7 +85,7 @@ void window_set_abstract(ObWindow *self,
 
 #ifdef SHAPE
 #ifdef USE_COMPOSITING
-    {
+    if (window_redir(self)) {
         gint foo;
         guint ufoo;
         gint s;
@@ -98,7 +98,8 @@ void window_set_abstract(ObWindow *self,
 #endif
 #endif
 
-    composite_window_setup(self);
+    if (window_redir(self))
+        composite_window_setup(self);
 }
 
 void window_set_top_area(ObWindow *self, const Rect *r, gint border)
@@ -116,7 +117,8 @@ void window_set_top_area(ObWindow *self, const Rect *r, gint border)
 
 void window_cleanup(ObWindow *self)
 {
-    composite_window_cleanup(self);
+    if (window_redir(self))
+        composite_window_cleanup(self);
 }
 
 void window_free(ObWindow *self)
@@ -180,11 +182,11 @@ ObInternalWindow* window_internal_new(Window window, const Rect *area,
     self->depth = depth;
     window_set_top_area(INTERNAL_AS_WINDOW(self), area, border);
     window_set_abstract(INTERNAL_AS_WINDOW(self),
-                        &self->window, /* top-most window */
-                        &self->window, /* composite redir window */
-                        &self->layer,  /* stacking layer */
-                        &self->depth,  /* window depth */
-                        NULL);         /* opacity */
+                        &self->window,                  /* top-most window */
+                        (depth ? &self->window : NULL), /* comp redir window */
+                        &self->layer,                   /* stacking layer */
+                        &self->depth,                   /* window depth */
+                        NULL);                          /* opacity */
     return self;
 }
 
@@ -221,75 +223,44 @@ void window_manage_all(void)
     for (i = 0; i < nchild; ++i) {
         if (children[i] == None) continue;
         if (window_find(children[i])) continue; /* skip our own windows */
-        if (XGetWindowAttributes(obt_display, children[i], &attrib)) {
-            if (attrib.map_state == IsUnmapped)
-                unmanaged_new(children[i]);
-            else
-                window_manage(children[i]);
-        }
+        if (!XGetWindowAttributes(obt_display, children[i], &attrib)) continue;
+        if (attrib.map_state == IsUnmapped || attrib.override_redirect)
+            unmanaged_new(children[i]);
+        else
+            window_manage(children[i]);
     }
 
     if (children) XFree(children);
 }
 
-static gboolean check_unmap(XEvent *e, gpointer data)
-{
-    const Window win = *(Window*)data;
-    return ((e->type == DestroyNotify && e->xdestroywindow.window == win) ||
-            (e->type == UnmapNotify && e->xunmap.window == win));
-}
-
 void window_manage(Window win)
 {
-    XWindowAttributes attrib;
-    gboolean no_manage = FALSE;
     gboolean is_dockapp = FALSE;
     Window icon_win = None;
+    XWMHints *wmhints;
+
+    /* is the window a docking app */
+    is_dockapp = FALSE;
+    if ((wmhints = XGetWMHints(obt_display, win))) {
+        if ((wmhints->flags & StateHint) &&
+            wmhints->initial_state == WithdrawnState)
+        {
+            if (wmhints->flags & IconWindowHint)
+                icon_win = wmhints->icon_window;
+            is_dockapp = TRUE;
+        }
+        XFree(wmhints);
+    }
 
     grab_server(TRUE);
 
-    /* check if it has already been unmapped by the time we started
-       mapping. the grab does a sync so we don't have to here */
-    if (xqueue_exists_local(check_unmap, &win)) {
-        ob_debug("Trying to manage unmapped window. Aborting that.");
-        no_manage = TRUE;
+    if (is_dockapp) {
+        if (!icon_win)
+            icon_win = win;
+        dock_manage(icon_win, win);
     }
-    else if (!XGetWindowAttributes(obt_display, win, &attrib))
-        no_manage = TRUE;
-    else {
-        XWMHints *wmhints;
-
-        /* is the window a docking app */
-        is_dockapp = FALSE;
-        if ((wmhints = XGetWMHints(obt_display, win))) {
-            if ((wmhints->flags & StateHint) &&
-                wmhints->initial_state == WithdrawnState)
-            {
-                if (wmhints->flags & IconWindowHint)
-                    icon_win = wmhints->icon_window;
-                is_dockapp = TRUE;
-            }
-            XFree(wmhints);
-        }
-    }
-
-    if (!no_manage) {
-        if (attrib.override_redirect) {
-            ob_debug("not managing override redirect window 0x%x", win);
-            grab_server(FALSE);
-        }
-        else if (is_dockapp) {
-            if (!icon_win)
-                icon_win = win;
-            dock_manage(icon_win, win);
-        }
-        else
-            client_manage(win, NULL);
-    }
-    else {
-        grab_server(FALSE);
-        ob_debug("FAILED to manage window 0x%x", win);
-    }
+    else
+        client_manage(win, NULL);
 }
 
 void window_unmanage_all(void)

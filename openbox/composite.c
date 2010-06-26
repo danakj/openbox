@@ -62,6 +62,7 @@ static void composite_window_unredir(struct _ObWindow *w);
 
 static GLXContext composite_ctx = NULL;
 static ObCompositeFBConfig pixmap_config[MAX_DEPTH + 1]; /* depth is index */
+static gboolean composite_enabled = FALSE;
 static guint composite_idle_source = 0;
 static gboolean need_redraw = FALSE;
 static gboolean animating = FALSE;
@@ -71,7 +72,6 @@ static gboolean composite_started = FALSE;
 #endif
 
 static gboolean composite(gpointer data);
-#define composite_enabled() (!!composite_idle_source)
 
 static inline void time_fix(struct timeval *tv)
 {
@@ -155,6 +155,8 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
 void composite_dirty(void)
 {
     need_redraw = 1;
+    if (!composite_idle_source)
+        composite_idle_source = g_idle_add(composite, NULL);
 }
 
 static gboolean composite_annex(void)
@@ -204,7 +206,7 @@ gboolean composite_enable(void)
     XVisualInfo tmp, *vi;
     GLXFBConfig *fbcs;
 
-    if (composite_enabled()) return TRUE;
+    if (composite_enabled) return TRUE;
 
     g_assert(config_comp);
 
@@ -339,7 +341,8 @@ gboolean composite_enable(void)
     /* We're good to go for composite ! */
 
     /* register our screen redraw callback */
-    composite_idle_source = g_idle_add(composite, NULL);
+    if (animating)
+        composite_idle_source = g_idle_add(composite, NULL);
 
     //Attempt to enable vsync
     if (GLXEW_EXT_swap_control) {
@@ -359,6 +362,8 @@ gboolean composite_enable(void)
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    composite_enabled = TRUE;
 
     composite_resize();
     window_foreach(composite_window_redir);
@@ -387,8 +392,12 @@ void composite_disable(void)
 
     window_foreach(composite_window_unredir);
 
-    g_source_remove(composite_idle_source);
-    composite_idle_source = 0;
+    if (composite_idle_source) {
+        g_source_remove(composite_idle_source);
+        composite_idle_source = 0;
+    }
+
+    composite_enabled = FALSE;
 }
 
 /*! This function will try enable composite if config_comp is TRUE.  At the
@@ -414,7 +423,7 @@ void composite_shutdown(gboolean reconfig)
 
     if (reconfig) return;
 
-    if (composite_enabled())
+    if (composite_enabled)
         composite_disable();
 }
 
@@ -422,7 +431,7 @@ void composite_resize(void)
 {
     const Rect *a;
 
-    if (!composite_enabled()) return;
+    if (!composite_enabled) return;
 
     a = screen_physical_area_all_monitors();
     glOrtho(a->x, a->x + a->width, a->y + a->height, a->y, -100, 100);
@@ -435,10 +444,16 @@ static gboolean composite(gpointer data)
     ObWindow *win;
     ObClient *client;
 
-    if (!composite_enabled()) return FALSE;
+    if (!composite_enabled) {
+        composite_idle_source = 0;
+        return FALSE;
+    }
 
-    if (!animating && !need_redraw)
-        return animating;
+    if (!animating && !need_redraw) {
+        if (animating) return TRUE;
+        composite_idle_source = 0;
+        return FALSE;
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -646,12 +661,14 @@ static gboolean composite(gpointer data)
 #endif
 
     need_redraw = FALSE;
-    return animating;
+    if (animating) return TRUE;
+    composite_idle_source = 0;
+    return FALSE;
 }
 
 static void composite_window_redir(ObWindow *w)
 {
-    if (!composite_enabled()) return;
+    if (!composite_enabled) return;
 
     if (w->is_redir) return;
 

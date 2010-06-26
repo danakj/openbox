@@ -53,6 +53,7 @@ typedef enum {
     /*! This is a special context, which occurs while dragging a window in
       a move/resize */
     OB_FRAME_CONTEXT_MOVE_RESIZE,
+    OB_FRAME_CONTEXT_DOCK,
     OB_FRAME_NUM_CONTEXTS
 } ObFrameContext;
 

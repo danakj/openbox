@@ -709,7 +709,7 @@ static void event_process(const XEvent *ec, gpointer data)
             /* ...or it if it was physically on an openbox
                internal window... */
             ((w = window_find(e->xbutton.subwindow)) &&
-             WINDOW_IS_INTERNAL(w)))
+             (WINDOW_IS_INTERNAL(w) || WINDOW_IS_DOCK(w))))
             /* ...then process the event, otherwise ignore it */
         {
             used = event_handle_user_input(client, e);
@@ -1712,12 +1712,6 @@ static void event_handle_client(ObClient *client, XEvent *e)
 static void event_handle_dock(ObDock *s, XEvent *e)
 {
     switch (e->type) {
-    case ButtonPress:
-        if (e->xbutton.button == 1)
-            stacking_raise(DOCK_AS_WINDOW(s));
-        else if (e->xbutton.button == 2)
-            stacking_lower(DOCK_AS_WINDOW(s));
-        break;
     case EnterNotify:
         dock_hide(FALSE);
         break;

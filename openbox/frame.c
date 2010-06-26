@@ -1368,18 +1368,27 @@ ObFrameContext frame_context_from_string(const gchar *name)
         return OB_FRAME_CONTEXT_CLOSE;
     else if (!g_ascii_strcasecmp("MoveResize", name))
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
+    else if (!g_ascii_strcasecmp("Dock", name))
+        return OB_FRAME_CONTEXT_DOCK;
+
     return OB_FRAME_CONTEXT_NONE;
 }
 
 ObFrameContext frame_context(ObClient *client, Window win, gint x, gint y)
 {
     ObFrame *self;
+    ObWindow *obwin;
 
     if (moveresize_in_progress)
         return OB_FRAME_CONTEXT_MOVE_RESIZE;
 
     if (win == obt_root(ob_screen))
-        return OB_FRAME_CONTEXT_ROOT ;
+        return OB_FRAME_CONTEXT_ROOT;
+    if ((obwin = window_find(win))) {
+        if (WINDOW_IS_DOCK(obwin)) {
+          return OB_FRAME_CONTEXT_DOCK;
+        }
+    }
     if (client == NULL) return OB_FRAME_CONTEXT_NONE;
     if (win == client->window) {
         /* conceptually, this is the desktop, as far as users are

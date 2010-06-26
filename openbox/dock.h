@@ -80,6 +80,9 @@ void dock_app_configure(ObDockApp *app, gint w, gint h);
 
 void dock_get_area(Rect *a);
 
+void dock_raise_dock(void);
+void dock_lower_dock(void);
+
 ObDockApp* dock_find_dockapp(Window xwin);
 
 #endif

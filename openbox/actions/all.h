@@ -31,6 +31,7 @@ void action_directionalwindows_startup(void);
 void action_resize_startup(void);
 void action_decorations_startup(void);
 void action_desktop_startup(void);
+void action_dock_startup(void);
 void action_resizerelative_startup(void);
 void action_addremovedesktop_startup(void);
 void action_dockautohide_startup(void);

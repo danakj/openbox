@@ -30,6 +30,7 @@ void action_all_startup(void)
     action_resize_startup();
     action_decorations_startup();
     action_desktop_startup();
+    action_dock_startup();
     action_resizerelative_startup();
     action_addremovedesktop_startup();
     action_dockautohide_startup();

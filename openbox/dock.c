@@ -677,6 +677,16 @@ void dock_get_area(Rect *a)
              dock->area.width, dock->area.height);
 }
 
+void dock_raise_dock(void)
+{
+    stacking_raise(DOCK_AS_WINDOW(dock));
+}
+
+void dock_lower_dock(void)
+{
+    stacking_lower(DOCK_AS_WINDOW(dock));
+}
+
 ObDockApp* dock_find_dockapp(Window xwin)
 {
     return g_hash_table_lookup(dock->dock_map, &xwin);

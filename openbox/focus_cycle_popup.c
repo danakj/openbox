@@ -229,7 +229,7 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
     window_cleanup(INTERNAL_AS_WINDOW(popup));
 
     window_remove(popup->bg);
-    stacking_remove(INTERNAL_AS_WINDOW(&popup));
+    stacking_remove(INTERNAL_AS_WINDOW(popup));
 
     while(popup->targets) {
         ObFocusCyclePopupTarget *t = popup->targets->data;

@@ -327,7 +327,8 @@ typedef struct _ObtXQueueCB {
 static ObtXQueueCB *callbacks = NULL;
 static guint n_callbacks = 0;
 
-static gboolean event_read(GSource *source, GSourceFunc callback, gpointer data)
+static gboolean event_read(GSource *source, GSourceFunc callback,
+                           gpointer data)
 {
     XEvent ev;
 

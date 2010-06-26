@@ -491,9 +491,14 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
         modcxstr = g_strdup(cxstr); /* make a copy to mutilate */
         while (frame_next_context_from_string(modcxstr, &cx)) {
             if (!cx) {
-                g_message(_("Invalid context \"%s\" in mouse binding"),
-                          cxstr);
-                break;
+                gchar *s = strchr(modcxstr, ' ');
+                if (s) {
+                    *s = '\0';
+                    g_message(_("Invalid context \"%s\" in mouse binding"),
+                              modcxstr);
+                    *s = ' ';
+                }
+                continue;
             }
 
             nbut = obt_xml_find_node(n->children, "mousebind");

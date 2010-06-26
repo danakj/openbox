@@ -201,11 +201,11 @@ void popup_delay_show(ObPopup *self, gulong msec, gchar *text)
         textx += iconw + ob_rr_theme->paddingx;
         if (textw)
             emptyx += ob_rr_theme->paddingx; /* between the icon and text */
+        icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
     } else
         iconw = 0;
 
     texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->paddingy;
-    icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
 
     /* when there is no icon, then fill the whole dialog with the text
        appearance

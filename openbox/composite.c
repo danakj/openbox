@@ -64,7 +64,6 @@ static void composite_window_unredir(struct _ObWindow *w);
 static GLXContext          composite_ctx = NULL;
 static ObCompositeFBConfig pixmap_config[MAX_DEPTH + 1]; /* depth is index */
 static gboolean            composite_enabled = FALSE;
-static guint               composite_idle_source = 0;
 static gboolean            need_redraw = FALSE;
 static gboolean            animating = FALSE;
 static Window              composite_support_win = None;
@@ -72,11 +71,12 @@ static Pixmap              root_pixmap = None;
 static GLXPixmap           root_gpixmap = None;
 static GLuint              root_texture = 0;
 static gboolean            root_bound = FALSE;
+static gint                gsource_id = 0;
 #ifdef DEBUG
 static gboolean composite_started = FALSE;
 #endif
 
-static gboolean composite(gpointer data);
+static void composite(void);
 
 static inline void time_fix(struct timeval *tv)
 {
@@ -226,8 +226,6 @@ static void destroy_glx_pixmap(GLXPixmap gpx, GLuint tex)
 void composite_dirty(void)
 {
     need_redraw = 1;
-    if (!composite_idle_source)
-        composite_idle_source = g_idle_add(composite, NULL);
 }
 
 static gboolean composite_annex(void)
@@ -277,6 +275,23 @@ static gboolean composite_annex(void)
     return TRUE;
 }
 
+static gboolean source_prepare(GSource *source, gint *timeout)
+{
+    *timeout = -1;
+    return need_redraw || animating;
+}
+
+static gboolean source_check(GSource *source)
+{
+    return need_redraw || animating;
+}
+
+static gboolean source_run(GSource *source, GSourceFunc cb, gpointer data)
+{
+    composite();
+    return TRUE; /* repeat */
+}
+
 gboolean composite_enable(void)
 {
     int count, val, i;
@@ -284,6 +299,13 @@ gboolean composite_enable(void)
     XserverRegion xr;
     XVisualInfo tmp, *vi;
     GLXFBConfig *fbcs;
+    GSource *gsource;
+    static GSourceFuncs source_funcs = {
+        source_prepare,
+        source_check,
+        source_run,
+        NULL
+    };
 
     if (composite_enabled) return TRUE;
 
@@ -419,10 +441,6 @@ gboolean composite_enable(void)
 
     /* We're good to go for composite ! */
 
-    /* register our screen redraw callback */
-    if (animating)
-        composite_idle_source = g_idle_add(composite, NULL);
-
     //Attempt to enable vsync
     if (GLXEW_EXT_swap_control) {
         GLXDrawable drawable = glXGetCurrentDrawable();
@@ -445,6 +463,11 @@ gboolean composite_enable(void)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glGenTextures(1, &root_texture);
+
+    /* create our GSource which allows us to redraw */
+    gsource = g_source_new(&source_funcs, sizeof(GSource));
+    g_source_set_priority(gsource, G_PRIORITY_LOW); /* X events first */
+    gsource_id = g_source_attach(gsource, NULL);
 
     composite_enabled = TRUE;
 
@@ -486,10 +509,7 @@ void composite_disable(void)
     if (composite_support_win)
         XDestroyWindow(obt_display, composite_support_win);
 
-    if (composite_idle_source) {
-        g_source_remove(composite_idle_source);
-        composite_idle_source = 0;
-    }
+    g_source_remove(gsource_id);
 
     composite_enabled = FALSE;
     need_redraw = 0;
@@ -541,22 +561,15 @@ void composite_resize(void)
     composite_dirty();
 }
 
-static gboolean composite(gpointer data)
+static void composite(void)
 {
     ObWindow *win;
     ObClient *client;
     ObStackingIter *it;
 
-    if (!composite_enabled) {
-        composite_idle_source = 0;
-        return FALSE;
-    }
+    g_assert(need_redraw || animating);
 
-    if (!animating && !need_redraw) {
-        if (animating) return TRUE;
-        composite_idle_source = 0;
-        return FALSE;
-    }
+    if (!composite_enabled) return;
 
     glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -734,9 +747,6 @@ static gboolean composite(gpointer data)
 #endif
 
     need_redraw = FALSE;
-    if (animating) return TRUE;
-    composite_idle_source = 0;
-    return FALSE;
 }
 
 static void composite_window_redir(ObWindow *w)

@@ -1809,28 +1809,26 @@ static void event_handle_window(ObWindow *wi, XEvent *e)
             RECT_SET(wi->area, x, y, w, h);
         }
 
-        /* set the top window's area/border */
         if (e->xconfigure.window == window_top(wi)) {
+            /* set the top window's area/border */
             XConfigureEvent const *xe = &e->xconfigure;
             RECT_SET(wi->toparea, xe->x, xe->y, xe->width, xe->height);
             wi->topborder = xe->border_width;
+
+            /* fix the stacking order */
+            if (e->xconfigure.above != wi->above) {
+                stacking_above_notify(wi, e->xconfigure.above);
+                wi->above = e->xconfigure.above;
+            }
         }
 
         break;
     case CreateNotify:
         if (e->xcreatewindow.parent == obt_root(ob_screen))
-            /* we actually only care about tracking above for unmanaged
-               windows, and they are only created by create or reparent
-               events, at which time they become the top-most, so we don't
-               bother tracking above for all windows in this function */
             wi->above = window_top(stacking_topmost_window());
         break;
     case ReparentNotify:
         if (e->xreparent.parent == obt_root(ob_screen))
-            /* we actually only care about tracking above for unmanaged
-               windows, and they are only created by create or reparent
-               events, at which time they become the top-most, so we don't
-               bother tracking above for all windows in this function */
             wi->above = window_top(stacking_topmost_window());
         break;
     case MapNotify:
@@ -1914,13 +1912,6 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
                          e->xconfigurerequest.value_mask, &xwc);
         obt_display_ignore_errors(FALSE);
         break;
-    case ConfigureNotify:
-        if (e->xconfigure.above != UNMANAGED_AS_WINDOW(um)->above) {
-            ob_debug("ConfigureNotify changed stacking order for "
-                     "unmanaged 0x%lx", window_top(um));
-            stacking_unmanaged_above_notify(um, e->xconfigure.above);
-            UNMANAGED_AS_WINDOW(um)->above = e->xconfigure.above;
-        }
     }
 }
 

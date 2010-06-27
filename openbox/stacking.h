@@ -90,7 +90,7 @@ gboolean stacking_restack_request(struct _ObClient *client,
                                   struct _ObClient *sibling,
                                   gint detail);
 
-void stacking_unmanaged_above_notify(struct _ObUnmanaged *win, Window above);
+void stacking_above_notify(struct _ObWindow *win, Window above);
 
 ObStackingIter* stacking_iter_head(void);
 ObStackingIter* stacking_iter_tail(void);

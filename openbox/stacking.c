@@ -807,64 +807,111 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
     return ret;
 }
 
-void stacking_unmanaged_above_notify(ObUnmanaged *win, Window above)
+void stacking_above_notify(ObWindow *win, Window above)
 {
     GList *aboveit, *winit, *uit, *mit;
     ObUNode *un, *an;
+    gboolean last;
 
-    g_assert(WINDOW_IS_UNMANAGED(win));
+    if (!WINDOW_IS_UNMANAGED(win)) {
+        GList *belowme;
+        /* a managed window moved, so any unmanaged that were above it before
+           no longer are.
+           on the other hand, the unmanaged that were above @above before
+           are now above this window */
+        winit = g_hash_table_lookup(stacking_map, &window_top(win));
+        belowme = winit->next;
 
-    winit = g_hash_table_lookup(stacking_umap, &window_top(win));
+        /* find the unmanaged windows that were above me */
+        for (uit = stacking_ulist; uit; uit = g_list_next(uit))
+            if (((ObUNode*)uit->data)->belowme == winit) break;
+        /* change them to be above what i used to be above */
+        while (uit && ((ObUNode*)uit->data)->belowme == winit) {
+            ((ObUNode*)uit->data)->belowme = belowme;
+            uit = g_list_next(uit);
+        }
 
-    if (!above) {
-        /* at the very bottom of the stacking order */
-        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
-        stacking_ulist = list_insert_link_before(stacking_ulist, NULL, winit);
-        un = winit->data;
-        un->belowme = NULL;
-    }
-    else if ((aboveit = g_hash_table_lookup(stacking_map, &above))) {
-        /* directly above a managed window, so put it at the bottom of
-           any siblings which are also above it */
-
-        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
-        un = winit->data;
-        un->belowme = aboveit;
-
-        /* go through the managed windows in the stacking list from top to
-           bottom.
-           follow along in the list of unmanaged windows, until we come to the
-           managed window @winit is now above.  then keep moving through the
-           unmanaged windows until we find something above a different
-           managed window, and insert @winit into the unmanaged list before it.
-        */
-        mit = stacking_list;
-        uit = stacking_ulist;
-        for (; mit; mit = g_list_next(mit)) {
-            /* skip thru the unmanged windows above 'mit' */
-            while (uit && ((ObUNode*)uit->data)->belowme == mit)
-                uit = g_list_next(uit);
-            if (mit == aboveit) {
-                /* @win is above 'mit', so stick it in the unmanaged list
-                   before 'uit' (the first window above something lower in the
-                   managed stacking list */
-                stacking_ulist = list_insert_link_before(stacking_ulist,
-                                                         uit, winit);
-                break; /* done */
+        /* find who i am now above and tell them so */
+        if (!above) {
+            /* unmanaged that used to be above nothing */
+            uit = g_list_last(stacking_ulist);
+            while (uit && ((ObUNode*)uit->data)->belowme == NULL) {
+                ((ObUNode*)uit->data)->belowme = winit;
+                uit = g_list_previous(uit);
+            }
+        }
+        else if ((aboveit = g_hash_table_lookup(stacking_map, &above))) {
+            /* find unmanaged windows above managed 'aboveit' */
+            for (uit = stacking_ulist; uit; uit = g_list_next(uit))
+                if (((ObUNode*)uit->data)->belowme == aboveit) break;
+            while (uit && ((ObUNode*)uit->data)->belowme == aboveit)
+                ((ObUNode*)uit->data)->belowme = winit;
+        }
+        else if ((uit = g_hash_table_lookup(stacking_umap, &above))) {
+            /* change unmanaged windows above unmanaged 'uit' */
+            aboveit = ((ObUNode*)uit->data)->belowme;
+            uit = g_list_previous(uit);
+            while (uit && ((ObUNode*)uit->data)->belowme == aboveit) {
+                ((ObUNode*)uit->data)->belowme = winit;
+                uit = g_list_previous(uit);
             }
         }
     }
-    else if ((aboveit = g_hash_table_lookup(stacking_umap, &above))) {
-        /* directly above another unmanaged window, put it in that position
-           in the stacking_ulist */
+    else {
+        winit = g_hash_table_lookup(stacking_umap, &window_top(win));
 
-        stacking_ulist = g_list_remove_link(stacking_ulist, winit);
-        stacking_ulist = list_insert_link_before(stacking_ulist,
-                                                 aboveit, winit);
-        /* we share the same neighbour in stacking_list */
-        un = winit->data;
-        an = aboveit->data;
-        un->belowme = an->belowme;
+        if (!above) {
+            /* at the very bottom of the stacking order */
+            stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+            stacking_ulist = list_insert_link_before(stacking_ulist,
+                                                     NULL, winit);
+            un = winit->data;
+            un->belowme = NULL;
+        }
+        else if ((aboveit = g_hash_table_lookup(stacking_map, &above))) {
+            /* directly above a managed window, so put it at the bottom of
+               any siblings which are also above it */
+
+            stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+            un = winit->data;
+            un->belowme = aboveit;
+
+            /* go through the managed windows in the stacking list from top to
+               bottom.
+               follow along in the list of unmanaged windows, until we come to
+               the managed window @winit is now above.  then keep moving
+               through the unmanaged windows until we find something above a
+               different managed window, and insert @winit into the unmanaged
+               list before it.
+            */
+            mit = stacking_list;
+            uit = stacking_ulist;
+            for (; mit; mit = g_list_next(mit)) {
+                /* skip thru the unmanged windows above 'mit' */
+                while (uit && ((ObUNode*)uit->data)->belowme == mit)
+                    uit = g_list_next(uit);
+                if (mit == aboveit) {
+                    /* @win is above 'mit', so stick it in the unmanaged list
+                       before 'uit' (the first window above something lower in
+                       the managed stacking list */
+                    stacking_ulist = list_insert_link_before(stacking_ulist,
+                                                             uit, winit);
+                    break; /* done */
+                }
+            }
+        }
+        else if ((aboveit = g_hash_table_lookup(stacking_umap, &above))) {
+            /* directly above another unmanaged window, put it in that position
+               in the stacking_ulist */
+
+            stacking_ulist = g_list_remove_link(stacking_ulist, winit);
+            stacking_ulist = list_insert_link_before(stacking_ulist,
+                                                     aboveit, winit);
+            /* we share the same neighbour in stacking_list */
+            un = winit->data;
+            an = aboveit->data;
+            un->belowme = an->belowme;
+        }
     }
 }
 

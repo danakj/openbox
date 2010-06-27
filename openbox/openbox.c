@@ -47,6 +47,7 @@
 #include "obrender/theme.h"
 #include "obt/display.h"
 #include "obt/xqueue.h"
+#include "obt/signal.h"
 #include "obt/prop.h"
 #include "obt/keyboard.h"
 #include "obt/xml.h"
@@ -117,6 +118,8 @@ gint main(gint argc, gchar **argv)
 {
     gchar *program_name;
 
+    obt_signal_listen();
+
     ob_set_state(OB_STATE_STARTING);
 
     ob_debug_startup();
@@ -160,16 +163,17 @@ gint main(gint argc, gchar **argv)
 
     ob_main_loop = g_main_loop_new(NULL, FALSE);
 
-    /* set up signal handler */
-//  obt_main_loop_signal_add(ob_main_loop, SIGUSR1, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGUSR2, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGTERM, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGINT, signal_handler,  NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGHUP, signal_handler,  NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGPIPE, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGCHLD, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGTTIN, signal_handler, NULL,NULL);
-//  obt_main_loop_signal_add(ob_main_loop, SIGTTOU, signal_handler, NULL,NULL);
+    /* set up signal handlers, they are called from the mainloop
+       in the main program's thread */
+    obt_signal_add_callback(SIGUSR1, signal_handler, NULL);
+    obt_signal_add_callback(SIGUSR2, signal_handler, NULL);
+    obt_signal_add_callback(SIGTERM, signal_handler, NULL);
+    obt_signal_add_callback(SIGINT,  signal_handler, NULL);
+    obt_signal_add_callback(SIGHUP,  signal_handler, NULL);
+    obt_signal_add_callback(SIGPIPE, signal_handler, NULL);
+    obt_signal_add_callback(SIGCHLD, signal_handler, NULL);
+    obt_signal_add_callback(SIGTTIN, signal_handler, NULL);
+    obt_signal_add_callback(SIGTTOU, signal_handler, NULL);
 
     ob_screen = DefaultScreen(obt_display);
 
@@ -420,6 +424,7 @@ gint main(gint argc, gchar **argv)
 
     if (restart) {
         ob_debug_shutdown();
+        obt_signal_stop();
         if (restart_path != NULL) {
             gint argcp;
             gchar **argvp;
@@ -473,8 +478,10 @@ gint main(gint argc, gchar **argv)
     g_free(ob_sm_id);
     g_free(program_name);
 
-    if (!restart)
+    if (!restart) {
         ob_debug_shutdown();
+        obt_signal_stop();
+    }
 
     return exitcode;
 }

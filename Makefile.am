@@ -144,6 +144,8 @@ obt_libobt_la_SOURCES = \
 	obt/paths.c \
 	obt/prop.h \
 	obt/prop.c \
+	obt/signal.h \
+	obt/signal.c \
 	obt/util.h \
 	obt/watch.h \
 	obt/watch.c \
@@ -439,6 +441,7 @@ obtpubinclude_HEADERS = \
 	obt/xml.h \
 	obt/paths.h \
 	obt/prop.h \
+	obt/signal.h \
 	obt/util.h \
 	obt/version.h \
 	obt/watch.h \

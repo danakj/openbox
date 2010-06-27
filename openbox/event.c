@@ -813,6 +813,12 @@ static void event_handle_root(XEvent *e)
         }
         else if (e->xproperty.atom == OBT_PROP_ATOM(NET_DESKTOP_LAYOUT))
             screen_update_layout();
+        else if (e->xproperty.atom == OBT_PROP_ATOM(XROOTPMAP_ID) ||
+                 e->xproperty.atom == OBT_PROP_ATOM(ESETROOT_PMAP_ID))
+        {
+            composite_root_invalid();
+            composite_dirty();
+        }
         break;
     case ConfigureNotify:
 #ifdef XRANDR

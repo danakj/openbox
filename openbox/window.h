@@ -69,6 +69,7 @@ struct _ObWindow {
     GLuint texture;
     Pixmap pixmap;
     GLXPixmap gpixmap;
+    gboolean bound;
     Damage damage;
     Rect area; /* area of the redirected window */
     Rect toparea; /* area of the top-level window */

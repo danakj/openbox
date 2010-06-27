@@ -49,6 +49,9 @@ Atom   composite_cm_atom = None;
 
 #ifdef USE_COMPOSITING
 #define MAX_DEPTH 32
+#define ROOT_COLOR_R 0.4f
+#define ROOT_COLOR_G 0.6f
+#define ROOT_COLOR_B 0.8f
 
 typedef struct _ObCompositeFBConfig {
     GLXFBConfig fbc; /* the fbconfig */
@@ -67,6 +70,10 @@ static guint               composite_idle_source = 0;
 static gboolean            need_redraw = FALSE;
 static gboolean            animating = FALSE;
 static Window              composite_support_win = None;
+static Pixmap              root_pixmap = None;
+static GLXPixmap           root_gpixmap = None;
+static GLuint              root_texture = 0;
+static gboolean            root_bound = FALSE;
 #ifdef DEBUG
 static gboolean composite_started = FALSE;
 #endif
@@ -150,6 +157,57 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
     }
     out->fbc = best;
     out->tf = rgba ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT;
+}
+
+static GLXPixmap create_glx_pixmap(Pixmap px, gint depth)
+{
+    GLXPixmap gpx;
+    int attribs[] = {
+        GLX_TEXTURE_FORMAT_EXT,
+        pixmap_config[depth].tf,
+        GLX_TEXTURE_TARGET_EXT,
+        GLX_TEXTURE_2D_EXT,
+        None
+    };
+    obt_display_ignore_errors(TRUE);
+    gpx = glXCreatePixmap(obt_display, pixmap_config[depth].fbc, px, attribs);
+    obt_display_ignore_errors(FALSE);
+    if (obt_display_error_occured)
+        gpx = None; /* stupid drivers can and do exist */
+    return gpx;
+}
+
+static gboolean bind_glx_pixmap(GLXPixmap gpx, GLuint tex)
+{
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    obt_display_ignore_errors(TRUE);
+    glXBindTexImageEXT(obt_display, gpx, GLX_FRONT_LEFT_EXT, NULL);
+    obt_display_ignore_errors(FALSE);
+
+    if (!obt_display_error_occured) {
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+        ob_debug_type(OB_DEBUG_CM, "Error binding GLXPixmap to Texture");
+
+    return !obt_display_error_occured;
+}
+
+/* pass 0 for tex if it is not bound to one */
+static void destroy_glx_pixmap(GLXPixmap gpx, GLuint tex)
+{
+    if (gpx) {
+        if (tex) {
+            glBindTexture(GL_TEXTURE_2D, tex);
+            glXReleaseTexImageEXT(obt_display, gpx, GLX_FRONT_LEFT_EXT);
+        }
+        glXDestroyPixmap(obt_display, gpx);
+    }
 }
 
 void composite_dirty(void)
@@ -360,6 +418,7 @@ gboolean composite_enable(void)
         ob_debug_type(OB_DEBUG_CM, "Vsync control not available.");
     }
 
+    glClearColor(ROOT_COLOR_R, ROOT_COLOR_G, ROOT_COLOR_B, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glXSwapBuffers(obt_display, composite_overlay);
     glMatrixMode(GL_PROJECTION);
@@ -371,6 +430,8 @@ gboolean composite_enable(void)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glGenTextures(1, &root_texture);
+
     composite_enabled = TRUE;
 
     composite_resize();
@@ -381,6 +442,19 @@ gboolean composite_enable(void)
 
 void composite_disable(void)
 {
+    if (root_texture) {
+        glDeleteTextures(1, &root_texture);
+        root_texture = 0;
+    }
+
+    if (root_gpixmap) {
+        destroy_glx_pixmap(root_gpixmap, root_bound ? root_texture : 0);
+        root_bound = FALSE;
+        root_gpixmap = None;
+    }
+
+    window_foreach(composite_window_unredir);
+
     if (composite_ctx) {
         obt_display_ignore_errors(TRUE);
         glXMakeCurrent(obt_display, None, NULL);
@@ -398,14 +472,13 @@ void composite_disable(void)
     if (composite_support_win)
         XDestroyWindow(obt_display, composite_support_win);
 
-    window_foreach(composite_window_unredir);
-
     if (composite_idle_source) {
         g_source_remove(composite_idle_source);
         composite_idle_source = 0;
     }
 
     composite_enabled = FALSE;
+    need_redraw = 0;
 }
 
 /*! This function will try enable composite if config_comp is TRUE.  At the
@@ -420,7 +493,14 @@ void composite_startup(gboolean reconfig)
     if (!reconfig) {
         if (ob_comp_indirect)
             setenv("LIBGL_ALWAYS_INDIRECT", "1", TRUE);
+        return;
     }
+
+    if (composite_enabled)
+        /* XXX this will be a config option sometime so it can be changed
+           on reconfigure */
+        glClearColor(ROOT_COLOR_R, ROOT_COLOR_G, ROOT_COLOR_B, 0.0f);
+
 }
 
 void composite_shutdown(gboolean reconfig)
@@ -443,11 +523,13 @@ void composite_resize(void)
 
     a = screen_physical_area_all_monitors();
     glOrtho(a->x, a->x + a->width, a->y + a->height, a->y, -100, 100);
+
+    composite_root_invalid();
+    composite_dirty();
 }
 
 static gboolean composite(gpointer data)
 {
-    struct timeval start, end, dif;
     ObWindow *win;
     ObClient *client;
     ObStackingIter *it;
@@ -463,11 +545,42 @@ static gboolean composite(gpointer data)
         return FALSE;
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    /* draw the screen background */
+    if (!root_gpixmap) {
+        if (root_pixmap) {
+            const int depth = DefaultDepth(obt_display, ob_screen);
+            root_gpixmap = create_glx_pixmap(root_pixmap, depth);
+            root_bound = bind_glx_pixmap(root_gpixmap, root_texture);
+        }
+    }
+    if (root_bound) {
+        const Rect *rw = screen_physical_area_all_monitors();
+        const gint l = rw->x, r = rw->x + rw->width, t = rw->y,
+            b = rw->y + rw->height;
+        obt_display_ignore_errors(TRUE);
+        glBindTexture(GL_TEXTURE_2D, root_texture);
+        glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 0.0f);
+        glVertex3f(l, t, 0);
+        glTexCoord2f(0.0f, 1.0f);
+        glVertex3f(l, b, 0);
+        glTexCoord2f(1.0f, 1.0f);
+        glVertex3f(r, b, 0.0f);
+        glTexCoord2f(1.0f, 0.0f);
+        glVertex3f(r, t, 0);
+        glEnd();
+        obt_display_ignore_errors(FALSE);
+    }
+    else {
+        /* solid color as the fallback */
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
     it = stacking_iter_tail();
     for (; (win = stacking_iter_win(it)); stacking_iter_prev(it)) {
-        gint d, x, y, w, h;
+        gint x, y, w, h;
 
         if (!win->mapped || !win->is_redir)
             continue;
@@ -477,8 +590,6 @@ static gboolean composite(gpointer data)
             if (!client->frame->visible)
                 continue;
         } else client = NULL;
-
-        d = window_depth(win);
 
         if (win->pixmap == None) {
             obt_display_ignore_errors(TRUE);
@@ -499,52 +610,21 @@ static gboolean composite(gpointer data)
                     win->pixmap = None;
                 }
             }
+            if (win->pixmap == None)
+                continue;
         }
-        if (win->pixmap == None)
-            continue;
 
         if (win->gpixmap == None) {
-            int attribs[] = {
-                GLX_TEXTURE_FORMAT_EXT,
-                pixmap_config[d].tf,
-                GLX_TEXTURE_TARGET_EXT,
-                GLX_TEXTURE_2D_EXT,
-                None
-            };
-            obt_display_ignore_errors(TRUE);
-            win->gpixmap = glXCreatePixmap(obt_display,
-                                           pixmap_config[d].fbc,
-                                           win->pixmap, attribs);
-            obt_display_ignore_errors(FALSE);
-            if (obt_display_error_occured)
-                g_assert(0 && "ERROR CREATING GLX PIXMAP FROM NAMED PIXMAP");
+            const int depth = window_depth(win);
+            if (!(win->gpixmap = create_glx_pixmap(win->pixmap, depth)))
+                continue;
+            win->bound = bind_glx_pixmap(win->gpixmap, win->texture);
         }
-        if (win->gpixmap == None)
+
+        if (!win->bound)
             continue;
 
         glBindTexture(GL_TEXTURE_2D, win->texture);
-#ifdef DEBUG
-        gettimeofday(&start, NULL);
-#endif
-        obt_display_ignore_errors(TRUE);
-        glXBindTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT,
-                           NULL);
-        obt_display_ignore_errors(FALSE);
-        if (obt_display_error_occured)
-            g_assert(0 && "ERROR BINDING GLX PIXMAP");
-#ifdef DEBUG
-        gettimeofday(&end, NULL);
-        dif.tv_sec = end.tv_sec - start.tv_sec;
-        dif.tv_usec = end.tv_usec - start.tv_usec;
-        time_fix(&dif);
-//printf("took %f ms\n", dif.tv_sec * 1000.0 + dif.tv_usec / 1000.0);
-#endif
-
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         x = win->toparea.x + win->topborder + win->area.x;
         y = win->toparea.y + win->topborder + win->area.y;
@@ -641,12 +721,6 @@ static gboolean composite(gpointer data)
             glEnable(GL_TEXTURE_2D);
             glColor4f(1.0, 1.0, 1.0, 1.0);
         }
-
-        obt_display_ignore_errors(TRUE);
-        glXReleaseTexImageEXT(obt_display, win->gpixmap, GLX_FRONT_LEFT_EXT);
-        obt_display_ignore_errors(FALSE);
-        if (obt_display_error_occured)
-            g_assert(0 && "ERROR RELEASING GLX PIXMAP");
     }
     stacking_iter_free(it);
 
@@ -677,8 +751,16 @@ static void composite_window_redir(ObWindow *w)
 
     if (w->is_redir) return;
 
+    g_assert(w->gpixmap == None);
+    g_assert(w->pixmap == None);
+    g_assert(w->bound == FALSE);
+    g_assert(w->texture == 0);
+
     XCompositeRedirectWindow(obt_display, window_redir(w),
                              CompositeRedirectManual);
+
+    glGenTextures(1, &w->texture);
+
     w->is_redir = TRUE;
 }
 
@@ -691,7 +773,13 @@ static void composite_window_unredir(ObWindow *w)
     XCompositeUnredirectWindow(obt_display, window_redir(w),
                                CompositeRedirectManual);
     obt_display_ignore_errors(FALSE);
+
+    glDeleteTextures(1, &w->texture);
+    w->texture = 0;
+
     w->is_redir = FALSE;
+
+    composite_window_invalid(w);
 }
 
 void composite_window_setup(ObWindow *w)
@@ -706,7 +794,6 @@ void composite_window_setup(ObWindow *w)
     w->damage = XDamageCreate(obt_display, window_redir(w),
                               XDamageReportRawRectangles);
     obt_display_ignore_errors(FALSE);
-    glGenTextures(1, &w->texture);
 
     composite_window_redir(w);
 }
@@ -720,21 +807,18 @@ void composite_window_cleanup(ObWindow *w)
 #endif
 
     composite_window_unredir(w);
-    composite_window_invalid(w);
+
     if (w->damage) {
         XDamageDestroy(obt_display, w->damage);
         w->damage = None;
-    }
-    if (w->texture) {
-        glDeleteTextures(1, &w->texture);
-        w->texture = 0;
     }
 }
 
 void composite_window_invalid(ObWindow *w)
 {
     if (w->gpixmap) {
-        glXDestroyPixmap(obt_display, w->gpixmap);
+        destroy_glx_pixmap(w->gpixmap, w->bound ? w->texture : 0);
+        w->bound = FALSE;
         w->gpixmap = None;
     }
     if (w->pixmap) {
@@ -742,7 +826,25 @@ void composite_window_invalid(ObWindow *w)
         w->pixmap = None;
     }
 }
-        
+
+void composite_root_invalid(void)
+{
+    guint32 px;
+
+    px = None;
+    if (!OBT_PROP_GET32(obt_root(ob_screen), XROOTPMAP_ID, PIXMAP, &px))
+        OBT_PROP_GET32(obt_root(ob_screen), ESETROOT_PMAP_ID, PIXMAP, &px);
+
+    if (px != root_pixmap) {
+        if (root_gpixmap) {
+            destroy_glx_pixmap(root_gpixmap, root_bound ? root_texture : 0);
+            root_bound = FALSE;
+            root_gpixmap = None;
+        }
+        root_pixmap = px;
+    }
+}
+
 #else
 void composite_startup        (gboolean boiv) {;(void)(biov);}
 void composite_shutdown       (gboolean boiv) {;(void)(biov);}
@@ -752,6 +854,7 @@ void composite_disable        (void)          {}
 void composite_window_setup   (ObWindow *w)   {}
 void composite_window_cleanup (ObWindow *w)   {}
 void composite_window_invalid (ObWindow *w)   {}
+void composite_root_invalid   (void)          {}
 void composite_dirty          (void)          {}
 
 void composite_enable(void)

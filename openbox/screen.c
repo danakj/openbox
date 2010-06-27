@@ -304,6 +304,9 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_FRAME_STRUT);
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE);
 
+    supported[i++] = OBT_PROP_ATOM(XROOTPMAP_ID);
+    supported[i++] = OBT_PROP_ATOM(ESETROOT_PMAP_ID);
+
     supported[i++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
     supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
     supported[i++] = OBT_PROP_ATOM(OPENBOX_PID);

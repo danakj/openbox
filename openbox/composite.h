@@ -50,4 +50,7 @@ void composite_window_cleanup(struct _ObWindow *w);
 /*! Called when a window's pixmaps become invalid and need to be destroyed */
 void composite_window_invalid(struct _ObWindow *w);
 
+/*! Called when the root pixmap changes */
+void composite_root_invalid(void);
+
 #endif

@@ -77,6 +77,7 @@ struct _ObWindow {
     gint n_rects; /* number of objects in @rects */
     gboolean mapped;
     gboolean is_redir;
+    Window above; /* the sibling window last reported that this is above */
 #endif
 };
 

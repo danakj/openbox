@@ -99,4 +99,7 @@ void stacking_iter_prev(ObStackingIter *it);
 struct _ObWindow* stacking_iter_win(ObStackingIter *it);
 void stacking_iter_free(ObStackingIter *it);
 
+/*! Return the topmost window on the screen */
+struct _ObWindow* stacking_topmost_window(void);
+
 #endif

@@ -521,6 +521,16 @@ static void event_process(const XEvent *ec, gpointer data)
 
     /* deal with it in the kernel */
 
+    /* deal with it in the ObWindow superclass first */
+    if (!obwin) {
+        Window p; /* parent window (it's never None in these events) */
+        if (((e->type == CreateNotify && (p = e->xcreatewindow.parent)) ||
+             (e->type == ReparentNotify && (p = e->xreparent.parent))) &&
+            p == obt_root(ob_screen))
+        {
+            obwin = UNMANAGED_AS_WINDOW(unmanaged_new(window));
+        }
+    }
     if (obwin) event_handle_window(obwin, e);
 
     if (e->type == FocusIn) {
@@ -647,16 +657,6 @@ static void event_process(const XEvent *ec, gpointer data)
 
         if (client && client != focus_client)
             frame_adjust_focus(client->frame, FALSE);
-    }
-    else if (e->type == CreateNotify &&
-             !obwin && e->xcreatewindow.parent == obt_root(ob_screen))
-    {
-        obwin = UNMANAGED_AS_WINDOW(unmanaged_new(e->xcreatewindow.window));
-    }
-    else if (e->type == ReparentNotify &&
-             !obwin && e->xreparent.parent == obt_root(ob_screen))
-    {
-        obwin = UNMANAGED_AS_WINDOW(unmanaged_new(e->xreparent.window));
     }
     else if (client)
         event_handle_client(client, e);
@@ -1817,7 +1817,22 @@ static void event_handle_window(ObWindow *wi, XEvent *e)
         }
 
         break;
-
+    case CreateNotify:
+        if (e->xcreatewindow.parent == obt_root(ob_screen))
+            /* we actually only care about tracking above for unmanaged
+               windows, and they are only created by create or reparent
+               events, at which time they become the top-most, so we don't
+               bother tracking above for all windows in this function */
+            wi->above = window_top(stacking_topmost_window());
+        break;
+    case ReparentNotify:
+        if (e->xreparent.parent == obt_root(ob_screen))
+            /* we actually only care about tracking above for unmanaged
+               windows, and they are only created by create or reparent
+               events, at which time they become the top-most, so we don't
+               bother tracking above for all windows in this function */
+            wi->above = window_top(stacking_topmost_window());
+        break;
     case MapNotify:
         if (e->xmap.window == window_redir(wi)) {
             composite_dirty();
@@ -1900,8 +1915,12 @@ static void event_handle_unmanaged(ObUnmanaged *um, XEvent *e)
         obt_display_ignore_errors(FALSE);
         break;
     case ConfigureNotify:
-        /* XXX check if above changed */
-        stacking_unmanaged_above_notify(um, e->xconfigure.above);
+        if (e->xconfigure.above != UNMANAGED_AS_WINDOW(um)->above) {
+            ob_debug("ConfigureNotify changed stacking order for "
+                     "unmanaged 0x%lx", window_top(um));
+            stacking_unmanaged_above_notify(um, e->xconfigure.above);
+            UNMANAGED_AS_WINDOW(um)->above = e->xconfigure.above;
+        }
     }
 }
 

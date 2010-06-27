@@ -964,3 +964,19 @@ void stacking_iter_free(ObStackingIter *it)
 {
     g_slice_free(ObStackingIter, it);
 }
+
+ObWindow* stacking_topmost_window(void)
+{
+    ObUNode *un = stacking_ulist ? stacking_ulist->data : NULL;
+    if (un && un->belowme == stacking_list)
+        /* the topmost unmanaged window is higher than the topmost
+           managed window, return it */
+        return UNMANAGED_AS_WINDOW(un->um);
+    else if (stacking_list)
+        /* the topmost managed window exists so it must be the highest */
+        return stacking_list->data;
+    else
+        /* there is no topmost managed window, and there must not be an
+           unmanaged window either, as it would be above NULL */
+        return NULL;
+}

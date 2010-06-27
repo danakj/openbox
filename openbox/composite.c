@@ -49,9 +49,6 @@ Atom   composite_cm_atom = None;
 
 #ifdef USE_COMPOSITING
 #define MAX_DEPTH 32
-#define ROOT_COLOR_R 0.4f
-#define ROOT_COLOR_G 0.6f
-#define ROOT_COLOR_B 0.8f
 
 typedef struct _ObCompositeFBConfig {
     GLXFBConfig fbc; /* the fbconfig */
@@ -157,6 +154,22 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
     }
     out->fbc = best;
     out->tf = rgba ? GLX_TEXTURE_FORMAT_RGBA_EXT : GLX_TEXTURE_FORMAT_RGB_EXT;
+}
+
+static Pixmap name_window_pixmap(Window w)
+{
+    Pixmap p;
+    obt_display_ignore_errors(TRUE);
+    p = XCompositeNameWindowPixmap(obt_display, w);
+    obt_display_ignore_errors(FALSE);
+    if (obt_display_error_occured) {
+        ob_debug_type(OB_DEBUG_CM, "Error in XCompositeNameWindowPixmap for "
+                      "window 0x%x", w);
+        /* it can error but still return an ID, which will cause an
+           error to occur if you try to free it etc */
+        p = None;
+    }
+    return p;
 }
 
 static GLXPixmap create_glx_pixmap(Pixmap px, gint depth)
@@ -418,7 +431,8 @@ gboolean composite_enable(void)
         ob_debug_type(OB_DEBUG_CM, "Vsync control not available.");
     }
 
-    glClearColor(ROOT_COLOR_R, ROOT_COLOR_G, ROOT_COLOR_B, 0.0f);
+    glClearColor(config_comp_root_color_r, config_comp_root_color_g,
+                 config_comp_root_color_b, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glXSwapBuffers(obt_display, composite_overlay);
     glMatrixMode(GL_PROJECTION);
@@ -497,10 +511,9 @@ void composite_startup(gboolean reconfig)
     }
 
     if (composite_enabled)
-        /* XXX this will be a config option sometime so it can be changed
-           on reconfigure */
-        glClearColor(ROOT_COLOR_R, ROOT_COLOR_G, ROOT_COLOR_B, 0.0f);
-
+        /* this is a config option so it can be changed on reconfigure */
+        glClearColor(config_comp_root_color_r, config_comp_root_color_g,
+                     config_comp_root_color_b, 0.0f);
 }
 
 void composite_shutdown(gboolean reconfig)
@@ -548,12 +561,10 @@ static gboolean composite(gpointer data)
     glClear(GL_DEPTH_BUFFER_BIT);
 
     /* draw the screen background */
-    if (!root_gpixmap) {
-        if (root_pixmap) {
-            const int depth = DefaultDepth(obt_display, ob_screen);
-            root_gpixmap = create_glx_pixmap(root_pixmap, depth);
-            root_bound = bind_glx_pixmap(root_gpixmap, root_texture);
-        }
+    if (root_pixmap && !root_gpixmap) {
+        const int depth = DefaultDepth(obt_display, ob_screen);
+        root_gpixmap = create_glx_pixmap(root_pixmap, depth);
+        root_bound = bind_glx_pixmap(root_gpixmap, root_texture);
     }
     if (root_bound) {
         const Rect *rw = screen_physical_area_all_monitors();
@@ -589,28 +600,11 @@ static gboolean composite(gpointer data)
             client = WINDOW_AS_CLIENT(win);
             if (!client->frame->visible)
                 continue;
-        } else client = NULL;
+        }
+        else client = NULL;
 
         if (win->pixmap == None) {
-            obt_display_ignore_errors(TRUE);
-            win->pixmap = XCompositeNameWindowPixmap(obt_display,
-                                                     window_redir(win));
-            obt_display_ignore_errors(FALSE);
-            if (obt_display_error_occured) {
-                ob_debug_type(OB_DEBUG_CM,
-                              "Error in XCompositeNameWindowPixmap for "
-                              "window 0x%x of 0x%x",
-                              window_redir(win), window_top(win));
-                /* it can error but still return an ID, which will cause an
-                   error to occur if you try to free it etc */
-                if (win->pixmap) {
-                    obt_display_ignore_errors(TRUE);
-                    XFreePixmap(obt_display, win->pixmap);
-                    obt_display_ignore_errors(FALSE);
-                    win->pixmap = None;
-                }
-            }
-            if (win->pixmap == None)
+            if (!(win->pixmap = name_window_pixmap(window_redir(win))))
                 continue;
         }
 

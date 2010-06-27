@@ -138,6 +138,10 @@ extern gchar *config_theme;
 /*! Whether to act as a compositing manager or not */
 extern gboolean config_comp;
 
+extern gfloat   config_comp_root_color_r;
+extern gfloat   config_comp_root_color_g;
+extern gfloat   config_comp_root_color_b;
+
 /*! Show the one-pixel border after toggleDecor */
 extern gboolean config_theme_keepborder;
 /*! Titlebar button layout */

@@ -51,6 +51,9 @@ gboolean config_theme_keepborder;
 guint    config_theme_window_list_icon_size;
 
 gboolean config_comp;
+gfloat   config_comp_root_color_r;
+gfloat   config_comp_root_color_g;
+gfloat   config_comp_root_color_b;
 
 gchar   *config_title_layout;
 
@@ -1015,6 +1018,9 @@ void config_startup(ObtXmlInst *i)
     config_theme = NULL;
 
     config_comp = TRUE;
+    config_comp_root_color_r = 0.4f;
+    config_comp_root_color_g = 0.6f;
+    config_comp_root_color_b = 0.8f;
 
     config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");

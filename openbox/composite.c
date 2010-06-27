@@ -22,6 +22,7 @@
 #include "obt/display.h"
 #include "openbox.h"
 #include "screen.h"
+#include "grab.h"
 #include "event.h"
 #include "geom.h"
 #include "client.h"
@@ -158,17 +159,14 @@ static void get_best_fbcon(GLXFBConfig *in, int count, int depth,
 
 static Pixmap name_window_pixmap(Window w)
 {
-    Pixmap p;
-    obt_display_ignore_errors(TRUE);
-    p = XCompositeNameWindowPixmap(obt_display, w);
-    obt_display_ignore_errors(FALSE);
-    if (obt_display_error_occured) {
-        ob_debug_type(OB_DEBUG_CM, "Error in XCompositeNameWindowPixmap for "
-                      "window 0x%x", w);
-        /* it can error but still return an ID, which will cause an
-           error to occur if you try to free it etc */
-        p = None;
-    }
+    XWindowAttributes at;
+    Pixmap p = None;
+
+    grab_server(TRUE);
+    if (XGetWindowAttributes(obt_display, w, &at))
+        p = XCompositeNameWindowPixmap(obt_display, w);
+    grab_server(FALSE);
+
     return p;
 }
 
@@ -743,6 +741,9 @@ static gboolean composite(gpointer data)
 
 static void composite_window_redir(ObWindow *w)
 {
+    const Window win = window_redir(w);
+    XWindowAttributes at;
+
     if (!composite_enabled) return;
 
     if (w->is_redir) return;
@@ -751,11 +752,23 @@ static void composite_window_redir(ObWindow *w)
     g_assert(w->pixmap == None);
     g_assert(w->bound == FALSE);
     g_assert(w->texture == 0);
+    g_assert(w->damage == None);
 
-    XCompositeRedirectWindow(obt_display, window_redir(w),
-                             CompositeRedirectManual);
+    grab_server(TRUE);
+
+    /* make sure the window exists */
+    if (!XGetWindowAttributes(obt_display, win, &at)) {
+        grab_server(FALSE);
+        return;
+    }
 
     glGenTextures(1, &w->texture);
+    /* this can cause a BadDrawable error if the window isn't there
+       anymoree */
+    w->damage = XDamageCreate(obt_display, win, XDamageReportRawRectangles);
+    XCompositeRedirectWindow(obt_display, win, CompositeRedirectManual);
+
+    grab_server(FALSE);
 
     w->is_redir = TRUE;
 }
@@ -770,12 +783,21 @@ static void composite_window_unredir(ObWindow *w)
                                CompositeRedirectManual);
     obt_display_ignore_errors(FALSE);
 
-    glDeleteTextures(1, &w->texture);
-    w->texture = 0;
+    /* destroy everything used only when the window is redirected */
+
+    /* destroy the window's pixmap stuff */
+    composite_window_invalid(w);
+
+    if (w->damage) {
+        XDamageDestroy(obt_display, w->damage);
+        w->damage = None;
+    }
+    if (w->texture) {
+        glDeleteTextures(1, &w->texture);
+        w->texture = 0;
+    }
 
     w->is_redir = FALSE;
-
-    composite_window_invalid(w);
 }
 
 void composite_window_setup(ObWindow *w)
@@ -785,11 +807,6 @@ void composite_window_setup(ObWindow *w)
 #ifdef DEBUG
     g_assert(composite_started);
 #endif
-
-    obt_display_ignore_errors(TRUE);
-    w->damage = XDamageCreate(obt_display, window_redir(w),
-                              XDamageReportRawRectangles);
-    obt_display_ignore_errors(FALSE);
 
     composite_window_redir(w);
 }
@@ -804,10 +821,6 @@ void composite_window_cleanup(ObWindow *w)
 
     composite_window_unredir(w);
 
-    if (w->damage) {
-        XDamageDestroy(obt_display, w->damage);
-        w->damage = None;
-    }
 }
 
 void composite_window_invalid(ObWindow *w)

@@ -215,11 +215,13 @@ static gboolean bind_glx_pixmap(GLXPixmap gpx, GLuint tex)
 static void destroy_glx_pixmap(GLXPixmap gpx, GLuint tex)
 {
     if (gpx) {
+        obt_display_ignore_errors(TRUE);
         if (tex) {
             glBindTexture(GL_TEXTURE_2D, tex);
             glXReleaseTexImageEXT(obt_display, gpx, GLX_FRONT_LEFT_EXT);
         }
         glXDestroyPixmap(obt_display, gpx);
+        obt_display_ignore_errors(FALSE);
     }
 }
 

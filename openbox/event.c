@@ -1819,15 +1819,15 @@ static void event_handle_window(ObWindow *wi, XEvent *e)
         break;
 
     case MapNotify:
-        composite_dirty();
         if (e->xmap.window == window_redir(wi)) {
+            composite_dirty();
             wi->mapped = TRUE;
             pixchange = TRUE;
         }
         break;
     case UnmapNotify:
-        composite_dirty();
         if (e->xunmap.window == window_top(wi)) {
+            composite_dirty();
             wi->mapped = FALSE;
         }
         break;
@@ -1838,8 +1838,8 @@ static void event_handle_window(ObWindow *wi, XEvent *e)
             e->type == obt_display_extension_shape_basep + ShapeNotify)
         {
             XShapeEvent *s = (XShapeEvent*)e;
-            composite_dirty();
             if (s->window == window_redir(wi) && s->kind == ShapeBounding) {
+                composite_dirty();
                 window_adjust_redir_shape(wi);
             }
         }

@@ -117,8 +117,11 @@ void window_set_top_area(ObWindow *self, const Rect *r, gint border)
 
 void window_cleanup(ObWindow *self)
 {
-    if (window_redir(self))
+    if (window_redir(self)) {
         composite_window_cleanup(self);
+        /* when the window goes away, we will need to redraw */
+        composite_dirty();
+    }
 }
 
 void window_free(ObWindow *self)

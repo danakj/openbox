@@ -55,7 +55,7 @@ theme awesome {
 						box (0, 0, 0) to (10, 10, 0)
 					}
 					material(none)
-					context(minimize)
+					context(iconify)
 				}
 				decor maxbutton {
 					space {

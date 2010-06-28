@@ -45,14 +45,15 @@ static struct context_table_item contexts[OB_FRAME_NUM_CONTEXTS] = {
 	{"iconify", OB_FRAME_CONTEXT_ICONIFY},
 	{"icon", OB_FRAME_CONTEXT_ICON},
 	{"close", OB_FRAME_CONTEXT_CLOSE},
-	{"moveresize", OB_FRAME_CONTEXT_MOVE_RESIZE}
+	{"moveresize", OB_FRAME_CONTEXT_MOVE_RESIZE},
+	{"dock", OB_FRAME_CONTEXT_DOCK}
 };
 
 static ObFrameContext context_from_string(char *str)
 {
 	int i;
 	for (i = 0; i < OB_FRAME_NUM_CONTEXTS; i++)
-		if (strcmp(contexts[i].name, str) == 1)
+		if (strcmp(contexts[i].name, str) == 0)
 			return contexts[i].val;
 	return -1;
 }
@@ -79,10 +80,10 @@ static RrSurfaceColorType gradient_from_string(char *str)
 {
 	int i;
 
-	for (i = 0; i < RR_SURFACE_NUM_TYPES; i++)
-		if (strcmp(gradients[i].name, str) == 1)
+	for (i = 0; i < RR_SURFACE_NUM_TYPES; i++) {
+		if (strcmp(gradients[i].name, str) == 0)
 			return gradients[i].val;
-
+	}
 	return -1;
 }
 

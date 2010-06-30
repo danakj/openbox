@@ -41,7 +41,7 @@ struct _ObtSignalCallback
 
 static gboolean signal_prepare(GSource *source, gint *timeout);
 static gboolean signal_check(GSource *source);
-static gboolean signal_occured(GSource *source, GSourceFunc callback,
+static gboolean signal_occurred(GSource *source, GSourceFunc callback,
                                gpointer data);
 static void sighandler(gint sig);
 
@@ -78,7 +78,7 @@ static const gint core_signals[] =
 static GSourceFuncs source_funcs = {
     signal_prepare,
     signal_check,
-    signal_occured,
+    signal_occurred,
     NULL
 };
 static GSource *gsource = NULL;
@@ -228,8 +228,8 @@ static gboolean signal_check(GSource *source)
     return signal_fired;
 }
 
-static gboolean signal_occured(GSource *source, GSourceFunc callback,
-                               gpointer data)
+static gboolean signal_occurred(GSource *source, GSourceFunc callback,
+                                gpointer data)
 {
     guint i;
     sigset_t oldset;

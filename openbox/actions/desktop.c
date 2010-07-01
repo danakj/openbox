@@ -54,7 +54,6 @@ static void i_post_func(gpointer options);
 static gpointer setup_go_last_func(xmlNodePtr node);
 static gpointer setup_send_last_func(xmlNodePtr node);
 static gpointer setup_go_abs_func(xmlNodePtr node);
-static gpointer setup_send_abs_func(xmlNodePtr node);
 static gpointer setup_go_next_func(xmlNodePtr node,
                                    ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *input,
@@ -125,8 +124,6 @@ void action_desktop_startup(void)
     actions_register("SendToDesktopLast", setup_send_last_func,
                      free_func, run_func);
     actions_register("Desktop", setup_go_abs_func, free_func, run_func);
-    actions_register("SendToDesktop", setup_send_abs_func,
-                     free_func, run_func);
     actions_register_i("DesktopNext", setup_go_next_func, free_func, run_func);
     actions_register_i("SendToDesktopNext", setup_send_next_func,
                        free_func, run_func);
@@ -244,6 +241,11 @@ static gpointer setup_send_func(xmlNodePtr node,
     Options *o;
 
     o = setup_func(node, pre, input, cancel, post);
+    if ((n = obt_xml_find_node(node, "desktop"))) {
+        /* 3.4 compatibility */
+        o->u.abs.desktop = obt_xml_node_int(n) - 1;
+        o->type = ABSOLUTE;
+    }
     o->send = TRUE;
     o->follow = TRUE;
 
@@ -265,7 +267,6 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
@@ -395,18 +396,6 @@ static gpointer setup_go_abs_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o = g_slice_new0(Options);
-    o->type = ABSOLUTE;
-    if ((n = obt_xml_find_node(node, "desktop")))
-        o->u.abs.desktop = obt_xml_node_int(n) - 1;
-    else
-        o->u.abs.desktop = screen_desktop;
-    return o;
-}
-
-static gpointer setup_send_abs_func(xmlNodePtr node)
-{
-    xmlNodePtr n;
-    Options *o = setup_follow(node);
     o->type = ABSOLUTE;
     if ((n = obt_xml_find_node(node, "desktop")))
         o->u.abs.desktop = obt_xml_node_int(n) - 1;

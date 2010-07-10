@@ -66,7 +66,6 @@ static void grab_keys(gboolean grab)
 static gboolean chain_timeout(gpointer data)
 {
     keyboard_reset_chains(0);
-    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 

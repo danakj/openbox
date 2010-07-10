@@ -632,7 +632,6 @@ static gboolean hide_timeout(gpointer data)
 
     hide_timeout_id = 0;
 
-    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 
@@ -644,7 +643,6 @@ static gboolean show_timeout(gpointer data)
 
     show_timeout_id = 0;
 
-    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 

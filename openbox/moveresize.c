@@ -462,8 +462,6 @@ static gboolean sync_timeout_func(gpointer data)
     ++waiting_for_sync; /* we timed out waiting for our sync... */
     do_resize(); /* ...so let any pending resizes through */
 
-    XFlush(obt_display);
-
     if (waiting_for_sync > SYNC_TIMEOUTS) {
         sync_timer = 0;
         return FALSE; /* don't repeat */
@@ -618,7 +616,6 @@ static gboolean edge_warp_delay_func(gpointer data)
     }
     edge_warp_odd = !edge_warp_odd;
 
-    XFlush(obt_display);
     return TRUE; /* do repeat ! */
 }
 

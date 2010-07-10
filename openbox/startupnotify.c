@@ -116,7 +116,6 @@ static gboolean sn_wait_timeout(gpointer data)
     SnStartupSequence *seq = data;
     sn_waits = g_slist_remove(sn_waits, seq);
     screen_set_root_cursor();
-    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 
@@ -229,7 +228,6 @@ static gboolean sn_launch_wait_timeout(gpointer data)
 {
     SnLauncherContext *sn = data;
     sn_launcher_context_complete(sn);
-    XFlush(obt_display);
     return FALSE; /* don't repeat */
 }
 

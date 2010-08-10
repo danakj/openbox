@@ -208,9 +208,9 @@ ObtModkeysKey obt_keyboard_keyevent_to_modkey(XEvent *e)
     case XK_Super_L:
     case XK_Super_R: return OBT_KEYBOARD_MODKEY_SUPER;
     case XK_Hyper_L:
-    case XK_Hyper_R: return OBT_KEYBOARD_MODKEY_SUPER;
+    case XK_Hyper_R: return OBT_KEYBOARD_MODKEY_HYPER;
     case XK_Meta_L:
-    case XK_Meta_R: return OBT_KEYBOARD_MODKEY_SUPER;
+    case XK_Meta_R: return OBT_KEYBOARD_MODKEY_META;
     case XK_Control_L:
     case XK_Control_R: return OBT_KEYBOARD_MODKEY_CONTROL;
     case XK_Shift_L:

@@ -30,6 +30,8 @@ typedef struct {
     guint    desktop_number;
     guint    screendesktop_number;
     GPatternSpec *matchtitle;
+    GRegex *regextitle;
+    gchar  *plaintitle;
     GSList *thenacts;
     GSList *elseacts;
 } Options;
@@ -91,9 +93,17 @@ static gpointer setup_func(xmlNodePtr node)
         o->screendesktop_number = obt_xml_node_int(n);
     }
     if ((n = obt_xml_find_node(node, "title"))) {
-        gchar *s;
+        gchar *s, *type = NULL;
         if ((s = obt_xml_node_string(n))) {
-            o->matchtitle = g_pattern_spec_new(s);
+            if (!obt_xml_attr_string(n, "type", &type) ||
+                !g_ascii_strcasecmp(type, "pattern"))
+            {
+                o->matchtitle = g_pattern_spec_new(s);
+            } else if (type && !g_ascii_strcasecmp(type, "regex")) {
+                o->regextitle = g_regex_new(s, 0, 0, NULL);
+            } else if (type && !g_ascii_strcasecmp(type, "plain")) {
+                o->plaintitle = g_strdup(s);
+            }
             g_free(s);
         }
     }
@@ -136,6 +146,10 @@ static void free_func(gpointer options)
     }
     if (o->matchtitle)
         g_pattern_spec_free(o->matchtitle);
+    if (o->regextitle)
+        g_regex_unref(o->regextitle);
+    if (o->plaintitle)
+        g_free(o->plaintitle);
 
     g_slice_free(Options, o);
 }
@@ -174,7 +188,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                  (c->desktop == DESKTOP_ALL))) &&
         (!o->screendesktop_number || screen_desktop == o->screendesktop_number - 1) &&
         (!o->matchtitle ||
-         (g_pattern_match_string(o->matchtitle, c->original_title))))
+         (g_pattern_match_string(o->matchtitle, c->original_title))) &&
+        (!o->regextitle ||
+         (g_regex_match(o->regextitle, c->original_title, 0, NULL))) &&
+        (!o->plaintitle ||
+         (!strcmp(o->plaintitle, c->original_title))))
     {
         acts = o->thenacts;
     }

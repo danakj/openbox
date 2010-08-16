@@ -526,8 +526,8 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                         mouse_bind(buttonstr, cx, mact, action);
                     nact = obt_xml_find_node(nact->next, "action");
                 }
-            next_nbut:
             g_free(buttonstr);
+            next_nbut:
             nbut = obt_xml_find_node(nbut->next, "mousebind");
             }
         }

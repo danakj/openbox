@@ -1792,8 +1792,9 @@ static gboolean event_handle_menu_input(XEvent *ev)
     if (ev->type == ButtonRelease || ev->type == ButtonPress) {
         ObMenuEntryFrame *e;
 
-        if (menu_hide_delay_reached() &&
-            (ev->xbutton.button < 4 || ev->xbutton.button > 5))
+        if ((ev->xbutton.button < 4 || ev->xbutton.button > 5) &&
+            ((ev->type == ButtonRelease && menu_hide_delay_reached()) ||
+             ev->type == ButtonPress))
         {
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
@@ -1804,7 +1805,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 if (ev->type == ButtonRelease)
                     menu_entry_frame_execute(e, ev->xbutton.state);
             }
-            else if (ev->type == ButtonRelease)
+            else
                 menu_frame_hide_all();
         }
         ret = TRUE;

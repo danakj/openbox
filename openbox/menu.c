@@ -49,6 +49,7 @@ static GHashTable *menu_hash = NULL;
 static ObtXmlInst *menu_parse_inst;
 static ObMenuParseState menu_parse_state;
 static gboolean menu_can_hide = FALSE;
+static guint menu_timeout_id = 0;
 
 static void menu_destroy_hash_value(ObMenu *self);
 static void parse_menu_item(xmlNodePtr node, gpointer data);
@@ -437,6 +438,7 @@ void menu_free(ObMenu *menu)
 static gboolean menu_hide_delay_func(gpointer data)
 {
     menu_can_hide = TRUE;
+    menu_timeout_id = 0;
     return FALSE; /* no repeat */
 }
 
@@ -486,10 +488,11 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
             menu_can_hide = TRUE;
         else {
             menu_can_hide = FALSE;
-            g_timeout_add_full(G_PRIORITY_DEFAULT,
-                               config_menu_hide_delay,
-                               menu_hide_delay_func,
-                               NULL, NULL);
+            if (menu_timeout_id) g_source_remove(menu_timeout_id);
+            menu_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                 config_menu_hide_delay,
+                                                 menu_hide_delay_func,
+                                                 NULL, NULL);
         }
     }
 }

@@ -389,39 +389,44 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
 static void parse_key(xmlNodePtr node, GList *keylist)
 {
-    gchar *key;
+    gchar *keystring, **keys, **key;
     xmlNodePtr n;
     gboolean is_chroot = FALSE;
 
-    if (!obt_xml_attr_string(node, "key", &key))
+    if (!obt_xml_attr_string(node, "key", &keystring))
         return;
 
     obt_xml_attr_bool(node, "chroot", &is_chroot);
 
-    keylist = g_list_append(keylist, key);
+    keys = g_strsplit(keystring, " ", 0);
+    for (key = keys; *key; ++key) {
+        keylist = g_list_append(keylist, *key);
 
-    if ((n = obt_xml_find_node(node->children, "keybind"))) {
-        while (n) {
-            parse_key(n, keylist);
-            n = obt_xml_find_node(n->next, "keybind");
+        if ((n = obt_xml_find_node(node->children, "keybind"))) {
+            while (n) {
+                parse_key(n, keylist);
+                n = obt_xml_find_node(n->next, "keybind");
+            }
         }
-    }
-    else if ((n = obt_xml_find_node(node->children, "action"))) {
-        while (n) {
-            ObActionsAct *action;
+        else if ((n = obt_xml_find_node(node->children, "action"))) {
+            while (n) {
+                ObActionsAct *action;
 
-            action = actions_parse(n);
-            if (action)
-                keyboard_bind(keylist, action);
-            n = obt_xml_find_node(n->next, "action");
+                action = actions_parse(n);
+                if (action)
+                    keyboard_bind(keylist, action);
+                n = obt_xml_find_node(n->next, "action");
+            }
         }
+
+
+        if (is_chroot)
+            keyboard_chroot(keylist);
+        keylist = g_list_delete_link(keylist, g_list_last(keylist));
     }
 
-    if (is_chroot)
-        keyboard_chroot(keylist);
-
-    g_free(key);
-    keylist = g_list_delete_link(keylist, g_list_last(keylist));
+    g_strfreev(keys);
+    g_free(keystring);
 }
 
 static void parse_keyboard(xmlNodePtr node, gpointer d)

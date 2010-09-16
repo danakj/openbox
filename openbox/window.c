@@ -26,6 +26,7 @@
 #include "prompt.h"
 #include "debug.h"
 #include "grab.h"
+#include "obt/prop.h"
 #include "obt/xqueue.h"
 
 static GHashTable *window_map;
@@ -185,6 +186,20 @@ void window_manage(Window win)
                 is_dockapp = TRUE;
             }
             XFree(wmhints);
+        }
+        /* This is a new method to declare that a window is a dockapp, being
+           implemented by Windowmaker, to alleviate pain in writing GTK+
+           dock apps.
+           http://thread.gmane.org/gmane.comp.window-managers.openbox/4881
+        */
+        if (!is_dockapp) {
+            gchar **ss;
+            if (OBT_PROP_GETSS_TYPE(win, WM_CLASS, STRING_NO_CC, &ss))
+            {
+                if (ss[0] && ss[1] && strcmp(ss[1], "DockApp") == 0)
+                    is_dockapp = TRUE;
+                g_strfreev(ss);
+            }
         }
     }
 

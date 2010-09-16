@@ -98,6 +98,7 @@ tests/strut
 tests/title
 tests/urgent
 tests/usertimewin
+tests/wmhints
 data/autostart/openbox-autostart
 data/autostart/autostart
 obrender/rendertest

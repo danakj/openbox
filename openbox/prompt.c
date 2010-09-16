@@ -175,7 +175,7 @@ ObPrompt* prompt_new(const gchar *msg, const gchar *title,
 
     /* set the window's title */
     if (title)
-        OBT_PROP_SETS(self->super.window, NET_WM_NAME, utf8, title);
+        OBT_PROP_SETS(self->super.window, NET_WM_NAME, title);
 
     /* listen for key presses on the window */
     self->event_mask = KeyPressMask;

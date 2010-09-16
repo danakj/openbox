@@ -28,11 +28,13 @@ G_BEGIN_DECLS
 typedef enum {
     /* types */
     OBT_PROP_CARDINAL, /*!< The atom which represents the Cardinal data type */
-    OBT_PROP_WINDOW,   /*!< The atom which represents window ids */
-    OBT_PROP_PIXMAP,   /*!< The atom which represents pixmap ids */
-    OBT_PROP_ATOM,     /*!< The atom which represents atom values */
-    OBT_PROP_STRING,   /*!< The atom which represents ascii strings */
-    OBT_PROP_UTF8,     /*!< The atom which represents utf8-encoded strings */
+    OBT_PROP_WINDOW, /*!< The atom which represents window ids */
+    OBT_PROP_PIXMAP, /*!< The atom which represents pixmap ids */
+    OBT_PROP_ATOM, /*!< The atom which represents atom values */
+    OBT_PROP_STRING, /*!< The atom which represents latin1 strings */
+    OBT_PROP_COMPOUND_TEXT, /*!< The atom which represents locale-encoded
+                              strings */
+    OBT_PROP_UTF8_STRING, /*!< The atom which represents utf8-encoded strings*/
 
     /* selection stuff */
     OBT_PROP_MANAGER,
@@ -223,23 +225,39 @@ typedef enum {
 
 Atom obt_prop_atom(ObtPropAtom a);
 
+typedef enum {
+    /*! STRING is latin1 encoded.  It cannot contain control characters except
+       for tab and line-feed. */
+    OBT_PROP_TEXT_STRING = 1,
+    /*! STRING text restricted to characters in the X Portable Character
+      Set, which is a subset of latin1.
+      http://static.cray-cyber.org/Documentation/NEC_SX_R10_1/G1AE02E/CHAP1.HTML
+    */
+    OBT_PROP_TEXT_STRING_XPCS = 2,
+    /*! STRING text restricted to not allow any control characters to be
+      present. */
+    OBT_PROP_TEXT_STRING_NO_CC = 3,
+    /* COMPOUND_TEXT is encoded in the current locale setting. */
+    OBT_PROP_TEXT_COMPOUND_TEXT = 4,
+    /* UTF8_STRING is encoded as utf-8. */
+    OBT_PROP_TEXT_UTF8_STRING = 5,
+} ObtPropTextType;
+
 gboolean obt_prop_get32(Window win, Atom prop, Atom type, guint32 *ret);
 gboolean obt_prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
                               guint *nret);
-gboolean obt_prop_get_string_locale(Window win, Atom prop, gchar **ret);
-gboolean obt_prop_get_string_utf8(Window win, Atom prop, gchar **ret);
-gboolean obt_prop_get_strings_locale(Window win, Atom prop, gchar ***ret);
-gboolean obt_prop_get_strings_utf8(Window win, Atom prop, gchar ***ret);
+
+gboolean obt_prop_get_text(Window win, Atom prop, ObtPropTextType type,
+                           gchar **ret);
+gboolean obt_prop_get_array_text(Window win, Atom prop,
+                                 ObtPropTextType type,
+                                 gchar ***ret);
 
 void obt_prop_set32(Window win, Atom prop, Atom type, gulong val);
 void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                           guint num);
-void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val);
-void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val);
-void obt_prop_set_strings_locale(Window win, Atom prop,
-                                 const gchar *const *strs);
-void obt_prop_set_strings_utf8(Window win, Atom prop,
-                               const gchar *const *strs);
+void obt_prop_set_text(Window win, Atom prop, const gchar *str);
+void obt_prop_set_array_text(Window win, Atom prop, const gchar *const *strs);
 
 void obt_prop_erase(Window win, Atom prop);
 
@@ -257,20 +275,33 @@ void obt_prop_message_to(Window to, Window about, Atom messagetype,
 #define OBT_PROP_GETA32(win, prop, type, ret, nret) \
     (obt_prop_get_array32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), \
                           ret, nret))
-#define OBT_PROP_GETS(win, prop, type, ret) \
-    (obt_prop_get_string_##type(win, OBT_PROP_ATOM(prop), ret))
-#define OBT_PROP_GETSS(win, prop, type, ret) \
-    (obt_prop_get_strings_##type(win, OBT_PROP_ATOM(prop), ret))
+#define OBT_PROP_GETS(win, prop, ret) \
+    (obt_prop_get_text(win, OBT_PROP_ATOM(prop), 0, ret))
+#define OBT_PROP_GETSS(win, prop, ret) \
+    (obt_prop_get_array_text(win, OBT_PROP_ATOM(prop), 0, ret))
+
+#define OBT_PROP_GETS_TYPE(win, prop, type, ret) \
+    (obt_prop_get_text(win, OBT_PROP_ATOM(prop), OBT_PROP_TEXT_##type, ret))
+#define OBT_PROP_GETSS_TYPE(win, prop, type, ret) \
+    (obt_prop_get_array_text(win, OBT_PROP_ATOM(prop), \
+                             OBT_PROP_TEXT_##type, ret))
+
+#define OBT_PROP_GETS_UTF8(win, prop, ret) \
+    OBT_PROP_GETS_TYPE(win, prop, UTF8_STRING, ret)
+#define OBT_PROP_GETSS_UTF8(win, prop, ret) \
+    OBT_PROP_GETSS_TYPE(win, prop, UTF8_STRING, ret)
+#define OBT_PROP_GETS_XPCS(win, prop, ret) \
+    OBT_PROP_GETS_TYPE(win, prop, STRING_XPCS, ret)
 
 #define OBT_PROP_SET32(win, prop, type, val) \
     (obt_prop_set32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), val))
 #define OBT_PROP_SETA32(win, prop, type, val, num) \
     (obt_prop_set_array32(win, OBT_PROP_ATOM(prop), OBT_PROP_ATOM(type), \
                           val, num))
-#define OBT_PROP_SETS(win, prop, type, val) \
-    (obt_prop_set_string_##type(win, OBT_PROP_ATOM(prop), val))
-#define OBT_PROP_SETSS(win, prop, type, strs) \
-    (obt_prop_set_strings_##type(win, OBT_PROP_ATOM(prop), strs))
+#define OBT_PROP_SETS(win, prop, val) \
+    (obt_prop_set_text(win, OBT_PROP_ATOM(prop), val))
+#define OBT_PROP_SETSS(win, prop, strs) \
+    (obt_prop_set_array_text(win, OBT_PROP_ATOM(prop), strs))
 
 #define OBT_PROP_ERASE(win, prop) (obt_prop_erase(win, OBT_PROP_ATOM(prop)))
 

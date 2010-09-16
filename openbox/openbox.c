@@ -258,8 +258,7 @@ gint main(gint argc, gchar **argv)
                     gchar *p = g_filename_to_utf8(config_file, -1,
                                                   NULL, NULL, NULL);
                     if (p)
-                        OBT_PROP_SETS(obt_root(ob_screen), OB_CONFIG_FILE,
-                                      utf8, p);
+                        OBT_PROP_SETS(obt_root(ob_screen), OB_CONFIG_FILE, p);
                     g_free(p);
                 }
                 else
@@ -286,8 +285,8 @@ gint main(gint argc, gchar **argv)
                 if (ob_rr_theme == NULL)
                     ob_exit_with_error(_("Unable to load a theme."));
 
-                OBT_PROP_SETS(obt_root(ob_screen),
-                              OB_THEME, utf8, ob_rr_theme->name);
+                OBT_PROP_SETS(obt_root(ob_screen), OB_THEME,
+                              ob_rr_theme->name);
             }
 
             if (reconfigure) {

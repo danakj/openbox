@@ -1154,11 +1154,10 @@ static void client_get_all(ObClient *self, gboolean real)
 
 static void client_get_startup_id(ObClient *self)
 {
-    if (!(OBT_PROP_GETS(self->window, NET_STARTUP_ID, utf8,
-                        &self->startup_id)))
+    if (!(OBT_PROP_GETS_UTF8(self->window, NET_STARTUP_ID, &self->startup_id)))
         if (self->group)
-            OBT_PROP_GETS(self->group->leader,
-                          NET_STARTUP_ID, utf8, &self->startup_id);
+            OBT_PROP_GETS_UTF8(self->group->leader, NET_STARTUP_ID,
+                               &self->startup_id);
 }
 
 static void client_get_area(ObClient *self)
@@ -1969,15 +1968,14 @@ void client_update_title(ObClient *self)
     g_free(self->original_title);
 
     /* try netwm */
-    if (!OBT_PROP_GETS(self->window, NET_WM_NAME, utf8, &data)) {
+    if (!OBT_PROP_GETS_UTF8(self->window, NET_WM_NAME, &data)) {
         /* try old x stuff */
-        if (!(OBT_PROP_GETS(self->window, WM_NAME, locale, &data)
-              || OBT_PROP_GETS(self->window, WM_NAME, utf8, &data))) {
+        if (!OBT_PROP_GETS(self->window, WM_NAME, &data)) {
             if (self->transient) {
-    /*
-    GNOME alert windows are not given titles:
-    http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-    */
+   /*
+   GNOME alert windows are not given titles:
+   http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+   */
                 data = g_strdup("");
             } else
                 data = g_strdup(_("Unnamed Window"));
@@ -2000,7 +1998,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, utf8, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_NAME, visible);
     self->title = visible;
 
     if (self->frame)
@@ -2011,10 +2009,9 @@ void client_update_title(ObClient *self)
     g_free(self->icon_title);
 
     /* try netwm */
-    if (!OBT_PROP_GETS(self->window, NET_WM_ICON_NAME, utf8, &data))
+    if (!OBT_PROP_GETS_UTF8(self->window, NET_WM_ICON_NAME, &data))
         /* try old x stuff */
-        if (!(OBT_PROP_GETS(self->window, WM_ICON_NAME, locale, &data) ||
-              OBT_PROP_GETS(self->window, WM_ICON_NAME, utf8, &data)))
+        if (!OBT_PROP_GETS(self->window, WM_ICON_NAME, &data))
             data = g_strdup(self->title);
 
     if (self->client_machine) {
@@ -2032,7 +2029,7 @@ void client_update_title(ObClient *self)
         g_free(data);
     }
 
-    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, utf8, visible);
+    OBT_PROP_SETS(self->window, NET_WM_VISIBLE_ICON_NAME, visible);
     self->icon_title = visible;
 }
 
@@ -2248,19 +2245,14 @@ static void client_get_session_ids(ObClient *self)
         leader = None;
 
     /* get the SM_CLIENT_ID */
-    got = FALSE;
-    if (leader)
-        got = OBT_PROP_GETS(leader, SM_CLIENT_ID, locale, &self->sm_client_id);
-    if (!got)
-        OBT_PROP_GETS(self->window, SM_CLIENT_ID, locale, &self->sm_client_id);
+    if (leader && leader != self->window)
+        OBT_PROP_GETS_XPCS(leader, SM_CLIENT_ID, &self->sm_client_id);
+    else
+        OBT_PROP_GETS_XPCS(self->window, SM_CLIENT_ID, &self->sm_client_id);
 
     /* get the WM_CLASS (name and class). make them "" if they are not
        provided */
-    got = FALSE;
-    if (leader)
-        got = OBT_PROP_GETSS(leader, WM_CLASS, locale, &ss);
-    if (!got)
-        got = OBT_PROP_GETSS(self->window, WM_CLASS, locale, &ss);
+    got = OBT_PROP_GETSS_TYPE(self->window, WM_CLASS, STRING_NO_CC, &ss);
 
     if (got) {
         if (ss[0]) {
@@ -2275,11 +2267,7 @@ static void client_get_session_ids(ObClient *self)
     if (self->class == NULL) self->class = g_strdup("");
 
     /* get the WM_WINDOW_ROLE. make it "" if it is not provided */
-    got = FALSE;
-    if (leader)
-        got = OBT_PROP_GETS(leader, WM_WINDOW_ROLE, locale, &s);
-    if (!got)
-        got = OBT_PROP_GETS(self->window, WM_WINDOW_ROLE, locale, &s);
+    got = OBT_PROP_GETS_XPCS(self->window, WM_WINDOW_ROLE, &s);
 
     if (got)
         self->role = s;
@@ -2290,9 +2278,9 @@ static void client_get_session_ids(ObClient *self)
     got = FALSE;
 
     if (leader)
-        got = OBT_PROP_GETSS(leader, WM_COMMAND, locale, &ss);
+        got = OBT_PROP_GETSS(leader, WM_COMMAND, &ss);
     if (!got)
-        got = OBT_PROP_GETSS(self->window, WM_COMMAND, locale, &ss);
+        got = OBT_PROP_GETSS(self->window, WM_COMMAND, &ss);
 
     if (got) {
         /* merge/mash them all together */
@@ -2315,9 +2303,9 @@ static void client_get_session_ids(ObClient *self)
     /* get the WM_CLIENT_MACHINE */
     got = FALSE;
     if (leader)
-        got = OBT_PROP_GETS(leader, WM_CLIENT_MACHINE, locale, &s);
+        got = OBT_PROP_GETS(leader, WM_CLIENT_MACHINE, &s);
     if (!got)
-        got = OBT_PROP_GETS(self->window, WM_CLIENT_MACHINE, locale, &s);
+        got = OBT_PROP_GETS(self->window, WM_CLIENT_MACHINE, &s);
 
     if (got) {
         gchar localhost[128];
@@ -2344,10 +2332,10 @@ static void client_save_app_rule_values(ObClient *self)
 {
     const gchar *type;
 
-    OBT_PROP_SETS(self->window, OB_APP_ROLE, utf8, self->role);
-    OBT_PROP_SETS(self->window, OB_APP_NAME, utf8, self->name);
-    OBT_PROP_SETS(self->window, OB_APP_CLASS, utf8, self->class);
-    OBT_PROP_SETS(self->window, OB_APP_TITLE, utf8, self->original_title);
+    OBT_PROP_SETS(self->window, OB_APP_ROLE, self->role);
+    OBT_PROP_SETS(self->window, OB_APP_NAME, self->name);
+    OBT_PROP_SETS(self->window, OB_APP_CLASS, self->class);
+    OBT_PROP_SETS(self->window, OB_APP_TITLE, self->original_title);
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
@@ -2367,7 +2355,7 @@ static void client_save_app_rule_values(ObClient *self)
     case OB_CLIENT_TYPE_DOCK:
         type = "dock"; break;
     }
-    OBT_PROP_SETS(self->window, OB_APP_TYPE, utf8, type);
+    OBT_PROP_SETS(self->window, OB_APP_TYPE, type);
 }
 
 static void client_change_wm_state(ObClient *self)

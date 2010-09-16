@@ -206,7 +206,7 @@ gboolean screen_annex(void)
                    NET_SUPPORTING_WM_CHECK, WINDOW, screen_support_win);
 
     /* set properties on the supporting window */
-    OBT_PROP_SETS(screen_support_win, NET_WM_NAME, utf8, "Openbox");
+    OBT_PROP_SETS(screen_support_win, NET_WM_NAME, "Openbox");
     OBT_PROP_SET32(screen_support_win, NET_SUPPORTING_WM_CHECK,
                    WINDOW, screen_support_win);
 
@@ -311,7 +311,7 @@ gboolean screen_annex(void)
                     NET_SUPPORTED, ATOM, supported, num_support);
     g_free(supported);
 
-    OBT_PROP_SETS(RootWindow(obt_display, ob_screen), OB_VERSION, utf8,
+    OBT_PROP_SETS(RootWindow(obt_display, ob_screen), OB_VERSION,
                   OPENBOX_VERSION);
 
     screen_tell_ksplash();
@@ -375,7 +375,7 @@ void screen_startup(gboolean reconfig)
     screen_resize();
 
     /* have names already been set for the desktops? */
-    if (OBT_PROP_GETSS(obt_root(ob_screen), NET_DESKTOP_NAMES, utf8, &names)) {
+    if (OBT_PROP_GETSS_UTF8(obt_root(ob_screen), NET_DESKTOP_NAMES, &names)) {
         g_strfreev(names);
         namesexist = TRUE;
     }
@@ -397,7 +397,7 @@ void screen_startup(gboolean reconfig)
 
         /* set the root window property */
         OBT_PROP_SETSS(obt_root(ob_screen),
-                       NET_DESKTOP_NAMES, utf8, (const gchar*const*)names);
+                       NET_DESKTOP_NAMES, (const gchar*const*)names);
 
         g_strfreev(names);
     }
@@ -1182,7 +1182,7 @@ void screen_update_desktop_names(void)
     screen_desktop_names = NULL;
 
     if (OBT_PROP_GETSS(obt_root(ob_screen),
-                       NET_DESKTOP_NAMES, utf8, &screen_desktop_names))
+                       NET_DESKTOP_NAMES, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
@@ -1209,7 +1209,7 @@ void screen_update_desktop_names(void)
         /* if we changed any names, then set the root property so we can
            all agree on the names */
         OBT_PROP_SETSS(obt_root(ob_screen), NET_DESKTOP_NAMES,
-                       utf8, (const gchar*const*)screen_desktop_names);
+                       (const gchar*const*)screen_desktop_names);
     }
 
     /* resize the pager for these names */

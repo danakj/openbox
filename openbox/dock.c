@@ -145,7 +145,7 @@ void dock_manage(Window icon_win, Window name_win)
     app->name_win = name_win;
     app->icon_win = icon_win;
 
-    if (OBT_PROP_GETSS(app->name_win, WM_CLASS, locale, &data)) {
+    if (OBT_PROP_GETSS_TYPE(app->name_win, WM_CLASS, STRING_NO_CC, &data)) {
         if (data[0]) {
             app->name = g_strdup(data[0]);
             if (data[1])

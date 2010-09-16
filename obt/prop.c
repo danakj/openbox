@@ -45,7 +45,8 @@ void obt_prop_startup(void)
     CREATE(PIXMAP);
     CREATE(ATOM);
     CREATE(STRING);
-    CREATE_NAME(UTF8, "UTF8_STRING");
+    CREATE(COMPOUND_TEXT);
+    CREATE(UTF8_STRING);
 
     CREATE(MANAGER);
 
@@ -283,17 +284,186 @@ static gboolean get_all(Window win, Atom prop, Atom type, gint size,
     return ret;
 }
 
-static gboolean get_stringlist(Window win, Atom prop, gchar ***list, gint *nstr)
+/*! Get a text property from a window, and fill out the XTextProperty with it.
+  @param win The window to read the property from.
+  @param prop The atom of the property to read off the window.
+  @param tprop The XTextProperty to fill out.
+  @param type 0 to get text of any type, or a value from
+    ObtPropTextType to restrict the value to a specific type.
+  @return TRUE if the text was read and validated against the @type, and FALSE
+    otherwise.
+*/
+static gboolean get_text_property(Window win, Atom prop,
+                                  XTextProperty *tprop, ObtPropTextType type)
 {
-    XTextProperty tprop;
-    gboolean ret = FALSE;
-
-    if (XGetTextProperty(obt_display, win, &tprop, prop) && tprop.nitems) {
-        if (XTextPropertyToStringList(&tprop, list, nstr))
-            ret = TRUE;
-        XFree(tprop.value);
+    if (!(XGetTextProperty(obt_display, win, tprop, prop) && tprop->nitems))
+        return FALSE;
+    if (!type)
+        return TRUE; /* no type checking */
+    switch (type) {
+    case OBT_PROP_TEXT_STRING:
+    case OBT_PROP_TEXT_STRING_XPCS:
+    case OBT_PROP_TEXT_STRING_NO_CC:
+        return tprop->encoding == OBT_PROP_ATOM(STRING);
+    case OBT_PROP_TEXT_COMPOUND_TEXT:
+        return tprop->encoding == OBT_PROP_ATOM(COMPOUND_TEXT);
+    case OBT_PROP_TEXT_UTF8_STRING:
+        return tprop->encoding == OBT_PROP_ATOM(UTF8_STRING);
+    default:
+        g_assert_not_reached();
     }
-    return ret;
+}
+
+/*! Returns one or more UTF-8 encoded strings from the text property.
+  @param tprop The XTextProperty to convert into UTF-8 string(s).
+  @param type The type which specifies the format that the text must meet, or
+    0 to allow any valid characters that can be converted to UTF-8 through.
+  @param max The maximum number of strings to return.  -1 to return them all.
+  @return If max is 1, then this returns a gchar* with the single string.
+    Otherwise, this returns a gchar** of no more than max strings (or all
+    strings read, if max is negative). If an error occurs, NULL is returned.
+ */
+static void* convert_text_property(XTextProperty *tprop,
+                                   ObtPropTextType type, gint max)
+{
+    enum {
+        LATIN1,
+        UTF8,
+        LOCALE
+    } encoding;
+    const gboolean return_single = (max == 1);
+    gboolean ok = FALSE;
+    gchar **strlist = NULL;
+    gchar *single[1] = { NULL };
+    gchar **retlist = single; /* single is used when max == 1 */
+    gint i, n_strs;
+
+    /* Read each string in the text property and store a pointer to it in
+       retlist.  These pointers point into the X data structures directly.
+
+       Then we will convert them to UTF-8, and replace the retlist pointer with
+       a new one.
+    */
+    if (tprop->encoding == OBT_PROP_ATOM(COMPOUND_TEXT))
+    {
+        encoding = LOCALE;
+        ok = (XmbTextPropertyToTextList(
+                   obt_display, tprop, &strlist, &n_strs) == Success);
+        if (ok) {
+            if (max >= 0)
+                n_strs = MIN(max, n_strs);
+            if (!return_single)
+                retlist = g_new0(gchar*, n_strs+1);
+            if (retlist)
+                for (i = 0; i < n_strs; ++i)
+                    retlist[i] = strlist[i];
+        }
+    }
+    else if (tprop->encoding == OBT_PROP_ATOM(UTF8_STRING) ||
+             tprop->encoding == OBT_PROP_ATOM(STRING))
+    {
+        gchar *p; /* iterator */
+
+        if (tprop->encoding == OBT_PROP_ATOM(STRING))
+            encoding = LATIN1;
+        else
+            encoding = UTF8;
+        ok = TRUE;
+
+        /* First, count the number of strings. Then make a structure for them
+           and copy pointers to them into it. */
+        p = (gchar*)tprop->value;
+        n_strs = 0;
+        while (p < (gchar*)tprop->value + tprop->nitems) {
+            p += strlen(p) + 1; /* next string */
+            ++n_strs;
+        }
+
+        if (max >= 0)
+            n_strs = MIN(max, n_strs);
+        if (!return_single)
+            retlist = g_new0(gchar*, n_strs+1);
+        if (retlist) {
+            p = (gchar*)tprop->value;
+            for (i = 0; i < n_strs; ++i) {
+                retlist[i] = p;
+                p += strlen(p) + 1; /* next string */
+            }
+        }
+    }
+
+    if (!(ok && retlist)) {
+        if (strlist) XFreeStringList(strlist);
+        return NULL;
+    }
+
+    /* convert each element in retlist to UTF-8, and replace it. */
+    for (i = 0; i < n_strs; ++i) {
+        if (encoding == UTF8) {
+            const gchar *end; /* the first byte past the valid data */
+
+            g_utf8_validate(retlist[i], -1, &end);
+            retlist[i] = g_strndup(retlist[i], end-retlist[i]);
+        }
+        else if (encoding == LOCALE) {
+            gsize nvalid; /* the number of valid bytes at the front of the
+                             string */
+            gchar *utf; /* the string converted into utf8 */
+
+            utf = g_locale_to_utf8(retlist[i], -1, &nvalid, NULL, NULL);
+            if (!utf)
+                utf = g_locale_to_utf8(retlist[i], nvalid, NULL, NULL, NULL);
+            g_assert(utf);
+            retlist[i] = utf;
+        }
+        else { /* encoding == LATIN1 */
+            gsize nvalid; /* the number of valid bytes at the front of the
+                             string */
+            gchar *utf; /* the string converted into utf8 */
+            gchar *p; /* iterator */
+
+            /* look for invalid characters */
+            for (p = retlist[i], nvalid = 0; *p; ++p, ++nvalid) {
+                /* The only valid control characters are TAB(HT)=9 and
+                   NEWLINE(LF)=10.
+                   This is defined in ICCCM section 2:
+                     http://tronche.com/gui/x/icccm/sec-2.html.
+                   See a definition of the latin1 codepage here:
+                     http://en.wikipedia.org/wiki/ISO/IEC_8859-1.
+                   The above page includes control characters in the table,
+                   which we must explicitly exclude, as the g_convert function
+                   will happily take them.
+                */
+                const register guchar c = (guchar)*p; /* unsigned value at p */
+                if ((c < 32 && c != 9 && c != 10) || (c >= 127 && c <= 160))
+                    break; /* found a control character that isn't allowed */
+
+                if (type == OBT_PROP_TEXT_STRING_NO_CC && c < 32)
+                    break; /* absolutely no control characters are allowed */
+
+                if (type == OBT_PROP_TEXT_STRING_XPCS) {
+                    const gboolean valid = (
+                        (c >= 32 && c < 128) || c == 9 || c == 10);
+                    if (!valid)
+                        break; /* strict whitelisting for XPCS */
+                }
+            }
+            /* look for invalid latin1 characters */
+            utf = g_convert(retlist[i], nvalid, "utf-8", "iso-8859-1",
+                            &nvalid, NULL, NULL);
+            if (!utf)
+                utf = g_convert(retlist[i], nvalid, "utf-8", "iso-8859-1",
+                                NULL, NULL, NULL);
+            g_assert(utf);
+            retlist[i] = utf;
+        }
+    }
+
+    if (strlist) XFreeStringList(strlist);
+    if (return_single)
+        return retlist[0];
+    else
+        return retlist;
 }
 
 gboolean obt_prop_get32(Window win, Atom prop, Atom type, guint32 *ret)
@@ -307,104 +477,43 @@ gboolean obt_prop_get_array32(Window win, Atom prop, Atom type, guint32 **ret,
     return get_all(win, prop, type, 32, (guchar**)ret, nret);
 }
 
-gboolean obt_prop_get_string_locale(Window win, Atom prop, gchar **ret)
+gboolean obt_prop_get_text(Window win, Atom prop, ObtPropTextType type,
+                           gchar **ret_string)
 {
-    gchar **list;
-    gint nstr;
-    gchar *s;
-
-    if (get_stringlist(win, prop, &list, &nstr) && nstr) {
-        s = g_locale_to_utf8(list[0], -1, NULL, NULL, NULL);
-        XFreeStringList(list);
-        if (s) {
-            *ret = s;
-            return TRUE;
-        }
-    }
-    return FALSE;
-}
-
-gboolean obt_prop_get_strings_locale(Window win, Atom prop, gchar ***ret)
-{
-    GSList *strs = NULL, *it;
-    gchar *raw, *p;
-    guint num, i, count = 0;
-
-    if (get_all(win, prop, OBT_PROP_ATOM(STRING), 8,
-                (guchar**)&raw, &num))
-    {
-        p = raw;
-        while (p < raw + num) {
-            ++count;
-            strs = g_slist_append(strs, p);
-            p += strlen(p) + 1; /* next string */
-        }
-
-        *ret = g_new0(gchar*, count + 1);
-        (*ret)[count] = NULL; /* null terminated list */
-
-        for (i = 0, it = strs; it; ++i, it = g_slist_next(it)) {
-            (*ret)[i] = g_locale_to_utf8(it->data, -1, NULL, NULL, NULL);
-            /* make sure translation did not fail */
-            if (!(*ret)[i])
-                (*ret)[i] = g_strdup("");
-        }
-        g_free(raw);
-        g_slist_free(strs);
-        return TRUE;
-    }
-    return FALSE;
-}
-
-gboolean obt_prop_get_string_utf8(Window win, Atom prop, gchar **ret)
-{
-    gchar *raw;
+    XTextProperty tprop;
     gchar *str;
-    guint num;
+    gboolean ret = FALSE;
 
-    if (get_all(win, prop, OBT_PROP_ATOM(UTF8), 8,
-                (guchar**)&raw, &num))
-    {
-        str = g_strndup(raw, num); /* grab the first string from the list */
-        g_free(raw);
-        if (g_utf8_validate(str, -1, NULL)) {
-            *ret = str;
-            return TRUE;
+    if (get_text_property(win, prop, &tprop, type)) {
+        str = (gchar*)convert_text_property(&tprop, type, 1);
+
+        if (str) {
+            *ret_string = str;
+            ret = TRUE;
         }
-        g_free(str);
     }
-    return FALSE;
+    XFree(tprop.value);
+    return ret;
 }
 
-gboolean obt_prop_get_strings_utf8(Window win, Atom prop, gchar ***ret)
+gboolean obt_prop_get_array_text(Window win, Atom prop,
+                                 ObtPropTextType type,
+                                 gchar ***ret_strings)
 {
-    GSList *strs = NULL, *it;
-    gchar *raw, *p;
-    guint num, i, count = 0;
+    XTextProperty tprop;
+    gchar **strs;
+    gboolean ret = FALSE;
 
-    if (get_all(win, prop, OBT_PROP_ATOM(UTF8), 8,
-                (guchar**)&raw, &num))
-    {
-        p = raw;
-        while (p < raw + num) {
-            ++count;
-            strs = g_slist_append(strs, p);
-            p += strlen(p) + 1; /* next string */
+    if (get_text_property(win, prop, &tprop, type)) {
+        strs = (gchar**)convert_text_property(&tprop, type, -1);
+
+        if (strs) {
+            *ret_strings = strs;
+            ret = TRUE;
         }
-
-        *ret = g_new0(gchar*, count + 1);
-
-        for (i = 0, it = strs; it; ++i, it = g_slist_next(it)) {
-            if (g_utf8_validate(it->data, -1, NULL))
-                (*ret)[i] = g_strdup(it->data);
-            else
-                (*ret)[i] = g_strdup("");
-        }
-        g_free(raw);
-        g_slist_free(strs);
-        return TRUE;
     }
-    return FALSE;
+    XFree(tprop.value);
+    return ret;
 }
 
 void obt_prop_set32(Window win, Atom prop, Atom type, gulong val)
@@ -420,45 +529,13 @@ void obt_prop_set_array32(Window win, Atom prop, Atom type, gulong *val,
                     (guchar*)val, num);
 }
 
-void obt_prop_set_string_locale(Window win, Atom prop, const gchar *val)
+void obt_prop_set_text(Window win, Atom prop, const gchar *val)
 {
-    gchar const *s[2] = { val, NULL };
-    obt_prop_set_strings_locale(win, prop, s);
-}
-
-void obt_prop_set_strings_locale(Window win, Atom prop,
-                                 const gchar *const *strs)
-{
-    gint i, count;
-    gchar **lstrs;
-    XTextProperty tprop;
-
-    /* count the strings in strs, and convert them to the locale format */
-    for (count = 0; strs[count]; ++count);
-    lstrs = g_new0(char*, count);
-    for (i = 0; i < count; ++i) {
-        lstrs[i] = g_locale_from_utf8(strs[i], -1, NULL, NULL, NULL);
-        if (!lstrs[i]) {
-            lstrs[i] = g_strdup(""); /* make it an empty string */
-            g_warning("Unable to translate string '%s' from UTF8 to locale "
-                      "format", strs[i]);
-        }
-    }
-
-
-    XStringListToTextProperty(lstrs, count, &tprop);
-    XSetTextProperty(obt_display, win, &tprop, prop);
-    XFree(tprop.value);
-}
-
-void obt_prop_set_string_utf8(Window win, Atom prop, const gchar *val)
-{
-    XChangeProperty(obt_display, win, prop, OBT_PROP_ATOM(UTF8), 8,
+    XChangeProperty(obt_display, win, prop, OBT_PROP_ATOM(UTF8_STRING), 8,
                     PropModeReplace, (const guchar*)val, strlen(val));
 }
 
-void obt_prop_set_strings_utf8(Window win, Atom prop,
-                               const gchar *const *strs)
+void obt_prop_set_array_text(Window win, Atom prop, const gchar *const *strs)
 {
     GString *str;
     gchar const *const *s;
@@ -468,7 +545,7 @@ void obt_prop_set_strings_utf8(Window win, Atom prop,
         str = g_string_append(str, *s);
         str = g_string_append_c(str, '\0');
     }
-    XChangeProperty(obt_display, win, prop, obt_prop_atom(OBT_PROP_UTF8), 8,
+    XChangeProperty(obt_display, win, prop, OBT_PROP_ATOM(UTF8_STRING), 8,
                     PropModeReplace, (guchar*)str->str, str->len);
     g_string_free(str, TRUE);
 }

@@ -1810,18 +1810,6 @@ static gboolean event_handle_menu_input(XEvent *ev)
         }
         ret = TRUE;
     }
-    else if (ev->type == MotionNotify) {
-        ObMenuFrame *f;
-        ObMenuEntryFrame *e;
-
-        if ((e = menu_entry_frame_under(ev->xmotion.x_root,
-                                        ev->xmotion.y_root)))
-            if (!(f = find_active_menu()) ||
-                f == e->frame ||
-                f->parent == e->frame ||
-                f->child == e->frame)
-                menu_frame_select(e->frame, e, FALSE);
-    }
     else if (ev->type == KeyPress || ev->type == KeyRelease) {
         guint mods;
         ObMenuFrame *frame;

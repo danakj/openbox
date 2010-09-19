@@ -500,11 +500,12 @@ void screen_resize(void)
     if (ob_state() != OB_STATE_RUNNING)
         return;
 
-    screen_update_areas();
+    /* this calls screen_update_areas(), which we need ! */
     dock_configure();
 
-    for (it = client_list; it; it = g_list_next(it))
-        client_move_onscreen(it->data, FALSE);
+    if (oldw)
+        for (it = client_list; it; it = g_list_next(it))
+            client_move_onscreen(it->data, FALSE);
 }
 
 void screen_set_num_desktops(guint num)
@@ -1458,10 +1459,8 @@ void screen_update_areas(void)
                     dims, 4 * screen_num_desktops);
 
     /* the area has changed, adjust all the windows if they need it */
-    for (it = onscreen; it; it = g_list_next(it)) {
-        client_move_onscreen(it->data, FALSE);
+    for (it = onscreen; it; it = g_list_next(it))
         client_reconfigure(it->data, FALSE);
-    }
 
     g_free(dims);
 }

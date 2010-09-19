@@ -551,6 +551,8 @@ void dock_configure(void)
         dock->area.height += ob_rr_theme->obwidth * 2;
     }
 
+    /* screen_resize() depends on this function to call screen_update_areas(),
+       so if this changes, also update screen_resize(). */
     screen_update_areas();
 }
 

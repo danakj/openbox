@@ -24,17 +24,37 @@
 G_BEGIN_DECLS
 
 typedef struct _ObtWatch ObtWatch;
+typedef enum _ObtWatchNotifyType ObtWatchNotifyType;
 
-struct _ObtMainLoop;
+typedef void (*ObtWatchFunc)(ObtWatch *w, const gchar *subpath,
+                             ObtWatchNotifyType type, gpointer data);
 
-typedef void (*ObtWatchFunc)(ObtWatch *w, gchar *subpath, gpointer data);
+enum _ObtWatchNotifyType {
+    OBT_WATCH_ADDED, /*!< A file/dir was added in a watched dir */
+    OBT_WATCH_REMOVED, /*!< A file/dir was removed in a watched dir */
+    OBT_WATCH_MODIFIED, /*!< A watched file, or a file in a watched dir, was
+                             modified */
+    OBT_WATCH_SELF_REMOVED /*!< The watched target was removed. */ 
+};
 
 ObtWatch* obt_watch_new();
 void obt_watch_ref(ObtWatch *w);
 void obt_watch_unref(ObtWatch *w);
 
-void obt_watch_dir(ObtWatch *w, const gchar *path,
-                   ObtWatchFunc func, gpointer data);
+/*! Start watching a target file or directory.
+  If the target is a directory, the watch is performed recursively.
+  On start, if the target is a directory, an ADDED notification will come for
+  each file in the directory, and its subdirectories.
+  @param path The path to the target to watch.  Must be an absolute path that
+    starts with a /.
+  @param watch_hidden If TRUE, and if the target is a directory, dot-files (and
+    dot-subdirectories) will be included in the watch.  If the target is a
+    file, this parameter is ignored.
+*/
+gboolean obt_watch_add(ObtWatch *w, const gchar *path,
+                       gboolean watch_hidden,
+                       ObtWatchFunc func, gpointer data);
+void obt_watch_remove(ObtWatch *w, const gchar *path);
 
 G_END_DECLS
 

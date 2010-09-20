@@ -45,7 +45,7 @@ enum {
 };
 
 struct _ObtDDParse {
-    gchar *filename;
+    const gchar *filename;
     gulong lineno;
     gulong flags;
     ObtDDParseGroup *group;
@@ -747,15 +747,19 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
     return TRUE;
 }
 
-GHashTable* obt_ddparse_file(const gchar *name, GSList *paths)
+GHashTable* obt_ddparse_file(const gchar *filename)
 {
     ObtDDParse parse;
     ObtDDParseGroup *desktop_entry;
-    GSList *it;
     FILE *f;
     gboolean success;
 
-    parse.filename = NULL;
+    if (!g_utf8_validate(filename, -1, NULL)) {
+        g_warning("Filename contains bad utf8: %s", filename);
+        return NULL;
+    }
+
+    parse.filename = filename;
     parse.lineno = 0;
     parse.group = NULL;
     parse.group_hash = g_hash_table_new_full(g_str_hash,
@@ -769,39 +773,34 @@ GHashTable* obt_ddparse_file(const gchar *name, GSList *paths)
     g_hash_table_insert(parse.group_hash, desktop_entry->name, desktop_entry);
 
     success = FALSE;
-    for (it = paths; it && !success; it = g_slist_next(it)) {
-        gchar *path = g_strdup_printf("%s/%s", (char*)it->data, name);
-        if ((f = fopen(path, "r"))) {
-            parse.filename = path;
-            parse.lineno = 1;
-            parse.flags = 0;
-            if ((success = parse_file(f, &parse))) {
-                /* check that required keys exist */
+    if ((f = fopen(parse.filename, "r"))) {
+        parse.lineno = 1;
+        parse.flags = 0;
+        if ((success = parse_file(f, &parse))) {
+            /* check that required keys exist */
 
-                if (!(parse.flags & DE_TYPE)) {
-                    g_warning("Missing Type key in %s", path);
-                    success = FALSE;
-                }
-                if (!(parse.flags & DE_NAME)) {
-                    g_warning("Missing Name key in %s", path);
-                    success = FALSE;
-                }
-                if (parse.flags & DE_TYPE_APPLICATION &&
-                    !(parse.flags & DE_EXEC))
-                {
-                    g_warning("Missing Exec key for Application in %s",
-                              path);
-                    success = FALSE;
-                }
-                else if (parse.flags & DE_TYPE_LINK && !(parse.flags & DE_URL))
-                {
-                    g_warning("Missing URL key for Link in %s", path);
-                    success = FALSE;
-                }
+            if (!(parse.flags & DE_TYPE)) {
+                g_warning("Missing Type key in %s", parse.filename);
+                success = FALSE;
             }
-            fclose(f);
+            if (!(parse.flags & DE_NAME)) {
+                g_warning("Missing Name key in %s", parse.filename);
+                success = FALSE;
+            }
+            if (parse.flags & DE_TYPE_APPLICATION &&
+                !(parse.flags & DE_EXEC))
+            {
+                g_warning("Missing Exec key for Application in %s",
+                          parse.filename);
+                success = FALSE;
+            }
+            else if (parse.flags & DE_TYPE_LINK && !(parse.flags & DE_URL))
+            {
+                g_warning("Missing URL key for Link in %s", parse.filename);
+                success = FALSE;
+            }
         }
-        g_free(path);
+        fclose(f);
     }
     if (!success) {
         g_hash_table_destroy(parse.group_hash);
@@ -813,4 +812,45 @@ GHashTable* obt_ddparse_file(const gchar *name, GSList *paths)
 GHashTable* obt_ddparse_group_keys(ObtDDParseGroup *g)
 {
     return g->key_hash;
+}
+
+gchar* obt_ddparse_file_to_id(const gchar *filename)
+{
+    gint len;
+    const gchar *in;
+    gchar *out;
+    gboolean sep;
+
+    if (!g_utf8_validate(filename, -1, NULL)) {
+        g_warning("Filename contains bad utf8: %s", filename);
+        return NULL;
+    }
+
+    len = strlen(filename) - 8;  /* 8 = strlen(".desktop") */
+    g_assert(strcmp(filename+len, ".desktop") == 0);
+
+    out = g_new(char, len+1);
+    sep = TRUE;
+    for (in = filename; *in; ++in) {
+        gchar *next;
+
+        if (*in == '/') {
+            /* path separators becomes dashes */
+            if (!sep) {
+                *out = '-';
+                ++out;
+            }
+            sep = TRUE;
+        }
+        else {
+            /* everything else is copied as is */
+            next = g_utf8_next_char(in);
+            while (in < next) {
+                *out = *in;
+                ++out;
+                ++in;
+            }
+        }
+    }
+    return out;
 }

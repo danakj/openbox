@@ -150,6 +150,8 @@ obt_libobt_la_SOURCES = \
 	obt/ddparse.c \
 	obt/link.h \
 	obt/link.c \
+	obt/linkbase.h \
+	obt/linkbase.c \
 	obt/paths.h \
 	obt/paths.c \
 	obt/prop.h \

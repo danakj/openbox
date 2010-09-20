@@ -18,63 +18,79 @@
 
 #include "obt/watch.h"
 
-#ifdef HAVE_SYS_INOTIFY_H
-#  include <sys/inotify.h>
-#endif
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
 #endif
-#include <errno.h>
+
+#include <glib.h>
+
+typedef struct _ObtWatchTarget ObtWatchTarget;
+
+/*! Callback function for the system-specific GSource to alert us to changes.
+*/
+typedef void (*ObtWatchNotifyFunc)(const gchar *path, gpointer target,
+                                   ObtWatchNotifyType type);
+
+
+/* Interface for system-specific stuff (e.g. inotify). the functions are
+   defined in in watch_<system>.c
+*/
+
+/*! Initializes the watch subsystem, and returns a GSource for it.
+  @param notify The GSource will call @notify when a watched file is changed.
+  @return Returns a GSource* on success, and a NULL if an error occurred.
+*/
+GSource* watch_sys_create_source(ObtWatchNotifyFunc notify);
+/*! Add a target to the watch subsystem.
+  @return Returns an integer key that is used to uniquely identify the target
+    within this subsystem.  A negative value indicates an error.
+*/
+gint watch_sys_add_target(GSource *source, const char *path,
+                          gboolean watch_hidden, gpointer target);
+/*! Remove a target from the watch system, by its key.
+  Use the key returned from watch_sys_add_target() to remove the target.
+*/
+void watch_sys_remove_target(GSource *source, gint key);
+
+
+/* General system which uses the watch_sys_* stuff
+*/
 
 struct _ObtWatch {
     guint ref;
-    gint ino_fd;
-    guint ino_watch;
-    GHashTable *targets;
-
-#ifdef HAVE_SYS_INOTIFY_H
-    GHashTable *targets_by_wd;
-#endif
+    GHashTable *targets_by_path;
+    GSource *source;
 };
 
-typedef struct _ObtWatchTarget {
+struct _ObtWatchTarget {
     ObtWatch *w;
-
-#ifdef HAVE_SYS_INOTIFY_H
-    gint wd;
-#endif
-
-    gchar *path;
+    gchar *base_path;
     ObtWatchFunc func;
     gpointer data;
-} ObtWatchTarget;
+    gint key;
+};
 
-static void init_inot(ObtWatch *w);
-static gboolean read_inot(GIOChannel *s, GIOCondition cond, gpointer data);
-static gboolean add_inot(ObtWatch *w, ObtWatchTarget *t, const char *path,
-                         gboolean dir);
-static void rm_inot(ObtWatchTarget *t);
-static ObtWatchTarget* target_new(ObtWatch *w, const gchar *path,
-                                  ObtWatchFunc func, gpointer data);
 static void target_free(ObtWatchTarget *t);
+static void target_notify(const gchar *const path, gpointer target,
+                          ObtWatchNotifyType type);
 
 ObtWatch* obt_watch_new()
 {
     ObtWatch *w;
+    GSource *source;
 
-    w = g_slice_new(ObtWatch);
-    w->ref = 1;
-    w->ino_fd = -1;
-    w->targets = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                       NULL, (GDestroyNotify)target_free);
-#ifdef HAVE_SYS_INOTIFY_H
-    w->targets_by_wd = g_hash_table_new(g_int_hash, g_int_equal);
-#endif
-
-    init_inot(w);
-
+    w = NULL;
+    source = watch_sys_create_source(target_notify);
+    if (source) {
+        w = g_slice_new(ObtWatch);
+        w->ref = 1;
+        w->targets_by_path = g_hash_table_new_full(
+            g_str_hash, g_str_equal, NULL, (GDestroyNotify)target_free);
+        w->source = source;
+    }
     return w;
 }
+
 void obt_watch_ref(ObtWatch *w)
 {
     ++w->ref;
@@ -83,155 +99,64 @@ void obt_watch_ref(ObtWatch *w)
 void obt_watch_unref(ObtWatch *w)
 {
     if (--w->ref < 1) {
-        if (w->ino_fd >= 0 && w->ino_watch)
-            g_source_remove(w->ino_watch);
-
-        g_hash_table_destroy(w->targets);
-#ifdef HAVE_SYS_INOTIFY_H
-        g_hash_table_destroy(w->targets_by_wd);
-#endif
-
+        g_hash_table_destroy(w->targets_by_path);
+        g_source_destroy(w->source);
         g_slice_free(ObtWatch, w);
     }
 }
 
-static void init_inot(ObtWatch *w)
-{
-#ifdef HAVE_SYS_INOTIFY_H
-    if (w->ino_fd >= 0) return;
-
-    w->ino_fd = inotify_init();
-    if (w->ino_fd >= 0) {
-        GIOChannel *ch;
-
-        ch = g_io_channel_unix_new(w->ino_fd);
-        w->ino_watch = g_io_add_watch(ch, G_IO_IN | G_IO_HUP | G_IO_ERR,
-                                      read_inot, w);
-        g_io_channel_unref(ch);
-    }
-#endif
-}
-
-static gboolean read_inot(GIOChannel *src, GIOCondition cond, gpointer data)
-{
-#ifdef HAVE_SYS_INOTIFY_H
-    ObtWatch *w = data;
-    ObtWatchTarget *t;
-    struct inotify_event s;
-    gint len;
-    guint ilen;
-    char *name;
-    
-    /* read the event */
-    for (ilen = 0; ilen < sizeof(s); ilen += len) {
-        len = read(w->ino_fd, ((char*)&s)+ilen, sizeof(s)-ilen);
-        if (len < 0 && errno != EINTR) return FALSE; /* error, don't repeat */
-        if (!len) return TRUE; /* nothing there */
-    }
-
-    name = g_new(char, s.len);
-
-    /* read the filename */
-    for (ilen = 0; ilen < s.len; ilen += len) {
-        len = read(w->ino_fd, name+ilen, s.len-ilen);
-        if (len < 0 && errno != EINTR) return FALSE; /* error, don't repeat */
-        if (!len) return TRUE; /* nothing there */
-    }
-
-    t = g_hash_table_lookup(w->targets, &s.wd);
-    if (t) t->func(w, name, t->data);
-
-    g_free(name);
-#endif
-    return TRUE; /* repeat */
-}
-
-static gboolean add_inot(ObtWatch *w, ObtWatchTarget *t, const char *path,
-                         gboolean dir)
-{
-#ifndef HAVE_SYS_INOTIFY_H
-    return FALSE;
-#else
-    gint mask;
-    if (w->ino_fd < 0) return FALSE;
-    if (dir) mask = IN_MODIFY | IN_CREATE | IN_DELETE | IN_MOVE;
-    else g_assert_not_reached();
-    t->wd = inotify_add_watch(w->ino_fd, path, mask);
-    return TRUE;
-#endif
-}
-
-static void rm_inot(ObtWatchTarget *t)
-{
-#ifdef HAVE_SYS_INOTIFY_H
-    if (t->w->ino_fd < 0) return;
-    if (t->wd < 0) return;
-    inotify_rm_watch(t->w->ino_fd, t->wd);
-#endif
-}
-
-static ObtWatchTarget* target_new(ObtWatch *w, const gchar *path,
-                                  ObtWatchFunc func, gpointer data)
-{
-    ObtWatchTarget *t;
-
-    t = g_slice_new0(ObtWatchTarget);
-    t->w = w;
-#ifdef HAVE_SYS_INOTIFY_H
-    t->wd = -1;
-#endif
-    t->path = g_strdup(path);
-    t->func = func;
-    t->data = data;
-
-    if (!add_inot(w, t, path, TRUE)) {
-        g_assert_not_reached(); /* XXX do something */
-    }
-
-#ifndef HAVE_SYS_INOTIFY_H
-#error need inotify for now
-#endif
-
-    return t;
-}
-
 static void target_free(ObtWatchTarget *t)
 {
-    rm_inot(t);
-
-    g_free(t->path);
+    if (t->key >= 0)
+        watch_sys_remove_target(t->w->source, t->key);
+    g_free(t->base_path);
     g_slice_free(ObtWatchTarget, t);
 }
 
-void obt_paths_watch_dir(ObtWatch *w, const gchar *path,
-                         ObtWatchFunc func, gpointer data)
+gboolean obt_watch_add(ObtWatch *w, const gchar *path,
+                       gboolean watch_hidden,
+                       ObtWatchFunc func, gpointer data)
 {
     ObtWatchTarget *t;
 
-    g_return_if_fail(w != NULL);
-    g_return_if_fail(path != NULL);
-    g_return_if_fail(data != NULL);
+    g_return_val_if_fail(w != NULL, FALSE);
+    g_return_val_if_fail(path != NULL, FALSE);
+    g_return_val_if_fail(func != NULL, FALSE);
+    g_return_val_if_fail(path[0] == G_DIR_SEPARATOR, FALSE);
 
-    t = target_new(w, path, func, data);
-    g_hash_table_insert(w->targets, t->path, t);
-#ifdef HAVE_SYS_INOTIFY_H
-    g_hash_table_insert(w->targets_by_wd, &t->wd, t);
-#endif
+    t = g_slice_new0(ObtWatchTarget);
+    t->w = w;
+    t->base_path = g_strdup(path);
+    t->func = func;
+    t->data = data;
+    g_hash_table_insert(w->targets_by_path, t->base_path, t);
+
+    t->key = watch_sys_add_target(w->source, path, watch_hidden, t);
+    if (t->key < 0) {
+        g_hash_table_remove(w->targets_by_path, t->base_path);
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
-void obt_paths_unwatch_dir(ObtWatch *w, const gchar *path)
+void obt_watch_remove(ObtWatch *w, const gchar *path)
 {
-    ObtWatchTarget *t;
-    
     g_return_if_fail(w != NULL);
     g_return_if_fail(path != NULL);
+    g_return_if_fail(path[0] == G_DIR_SEPARATOR);
 
-    t = g_hash_table_lookup(w->targets, path);
+    /* this also calls target_free */
+    g_hash_table_remove(w->targets_by_path, path);
+}
 
-    if (t) {
-#ifdef HAVE_SYS_INOTIFY_H
-        g_hash_table_remove(w->targets_by_wd, &t->wd);
-#endif
-        g_hash_table_remove(w->targets, path);
+static void target_notify(const gchar *const path, gpointer target,
+                          ObtWatchNotifyType type)
+{
+    ObtWatchTarget *t = target;
+    if (type == OBT_WATCH_SELF_REMOVED) {
+        /* this also calls target_free */
+        g_hash_table_remove(t->w->targets_by_path, t->base_path);
     }
+    t->func(t->w, path, type, t->data);
 }

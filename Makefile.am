@@ -155,6 +155,7 @@ obt_libobt_la_SOURCES = \
 	obt/util.h \
 	obt/watch.h \
 	obt/watch.c \
+	obt/watch_inotify.c \
 	obt/xqueue.h \
 	obt/xqueue.c
 

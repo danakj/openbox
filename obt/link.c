@@ -62,17 +62,21 @@ struct _ObtLink {
     } d;
 };
 
-ObtLink* obt_link_from_ddfile(const gchar *ddname, GSList *paths,
+ObtLink* obt_link_from_ddfile(const gchar *basepath, const gchar *filename,
                               ObtPaths *p)
 {
     ObtLink *link;
     GHashTable *groups, *keys;
     ObtDDParseGroup *g;
     ObtDDParseValue *v;
+    gchar *path;
 
     /* parse the file, and get a hash table of the groups */
-    groups = obt_ddparse_file(ddname, paths);
+    path = g_strconcat(basepath, filename, NULL);
+    groups = obt_ddparse_file(path);
+    g_free(path);
     if (!groups) return NULL; /* parsing failed */
+
     /* grab the Desktop Entry group */
     g = g_hash_table_lookup(groups, "Desktop Entry");
     g_assert(g != NULL);

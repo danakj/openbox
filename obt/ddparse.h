@@ -48,10 +48,24 @@ typedef struct _ObtDDParseValue {
     } value;
 } ObtDDParseValue;
 
-/* Returns a hash table where the keys are groups, and the values are
-   ObtDDParseGroups */
-GHashTable* obt_ddparse_file(const gchar *name, GSList *paths);
+/*! Parse a .desktop file.
+  @param filename The full path to the .desktop file to be read.
+  @return Returns a hash table where the keys are groups, and the values are
+    ObtDDParseGroups */
+GHashTable* obt_ddparse_file(const gchar *filename);
 
-/* Returns a hash table where the keys are "keys" in the .desktop file,
-   and the values are "values" in the .desktop file, for the group @g. */
+/*! Get the keys in a group from a .desktop file.
+  The group comes from the hash table returned by obt_ddparse_file.
+  @return Returns a hash table where the keys are "keys" in the .desktop file,
+    represented as strings.  The values are "values" in the .desktop file, for
+    the group @g. Each value will be a pointer to an ObtDDParseValue structure.
+*/
 GHashTable* obt_ddparse_group_keys(ObtDDParseGroup *g);
+
+/*! Determine the id for a .desktop file.
+  @param filename The path to the .desktop file, _relative to_ some
+    basepath. filename must end with ".desktop" and be encoded in utf8.
+  @return Returns a string which is the id for the given .desktop file in its
+    current position.  Returns NULL if there is an error.
+*/
+gchar* obt_ddparse_file_to_id(const gchar *filename);

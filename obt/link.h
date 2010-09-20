@@ -62,7 +62,13 @@ typedef enum {
 
 typedef struct _ObtLink     ObtLink;
 
-ObtLink* obt_link_from_ddfile(const gchar *name, GSList *paths,
+/*! Parse a .desktop (dd) file.
+  @param basepath The base directory in which to read the file.
+  @param filename The full path to the .desktop file _relative to_ basepath.
+    It must be in basepath or a subdirectory of it.
+  @param o An ObtPaths structure, which contains the executable paths.
+*/
+ObtLink* obt_link_from_ddfile(const gchar *basepath, const gchar *filename,
                               struct _ObtPaths *p);
 
 void obt_link_ref(ObtLink *e);

@@ -294,19 +294,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
             if (config_menu_show_icons &&
                 obt_xml_attr_string(node, "icon", &icon))
             {
-                RrImage *ic;
-
-                ic = RrImageCacheFindName(ob_rr_icons, icon);
-                if (ic)
-                    RrImageRef(ic);
-                else {
-                    ic = RrImageNew(ob_rr_icons);
-                    if (!RrImageAddPictureName(ic, icon)) {
-                        RrImageUnref(ic); /* no need to keep it around */
-                        ic = NULL;
-                    }
-                }
-                e->data.normal.icon = ic;
+                e->data.normal.icon = RrImageNewFromName(ob_rr_icons, icon);
 
                 if (e->data.normal.icon)
                     e->data.normal.icon_alpha = 0xff;

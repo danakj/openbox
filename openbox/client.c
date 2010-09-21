@@ -114,18 +114,9 @@ static gboolean client_can_steal_focus(ObClient *self,
 
 void client_startup(gboolean reconfig)
 {
-    if ((client_default_icon = RrImageCacheFind(ob_rr_icons,
-                                                ob_rr_theme->def_win_icon,
-                                                ob_rr_theme->def_win_icon_w,
-                                                ob_rr_theme->def_win_icon_h)))
-        RrImageRef(client_default_icon);
-    else {
-        client_default_icon = RrImageNew(ob_rr_icons);
-        RrImageAddPicture(client_default_icon,
-                          ob_rr_theme->def_win_icon,
-                          ob_rr_theme->def_win_icon_w,
-                          ob_rr_theme->def_win_icon_h);
-    }
+    client_default_icon = RrImageNewFromData(
+        ob_rr_icons, ob_rr_theme->def_win_icon,
+        ob_rr_theme->def_win_icon_w, ob_rr_theme->def_win_icon_h);
 
     if (reconfig) return;
 
@@ -2092,7 +2083,6 @@ void client_update_icons(ObClient *self)
     guint num;
     guint32 *data;
     guint w, h, i, j;
-    guint num_seen;  /* number of icons present */
     RrImage *img;
 
     img = NULL;
@@ -2105,13 +2095,15 @@ void client_update_icons(ObClient *self)
     if (OBT_PROP_GETA32(self->window, NET_WM_ICON, CARDINAL, &data, &num)) {
         /* figure out how many valid icons are in here */
         i = 0;
-        num_seen = 0;
         while (i + 2 < num) { /* +2 is to make sure there is a w and h */
             w = data[i++];
             h = data[i++];
             /* watch for the data being too small for the specified size,
                or for zero sized icons. */
-            if (i + w*h > num || w == 0 || h == 0) break;
+            if (i + w*h > num || w == 0 || h == 0) {
+                i += w*h;
+                continue;
+            }
 
             /* convert it to the right bit order for ObRender */
             for (j = 0; j < w*h; ++j)
@@ -2121,29 +2113,13 @@ void client_update_icons(ObClient *self)
                     (((data[i+j] >>  8) & 0xff) << RrDefaultGreenOffset) +
                     (((data[i+j] >>  0) & 0xff) << RrDefaultBlueOffset);
 
-            /* is it in the cache? */
-            img = RrImageCacheFind(ob_rr_icons, &data[i], w, h);
-            if (img) RrImageRef(img); /* own it */
+            /* add it to the image cache as an original */
+            if (!img)
+                img = RrImageNewFromData(ob_rr_icons, &data[i], w, h);
+            else
+                RrImageAddFromData(img, &data[i], w, h);
 
             i += w*h;
-            ++num_seen;
-
-            /* don't bother looping anymore if we already found it in the cache
-               since we'll just use that! */
-            if (img) break;
-        }
-
-        /* if it's not in the cache yet, then add it to the cache now.
-           we have already converted it to the correct bit order above */
-        if (!img && num_seen > 0) {
-            img = RrImageNew(ob_rr_icons);
-            i = 0;
-            for (j = 0; j < num_seen; ++j) {
-                w = data[i++];
-                h = data[i++];
-                RrImageAddPicture(img, &data[i], w, h);
-                i += w*h;
-            }
         }
 
         g_free(data);
@@ -2167,15 +2143,10 @@ void client_update_icons(ObClient *self)
 
                 if (xicon) {
                     if (w > 0 && h > 0) {
-                        /* is this icon in the cache yet? */
-                        img = RrImageCacheFind(ob_rr_icons, data, w, h);
-                        if (img) RrImageRef(img); /* own it */
-
-                        /* if not, then add it */
-                        if (!img) {
-                            img = RrImageNew(ob_rr_icons);
-                            RrImageAddPicture(img, data, w, h);
-                        }
+                        if (!img)
+                            img = RrImageNewFromData(ob_rr_icons, data, w, h);
+                        else
+                            RrImageAddFromData(img, data, w, h);
                     }
 
                     g_free(data);

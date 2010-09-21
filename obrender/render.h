@@ -44,10 +44,11 @@ typedef struct _RrPixmapMask       RrPixmapMask;
 typedef struct _RrInstance         RrInstance;
 typedef struct _RrColor            RrColor;
 typedef struct _RrImage            RrImage;
+typedef struct _RrImageSet         RrImageSet;
 typedef struct _RrImagePic         RrImagePic;
 typedef struct _RrImageCache       RrImageCache;
 
-typedef guint32 RrPixel32;
+typedef guint32 RrPixel32;  /* RGBA format */
 typedef guint16 RrPixel16;
 typedef guchar  RrPixel8;
 
@@ -238,24 +239,43 @@ struct _RrImagePic {
     /* The sum of all the pixels.  This is used to compare pictures if their
        hashes match. */
     gint sum;
-    /* The name of the image.  This is used to determine
-       if the named image already is loaded.  May be NULL if the image
-       was not loaded from disk. */
-    gchar *name;
 };
 
 typedef void (*RrImageDestroyFunc)(RrImage *image, gpointer data);
 
-/*! An RrImage is a sort of meta-image.  It can contain multiple versions of
-  an image at different sizes, which may or may not be completely different
-  pictures */
+/*! An RrImage refers to a RrImageSet.  If multiple RrImageSets end up
+  holding the same image data, they will be marged and the RrImages that
+  point to them would be updated. */
 struct _RrImage {
     gint ref;
+    RrImageSet *set;
+
+    /* This function (if not NULL) will be called just before destroying
+      RrImage. */
+    RrImageDestroyFunc destroy_func;
+    gpointer           destroy_data;
+};
+
+/*! An RrImage is a sort of meta-image.  It can contain multiple versions
+  of an image at different sizes, which may or may not be completely different
+  pictures */
+struct _RrImageSet
+{
     RrImageCache *cache;
+
+    /*! If a picture is loaded by a name, then it has a name attached to it.
+      This contains a list of strings, containing all names that have ever
+      been associated with the RrImageSet. A name in the RrImageCache can
+      only be associated with a single RrImageSet. */
+    GSList *names;
+
+    /*! RrImages that point at this RrImageSet. If this is empty, then there
+      are no images using the set and it can be freed. */
+    GSList *images;
 
     /*! An array of "originals", that is of RrPictures that have been added
       to the image in various sizes, and that have not been resized.  These
-      are explicitly added to the RrImage. */
+      are explicitly added to the RrImageSet. */
     RrImagePic **original;
     gint n_original;
     /*! An array of "resized" pictures.  When an "original" RrPicture
@@ -264,11 +284,6 @@ struct _RrImage {
       RrImage. */
     RrImagePic **resized;
     gint n_resized;
-
-    /* This function (if not NULL) will be called just before destroying
-      RrImage. */
-    RrImageDestroyFunc destroy_func;
-    gpointer           destroy_data;
 };
 
 /* these are the same on all endian machines because it seems to be dependant
@@ -355,23 +370,41 @@ RrImageCache* RrImageCacheNew(gint max_resized_saved);
 void          RrImageCacheRef(RrImageCache *self);
 void          RrImageCacheUnref(RrImageCache *self);
 
-/*! Finds an image in the cache, if it is already in there */
-RrImage*      RrImageCacheFind(RrImageCache *self,
-                               RrPixel32 *data, gint w, gint h);
-/*! Finds an image in the cache, by searching for the name of the image */
-RrImage*      RrImageCacheFindName(RrImageCache *self,
-                                   const gchar *name);
+/*! Create a new image, or return one from the cache that matches.
+  @param cache The image cache.
+  @param old The current RrImage, which the new image should be added to.
+    Use this if loading a different sized version of the same image.
+    The returned RrImage should replace the one passed in as old.
+    Pass NULL here if adding an image which is (or may be) entirely new.
+  @param name The name of the icon to be loaded off disk, or used in the cache
+  @return Returns NULL if unable to load an image by the name and it is not in
+    the cache already
+*/
+RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name);
 
-RrImage* RrImageNew(RrImageCache *cache);
-void     RrImageRef(RrImage *im);
-void     RrImageUnref(RrImage *im);
+/*! Create a new image, or return one from the cache that matches.
+  @param cache The image cache.
+  @param data The image data in RGBA32 format.  There should be @w * @h many
+    values in the data array.
+  @param w The width of the image data.
+  @param h The height of the image data.
+  @return Returns NULL if unable to load an image by the name and it is not in
+    the cache already
+*/
+RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
+                            gint w, gint h);
 
-void     RrImageAddPicture(RrImage *im, const RrPixel32 *data, gint w, gint h);
-/*! Adds a picture by name, from a file on disk. 
-  @name Can be a full path to an image, or it can be a name as per the
-        freedesktop.org icon spec. */
-gboolean RrImageAddPictureName(RrImage *im, const gchar *name);
-void     RrImageRemovePicture(RrImage *im, gint w, gint h);
+/*! Add a new size of a picture to an image.
+  If a picture has multiple versions of different sizes (example 16x16, 32x32
+  and so on), they should all be under the same RrImage.  This adds a new
+  size to an existing RrImage, associating the newly sized picture with the
+  others in the RrImage - classifying them as being the same logical image at a
+  different dimention.
+*/
+void RrImageAddFromData(RrImage *image, RrPixel32 *data, gint w, gint h);
+
+void RrImageRef(RrImage *im);
+void RrImageUnref(RrImage *im);
 
 G_END_DECLS
 

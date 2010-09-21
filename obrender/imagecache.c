@@ -58,21 +58,6 @@ void RrImageCacheUnref(RrImageCache *self)
     }
 }
 
-RrImage* RrImageCacheFindName(RrImageCache *self, const gchar *name)
-{
-    return g_hash_table_lookup(self->name_table, name);
-}
-
-/*! Finds an image in the cache, if it is already in there */
-RrImage* RrImageCacheFind(RrImageCache *self,
-                          RrPixel32 *data, gint w, gint h)
-{
-    RrImagePic pic;
-
-    RrImagePicInit(&pic, NULL, w, h, data);
-    return g_hash_table_lookup(self->pic_table, &pic);
-}
-
 #define hashsize(n) ((RrPixel32)1<<(n))
 #define hashmask(n) (hashsize(n)-1)
 #define rot(x,k) (((x)<<(k)) | ((x)>>(32-(k))))

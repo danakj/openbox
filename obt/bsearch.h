@@ -40,8 +40,9 @@ G_BEGIN_DECLS
         if ((val) == (ar)[out_BSEARCH]) {                           \
             break; \
         } \
-        else if ((val) < (ar)[out_BSEARCH])                       \
+        else if ((val) < (ar)[out_BSEARCH] && out_BSEARCH > 0) {     \
             r_BSEARCH = out_BSEARCH-1; /* search to the left side */ \
+        } \
         else \
             l_BSEARCH = out_BSEARCH+1; /* search to the left side */ \
     } \

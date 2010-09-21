@@ -469,6 +469,7 @@ rrpubinclude_HEADERS = \
 
 obtpubinclude_HEADERS = \
 	obt/link.h \
+	obt/linkbase.h \
 	obt/display.h \
 	obt/keyboard.h \
 	obt/xml.h \

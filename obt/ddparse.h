@@ -33,6 +33,15 @@ typedef enum {
     OBT_DDPARSE_NUM_VALUE_TYPES
 } ObtDDParseValueType;
 
+typedef enum {
+    OBT_DDPARSE_MATCH_NONE = 0,
+    OBT_DDPARSE_MATCH_FAIL,
+    OBT_DDPARSE_MATCH_LANG,
+    OBT_DDPARSE_MATCH_LANG_MODIFIER,
+    OBT_DDPARSE_MATCH_LANG_COUNTRY,
+    OBT_DDPARSE_MATCH_LANG_COUNTRY_MODIFIER
+} ObtDDParseLangMatch;
+
 typedef struct _ObtDDParseValue {
     ObtDDParseValueType type;
     union _ObtDDParseValueValue {
@@ -46,13 +55,17 @@ typedef struct _ObtDDParseValue {
         guint enumerable;
         guint environments; /*!< A mask of flags from ObtLinkEnvMask */
     } value;
+    ObtDDParseLangMatch language_match;
 } ObtDDParseValue;
 
 /*! Parse a .desktop file.
   @param filename The full path to the .desktop file to be read.
   @return Returns a hash table where the keys are groups, and the values are
     ObtDDParseGroups */
-GHashTable* obt_ddparse_file(const gchar *filename);
+GHashTable* obt_ddparse_file(const gchar *filename,
+                             const gchar *language,
+                             const gchar *country,
+                             const gchar *modifier);
 
 /*! Get the keys in a group from a .desktop file.
   The group comes from the hash table returned by obt_ddparse_file.

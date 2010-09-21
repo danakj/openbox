@@ -24,6 +24,8 @@
 struct _ObtLink {
     guint ref;
 
+    gchar *path; /*!< The path to the file where the link came from */
+
     ObtLinkType type;
     gchar *name; /*!< Specific name for the object (eg Firefox) */
     gboolean display; /*<! When false, do not display this link in menus or
@@ -62,19 +64,18 @@ struct _ObtLink {
     } d;
 };
 
-ObtLink* obt_link_from_ddfile(const gchar *basepath, const gchar *filename,
-                              ObtPaths *p)
+ObtLink* obt_link_from_ddfile(const gchar *path, ObtPaths *p,
+                              const gchar *language,
+                              const gchar *country,
+                              const gchar *modifier)
 {
     ObtLink *link;
     GHashTable *groups, *keys;
     ObtDDParseGroup *g;
     ObtDDParseValue *v;
-    gchar *path;
 
     /* parse the file, and get a hash table of the groups */
-    path = g_strconcat(basepath, filename, NULL);
-    groups = obt_ddparse_file(path);
-    g_free(path);
+    groups = obt_ddparse_file(path, language, country, modifier);
     if (!groups) return NULL; /* parsing failed */
 
     /* grab the Desktop Entry group */
@@ -86,6 +87,7 @@ ObtLink* obt_link_from_ddfile(const gchar *basepath, const gchar *filename,
     /* build the ObtLink (we steal all strings from the parser) */
     link = g_slice_new0(ObtLink);
     link->ref = 1;
+    link->path = g_strdup(path);
     link->display = TRUE;
 
     v = g_hash_table_lookup(keys, "Type");
@@ -239,4 +241,14 @@ const GQuark* obt_link_app_categories(ObtLink *e, gulong *n)
 
     *n = e->d.app.n_categories;
     return e->d.app.categories;
+}
+
+const gchar *obt_link_source_file(ObtLink *e)
+{
+    return e->path;
+}
+
+gchar* obt_link_id_from_ddfile(const gchar *filename)
+{
+    return obt_ddparse_file_to_id(filename);
 }

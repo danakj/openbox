@@ -63,16 +63,28 @@ typedef enum {
 typedef struct _ObtLink     ObtLink;
 
 /*! Parse a .desktop (dd) file.
-  @param basepath The base directory in which to read the file.
-  @param filename The full path to the .desktop file _relative to_ basepath.
-    It must be in basepath or a subdirectory of it.
+  @param path The full path to the .desktop file.
   @param o An ObtPaths structure, which contains the executable paths.
 */
-ObtLink* obt_link_from_ddfile(const gchar *basepath, const gchar *filename,
-                              struct _ObtPaths *p);
+ObtLink* obt_link_from_ddfile(const gchar *path,
+                              struct _ObtPaths *p,
+                              const gchar *language,
+                              const gchar *country,
+                              const gchar *modifier);
+
+/*! Determine the identifier for a .desktop (dd) file.
+  @param filename The full path to the .desktop file _relative to_ some
+    basepath.  For instance, if the desktop file is
+    /usr/share/applications/foo/bar.desktop, and the basepath is
+    /usr/share/applications, then the filename would be 'foo/bar.desktop'.
+    The filename must end with ".desktop" and be encoded in utf8.
+*/
+gchar* obt_link_id_from_ddfile(const gchar *filename);
 
 void obt_link_ref(ObtLink *e);
 void obt_link_unref(ObtLink *e);
+
+const gchar *obt_link_source_file(ObtLink *e);
 
 /*! Returns TRUE if the file exists but says it should be ignored, with
     the Hidden flag.  No other functions can be used for the ObtLink

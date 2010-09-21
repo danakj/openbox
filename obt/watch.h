@@ -26,7 +26,14 @@ G_BEGIN_DECLS
 typedef struct _ObtWatch ObtWatch;
 typedef enum _ObtWatchNotifyType ObtWatchNotifyType;
 
-typedef void (*ObtWatchFunc)(ObtWatch *w, const gchar *subpath,
+/*! Notification function for changes in a watch file/directory.
+  @param base_path is the path to the watch target (file or directory).
+  @param sub_path is a path relative to the watched directory.  If the
+    notification is about the watch target itself, the subpath will be
+    an empty string.
+*/
+typedef void (*ObtWatchFunc)(ObtWatch *w, const gchar *base_path,
+                             const gchar *sub_path, const gchar *full_path,
                              ObtWatchNotifyType type, gpointer data);
 
 enum _ObtWatchNotifyType {

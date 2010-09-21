@@ -28,7 +28,8 @@ typedef struct _ObtWatchTarget ObtWatchTarget;
 
 /*! Callback function for the system-specific GSource to alert us to changes.
 */
-typedef void (*ObtWatchNotifyFunc)(const gchar *path, gpointer target,
+typedef void (*ObtWatchNotifyFunc)(const gchar *sub_path,
+                                   const gchar *full_path, gpointer target,
                                    ObtWatchNotifyType type);
 
 
@@ -71,8 +72,8 @@ struct _ObtWatchTarget {
 };
 
 static void target_free(ObtWatchTarget *t);
-static void target_notify(const gchar *const path, gpointer target,
-                          ObtWatchNotifyType type);
+static void target_notify(const gchar *sub_path, const gchar *full_path,
+                          gpointer target, ObtWatchNotifyType type);
 
 ObtWatch* obt_watch_new()
 {
@@ -150,13 +151,13 @@ void obt_watch_remove(ObtWatch *w, const gchar *path)
     g_hash_table_remove(w->targets_by_path, path);
 }
 
-static void target_notify(const gchar *const path, gpointer target,
-                          ObtWatchNotifyType type)
+static void target_notify(const gchar *sub_path, const gchar *full_path,
+                          gpointer target, ObtWatchNotifyType type)
 {
     ObtWatchTarget *t = target;
     if (type == OBT_WATCH_SELF_REMOVED) {
         /* this also calls target_free */
         g_hash_table_remove(t->w->targets_by_path, t->base_path);
     }
-    t->func(t->w, path, type, t->data);
+    t->func(t->w, t->base_path, sub_path, full_path, type, t->data);
 }

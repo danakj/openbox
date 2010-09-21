@@ -27,8 +27,11 @@ G_BEGIN_DECLS
 
 typedef struct _ObtLinkBase ObtLinkBase;
 
-/*! Create a new database of ObtLinks. */
-ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths);
+/*! Create a new database of ObtLinks.
+  @param paths An ObtPaths structure.
+  @param locale The value of LC_MESSAGES.
+*/
+ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths, const gchar *locale);
 void obt_linkbase_ref(ObtLinkBase *lb);
 void obt_linkbase_unref(ObtLinkBase *lb);
 

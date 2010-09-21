@@ -32,6 +32,7 @@ typedef struct _ObtDDParse ObtDDParse;
    Return TRUE if it is added to the hash table, and FALSE if not.
 */
 typedef gboolean (*ObtDDParseValueFunc)(gchar *key, const gchar *val,
+                                        ObtDDParseLangMatch match,
                                         ObtDDParse *parse, gboolean *error);
 
 
@@ -46,6 +47,9 @@ enum {
 
 struct _ObtDDParse {
     const gchar *filename;
+    const gchar *language;
+    const gchar *country;
+    const gchar *modifier;
     gulong lineno;
     gulong flags;
     ObtDDParseGroup *group;
@@ -180,7 +184,7 @@ static gchar* parse_value_string(const gchar *in,
         }
         else if (*i == '\\')
             backslash = TRUE;
-        else if ((guchar)*i >= 127 || (guchar)*i < 32) {
+        else if ((!locale && (guchar)*i >= 127) || (guchar)*i < 32) {
             /* avoid ascii control characters */
             parse_error("Found control character in string", parse, error);
             break;
@@ -396,7 +400,7 @@ static gboolean parse_file_line(FILE *f, gchar **buf,
         }
         else {
             /* read more */
-            size += BUFMUL;
+            *size += BUFMUL;
             *buf = g_renew(char, *buf, *size);
         }
     }
@@ -446,7 +450,7 @@ static void parse_group(const gchar *buf, gulong len,
 
         g->seen = TRUE;
         parse->group = g;
-        g_print("Found group %s\n", g->name);
+        /* g_print("Found group %s\n", g->name); */
     }
 }
 
@@ -454,7 +458,10 @@ static void parse_key_value(const gchar *buf, gulong len,
                             ObtDDParse *parse, gboolean *error)
 {
     gulong i, keyend, valstart, eq;
+    gulong langstart, langend, countrystart, countryend, modstart, modend;
     char *key;
+    ObtDDParseValue *val;
+    ObtDDParseLangMatch match;
 
     /* find the end of the key */
     for (i = 0; i < len; ++i)
@@ -471,15 +478,74 @@ static void parse_key_value(const gchar *buf, gulong len,
         parse_error("Empty key", parse, error);
         return;
     }
+
+    /* is there a language specifier? */
+    langstart = langend = countrystart = countryend = modstart = modend = 0;
+    if ((guchar)buf[i] == '[') {
+        langstart = i+1;
+        for (i = langstart; i < len; ++i)
+            if ((guchar)buf[i] == '.' || (guchar)buf[i] == '_' ||
+                (guchar)buf[i] == '@' || (guchar)buf[i] == ']')
+            {
+                langend = i-1;
+                break;
+            }
+            else if (!(((guchar)buf[i] >= 'A' && (guchar)buf[i] <= 'Z') ||
+                       ((guchar)buf[i] >= 'a' && (guchar)buf[i] <= 'z'))) {
+                parse_error("Invalid character in language", parse, error);
+                return;
+            }
+        if ((guchar)buf[i] == '_') {
+            countrystart = i+1;
+            for (i = i+1; i < len; ++i)
+                if ((guchar)buf[i] == '.' ||
+                    (guchar)buf[i] == '@' || (guchar)buf[i] == ']')
+                {
+                    langend = i-1;
+                    break;
+                }
+            else if (!(((guchar)buf[i] >= 'A' && (guchar)buf[i] <= 'Z') ||
+                       ((guchar)buf[i] >= 'a' && (guchar)buf[i] <= 'z'))) {
+                parse_error("Invalid character in country", parse, error);
+                return;
+            }
+        }
+        if ((guchar)buf[i] == '.') {
+            for (i = i+1; i < len; ++i)
+                if ((guchar)buf[i] == '@' || (guchar)buf[i] == ']')
+                    break;
+            else if (!(((guchar)buf[i] >= 'A' && (guchar)buf[i] <= 'Z') ||
+                       ((guchar)buf[i] >= 'a' && (guchar)buf[i] <= 'z'))) {
+                parse_error("Invalid character in encoding", parse, error);
+                return;
+            }
+        }
+        if ((guchar)buf[i] == '@') {
+            modstart = i+1;
+            for (i = i+1; i < len; ++i)
+                if ((guchar)buf[i] == ']') {
+                    modend = i-1;
+                    break;
+                }
+            else if (!(((guchar)buf[i] >= 'A' && (guchar)buf[i] <= 'Z') ||
+                       ((guchar)buf[i] >= 'a' && (guchar)buf[i] <= 'z'))) {
+                parse_error("Invalid character in locale modifier",
+                            parse, error);
+                return;
+            }
+        }
+        ++i;
+    }
+
     /* find the = character */
-    for (i = keyend; i < len; ++i) {
+    for (; i < len; ++i) {
         if (buf[i] == '=') {
             eq = i;
             break;
         }
         else if (buf[i] != ' ') {
             parse_error("Invalid character in key name", parse, error);
-            return ;
+            return;
         }
     }
     if (i == len) {
@@ -497,16 +563,38 @@ static void parse_key_value(const gchar *buf, gulong len,
         return;
     }
 
-    key = g_strndup(buf, keyend);
-    if (g_hash_table_lookup(parse->group->key_hash, key)) {
-        parse_error("Duplicate key found", parse, error);
-        g_free(key);
-        return;
+    if (langend < langstart)
+        match = OBT_DDPARSE_MATCH_FAIL;
+    else
+        match = OBT_DDPARSE_MATCH_NONE;
+    if (parse->language && langend >= langstart &&
+        strncmp(parse->language, buf+langstart, langend-langstart+1) == 0)
+    {
+        match = OBT_DDPARSE_MATCH_LANG;
+        if (parse->country && countryend >= countrystart &&
+            strncmp(parse->country, buf+countrystart,
+                    countryend-countrystart+1) == 0)
+            match = OBT_DDPARSE_MATCH_LANG_COUNTRY;
+
+        if (parse->modifier && modend >= modstart &&
+            strncmp(parse->modifier, buf+modstart,
+                    modend-modstart+1) == 0)
+            match += 1; /* its one up for LANG and for LANG_COUNTY */
     }
-    g_print("Found key/value %s=%s.\n", key, buf+valstart);
+
+    key = g_strndup(buf, keyend);
+    if ((val = g_hash_table_lookup(parse->group->key_hash, key))) {
+        if (val->language_match >= match) {
+            /* found a better match already */
+            g_free(key);
+            return;
+        }
+    }
+    /* g_print("Found key/value %s=%s\n", key, buf+valstart); */
     if (parse->group->value_func)
-        if (!parse->group->value_func(key, buf+valstart, parse, error)) {
-            parse_error("Unknown key", parse, error);
+        if (!parse->group->value_func(key, buf+valstart, match, parse, error))
+        {
+            /*parse_error("Unknown key", parse, error);*/
             g_free(key);
         }
 }
@@ -537,9 +625,12 @@ static gboolean parse_file(FILE *f, ObtDDParse *parse)
 }
 
 static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
+                                          ObtDDParseLangMatch match,
                                           ObtDDParse *parse, gboolean *error)
 {
     ObtDDParseValue v, *pv;
+
+    v.language_match = match;
 
     switch (key[0]) {
     case 'C':
@@ -631,6 +722,13 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         if (strcmp(key+1, "ersion")) return FALSE;
         v.type = OBT_DDPARSE_STRING; break;
     default:
+        return FALSE;
+    }
+
+    if (v.language_match && !(v.type == OBT_DDPARSE_LOCALESTRING ||
+                              v.type == OBT_DDPARSE_LOCALESTRINGS))
+    {
+        parse_error("Invalid localization on key", parse, error);
         return FALSE;
     }
 
@@ -747,7 +845,10 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
     return TRUE;
 }
 
-GHashTable* obt_ddparse_file(const gchar *filename)
+GHashTable* obt_ddparse_file(const gchar *filename,
+                             const gchar *language,
+                             const gchar *country,
+                             const gchar *modifier)
 {
     ObtDDParse parse;
     ObtDDParseGroup *desktop_entry;
@@ -760,6 +861,9 @@ GHashTable* obt_ddparse_file(const gchar *filename)
     }
 
     parse.filename = filename;
+    parse.language = language;
+    parse.country = country;
+    parse.modifier = modifier;
     parse.lineno = 0;
     parse.group = NULL;
     parse.group_hash = g_hash_table_new_full(g_str_hash,
@@ -818,7 +922,7 @@ gchar* obt_ddparse_file_to_id(const gchar *filename)
 {
     gint len;
     const gchar *in;
-    gchar *out;
+    gchar *out, *out_start;
     gboolean sep;
 
     if (!g_utf8_validate(filename, -1, NULL)) {
@@ -829,9 +933,9 @@ gchar* obt_ddparse_file_to_id(const gchar *filename)
     len = strlen(filename) - 8;  /* 8 = strlen(".desktop") */
     g_assert(strcmp(filename+len, ".desktop") == 0);
 
-    out = g_new(char, len+1);
+    out_start = out = g_new(char, len+1);
     sep = TRUE;
-    for (in = filename; *in; ++in) {
+    for (in = filename; in < filename + len; ) {
         gchar *next;
 
         if (*in == '/') {
@@ -841,6 +945,7 @@ gchar* obt_ddparse_file_to_id(const gchar *filename)
                 ++out;
             }
             sep = TRUE;
+            ++in;
         }
         else {
             /* everything else is copied as is */
@@ -850,7 +955,9 @@ gchar* obt_ddparse_file_to_id(const gchar *filename)
                 ++out;
                 ++in;
             }
+            sep = FALSE;
         }
     }
-    return out;
+    *out = '\0';
+    return out_start;
 }

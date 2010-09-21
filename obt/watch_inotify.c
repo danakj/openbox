@@ -39,7 +39,8 @@ typedef struct _InoTarget InoTarget;
 /*! Callback function in the watch general system.
   Matches definition in watch.c
 */
-typedef void (*ObtWatchNotifyFunc)(const gchar *path, gpointer target,
+typedef void (*ObtWatchNotifyFunc)(const gchar *sub_path,
+                                   const gchar *full_path, gpointer target,
                                    ObtWatchNotifyType type);
 
 struct _InoSource {
@@ -54,6 +55,8 @@ struct _InoSource {
 struct _InoTarget {
     gint key;
     gchar *path;
+    guint base_len; /* the length of the prefix of path which is the
+                       target's path */
     gpointer watch_target;
     gboolean is_dir;
     gboolean watch_hidden;
@@ -68,6 +71,8 @@ static gint add_target(GSource *source, InoTarget *parent,
                        gpointer target);
 static void remove_target(GSource *source, InoTarget *target);
 static void target_free(InoTarget *target);
+static void notify_target(GSource *source, InoTarget *ino_target,
+                          const gchar *path, ObtWatchNotifyType type);
 
 static GSourceFuncs source_funcs = {
     source_prepare,
@@ -285,7 +290,7 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
                     if (cb) cb(data);
 
                     /* call the WatchNotify callback */
-                    ino_source->notify(full_path, t->watch_target, type);
+                    notify_target(source, t, full_path, type);
                 }
 
                 g_free(full_path);
@@ -307,8 +312,8 @@ static void source_finalize(GSource *source)
 }
 
 static gint add_target(GSource *source, InoTarget *parent,
-                       const gchar *path, gboolean watch_hidden,
-                       gpointer target)
+                       const gchar *path,
+                       gboolean watch_hidden, gpointer target)
 {
     InoSource *ino_source;
     InoTarget *ino_target;
@@ -339,6 +344,7 @@ static gint add_target(GSource *source, InoTarget *parent,
         ino_target = g_slice_new(InoTarget);
         ino_target->key = key;
         ino_target->path = g_strdup(path);
+        ino_target->base_len = (parent ? parent->base_len : strlen(path));
         ino_target->is_dir = is_dir;
         ino_target->watch_hidden = watch_hidden;
         ino_target->watch_target = target;
@@ -362,12 +368,12 @@ static gint add_target(GSource *source, InoTarget *parent,
 
                     subpath = g_build_filename(path, name, NULL);
                     if (g_file_test(subpath, G_FILE_TEST_IS_DIR))
-                        add_target(source, ino_target, subpath, watch_hidden,
-                                   target);
+                        add_target(source, ino_target, subpath,
+                                   watch_hidden, target);
                     else
                         /* notify for each file in the directory on startup */
-                        ino_source->notify(subpath, ino_target->watch_target,
-                                           OBT_WATCH_ADDED);
+                        notify_target(source, ino_target, subpath,
+                                      OBT_WATCH_ADDED);
                     g_free(subpath);
                 }
             }
@@ -391,6 +397,16 @@ static void target_free(InoTarget *target)
 {
     g_free(target->path);
     g_slice_free(InoTarget, target);
+}
+
+static void notify_target(GSource *source, InoTarget *ino_target,
+                          const gchar *path, ObtWatchNotifyType type)
+{
+    InoSource *ino_source = (InoSource*)source;
+    ino_source->notify(path + ino_target->base_len,
+                       path,
+                       ino_target->watch_target,
+                       type);
 }
 
 #endif

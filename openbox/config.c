@@ -370,7 +370,8 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             g_free(class);
             g_free(role);
             g_free(title);
-            name = class = role = title = NULL;
+            g_free(type_str);
+            name = class = role = title = type_str = NULL;
         }
 
         app = obt_xml_find_node(app->next, "application");

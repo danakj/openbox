@@ -70,6 +70,7 @@ int main(int argc, char **argv)
     Pixmap p;
     Cursor cur;
     XEvent ev;
+    unsigned int bs = sizeof(long);
 
     printf("Click on a window with an icon...\n");
 
@@ -132,10 +133,10 @@ int main(int argc, char **argv)
         i[image]->byte_order = LSBFirst;
         i[image]->data = (char*)prop_return[image];
         for (j = 0; j < w*h; j++) {
-            unsigned char alpha = (unsigned char)i[image]->data[j*4+3];
-            unsigned char r = (unsigned char) i[image]->data[j*4+0];
-            unsigned char g = (unsigned char) i[image]->data[j*4+1];
-            unsigned char b = (unsigned char) i[image]->data[j*4+2];
+            unsigned char alpha = (unsigned char)i[image]->data[j*bs+3];
+            unsigned char r = (unsigned char) i[image]->data[j*bs+0];
+            unsigned char g = (unsigned char) i[image]->data[j*bs+1];
+            unsigned char b = (unsigned char) i[image]->data[j*bs+2];
 
             // background color
             unsigned char bgr = 0;

@@ -23,6 +23,7 @@
 #include "event.h"
 #include "config.h"
 #include "client.h"
+#include "focus.h"
 #include "openbox.h"
 #include "debug.h"
 
@@ -300,6 +301,7 @@ void actions_run_acts(GSList *acts,
                       struct _ObClient *client)
 {
     GSList *it;
+    gboolean update_user_time;
 
     /* Don't allow saving the initial state when running things from the
        menu */
@@ -309,6 +311,7 @@ void actions_run_acts(GSList *acts,
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
 
+    update_user_time = FALSE;
     for (it = acts; it; it = g_slist_next(it)) {
         ObActionsData data;
         ObActionsAct *act = it->data;
@@ -337,6 +340,8 @@ void actions_run_acts(GSList *acts,
             if (!act->def->run(&data, act->options)) {
                 if (actions_act_is_interactive(act))
                     actions_interactive_end_act();
+                if (client && client == focus_client)
+                    update_user_time = TRUE;
             } else {
                 /* make sure its interactive if it returned TRUE */
                 g_assert(act->i_input);
@@ -346,6 +351,8 @@ void actions_run_acts(GSList *acts,
             }
         }
     }
+    if (update_user_time)
+        event_update_user_time();
 }
 
 gboolean actions_interactive_act_running(void)

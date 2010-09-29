@@ -76,7 +76,13 @@ void event_reset_time(void);
 /*! A time at which an event happened that caused this current event to be
   generated.  This is a user-provided time and not to be trusted.
   Returns CurrentTime if there was no source time provided.
- */
+*/
 Time event_source_time(void);
+
+/*! Update the timestamp for when the user has last used the focused window.
+  This updates the timestamp to the time of the last event, given by
+  event_time().
+*/
+void event_update_user_time(void);
 
 #endif

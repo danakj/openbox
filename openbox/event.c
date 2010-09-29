@@ -2246,3 +2246,8 @@ void event_reset_time(void)
 {
     next_time();
 }
+
+void event_update_user_time(void)
+{
+    event_last_user_time = event_time();
+}

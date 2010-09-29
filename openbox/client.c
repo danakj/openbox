@@ -730,9 +730,10 @@ static gboolean client_can_steal_focus(ObClient *self,
         /* If the user is working in another window right now, then don't
            steal focus */
         if (!parent_focused &&
-            event_last_user_time && launch_time &&
-            event_time_after(event_last_user_time, launch_time) &&
-            event_last_user_time != launch_time &&
+            event_last_user_time &&
+            (!launch_time ||
+             (event_time_after(event_last_user_time, launch_time) &&
+              event_last_user_time != launch_time)) &&
             event_time_after(event_last_user_time,
                              steal_time - OB_EVENT_USER_TIME_DELAY))
         {

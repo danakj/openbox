@@ -21,6 +21,7 @@
 #include "framerender.h"
 #include "screen.h"
 #include "client.h"
+#include "focus.h"
 #include "frame.h"
 #include "openbox.h"
 #include "resist.h"
@@ -1084,5 +1085,9 @@ gboolean moveresize_event(XEvent *e)
         used = TRUE;
     }
 #endif
+
+    if (used && moveresize_client == focus_client)
+        event_update_user_time();
+
     return used;
 }

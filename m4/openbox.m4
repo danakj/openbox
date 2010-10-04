@@ -77,6 +77,7 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 	    FLAGS="$FLAGS -O0 -ggdb -fno-inline -Wwrite-strings"
 	    FLAGS="$FLAGS -Wall -Wsign-compare -Waggregate-return"
 	    FLAGS="$FLAGS -Wbad-function-cast -Wpointer-arith"
+	    FLAGS="$FLAGS -Wno-write-strings -Wextra"
 	    # glib can't handle this flag
 	    # -Wcast-qual
             # for Python.h

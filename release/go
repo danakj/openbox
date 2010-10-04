@@ -1,0 +1,153 @@
+#!/bin/sh
+
+help() {
+  echo "Usage: $0 <revision> <version> [lastrelease]"
+  echo
+  echo "  <revision>    The revision which should be used for release."
+  echo "  <version>     The version of the release."
+  echo "  [lastrelease] The revision of the most recent release made."
+  echo "                By default it uses the most recent release-tag."
+  exit 1
+}
+
+REV="$1"
+test -z "$REV" && help
+VERSION="$2"
+test -z "$VERSION" && help
+LAST="$3"
+
+. release/common
+
+#### CONFIRM SHORTLOG #####
+
+echo Shortlog from previous release:
+echo "$SHORTLOG"
+echo
+echo Shortlog from $LAST contains $(echo "$SHORTLOG"|wc -l) lines
+echo -n "ok? (y/n) "
+read a
+test "$a" = "y" || error "aborted"
+
+#### TEST COMPILATION ####
+
+# check that it builds
+./bootstrap >/dev/null || "bootstrap failed"
+#CFLAGS="-Werror -isystem /usr/lib/glib-2.0" \
+./configure -C --enable-debug >/dev/null || \
+  error "configure (with debug) failed"
+make || error "make (with debug and Werror) failed"
+git clean -f -x -d -q
+
+# check that it builds with each optional featureset
+./bootstrap >/dev/null || "bootstrap failed"
+
+echo Check compile with all options enabled
+./configure -C >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make failed"
+grep "XKB 1" config.log >/dev/null || error "missing xkb extension"
+grep "XRANDR 1" config.log >/dev/null || error "missing xrandr extension"
+grep "XINERAMA 1" config.log >/dev/null || error "missing xinerama extension"
+grep "SYNC 1" config.log >/dev/null || error "missing sync extension"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with startup notification disabled
+./configure -C --disable-startup-notification >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-startup-notification) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with xcursor disabled
+./configure -C --disable-xcursor >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-xcursor) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with imlib2 disabled
+./configure -C --disable-imlib2 >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-imlib2) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with session management disabled
+./configure -C --disable-session-management >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-session-management) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with xkb disabled
+./configure -C --disable-xkb >/dev/null || error "configure failed"
+make >/dev/null 2>/dev/null || error "make (with --disable-xkb) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with xrandr disabled
+./configure -C --disable-xrandr >/dev/null || error "configure failed"
+make >/dev/null 2>/dev/null || error "make (with --disable-xrandr) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with xinerama disabled
+./configure -C --disable-xinerama >/dev/null || error "configure failed"
+make >/dev/null 2>/dev/null || error "make (with --disable-xinerama) failed"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with xsync disabled
+./configure -C --disable-xsync >/dev/null || error "configure failed"
+make >/dev/null 2>/dev/null || error "make (with --disable-xsync) failed"
+make clean >/dev/null || error "make clean failed"
+
+# check that it installs sanely
+echo Check installation correctness
+./configure -C >/dev/null || \
+  error "configure failed"
+make distcheck >/dev/null || \
+  error "make distcheck failed"
+
+# VERIFY TARBALL
+
+TAR="openbox-$VERSION.tar.gz"
+ASC="openbox-$VERSION.tar.gz.asc"
+
+echo Found Openbox release tarball:
+ls -d openbox-*.tar.gz
+test -e "$TAR" || \
+  error "Specified version does not match configure.am"
+
+# SIGN THE TARBALL
+
+echo Signing the release tarball:
+gpg --sign --detach-sign --armor "$TAR"
+test $? = 0 || \
+  error "Failed to sign release tarball"
+
+echo Tagging the release:
+git tag -s -m "tagging the $VERSION release" "release-$VERSION" $REV || \
+  error "Failed to tag the release"
+
+mv "$TAR" "$ASC" "$SRCDIR"
+
+echo "=$VERSION="
+echo "$CLNOWRAP"
+echo
+echo
+echo Edit download page:
+echo "  http://openbox.org/oldwiki/index.php?title=Openbox:Download&action=edit&section=1"
+echo
+echo Edit changelog:
+echo "  http://openbox.org/oldwiki/index.php?title=Openbox:Changelog&action=edit&section=1"
+echo
+echo Push the tag:
+echo "  git push origin tag release-$VERSION"
+echo
+echo Email:
+echo "  ./release/email $*"
+echo
+cd "$SRCDIR"
+ls -l "$TAR" "$ASC"
+
+clean
+exit 0

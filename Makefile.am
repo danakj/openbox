@@ -41,11 +41,16 @@ nodist_bin_SCRIPTS = \
 	data/xsession/openbox-kde-session
 
 dist_rc_SCRIPTS = \
-	data/environment \
+	data/environment
+
+nodist_rc_SCRIPTS = \
 	data/autostart/autostart
 
 dist_libexec_SCRIPTS = \
 	data/autostart/openbox-xdg-autostart \
+	data/autostart/openbox-autostart
+
+nodist_libexec_SCRIPTS = \
 	data/autostart/openbox-autostart
 
 
@@ -347,7 +352,7 @@ clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
 dist_clearlooks_theme_DATA= \
 	themes/Clearlooks/openbox-3/themerc
 
-clearlooks34_themedir = $(themedir)/Clearlooks/openbox-3
+clearlooks34_themedir = $(themedir)/Clearlooks-3.4/openbox-3
 dist_clearlooks34_theme_DATA= \
 	themes/Clearlooks-3.4/openbox-3/themerc
 
@@ -471,11 +476,15 @@ edit = $(SED) \
 
 data/autostart/autostart: $(srcdir)/data/autostart/autostart.in Makefile
 	@echo make: creating $@
-	@$(edit) $< >$@
+	@test -d $(shell dirname $(builddir)/$@) || \
+	  mkdir $(shell dirname $(builddir)/$@)
+	@$(edit) $< >$(builddir)/$@
 
 data/autostart/openbox-autostart: $(srcdir)/data/autostart/openbox-autostart.in Makefile
 	@echo make: creating $@
-	@$(edit) $< >$@
+	@test -d $(shell dirname $(builddir)/$@) || \
+	  mkdir $(shell dirname $(builddir)/$@)
+	@$(edit) $< >$(builddir)/$@
 
 %.desktop: %.desktop.in Makefile
 	@echo make: creating $@
@@ -567,16 +576,11 @@ EXTRA_DIST = \
 # make clean doesn't delete these for some reason, even though they are
 # built by make
 CLEANFILES = \
-	doc/openbox.1 \
-	doc/openbox-session.1 \
-	doc/openbox-gnome-session.1 \
-	doc/openbox-kde-session.1 \
-	data/xsession/openbox-session \
-	data/xsession/openbox-gnome-session \
-	data/xsession/openbox-kde-session \
-	data/xsession/openbox.desktop \
-	data/xsession/openbox-gnome.desktop \
-	data/xsession/openbox-kde.desktop
+	$(nodist_man_MANS) \
+	$(nodist_bin_SCRIPTS) \
+	$(nodist_xsessions_DATA) \
+	$(nodist_rc_SCRIPTS) \
+	$(nodist_libexec_SCRIPTS)
 
 #doc:
 #       $(MAKE) -$(MAKEFLAGS) -C doc/doxygen doc

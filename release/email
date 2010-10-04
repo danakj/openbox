@@ -1,0 +1,63 @@
+#!/bin/sh
+
+help() {
+  echo "Usage: $0 <revision> <version> [lastrelease]"
+  echo
+  echo "  <revision>    The revision which should be used for release."
+  echo "  <version>     The version of the release."
+  echo "  [lastrelease] The revision of the most recent release made."
+  echo "                By default it uses the most recent release-tag."
+  exit 1
+}
+
+REV="$1"
+test -z "$REV" && help
+VERSION="$2"
+test -z "$VERSION" && help
+LAST="$3"
+
+. release/common
+
+SUBJECT="[RELEASE] Openbox $VERSION"
+MAILINGLIST=openbox@icculus.org
+MIKACHU=mikachu@icculus.org
+
+cat <<EOF > $WORKDIR/.email
+Hello,
+
+Openbox $VERSION is now available!
+
+Some noteworthy changes are:
+$CLNOWRAP
+
+======== Download ========
+
+Download links are here: http://openbox.org/wiki/Openbox:Download
+
+======== Commits ========
+
+The following is a full list of commits appearing in this release.
+You can see the full commits here: http://git.openbox.org/?p=dana/openbox.git;a=shortlog;h=refs/tags/release-$VERSION
+
+
+$SHORTLOG
+EOF
+
+if test -z $EDITOR; then
+    nano -w $WORKDIR/.email || error "failed to edit email, set \$EDITOR"
+else
+    $EDITOR $WORKDIR/.email || error "failed to edit email with \$EDTIOR"
+fi
+
+test -e $WORKDIR/.email || error "email file disappeared"
+cat $WORKDIR/.email | mail -s "$SUBJECT" "$MAILINGLIST" || \
+    error "mail to $MAILINGLIST failed"
+
+echo "Hi Mikachu,
+
+Please update the freshmeat.net Openbox stuff for $VERSION. Thanks!" | \
+mail -s "Freshmeat.net for Openbox $VERSION" "$MIKACHU" || \
+    error "mail to $MIKACHU failed"
+
+clean
+exit 0

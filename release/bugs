@@ -1,0 +1,38 @@
+#!/bin/sh
+
+help() {
+  echo "Usage: $0 <revision> [lastrelease]"
+  echo
+  echo "  <revision>    The revision which should be used for release."
+  echo "  [lastrelease] The revision of the most recent release made."
+  echo "                By default it uses the most recent release-tag."
+  exit 1
+}
+
+error() {
+  echo "error: $1"
+  exit 1
+}
+
+test -e "./openbox/openbox.c" || \
+  error "must be run from the project's top level directory"
+
+REV="$1"
+test -z "$REV" && help
+RELEASE_SHA=$(git rev-parse "$REV")
+test $? = 0 || error "revision $REV not found"
+
+LAST="$2"
+if test -z "$LAST"; then
+    LAST=$(git describe --match 'release-*' $REV)
+    test $? = 0 || \
+	error "unable to find last release"
+fi
+
+#### CHANGELOG #####
+git log --no-merges $LAST..$REV --oneline|egrep '[bB][uU][Gg] #?[0-9]+'
+git log --no-merges $LAST..$REV --oneline | \
+  perl -n -e'/[bB][uU][Gg] #?([0-9]+)/ && print "#$1, "'
+perl -e'print "\b\b \n"'
+
+exit 0

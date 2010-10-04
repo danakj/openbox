@@ -1,0 +1,56 @@
+#!/bin/sh
+
+NOW=$(date +%s)
+SRCDIR="$PWD"
+WORKDIR="/tmp/openbox.$NOW"
+TESTDIR="$WORKDIR/.test"
+
+clean() {
+  cd "$SRCDIR"
+  if test -d "$WORKDIR"; then
+    chmod -R +w "$WORKDIR"
+    rm -r -f "$WORKDIR"
+  fi
+}
+
+error() {
+  echo "error: $1"
+  test -n "$2" && echo "$2"
+  clean
+  exit 1
+}
+
+RELEASE_SHA=$(git rev-parse "$REV")
+test $? = 0 || error "revision $REV not found"
+
+#NON_MASTER=$(git rev-list $RELEASE_SHA ^master)
+#test $? = 0 || error "git rev-list failed"
+#test -z $NON_MASTER || error "REVISION contains commits not on master"
+
+git new-workdir "$SRCDIR" "$WORKDIR"
+test $? = 0 || error "git-new-workdir failed"
+
+echo "working in $WORKDIR"
+
+cd "$WORKDIR"
+test $? = 0 || error "cd to $WORKDIR failed"
+
+git checkout -q $RELEASE_SHA
+test $? = 0 || error "git-checkout failed"
+
+# get last release
+if test -z "$LAST"; then
+    LAST=$(git describe --match 'release-*' --abbrev=0 $REV)
+    test $? = 0 || \
+	error "unable to find last release"
+    echo "Using previous release as $LAST"
+fi
+
+H="$(head -1 CHANGELOG|cut -d: -f 1)"
+test $H = $VERSION ||
+  error "CHANGELOG does not contain version $VERSION"
+
+CL="$(cat CHANGELOG|sed -n /^$VERSION:\$/,/^\$/p|tail -n +2|head -n -1)"
+CLNOWRAP=$(echo "$CL" \
+  |sed -e "s/^  \*/*/"|sed -n '1h;1!H;${;g;s/\n    / /g;p;}')
+SHORTLOG="$(git shortlog --no-merges $LAST..$REV)"

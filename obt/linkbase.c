@@ -89,6 +89,7 @@ static GSList* find_base_entry_priority(GSList *list, gint priority)
     return it;
 }
 
+/*! Called when a change happens in the filesystem. */
 static void update(ObtWatch *w, const gchar *base_path,
                    const gchar *sub_path,
                    const gchar *full_path,

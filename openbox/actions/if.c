@@ -98,13 +98,16 @@ static gpointer setup_func(xmlNodePtr node)
             o->decor_on = TRUE;
     }
     if ((n = obt_xml_find_node(node, "desktop"))) {
-        gchar *s = obt_xml_node_string(n);
-        if (!g_ascii_strcasecmp(s, "current"))
-            o->desktop_current = TRUE;
-        if (!g_ascii_strcasecmp(s, "other"))
-            o->desktop_other = TRUE;
-        else
-            o->desktop_number = atoi(s);
+        gchar *s;
+        if ((s = obt_xml_node_string(n))) {
+          if (!g_ascii_strcasecmp(s, "current"))
+              o->desktop_current = TRUE;
+          if (!g_ascii_strcasecmp(s, "other"))
+              o->desktop_other = TRUE;
+          else
+              o->desktop_number = atoi(s);
+          g_free(s);
+        }
     }
     if ((n = obt_xml_find_node(node, "omnipresent"))) {
         if (obt_xml_node_bool(n))

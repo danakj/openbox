@@ -28,6 +28,7 @@ typedef struct {
     gboolean desktop_current;
     gboolean desktop_other;
     guint    desktop_number;
+    guint    screendesktop_number;
     GPatternSpec *matchtitle;
     GSList *thenacts;
     GSList *elseacts;
@@ -100,13 +101,13 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_xml_find_node(node, "desktop"))) {
         gchar *s;
         if ((s = obt_xml_node_string(n))) {
-          if (!g_ascii_strcasecmp(s, "current"))
-              o->desktop_current = TRUE;
-          if (!g_ascii_strcasecmp(s, "other"))
-              o->desktop_other = TRUE;
-          else
-              o->desktop_number = atoi(s);
-          g_free(s);
+            if (!g_ascii_strcasecmp(s, "current"))
+                o->desktop_current = TRUE;
+            if (!g_ascii_strcasecmp(s, "other"))
+                o->desktop_other = TRUE;
+            else
+                o->desktop_number = atoi(s);
+            g_free(s);
         }
     }
     if ((n = obt_xml_find_node(node, "omnipresent"))) {
@@ -114,6 +115,8 @@ static gpointer setup_func(xmlNodePtr node)
             o->omnipresent_on = TRUE;
         else
             o->omnipresent_off = TRUE;
+    if ((n = obt_xml_find_node(node, "activedesktop"))) {
+        o->screendesktop_number = obt_xml_node_int(n);
     }
     if ((n = obt_xml_find_node(node, "title"))) {
         gchar *s;
@@ -197,6 +200,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                                  (c->desktop != DESKTOP_ALL))) &&
         (!o->desktop_number  || ((c->desktop == o->desktop_number - 1) ||
                                  (c->desktop == DESKTOP_ALL))) &&
+        (!o->screendesktop_number || screen_desktop == o->screendesktop_number - 1) &&
         (!o->matchtitle ||
          (g_pattern_match_string(o->matchtitle, c->original_title))))
     {

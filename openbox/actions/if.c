@@ -43,6 +43,21 @@ void action_if_startup(void)
     actions_register("If", setup_func, free_func, run_func);
 }
 
+static inline set_bool(xmlNodePtr node,
+                       const char *name,
+                       gboolean *on,
+                       gboolean *off)
+{
+    xmlNodePtr n;
+
+    if ((n = obt_xml_find_node(node, name))) {
+        if (obt_xml_node_bool(n))
+            *on = TRUE;
+        else
+            *off = TRUE;
+    }
+}
+
 static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
@@ -50,54 +65,16 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "shaded"))) {
-        if (obt_xml_node_bool(n))
-            o->shaded_on = TRUE;
-        else
-            o->shaded_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "maximized"))) {
-        if (obt_xml_node_bool(n))
-            o->maxfull_on = TRUE;
-        else
-            o->maxfull_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "maximizedhorizontal"))) {
-        if (obt_xml_node_bool(n))
-            o->maxhorz_on = TRUE;
-        else
-            o->maxhorz_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "maximizedvertical"))) {
-        if (obt_xml_node_bool(n))
-            o->maxvert_on = TRUE;
-        else
-            o->maxvert_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "iconified"))) {
-        if (obt_xml_node_bool(n))
-            o->iconic_on = TRUE;
-        else
-            o->iconic_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "focused"))) {
-        if (obt_xml_node_bool(n))
-            o->focused = TRUE;
-        else
-            o->unfocused = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "urgent"))) {
-        if (obt_xml_node_bool(n))
-            o->urgent_on = TRUE;
-        else
-            o->urgent_off = TRUE;
-    }
-    if ((n = obt_xml_find_node(node, "undecorated"))) {
-        if (obt_xml_node_bool(n))
-            o->decor_off = TRUE;
-        else
-            o->decor_on = TRUE;
-    }
+    set_bool(node, "shaded", &o->shaded_on, &o->shaded_off);
+    set_bool(node, "maximized", &o->maxfull_on, &o->maxfull_off);
+    set_bool(node, "maximizedhorizontal", &o->maxhorz_on, &o->maxhorz_off);
+    set_bool(node, "maximizedvertical", &o->maxvert_on, &o->maxvert_off);
+    set_bool(node, "iconified", &o->iconic_on, &o->iconic_off);
+    set_bool(node, "focused", &o->focused, &o->unfocused);
+    set_bool(node, "urgent", &o->urgent_on, &o->urgent_off);
+    set_bool(node, "undecorated", &o->decor_off, &o->decor_on);
+    set_bool(node, "omnipresent", &o->omnipresent_on, &o->omnipresent_off);
+
     if ((n = obt_xml_find_node(node, "desktop"))) {
         gchar *s;
         if ((s = obt_xml_node_string(n))) {
@@ -110,11 +87,6 @@ static gpointer setup_func(xmlNodePtr node)
             g_free(s);
         }
     }
-    if ((n = obt_xml_find_node(node, "omnipresent"))) {
-        if (obt_xml_node_bool(n))
-            o->omnipresent_on = TRUE;
-        else
-            o->omnipresent_off = TRUE;
     if ((n = obt_xml_find_node(node, "activedesktop"))) {
         o->screendesktop_number = obt_xml_node_int(n);
     }

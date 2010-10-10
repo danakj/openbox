@@ -135,7 +135,8 @@ static gboolean load_file(ObtXmlInst *i,
             /* XML_PARSE_BLANKS is needed apparently, or the tree can end up
                with extra nodes in it. */
             i->doc = xmlReadFile(path, NULL, (XML_PARSE_NOBLANKS |
-                                              XML_PARSE_RECOVER));
+                                              XML_PARSE_RECOVER |
+                                              XML_PARSE_XINCLUDE));
             if (i->doc) {
                 i->root = xmlDocGetRootElement(i->doc);
                 if (!i->root) {

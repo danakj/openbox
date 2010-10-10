@@ -471,17 +471,17 @@ edit = $(SED) \
 	-e 's!@libexecdir\@!$(libexecdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 
-data/autostart/autostart: $(srcdir)/data/autostart/autostart.in Makefile
+data/autostart/autostart: $(top_srcdir)/data/autostart/autostart.in Makefile
 	@echo make: creating $@
-	@test -d $(shell dirname $(builddir)/$@) || \
-	  mkdir $(shell dirname $(builddir)/$@)
-	@$(edit) $< >$(builddir)/$@
+	@test -d $(shell dirname $(top_builddir)/$@) || \
+	  mkdir $(shell dirname $(top_builddir)/$@)
+	@$(edit) $< >$(top_builddir)/$@
 
-data/autostart/openbox-autostart: $(srcdir)/data/autostart/openbox-autostart.in Makefile
+data/autostart/openbox-autostart: $(top_srcdir)/data/autostart/openbox-autostart.in Makefile
 	@echo make: creating $@
-	@test -d $(shell dirname $(builddir)/$@) || \
-	  mkdir $(shell dirname $(builddir)/$@)
-	@$(edit) $< >$(builddir)/$@
+	@test -d $(shell dirname $(top_builddir)/$@) || \
+	  mkdir $(shell dirname $(top_builddir)/$@)
+	@$(edit) $< >$(top_builddir)/$@
 
 %.desktop: %.desktop.in Makefile
 	@echo make: creating $@

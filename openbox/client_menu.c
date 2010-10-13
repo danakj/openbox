@@ -276,7 +276,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
         if ((desk == DESKTOP_ALL && c->desktop != DESKTOP_ALL) ||
             (c->desktop == DESKTOP_ALL && desk == screen_desktop))
         {
-            e->data.normal.mask = ob_rr_theme->desk_mask;
+            e->data.normal.mask = ob_rr_theme->btn_desk->mask;
             set_icon_color(e);
         } else
             e->data.normal.mask = NULL;
@@ -392,7 +392,7 @@ void client_menu_startup(void)
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->max_toggled_mask;
+    e->data.normal.mask = ob_rr_theme->btn_max->toggled_mask;
     set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, TRUE);

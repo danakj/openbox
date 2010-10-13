@@ -59,10 +59,10 @@ void prompt_startup(gboolean reconfig)
     /* note: this is not a copy, don't free it */
     prompt_a_bg = ob_rr_theme->osd_bg;
 
-    prompt_a_button = RrAppearanceCopy(ob_rr_theme->a_focused_unpressed_close);
-    prompt_a_focus = RrAppearanceCopy(ob_rr_theme->a_hover_focused_close);
-    prompt_a_press = RrAppearanceCopy(ob_rr_theme->a_focused_pressed_close);
-    prompt_a_pfocus = RrAppearanceCopy(ob_rr_theme->a_focused_pressed_close);
+    prompt_a_button = RrAppearanceCopy(ob_rr_theme->btn_close->a_focused_unpressed);
+    prompt_a_focus = RrAppearanceCopy(ob_rr_theme->btn_close->a_hover_focused);
+    prompt_a_press = RrAppearanceCopy(ob_rr_theme->btn_close->a_focused_pressed);
+    prompt_a_pfocus = RrAppearanceCopy(ob_rr_theme->btn_close->a_focused_pressed);
 
     c_button = prompt_a_button->texture[0].data.mask.color;
     c_focus = prompt_a_focus->texture[0].data.mask.color;

@@ -231,13 +231,6 @@ void RrAppearanceClearTextures(RrAppearance *a)
     memset(a->texture, 0, a->textures * sizeof(RrTexture));
 }
 
-/* shallow copy means up the ref count and return it */
-RrAppearance *RrAppearanceCopyShallow(RrAppearance *orig)
-{
-    orig->ref++;
-    return orig;
-}
-
 /* deep copy of orig, means reset ref to 1 on copy
  * and copy each thing memwise. */
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)

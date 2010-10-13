@@ -109,6 +109,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     RrFont *default_font = NULL;
     gchar *path;
     gboolean userdef;
+    gint menu_overlap = 0;
 
     if (name) {
         db = loaddb(name, &path);
@@ -211,10 +212,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_font_unhilite = get_font(inactive_osd_font, &default_font,inst);
 
     /* load direct dimensions */
-    /* TODO: Need fallback for menu.overlap */
-    READ_INT("menu.overlap.x", theme->menu_overlap_x, -100, 100, 0);
-    READ_INT("menu.overlap.y", theme->menu_overlap_y, -100, 100, 0);
-    /*READ_INT("menu.overlap", theme->menu_overlap, -100, 100, 0);*/
+    READ_INT("menu.overlap", menu_overlap, -100, 100, 0);
+    READ_INT("menu.overlap.x", theme->menu_overlap_x, -100, 100, menu_overlap);
+    READ_INT("menu.overlap.y", theme->menu_overlap_y, -100, 100, menu_overlap);
     READ_INT("window.handle.width", theme->handle_height, 0, 100, 6);
     READ_INT("padding.width", theme->paddingx, 0, 100, 3);
     READ_INT("padding.height", theme->paddingy, 0, 100, theme->paddingx);
@@ -356,7 +356,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                RrColorNew(inst, 0, 0, 0));
 
     READ_COLOR("menu.separator.color", theme->menu_sep_color,
-               RrColorCopy(inst, theme->menu_color));
+               RrColorCopy(theme->menu_color));
    
     /* load the image masks */
 

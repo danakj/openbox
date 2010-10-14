@@ -2202,7 +2202,7 @@ gboolean event_time_after(guint32 t1, guint32 t2)
 gboolean find_timestamp(XEvent *e, gpointer data)
 {
     const Time t = event_get_timestamp(e);
-    if (t >= event_curtime) {
+    if (t && t >= event_curtime) {
         event_curtime = t;
         return TRUE;
     }

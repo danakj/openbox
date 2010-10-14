@@ -167,7 +167,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     a_unfocused_pressed_tmp = RrAppearanceNew(inst, 1);
 
     /* initialize theme */
-    theme = g_slice_new0(RrTheme, 1);
+    theme = g_slice_new0(RrTheme);
 
     theme->inst = inst;
     theme->name = g_strdup(name ? name : DEFAULT_THEME);

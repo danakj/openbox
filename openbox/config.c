@@ -582,6 +582,8 @@ static void parse_placement(xmlNodePtr node, gpointer d)
             config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
         else if (obt_xml_node_contains(n, "mouse"))
             config_place_monitor = OB_PLACE_MONITOR_MOUSE;
+        else if (obt_xml_node_contains(n, "any"))
+            config_place_monitor = OB_PLACE_MONITOR_ANY;
     }
     if ((n = obt_xml_find_node(node, "primaryMonitor"))) {
         config_primary_monitor_index = obt_xml_node_int(n);
@@ -1003,7 +1005,7 @@ void config_startup(ObtXmlInst *i)
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;
-    config_place_monitor = OB_PLACE_MONITOR_ANY;
+    config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
 
     config_primary_monitor_index = 1;
     config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;

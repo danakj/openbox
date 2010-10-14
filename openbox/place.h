@@ -35,10 +35,11 @@ typedef enum
 {
     OB_PLACE_MONITOR_ANY,
     OB_PLACE_MONITOR_ACTIVE,
-    OB_PLACE_MONITOR_MOUSE
+    OB_PLACE_MONITOR_MOUSE,
+    OB_PLACE_MONITOR_PRIMARY
 } ObPlaceMonitor;
 
-gboolean place_client(struct _ObClient *client, gint *x, gint *y,
-                      struct _ObAppSettings *settings);
+gboolean place_client(struct _ObClient *client, gboolean foreground,
+                      gint *x, gint *y, struct _ObAppSettings *settings);
 
 #endif

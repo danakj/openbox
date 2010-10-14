@@ -28,129 +28,207 @@
 
 extern ObDock *dock;
 
-static void add_choice(guint *choice, guint mychoice)
-{
-    guint i;
-    for (i = 0; i < screen_num_monitors; ++i) {
-        if (choice[i] == mychoice)
-            return;
-        else if (choice[i] == screen_num_monitors) {
-            choice[i] = mychoice;
-            return;
-        }
-    }
-}
-
 static Rect *pick_pointer_head(ObClient *c)
 {
     return screen_area(c->desktop, screen_monitor_pointer(), NULL);
 }
 
-/*! Pick a monitor to place a window on. */
-static Rect **pick_head(ObClient *c)
+/* use the following priority lists for pick_head()
+
+   When a window is being placed in the FOREGROUND, use a monitor chosen in
+   the following order:
+   1. same monitor as parent
+   2. primary monitor if placement=PRIMARY
+      active monitor if placement=ACTIVE
+      pointer monitor if placement=MOUSE
+   3. primary monitor
+   4. other monitors where the window has group members on the same desktop
+   5. other monitors where the window has group members on other desktops
+   6. other monitors
+
+   When a window is being placed in the BACKGROUND, use a monitor chosen in the
+   following order:
+   1. same monitor as parent
+   2. other monitors where the window has group members on the same desktop
+    2a. primary monitor in this set
+    2b. other monitors in this set
+   3. other monitors where the window has group members on other desktops
+    3a. primary monitor in this set
+    3b. other monitors in this set
+   4. other monitors
+    4a. primary monitor in this set
+    4b. other monitors in this set
+*/
+
+/*! One for each possible head, used to sort them in order of precedence. */
+typedef struct {
+    guint monitor;
+    guint flags;
+} ObPlaceHead;
+
+/*! Flags for ObPlaceHead */
+enum {
+    HEAD_PARENT = 1 << 0, /* parent's monitor */
+    HEAD_PLACED = 1 << 1, /* chosen monitor by placement */
+    HEAD_PRIMARY = 1 << 2, /* primary monitor */
+    HEAD_GROUP_DESK = 1 << 3, /* has a group member on the same desktop */
+    HEAD_GROUP = 1 << 4, /* has a group member on another desktop */
+};
+
+gint cmp_foreground(const void *a, const void *b)
 {
-    Rect **area;
-    guint *choice;
+    const ObPlaceHead *h1 = a;
+    const ObPlaceHead *h2 = b;
+    gint i = 0;
+
+    if (h1->monitor == h2->monitor) return 0;
+
+    if (h1->flags & HEAD_PARENT) --i;
+    if (h2->flags & HEAD_PARENT) ++i;
+    if (i) return i;
+
+    if (h1->flags & HEAD_PLACED) --i;
+    if (h2->flags & HEAD_PLACED) ++i;
+    if (i) return i;
+
+    if (h1->flags & HEAD_PRIMARY) --i;
+    if (h2->flags & HEAD_PRIMARY) ++i;
+    if (i) return i;
+
+    if (h1->flags & HEAD_GROUP_DESK) --i;
+    if (h2->flags & HEAD_GROUP_DESK) ++i;
+    if (i) return i;
+
+    if (h1->flags & HEAD_GROUP) --i;
+    if (h2->flags & HEAD_GROUP) ++i;
+    if (i) return i;
+
+    return h1->monitor - h2->monitor;
+}
+
+gint cmp_background(const void *a, const void *b)
+{
+    const ObPlaceHead *h1 = a;
+    const ObPlaceHead *h2 = b;
+    gint i = 0;
+
+    if (h1->monitor == h2->monitor) return 0;
+
+    if (h1->flags & HEAD_PARENT) --i;
+    if (h2->flags & HEAD_PARENT) ++i;
+    if (i) return i;
+
+    if (h1->flags & HEAD_GROUP_DESK || h2->flags & HEAD_GROUP_DESK) {
+        if (h1->flags & HEAD_GROUP_DESK) --i;
+        if (h2->flags & HEAD_GROUP_DESK) ++i;
+        if (i) return i;
+        if (h1->flags & HEAD_PRIMARY) --i;
+        if (h2->flags & HEAD_PRIMARY) ++i;
+        if (i) return i;
+    }
+
+    if (h1->flags & HEAD_GROUP || h2->flags & HEAD_GROUP) {
+        if (h1->flags & HEAD_GROUP) --i;
+        if (h2->flags & HEAD_GROUP) ++i;
+        if (i) return i;
+        if (h1->flags & HEAD_PRIMARY) --i;
+        if (h2->flags & HEAD_PRIMARY) ++i;
+        if (i) return i;
+    }
+
+    if (h1->flags & HEAD_PRIMARY) --i;
+    if (h2->flags & HEAD_PRIMARY) ++i;
+    if (i) return i;
+
+    return h1->monitor - h2->monitor;
+}
+
+/*! Pick a monitor to place a window on. */
+static Rect *pick_head(ObClient *c, gboolean foreground)
+{
+    Rect *area;
+    ObPlaceHead *choice;
     guint i;
-    gint px, py;
     ObClient *p;
+    GSList *it;
 
-    area = g_new(Rect*, screen_num_monitors);
-    choice = g_new(guint, screen_num_monitors);
-    for (i = 0; i < screen_num_monitors; ++i)
-        choice[i] = screen_num_monitors; /* make them all invalid to start */
+    choice = g_new(ObPlaceHead, screen_num_monitors);
+    for (i = 0; i < screen_num_monitors; ++i) {
+        choice[i].monitor = i;
+        choice[i].flags = 0;
+    }
 
-    /* try direct parent first */
+    /* find monitors with group members */
+    for (it = c->group->members; it; it = g_slist_next(it)) {
+        ObClient *itc = it->data;
+        if (itc != c) {
+            guint m = client_monitor(itc);
+
+            if (m < screen_num_monitors) {
+                if (screen_compare_desktops(itc->desktop, c->desktop))
+                    choice[m].flags |= HEAD_GROUP_DESK;
+                else
+                    choice[m].flags |= HEAD_GROUP;
+            }
+        }
+    }
+
+    i = screen_monitor_primary(FALSE);
+    if (i < screen_num_monitors) {
+        choice[i].flags |= HEAD_PRIMARY;
+        if (config_place_monitor == OB_PLACE_MONITOR_PRIMARY)
+            choice[i].flags |= HEAD_PLACED;
+    }
+
+    /* direct parent takes highest precedence */
     if ((p = client_direct_parent(c))) {
-        add_choice(choice, client_monitor(p));
-        ob_debug("placement adding choice %d for parent",
-                 client_monitor(p));
+        i = client_monitor(p);
+        if (i < screen_num_monitors)
+            choice[i].flags |= HEAD_PARENT;
     }
 
-    /* more than one window in its group (more than just this window) */
-    if (client_has_group_siblings(c)) {
-        GSList *it;
+    qsort(choice, screen_num_monitors, sizeof(ObPlaceHead),
+          foreground ? cmp_foreground : cmp_background);
 
-        /* try on the client's desktop */
-        for (it = c->group->members; it; it = g_slist_next(it)) {
-            ObClient *itc = it->data;
-            if (itc != c &&
-                (itc->desktop == c->desktop ||
-                 itc->desktop == DESKTOP_ALL || c->desktop == DESKTOP_ALL))
-            {
-                add_choice(choice, client_monitor(it->data));
-                ob_debug("placement adding choice %d for group sibling",
-                         client_monitor(it->data));
-            }
-        }
-
-        /* try on all desktops */
-        for (it = c->group->members; it; it = g_slist_next(it)) {
-            ObClient *itc = it->data;
-            if (itc != c) {
-                add_choice(choice, client_monitor(it->data));
-                ob_debug("placement adding choice %d for group sibling on "
-                         "another desktop", client_monitor(it->data));
-            }
-        }
-    }
-
-    /* skip this if placing by the mouse position */
-    if (focus_client && client_normal(focus_client) &&
-        config_place_monitor != OB_PLACE_MONITOR_MOUSE)
+    /* save the areas of the monitors in order of their being chosen */
+    for (i = 0; i < screen_num_monitors; ++i)
     {
-        add_choice(choice, client_monitor(focus_client));
-        ob_debug("placement adding choice %d for normal focused window",
-                 client_monitor(focus_client));
+        ob_debug("placement choice %d is monitor %d", i, choice[i].monitor);
+        if (choice[i].flags & HEAD_PARENT)
+            ob_debug("  - parent on monitor");
+        if (choice[i].flags & HEAD_PLACED)
+            ob_debug("  - placement choice");
+        if (choice[i].flags & HEAD_PRIMARY)
+            ob_debug("  - primary monitor");
+        if (choice[i].flags & HEAD_GROUP_DESK)
+            ob_debug("  - group on same desktop");
+        if (choice[i].flags & HEAD_GROUP)
+            ob_debug("  - group on other desktop");
     }
 
-    screen_pointer_pos(&px, &py);
-
-    for (i = 0; i < screen_num_monitors; i++) {
-        const Rect *monitor = screen_physical_area_monitor(i);
-        gboolean contain = RECT_CONTAINS(*monitor, px, py);
-        if (contain) {
-            add_choice(choice, i);
-            ob_debug("placement adding choice %d for mouse pointer", i);
-            break;
-        }
-    }
-
-    /* add any leftover choices */
-    for (i = 0; i < screen_num_monitors; ++i)
-        add_choice(choice, i);
-
-    for (i = 0; i < screen_num_monitors; ++i)
-        area[i] = screen_area(c->desktop, choice[i], NULL);
+    area = screen_area(c->desktop, choice[0].monitor, NULL);
 
     g_free(choice);
 
+    /* return the area for the chosen monitor */
     return area;
 }
 
-static gboolean place_random(ObClient *client, gint *x, gint *y)
+static gboolean place_random(ObClient *client, Rect *area, gint *x, gint *y)
 {
     gint l, r, t, b;
-    Rect **areas;
-    guint i;
 
-    areas = pick_head(client);
-    i = (config_place_monitor != OB_PLACE_MONITOR_ANY) ?
-        0 : g_random_int_range(0, screen_num_monitors);
+    ob_debug("placing randomly");
 
-    l = areas[i]->x;
-    t = areas[i]->y;
-    r = areas[i]->x + areas[i]->width - client->frame->area.width;
-    b = areas[i]->y + areas[i]->height - client->frame->area.height;
+    l = area->x;
+    t = area->y;
+    r = area->x + area->width - client->frame->area.width;
+    b = area->y + area->height - client->frame->area.height;
 
     if (r > l) *x = g_random_int_range(l, r + 1);
-    else       *x = areas[i]->x;
+    else       *x = area->x;
     if (b > t) *y = g_random_int_range(t, b + 1);
-    else       *y = areas[i]->y;
-
-    for (i = 0; i < screen_num_monitors; ++i)
-        g_slice_free(Rect, areas[i]);
-    g_free(areas);
+    else       *y = area->y;
 
     return TRUE;
 }
@@ -228,118 +306,108 @@ enum {
     IGNORE_END        = 7
 };
 
-static gboolean place_nooverlap(ObClient *c, gint *x, gint *y)
+static gboolean place_nooverlap(ObClient *c, Rect *area, gint *x, gint *y)
 {
-    Rect **areas;
     gint ignore;
     gboolean ret;
     gint maxsize;
     GSList *spaces = NULL, *sit, *maxit;
-    guint i;
 
-    areas = pick_head(c);
+    ob_debug("placing nonoverlap");
+
     ret = FALSE;
     maxsize = 0;
     maxit = NULL;
 
     /* try ignoring different things to find empty space */
     for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
-        /* try all monitors in order of preference, but only the first one
-           if config_place_monitor is MOUSE or ACTIVE */
-        for (i = 0; (i < (config_place_monitor != OB_PLACE_MONITOR_ANY ?
-                          1 : screen_num_monitors) && !ret); ++i)
-        {
-            GList *it;
+        GList *it;
 
-            /* add the whole monitor */
-            spaces = area_add(spaces, areas[i]);
+        /* add the whole monitor */
+        spaces = area_add(spaces, area);
 
-            /* go thru all the windows */
-            for (it = client_list; it; it = g_list_next(it)) {
-                ObClient *test = it->data;
+        /* go thru all the windows */
+        for (it = client_list; it; it = g_list_next(it)) {
+            ObClient *test = it->data;
 
-                /* should we ignore this client? */
-                if (screen_showing_desktop) continue;
-                if (c == test) continue;
-                if (test->iconic) continue;
-                if (c->desktop != DESKTOP_ALL) {
-                    if (test->desktop != c->desktop &&
-                        test->desktop != DESKTOP_ALL) continue;
-                } else {
-                    if (test->desktop != screen_desktop &&
-                        test->desktop != DESKTOP_ALL) continue;
-                }
-                if (test->type == OB_CLIENT_TYPE_SPLASH ||
-                    test->type == OB_CLIENT_TYPE_DESKTOP) continue;
-
-
-                if ((ignore >= IGNORE_FULLSCREEN) &&
-                    test->fullscreen) continue;
-                if ((ignore >= IGNORE_MAXIMIZED) &&
-                    test->max_horz && test->max_vert) continue;
-                if ((ignore >= IGNORE_MENUTOOL) &&
-                    (test->type == OB_CLIENT_TYPE_MENU ||
-                     test->type == OB_CLIENT_TYPE_TOOLBAR) &&
-                    client_has_parent(c)) continue;
-                /*
-                if ((ignore >= IGNORE_SHADED) &&
-                    test->shaded) continue;
-                */
-                if ((ignore >= IGNORE_NONGROUP) &&
-                    client_has_group_siblings(c) &&
-                    test->group != c->group) continue;
-                if ((ignore >= IGNORE_BELOW) &&
-                    test->layer < c->layer) continue;
-                /*
-                if ((ignore >= IGNORE_NONFOCUS) &&
-                    focus_client != test) continue;
-                */
-                /* don't ignore this window, so remove it from the available
-                   area */
-                spaces = area_remove(spaces, &test->frame->area);
+            /* should we ignore this client? */
+            if (screen_showing_desktop) continue;
+            if (c == test) continue;
+            if (test->iconic) continue;
+            if (c->desktop != DESKTOP_ALL) {
+                if (test->desktop != c->desktop &&
+                    test->desktop != DESKTOP_ALL) continue;
+            } else {
+                if (test->desktop != screen_desktop &&
+                    test->desktop != DESKTOP_ALL) continue;
             }
+            if (test->type == OB_CLIENT_TYPE_SPLASH ||
+                test->type == OB_CLIENT_TYPE_DESKTOP) continue;
 
-            if (ignore < IGNORE_DOCK) {
-                Rect a;
-                dock_get_area(&a);
-                spaces = area_remove(spaces, &a);
+
+            if ((ignore >= IGNORE_FULLSCREEN) &&
+                test->fullscreen) continue;
+            if ((ignore >= IGNORE_MAXIMIZED) &&
+                test->max_horz && test->max_vert) continue;
+            if ((ignore >= IGNORE_MENUTOOL) &&
+                (test->type == OB_CLIENT_TYPE_MENU ||
+                 test->type == OB_CLIENT_TYPE_TOOLBAR) &&
+                client_has_parent(c)) continue;
+            /*
+              if ((ignore >= IGNORE_SHADED) &&
+              test->shaded) continue;
+            */
+            if ((ignore >= IGNORE_NONGROUP) &&
+                client_has_group_siblings(c) &&
+                test->group != c->group) continue;
+            if ((ignore >= IGNORE_BELOW) &&
+                test->layer < c->layer) continue;
+            /*
+              if ((ignore >= IGNORE_NONFOCUS) &&
+              focus_client != test) continue;
+            */
+            /* don't ignore this window, so remove it from the available
+               area */
+            spaces = area_remove(spaces, &test->frame->area);
+        }
+
+        if (ignore < IGNORE_DOCK) {
+            Rect a;
+            dock_get_area(&a);
+            spaces = area_remove(spaces, &a);
+        }
+
+        for (sit = spaces; sit; sit = g_slist_next(sit)) {
+            Rect *r = sit->data;
+
+            if (r->width >= c->frame->area.width &&
+                r->height >= c->frame->area.height &&
+                r->width * r->height > maxsize)
+            {
+                maxsize = r->width * r->height;
+                maxit = sit;
             }
+        }
 
-            for (sit = spaces; sit; sit = g_slist_next(sit)) {
-                Rect *r = sit->data;
+        if (maxit) {
+            Rect *r = maxit->data;
 
-                if (r->width >= c->frame->area.width &&
-                    r->height >= c->frame->area.height &&
-                    r->width * r->height > maxsize)
-                {
-                    maxsize = r->width * r->height;
-                    maxit = sit;
-                }
+            /* center it in the area */
+            *x = r->x;
+            *y = r->y;
+            if (config_place_center) {
+                *x += (r->width - c->frame->area.width) / 2;
+                *y += (r->height - c->frame->area.height) / 2;
             }
+            ret = TRUE;
+        }
 
-            if (maxit) {
-                Rect *r = maxit->data;
-
-                /* center it in the area */
-                *x = r->x;
-                *y = r->y;
-                if (config_place_center) {
-                    *x += (r->width - c->frame->area.width) / 2;
-                    *y += (r->height - c->frame->area.height) / 2;
-                }
-                ret = TRUE;
-            }
-
-            while (spaces) {
-                g_slice_free(Rect, spaces->data);
-                spaces = g_slist_delete_link(spaces, spaces);
-            }
+        while (spaces) {
+            g_slice_free(Rect, spaces->data);
+            spaces = g_slist_delete_link(spaces, spaces);
         }
     }
 
-    for (i = 0; i < screen_num_monitors; ++i)
-        g_slice_free(Rect, areas[i]);
-    g_free(areas);
     return ret;
 }
 
@@ -348,6 +416,8 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     gint l, r, t, b;
     gint px, py;
     Rect *area;
+
+    ob_debug("placing under mouse");
 
     if (!screen_pointer_pos(&px, &py))
         return FALSE;
@@ -376,27 +446,17 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     if (!settings || (settings && !settings->pos_given))
         return FALSE;
 
+    ob_debug("placing by per-app settings");
+
     /* Find which head the pointer is on */
     if (settings->monitor == 0)
         /* this can return NULL */
         screen = pick_pointer_head(client);
-    else if (settings->monitor > 0 &&
-             (guint)settings->monitor <= screen_num_monitors)
-        screen = screen_area(client->desktop, (guint)settings->monitor - 1,
-                             NULL);
-
-    /* if we have't found a screen yet.. */
-    if (!screen) {
-        Rect **areas;
-        guint i;
-
-        areas = pick_head(client);
-        screen = areas[0];
-
-        /* don't free the first one, it's being set as "screen" */
-        for (i = 1; i < screen_num_monitors; ++i)
-            g_slice_free(Rect, areas[i]);
-        g_free(areas);
+    else {
+        guint m = settings->monitor;
+        if (m < 1 || m > screen_num_monitors)
+            m = screen_monitor_primary(TRUE) + 1;
+        screen = screen_area(client->desktop, m - 1, NULL);
     }
 
     if (settings->position.x.center)
@@ -423,12 +483,16 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     return TRUE;
 }
 
-static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
+static gboolean place_transient_splash(ObClient *client, Rect *area,
+                                       gint *x, gint *y)
 {
     if (client->type == OB_CLIENT_TYPE_DIALOG) {
         GSList *it;
         gboolean first = TRUE;
         gint l, r, t, b;
+
+        ob_debug("placing dialog");
+
         for (it = client->parents; it; it = g_slist_next(it)) {
             ObClient *m = it->data;
             if (!m->iconic) {
@@ -456,17 +520,10 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
     if (client->type == OB_CLIENT_TYPE_DIALOG ||
         client->type == OB_CLIENT_TYPE_SPLASH)
     {
-        Rect **areas;
-        guint i;
+        ob_debug("placing dialog or splash");
 
-        areas = pick_head(client);
-
-        *x = (areas[0]->width - client->frame->area.width) / 2 + areas[0]->x;
-        *y = (areas[0]->height - client->frame->area.height) / 2 + areas[0]->y;
-
-        for (i = 0; i < screen_num_monitors; ++i)
-            g_slice_free(Rect, areas[i]);
-        g_free(areas);
+        *x = (area->width - client->frame->area.width) / 2 + area->x;
+        *y = (area->height - client->frame->area.height) / 2 + area->y;
         return TRUE;
     }
 
@@ -475,9 +532,10 @@ static gboolean place_transient_splash(ObClient *client, gint *x, gint *y)
 
 /*! Return TRUE if openbox chose the position for the window, and FALSE if
   the application chose it */
-gboolean place_client(ObClient *client, gint *x, gint *y,
+gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
                       ObAppSettings *settings)
 {
+    Rect *area;
     gboolean ret;
 
     /* per-app settings override program specified position
@@ -488,14 +546,18 @@ gboolean place_client(ObClient *client, gint *x, gint *y,
          !(settings && settings->pos_given)))
         return FALSE;
 
+    area = pick_head(client, foreground);
+
     /* try a number of methods */
     ret = place_per_app_setting(client, x, y, settings) ||
-        place_transient_splash(client, x, y) ||
+        place_transient_splash(client, area, x, y) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||
-        place_nooverlap(client, x, y) ||
-        place_random(client, x, y);
+        place_nooverlap(client, area, x, y) ||
+        place_random(client, area, x, y);
     g_assert(ret);
+
+    g_slice_free(Rect, area);
 
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y);

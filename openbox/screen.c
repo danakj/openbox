@@ -1753,3 +1753,12 @@ gboolean screen_pointer_pos(gint *x, gint *y)
     }
     return ret;
 }
+
+gboolean screen_compare_desktops(guint a, guint b)
+{
+    if (a == DESKTOP_ALL)
+        a = screen_desktop;
+    if (b == DESKTOP_ALL)
+        b = screen_desktop;
+    return a == b;
+}

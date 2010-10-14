@@ -164,4 +164,12 @@ gboolean screen_pointer_pos(gint *x, gint *y);
 /*! Returns the monitor which contains the pointer device */
 guint screen_monitor_pointer(void);
 
+/*! Compare the desktop for two windows to see if they are considered on the
+  same desktop.
+  Windows that are on "all desktops" are treated like they are only on the
+  current desktop, so they are only in one place at a time.
+  @return TRUE if they are on the same desktop, FALSE otherwise.
+*/
+gboolean screen_compare_desktops(guint a, guint b);
+
 #endif

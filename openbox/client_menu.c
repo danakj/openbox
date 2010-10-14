@@ -408,7 +408,7 @@ void client_menu_startup(void)
     set_icon_color(e);
 
     e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->shade_mask;
+    e->data.normal.mask = ob_rr_theme->btn_shade->mask;
     set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, TRUE);

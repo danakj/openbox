@@ -295,7 +295,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     READ_COLOR_("osd.active.label.text.color",
                 "osd.label.text.color",
-                theme->osd_color, RrColorCopy(theme->title_focused_color));
+                theme->osd_text_active_color, RrColorCopy(theme->title_focused_color));
 
     READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color,
                RrColorCopy(theme->title_unfocused_color));

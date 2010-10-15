@@ -159,16 +159,18 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
     }
 
     /* find monitors with group members */
-    for (it = c->group->members; it; it = g_slist_next(it)) {
-        ObClient *itc = it->data;
-        if (itc != c) {
-            guint m = client_monitor(itc);
+    if (c->group) {
+        for (it = c->group->members; it; it = g_slist_next(it)) {
+            ObClient *itc = it->data;
+            if (itc != c) {
+                guint m = client_monitor(itc);
 
-            if (m < screen_num_monitors) {
-                if (screen_compare_desktops(itc->desktop, c->desktop))
-                    choice[m].flags |= HEAD_GROUP_DESK;
-                else
-                    choice[m].flags |= HEAD_GROUP;
+                if (m < screen_num_monitors) {
+                    if (screen_compare_desktops(itc->desktop, c->desktop))
+                        choice[m].flags |= HEAD_GROUP_DESK;
+                    else
+                        choice[m].flags |= HEAD_GROUP;
+                }
             }
         }
     }

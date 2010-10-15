@@ -712,13 +712,59 @@ static gboolean client_can_steal_focus(ObClient *self,
              self->window, steal_time, launch_time,
              event_last_user_time);
 
-    /* if it's on another desktop... */
+    /*
+      if no launch time is provided for an application, make one up.
+
+      if the window is related to other existing windows
+        and one of those windows was the last used
+          then we will give it a launch time equal to the last user time,
+          which will end up giving the window focus probably.
+        else
+          the window is related to other windows, but you are not working in
+          them?
+          seems suspicious, so we will give it a launch time of
+          NOW - STEAL_INTERVAL,
+          so it will be given focus only if we didn't use something else
+          during the steal interval.
+      else
+        the window is all on its own, so we can't judge it.  give it a launch
+        time equal to the last user time, so it will probably take focus.
+
+      this way running things from a terminal will give them focus, but popups
+      without a launch time shouldn't steal focus so easily.
+    */
+
+    if (!launch_time) {
+        if (client_has_relative(self)) {
+            if (event_last_user_time && client_search_focus_group_full(self)) {
+                /* our relative is focused */
+                launch_time = event_last_user_time;
+                ob_debug("Unknown launch time, using %u window in active "
+                         "group", launch_time);
+            }
+            else {
+                /* has relatives which are not being used. suspicious */
+                launch_time = event_time() - OB_EVENT_USER_TIME_DELAY;
+                ob_debug("Unknown launch time, using %u window in inactive "
+                         "group", launch_time);
+            }
+        }
+        else {
+            /* the window is on its own, probably the user knows it is going
+               to appear */
+            launch_time = event_last_user_time;
+            ob_debug("Unknown launch time, using %u for solo window",
+                     launch_time);
+        }
+    }
+
+    /* if it's on another desktop
+       then if allow_other_desktop is false, we don't want to let it steal
+       focus, unless it was launched after we changed desktops
+     */
     if (!(self->desktop == screen_desktop ||
           self->desktop == DESKTOP_ALL) &&
-        /* and (we dont know when it launched, and we don't want to allow
-           focus stealing from other desktops */
-        ((!launch_time && !allow_other_desktop) ||
-         /* or the timestamp is from before you changed desktops) */
+        (!allow_other_desktop ||
          (screen_desktop_user_time &&
           !event_time_after(launch_time, screen_desktop_user_time))))
     {
@@ -731,9 +777,9 @@ static gboolean client_can_steal_focus(ObClient *self,
            steal focus */
         if (!relative_focused &&
             event_last_user_time &&
-            (!launch_time ||
-             (event_time_after(event_last_user_time, launch_time) &&
-              event_last_user_time != launch_time)) &&
+            /* last user time must be strictly > launch_time to block focus */
+            (event_time_after(event_last_user_time, launch_time) &&
+             event_last_user_time != launch_time) &&
             event_time_after(event_last_user_time,
                              steal_time - OB_EVENT_USER_TIME_DELAY))
         {
@@ -2435,6 +2481,11 @@ ObClient *client_search_focus_group_full(ObClient *self)
 gboolean client_has_parent(ObClient *self)
 {
     return self->parents != NULL;
+}
+
+gboolean client_has_children(ObClient *self)
+{
+    return self->transients != NULL;
 }
 
 gboolean client_is_oldfullscreen(const ObClient *self,
@@ -4459,6 +4510,13 @@ ObClient* client_under_pointer(void)
 gboolean client_has_group_siblings(ObClient *self)
 {
     return self->group && self->group->members->next;
+}
+
+gboolean client_has_relative(ObClient *self)
+{
+    return client_has_parent(self) ||
+        client_has_group_siblings(self) ||
+        client_has_children(self);
 }
 
 /*! Returns TRUE if the client is running on the same machine as Openbox */

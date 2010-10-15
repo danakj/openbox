@@ -100,6 +100,10 @@ void focus_set_client(ObClient *client)
         active = client ? client->window : None;
         OBT_PROP_SET32(obt_root(ob_screen), NET_ACTIVE_WINDOW, WINDOW, active);
     }
+
+    /* when focus is moved to a new window, the last_user_time timestamp would
+       no longer be valid, as it applies for the focused window */
+    event_reset_user_time();
 }
 
 static ObClient* focus_fallback_target(gboolean allow_refocus,

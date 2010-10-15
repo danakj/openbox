@@ -657,6 +657,10 @@ RrImage* client_icon(ObClient *self);
   transient for */
 gboolean client_has_parent(ObClient *self);
 
+/*! Return TRUE if the client has some transient children, and FALSE otherwise.
+*/
+gboolean client_has_children(ObClient *self);
+
 /*! Searches a client's immediate parents for a focused window. The function
   does not check for the passed client, only for *ONE LEVEL* of its parents.
   If no focused parent is found, NULL is returned.
@@ -740,6 +744,11 @@ guint client_monitor(ObClient *self);
 ObClient* client_under_pointer(void);
 
 gboolean client_has_group_siblings(ObClient *self);
+
+/*! Returns TRUE if the client has a transient child, a parent, or a
+  group member.  Returns FALSE otherwise.
+*/
+gboolean client_has_relative(ObClient *self);
 
 /*! Returns TRUE if the client is running on the same machine as Openbox */
 gboolean client_on_localhost(ObClient *self);

@@ -273,7 +273,7 @@ static void event_set_curtime(XEvent *e)
        which can happen if the clock goes backwards, we erase the last
        specified user_time */
     if (t && event_last_user_time && event_time_after(event_last_user_time, t))
-        event_last_user_time = CurrentTime;
+        event_reset_user_time();
 
     event_sourcetime = CurrentTime;
     event_curtime = t;
@@ -2250,4 +2250,9 @@ void event_reset_time(void)
 void event_update_user_time(void)
 {
     event_last_user_time = event_time();
+}
+
+void event_reset_user_time(void)
+{
+    event_last_user_time = CurrentTime;
 }

@@ -85,4 +85,7 @@ Time event_source_time(void);
 */
 void event_update_user_time(void);
 
+/*! Reset the timestamp for when the user has last used the focused window. */
+void event_reset_user_time(void);
+
 #endif

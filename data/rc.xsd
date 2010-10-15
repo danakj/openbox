@@ -72,6 +72,7 @@
             <xsd:element minOccurs="0" name="policy" type="ob:placementpolicy"/>
             <xsd:element minOccurs="0" name="center" type="ob:bool"/>
             <xsd:element minOccurs="0" name="monitor" type="ob:placementmonitor"/>
+            <xsd:element minOccurs="0" name="monitor" type="ob:primarymonitor"/>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="margins">
@@ -517,6 +518,14 @@
             <xsd:enumeration value="Any"/>
             <xsd:enumeration value="Mouse"/>
             <xsd:enumeration value="Active"/>
+            <xsd:enumeration value="Primary"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="primarymonitor">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Mouse"/>
+            <xsd:enumeration value="Active"/>
+            <xsd:enumeration value="[0-9][0-9][0-9][0-9][0-9]"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="popupposition">

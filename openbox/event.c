@@ -1103,7 +1103,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             if (grab_on_keyboard())
                 break;
             if (e->xcrossing.mode == NotifyGrab ||
-                e->xcrossing.mode == NotifyUngrab ||
+                (e->xcrossing.mode == NotifyUngrab &&
+                 /* ungrab enters are used when _under_ mouse is being used */
+                 !(config_focus_follow && config_focus_under_mouse)) ||
                 /*ignore enters when we're already in the window */
                 e->xcrossing.detail == NotifyInferior)
             {

@@ -1695,10 +1695,12 @@ static void event_handle_client(ObClient *client, XEvent *e)
                         client->shaped = ((XShapeEvent*)e)->shaped;
                         kind = ShapeBounding;
                         break;
+#ifdef ShapeInput
                     case ShapeInput:
                         client->shaped_input = ((XShapeEvent*)e)->shaped;
                         kind = ShapeInput;
                         break;
+#endif
                     default:
                         g_assert_not_reached();
                 }

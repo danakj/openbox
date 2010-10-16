@@ -276,9 +276,14 @@ void frame_adjust_shape_kind(ObFrame *self, int kind)
 {
     gint num;
     XRectangle xrect[2];
+    gboolean shaped;
 
-    if (!((kind == ShapeBounding && self->client->shaped) ||
-          (kind == ShapeInput && self->client->shaped_input))) {
+    shaped = (kind == ShapeBounding && self->client->shaped);
+#ifdef ShapeInput
+    shaped |= (kind == ShapeInput && self->client->shaped_input);
+#endif
+
+    if (!shaped) {
         /* clear the shape on the frame window */
         XShapeCombineMask(obt_display, self->window, kind,
                           self->size.left,
@@ -323,7 +328,9 @@ void frame_adjust_shape(ObFrame *self)
 {
 #ifdef SHAPE
   frame_adjust_shape_kind(self, ShapeBounding);
+#ifdef ShapeInput
   frame_adjust_shape_kind(self, ShapeInput);
+#endif
 #endif
 }
 

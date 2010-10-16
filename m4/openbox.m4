@@ -11,6 +11,10 @@ AC_DEFUN([OB_DEBUG],
     AC_HELP_STRING([--enable-strict-ansi],[Enable strict ANSI compliance build [[default=no]]]),
     [STRICT=$enableval], [STRICT="no"])
 
+    AC_ARG_ENABLE([super-warnings],
+    AC_HELP_STRING([--enable-super-warnings],[Enable extra compiler warnings [[default=no]]]),
+    [SUPERWARN=$enableval], [SUPERWARN="no"])
+
     AC_ARG_ENABLE([debug],
     AC_HELP_STRING([--enable-debug],[build a debug version [[default=no]]]),
     [DEBUG=$enableval], [DEBUG="no"])
@@ -42,6 +46,9 @@ AC_DEFUN([OB_DEBUG],
     fi
     if test "$STRICT" = "yes"; then
 	MSG="$MSG with strict ANSI compliance"
+    fi
+    if test "$SUPERWARN" = "yes"; then
+	MSG="$MSG with super warnings"
     fi
     AC_MSG_RESULT([$MSG])
     
@@ -77,11 +84,13 @@ AC_DEFUN([OB_COMPILER_FLAGS],
 	    FLAGS="$FLAGS -O0 -ggdb -fno-inline -Wwrite-strings"
 	    FLAGS="$FLAGS -Wall -Wsign-compare -Waggregate-return"
 	    FLAGS="$FLAGS -Wbad-function-cast -Wpointer-arith"
-	    FLAGS="$FLAGS -Wno-write-strings -Wextra"
-	    # glib can't handle this flag
-	    # -Wcast-qual
+	    FLAGS="$FLAGS -Wno-write-strings"
             # for Python.h
 	    #FLAGS="$FLAGS -Wno-long-long"
+	fi
+	if test "$SUPERWARN" = "yes"; then
+	    # glib can't handle -Wcast-qual
+	    FLAGS="$FLAGS -Wcast-qual -Wextra"
 	fi
 	if test "$STRICT" = "yes"; then
 	    FLAGS="$FLAGS -ansi -pedantic -D_XOPEN_SOURCE"

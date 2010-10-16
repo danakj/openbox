@@ -19,6 +19,7 @@
 #include "obt/xml.h"
 #include "obt/paths.h"
 
+#include <libxml/xinclude.h>
 #include <glib.h>
 
 #ifdef HAVE_STDLIB_H
@@ -135,8 +136,9 @@ static gboolean load_file(ObtXmlInst *i,
             /* XML_PARSE_BLANKS is needed apparently, or the tree can end up
                with extra nodes in it. */
             i->doc = xmlReadFile(path, NULL, (XML_PARSE_NOBLANKS |
-                                              XML_PARSE_RECOVER |
-                                              XML_PARSE_XINCLUDE));
+                                              XML_PARSE_RECOVER));
+            xmlXIncludeProcessFlags(i->doc, (XML_PARSE_NOBLANKS |
+                                             XML_PARSE_RECOVER));
             if (i->doc) {
                 i->root = xmlDocGetRootElement(i->doc);
                 if (!i->root) {

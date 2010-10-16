@@ -260,7 +260,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         if (o->sn) {
             if (!ok) sn_spawn_cancel();
-            unsetenv("DESKTOP_STARTUP_ID");
+            g_unsetenv("DESKTOP_STARTUP_ID");
         }
 
         g_free(program);

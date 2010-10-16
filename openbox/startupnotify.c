@@ -263,7 +263,7 @@ void sn_setup_spawn_environment(const gchar *program, const gchar *name,
                        20 * 1000, sn_launch_wait_timeout, sn_launcher,
                        (GDestroyNotify)sn_launcher_context_unref);
 
-    setenv("DESKTOP_STARTUP_ID", id, TRUE);
+    g_setenv("DESKTOP_STARTUP_ID", id, TRUE);
 
     g_free(desc);
 }

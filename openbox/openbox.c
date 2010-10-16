@@ -196,7 +196,7 @@ gint main(gint argc, gchar **argv)
 
     /* set the DISPLAY environment variable for any lauched children, to the
        display we're using, so they open in the right place. */
-    setenv("DISPLAY", DisplayString(obt_display), TRUE);
+    g_setenv("DISPLAY", DisplayString(obt_display), TRUE);
 
     /* create available cursors */
     cursors[OB_CURSOR_NONE] = None;
@@ -589,12 +589,12 @@ static void parse_env(void)
     const gchar *id;
 
     /* unset this so we don't pass it on unknowingly */
-    unsetenv("DESKTOP_STARTUP_ID");
+    g_unsetenv("DESKTOP_STARTUP_ID");
 
     /* this is how gnome-session passes in a session client id */
     id = g_getenv("DESKTOP_AUTOSTART_ID");
     if (id) {
-        unsetenv("DESKTOP_AUTOSTART_ID");
+        g_unsetenv("DESKTOP_AUTOSTART_ID");
         if (ob_sm_id) g_free(ob_sm_id);
         ob_sm_id = g_strdup(id);
         ob_debug_type(OB_DEBUG_SM,

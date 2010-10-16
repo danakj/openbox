@@ -311,7 +311,7 @@
 </keyboard>
 
 <mouse>
-  <dragThreshold>8</dragThreshold>
+  <dragThreshold>1</dragThreshold>
   <!-- number of pixels the mouse must move before a drag begins -->
   <doubleClickTime>200</doubleClickTime>
   <!-- in milliseconds (1000 = 1 second) -->

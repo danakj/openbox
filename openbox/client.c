@@ -303,9 +303,10 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug("Going to try activate new window? %s",
              try_activate ? "yes" : "no");
     if (try_activate)
-        do_activate = client_can_steal_focus(self, settings->focus,
-                                             !!launch_time,
-                                             event_time(), launch_time);
+        do_activate = client_can_steal_focus(
+            self, settings->focus == 1,
+            (!!launch_time || settings->focus == 1),
+            event_time(), launch_time);
     else
         do_activate = FALSE;
 
@@ -712,9 +713,11 @@ static gboolean client_can_steal_focus(ObClient *self,
     /* This is focus stealing prevention */
     ob_debug("Want to focus window 0x%x at time %u "
              "launched at %u (last user interaction time %u) "
-             "request from %s",
+             "request from %s, allow other desktop: %s",
              self->window, steal_time, launch_time,
-             event_last_user_time, (request_from_user ? "user" : "other"));
+             event_last_user_time,
+             (request_from_user ? "user" : "other"),
+             (allow_other_desktop ? "yes" : "no"));
 
     /*
       if no launch time is provided for an application, make one up.
@@ -826,7 +829,8 @@ static gboolean client_can_steal_focus(ObClient *self,
             }
             /* Don't move focus if the window is not visible on the current
                desktop and none of its relatives are focused */
-            else if (!screen_compare_desktops(self->desktop, screen_desktop) &&
+            else if (!allow_other_desktop &&
+                     !screen_compare_desktops(self->desktop, screen_desktop) &&
                      !relative_focused)
             {
                 steal = FALSE;

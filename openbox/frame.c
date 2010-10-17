@@ -960,7 +960,7 @@ void frame_adjust_state(ObFrame *self)
 void frame_adjust_focus(ObFrame *self, gboolean hilite)
 {
     ob_debug_type(OB_DEBUG_FOCUS,
-                  "Frame for 0x%x has focus: %d\n",
+                  "Frame for 0x%x has focus: %d",
                   self->client->window, hilite);
     self->focused = hilite;
     self->need_render = TRUE;

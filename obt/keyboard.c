@@ -439,7 +439,8 @@ void obt_keyboard_context_unref(ObtIC *ic)
 {
     if (--ic->ref < 1) {
         xic_all = g_slist_remove(xic_all, ic);
-        XDestroyIC(ic->xic);
+        if (ic->xic)
+            XDestroyIC(ic->xic);
         g_slice_free(ObtIC, ic);
     }
 }

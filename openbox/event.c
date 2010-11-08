@@ -1859,14 +1859,23 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (sym == XK_Right) {
-                /* Right goes to the selected submenu */
-                if (frame->selected &&
-                    frame->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)
-                {
-                    /* make sure it is visible */
-                    menu_frame_select(frame, frame->selected, TRUE);
-                    menu_frame_select_next(frame->child);
+            else if (sym == XK_Right || sym == XK_Return || sym == XK_KP_Enter)
+            {
+                /* Right and enter goes to the selected submenu.
+                   Enter executes instead if it's not on a submenu. */
+
+                if (frame->selected) {
+                    const ObMenuEntryType t = frame->selected->entry->type;
+
+                    if (t == OB_MENU_ENTRY_TYPE_SUBMENU) {
+                        /* make sure it is visible */
+                        menu_frame_select(frame, frame->selected, TRUE);
+                        /* move focus to the child menu */
+                        menu_frame_select_next(frame->child);
+                    }
+                    else if (sym != XK_Right) {
+                        frame->press_doexec = TRUE;
+                    }
                 }
                 ret = TRUE;
             }
@@ -1888,11 +1897,6 @@ static gboolean event_handle_menu_input(XEvent *ev)
 
             else if (sym == XK_End) {
                 menu_frame_select_last(frame);
-                ret = TRUE;
-            }
-
-            else if (sym == XK_Return || sym == XK_KP_Enter) {
-                frame->press_doexec = TRUE;
                 ret = TRUE;
             }
 
@@ -1957,9 +1961,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 frame->got_press &&
                 frame->press_doexec)
             {
-                if (frame->child)
-                    menu_frame_select_next(frame->child);
-                else if (frame->selected)
+                if (frame->selected)
                     menu_entry_frame_execute(frame->selected, ev->xkey.state);
             }
         }

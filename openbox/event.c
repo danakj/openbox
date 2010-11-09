@@ -1945,8 +1945,15 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 if (found) {
                     menu_frame_select(frame, found, TRUE);
 
-                    if (num_found == 1)
-                        frame->press_doexec = TRUE;
+                    if (num_found == 1) {
+                        if (found->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
+                            /* move focus to the child menu */
+                            menu_frame_select_next(frame->child);
+                        }
+                        else {
+                            frame->press_doexec = TRUE;
+                        }
+                    }
                     ret = TRUE;
                 }
             }

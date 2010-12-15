@@ -64,8 +64,8 @@ static ObDirection edge_warp_dir = -1;
 static gboolean edge_warp_odd = FALSE;
 static guint edge_warp_timer = 0;
 static ObDirection key_resize_edge = -1;
-#ifdef SYNC
 static guint waiting_for_sync;
+#ifdef SYNC
 static guint sync_timer = 0;
 #endif
 
@@ -263,6 +263,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     cur_h = start_ch;
 
     moveresize_in_progress = TRUE;
+    waiting_for_sync = 0;
 
 #ifdef SYNC
     if (config_resize_redraw && !moving && obt_display_extension_sync &&
@@ -301,8 +302,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
                                             XSyncCADelta |
                                             XSyncCAEvents,
                                             &aa);
-
-        waiting_for_sync = 0;
     }
 #endif
 }

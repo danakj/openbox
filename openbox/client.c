@@ -4325,32 +4325,26 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     }
 
     /* search for edges of clients */
-    if (((dir == OB_DIRECTION_NORTH || dir == OB_DIRECTION_SOUTH) &&
-         !self->max_vert) ||
-        ((dir == OB_DIRECTION_EAST || dir == OB_DIRECTION_WEST) &&
-         !self->max_horz))
-    {
-        for (it = client_list; it; it = g_list_next(it)) {
-            ObClient *cur = it->data;
+    for (it = client_list; it; it = g_list_next(it)) {
+        ObClient *cur = it->data;
 
-            /* skip windows to not bump into */
-            if (cur == self)
-                continue;
-            if (cur->iconic)
-                continue;
-            if (self->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&
-                cur->desktop != screen_desktop)
-                continue;
+        /* skip windows to not bump into */
+        if (cur == self)
+            continue;
+        if (cur->iconic)
+            continue;
+        if (self->desktop != cur->desktop && cur->desktop != DESKTOP_ALL &&
+            cur->desktop != screen_desktop)
+            continue;
 
-            ob_debug("trying window %s", cur->title);
+        ob_debug("trying window %s", cur->title);
 
-            detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
-                        my_edge_size, dest, near_edge);
-        }
-        dock_get_area(&dock_area);
-        detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
+        detect_edge(cur->frame->area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
     }
+    dock_get_area(&dock_area);
+    detect_edge(dock_area, dir, my_head, my_size, my_edge_start,
+                my_edge_size, dest, near_edge);
 
     g_slice_free(Rect, a);
 }

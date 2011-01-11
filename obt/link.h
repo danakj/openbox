@@ -26,15 +26,15 @@ G_BEGIN_DECLS
 struct _ObtPaths;
 
 typedef enum {
-	OBT_LINK_TYPE_APPLICATION = 1,
-	OBT_LINK_TYPE_URL         = 2,
-	OBT_LINK_TYPE_DIRECTORY   = 3
+    OBT_LINK_TYPE_APPLICATION = 1,
+    OBT_LINK_TYPE_URL         = 2,
+    OBT_LINK_TYPE_DIRECTORY   = 3
 } ObtLinkType;
 
 typedef enum {
-	OBT_LINK_APP_STARTUP_NO_SUPPORT,
-	OBT_LINK_APP_STARTUP_PROTOCOL_SUPPORT,
-	OBT_LINK_APP_STARTUP_LEGACY_SUPPORT
+    OBT_LINK_APP_STARTUP_NO_SUPPORT,
+    OBT_LINK_APP_STARTUP_PROTOCOL_SUPPORT,
+    OBT_LINK_APP_STARTUP_LEGACY_SUPPORT
 } ObtLinkAppStartup;
 
 /*! These bit flags are environments for links.  Some links are used or not
@@ -50,14 +50,14 @@ typedef enum {
 } ObtLinkEnvFlags;
 
 typedef enum {
-	/*! The app can be launched with a single local file */
-	OBT_LINK_APP_SINGLE_LOCAL = 1 << 0,
-	/*! The app can be launched with multiple local files */
-	OBT_LINK_APP_MULTI_LOCAL  = 1 << 1,
-	/*! The app can be launched with a single URL */
-	OBT_LINK_APP_SINGLE_URL   = 1 << 2,
-	/*! The app can be launched with multiple URLs */
-	OBT_LINK_APP_MULTI_URL    = 1 << 3
+    /*! The app can be launched with a single local file */
+    OBT_LINK_APP_SINGLE_LOCAL = 1 << 0,
+    /*! The app can be launched with multiple local files */
+    OBT_LINK_APP_MULTI_LOCAL  = 1 << 1,
+    /*! The app can be launched with a single URL */
+    OBT_LINK_APP_SINGLE_URL   = 1 << 2,
+    /*! The app can be launched with multiple URLs */
+    OBT_LINK_APP_MULTI_URL    = 1 << 3
 } ObtLinkAppOpen;
 
 typedef struct _ObtLink     ObtLink;
@@ -77,8 +77,8 @@ gboolean obt_link_deleted (ObtLink *e);
 ObtLinkType obt_link_type (ObtLink *e);
 
 /*! Returns TRUE if the .desktop file should be displayed to users, given the
-    current	environment.  If FALSE,	the .desktop file should not be showed.
-	This also uses the TryExec option if it is present.
+    current environment.  If FALSE, the .desktop file should not be showed.
+    This also uses the TryExec option if it is present.
     @env A semicolon-deliminated list of environemnts.  Can be one or more of:
          GNOME, KDE, ROX, XFCE.  Other environments not listed here may also
          be supported.  This can be null also if not listing any environment. */

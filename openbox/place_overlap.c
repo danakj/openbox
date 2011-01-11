@@ -43,33 +43,33 @@ void place_overlap_find_least_placement(const Rect* client_rects,
     int overlap = G_MAXINT;
     int max_edges = 2 * (n_client_rects + 1);
 
-	int x_edges[max_edges];
-	int y_edges[max_edges];
-	make_grid(client_rects, n_client_rects, bound,
-			  x_edges, y_edges, max_edges);
-	int i;
-	for (i = 0; i < max_edges; ++i) {
-		if (x_edges[i] == G_MAXINT)
-			break;
-		int j;
-		for (j = 0; j < max_edges; ++j) {
-			if (y_edges[j] == G_MAXINT)
-				break;
-			Point grid_point = {.x = x_edges[i], .y = y_edges[j]};
-			Point best_top_left;
-			int this_overlap =
-				best_direction(&grid_point, client_rects, n_client_rects,
-							   bound, req_size, &best_top_left);
-			if (this_overlap < overlap) {
-				overlap = this_overlap;
-				*result = best_top_left;
-			}
-			if (overlap == 0)
-				break;
-		}
-		if (overlap == 0)
-			break;
-	}
+    int x_edges[max_edges];
+    int y_edges[max_edges];
+    make_grid(client_rects, n_client_rects, bound,
+            x_edges, y_edges, max_edges);
+    int i;
+    for (i = 0; i < max_edges; ++i) {
+        if (x_edges[i] == G_MAXINT)
+            break;
+        int j;
+        for (j = 0; j < max_edges; ++j) {
+            if (y_edges[j] == G_MAXINT)
+                break;
+            Point grid_point = {.x = x_edges[i], .y = y_edges[j]};
+            Point best_top_left;
+            int this_overlap =
+                best_direction(&grid_point, client_rects, n_client_rects,
+                        bound, req_size, &best_top_left);
+            if (this_overlap < overlap) {
+                overlap = this_overlap;
+                *result = best_top_left;
+            }
+            if (overlap == 0)
+                break;
+        }
+        if (overlap == 0)
+            break;
+    }
 }
 
 static int compare_ints(const void* a, const void* b)

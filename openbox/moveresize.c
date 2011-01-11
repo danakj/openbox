@@ -582,19 +582,19 @@ static void edge_warp_move_ptr(void)
     a = screen_physical_area_all_monitors();
 
     switch (edge_warp_dir) {
-	case OB_DIRECTION_NORTH:
-	    y = a->height - 1;
-	    break;
-	case OB_DIRECTION_EAST:
-	    x = a->x;
-	    break;
-	case OB_DIRECTION_SOUTH:
-	    y = a->y;
-	    break;
-	case OB_DIRECTION_WEST:
-	    x = a->width - 1;
-	    break;
-	default:
+    case OB_DIRECTION_NORTH:
+        y = a->height - 1;
+        break;
+    case OB_DIRECTION_EAST:
+        x = a->x;
+        break;
+    case OB_DIRECTION_SOUTH:
+        y = a->y;
+        break;
+    case OB_DIRECTION_WEST:
+        x = a->width - 1;
+        break;
+    default:
         g_assert_not_reached();
     }
 

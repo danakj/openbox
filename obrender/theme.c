@@ -93,6 +93,13 @@ static RrFont *get_font(RrFont *target, RrFont **default_font,
         RrAppearanceFree(x_var); \
         x_var = RrAppearanceCopy(x_defval); }
 
+#define READ_APPEARANCE_COPY_TEXTURES(x_resstr, x_var, x_parrel, x_defval, n_tex) \
+    if (!read_appearance(db, inst, x_resstr, x_var, x_parrel)) {\
+        RrAppearanceFree(x_var); \
+        x_var = RrAppearanceCopy(x_defval); \
+        RrAppearanceRemoveTextures(x_var); \
+        RrAppearanceAddTextures(x_var, 5); }
+
 #define READ_APPEARANCE_(x_res1, x_res2, x_var, x_parrel, x_defval) \
     if (!read_appearance(db, inst, x_res1, x_var, x_parrel) && \
         !read_appearance(db, inst, x_res2, x_var, x_parrel)) {\
@@ -209,6 +216,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_hilite_bg = RrAppearanceNew(inst, 0);
     theme->osd_unhilite_label = RrAppearanceNew(inst, 1);
     theme->osd_unhilite_bg = RrAppearanceNew(inst, 0);
+    theme->osd_unpressed_button = RrAppearanceNew(inst, 1);
+    theme->osd_pressed_button = RrAppearanceNew(inst, 5);
+    theme->osd_focused_button = RrAppearanceNew(inst, 5);
 
     /* load the font stuff */
     theme->win_font_focused = get_font(active_window_font,
@@ -390,6 +400,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("menu.bullet.selected.image.color", 
                theme->menu_bullet_selected_color,
                RrColorCopy(theme->menu_selected_color));
+
+    READ_COLOR("osd.button.unpressed.text.color", theme->osd_unpressed_color,
+               RrColorCopy(theme->osd_text_active_color));
+    READ_COLOR("osd.button.pressed.text.color", theme->osd_pressed_color,
+               RrColorCopy(theme->osd_text_active_color));
+    READ_COLOR("osd.button.focused.text.color", theme->osd_focused_color,
+               RrColorCopy(theme->osd_text_active_color));
+    READ_COLOR("osd.button.pressed.box.color", theme->osd_pressed_lineart,
+               RrColorCopy(theme->titlebut_focused_pressed_color));
+    READ_COLOR("osd.button.focused.box.color", theme->osd_focused_lineart,
+               RrColorCopy(theme->titlebut_hover_focused_color));
  
     /* load the image masks */
 
@@ -868,6 +889,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                          theme->btn_iconify->a_hover_unfocused, TRUE,
                          theme->btn_iconify->a_unfocused_unpressed);
 
+    /* osd buttons */
+    READ_APPEARANCE_COPY("osd.button.unpressed.bg", theme->osd_unpressed_button, TRUE, a_focused_unpressed_tmp);
+    READ_APPEARANCE_COPY_TEXTURES("osd.button.pressed.bg", theme->osd_pressed_button, TRUE, a_focused_pressed_tmp, 5);
+    READ_APPEARANCE_COPY_TEXTURES("osd.button.focused.bg", theme->osd_focused_button, TRUE, a_focused_unpressed_tmp, 5);
+
     theme->a_icon->surface.grad =
         theme->a_clear->surface.grad =
         theme->a_clear_tex->surface.grad =
@@ -974,6 +1000,35 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         theme->osd_text_active_shadow_color;
     theme->osd_hilite_label->texture[0].data.text.shadow_alpha =
         theme->osd_text_active_shadow_alpha;
+
+    theme->osd_unpressed_button->texture[0] =
+        theme->osd_pressed_button->texture[0] =
+        theme->osd_focused_button->texture[0] =
+        theme->osd_hilite_label->texture[0];
+
+    theme->osd_unpressed_button->texture[0].data.text.justify =
+        theme->osd_pressed_button->texture[0].data.text.justify =
+        theme->osd_focused_button->texture[0].data.text.justify =
+        RR_JUSTIFY_CENTER;
+
+    theme->osd_unpressed_button->texture[0].data.text.color =
+        theme->osd_unpressed_color;
+    theme->osd_pressed_button->texture[0].data.text.color =
+        theme->osd_pressed_color;
+    theme->osd_focused_button->texture[0].data.text.color =
+        theme->osd_focused_color;
+
+    theme->osd_pressed_button->texture[1].data.lineart.color =
+        theme->osd_pressed_button->texture[2].data.lineart.color =
+        theme->osd_pressed_button->texture[3].data.lineart.color =
+        theme->osd_pressed_button->texture[4].data.lineart.color =
+        theme->osd_pressed_lineart;
+
+    theme->osd_focused_button->texture[1].data.lineart.color =
+        theme->osd_focused_button->texture[2].data.lineart.color =
+        theme->osd_focused_button->texture[3].data.lineart.color =
+        theme->osd_focused_button->texture[4].data.lineart.color =
+        theme->osd_focused_lineart;
 
     theme->a_unfocused_label->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_unfocused_label->texture[0].data.text.justify = winjust;
@@ -1583,6 +1638,11 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->osd_text_inactive_color);
         RrColorFree(theme->osd_text_active_shadow_color);
         RrColorFree(theme->osd_text_inactive_shadow_color);
+        RrColorFree(theme->osd_pressed_color);
+        RrColorFree(theme->osd_unpressed_color);
+        RrColorFree(theme->osd_focused_color);
+        RrColorFree(theme->osd_pressed_lineart);
+        RrColorFree(theme->osd_focused_lineart);
         RrColorFree(theme->menu_title_shadow_color);
         RrColorFree(theme->menu_text_normal_shadow_color);
         RrColorFree(theme->menu_text_selected_shadow_color);
@@ -1631,6 +1691,9 @@ void RrThemeFree(RrTheme *theme)
         RrAppearanceFree(theme->osd_hilite_label);
         RrAppearanceFree(theme->osd_unhilite_bg);
         RrAppearanceFree(theme->osd_unhilite_label);
+        RrAppearanceFree(theme->osd_pressed_button);
+        RrAppearanceFree(theme->osd_unpressed_button);
+        RrAppearanceFree(theme->osd_focused_button);
 
         g_slice_free(RrTheme, theme);
     }

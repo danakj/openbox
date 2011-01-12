@@ -105,6 +105,11 @@ struct _RrTheme {
     RrColor *osd_text_inactive_shadow_color;
     gchar    osd_text_active_shadow_alpha;
     gchar    osd_text_inactive_shadow_alpha;
+    RrColor *osd_pressed_color;
+    RrColor *osd_unpressed_color;
+    RrColor *osd_focused_color;
+    RrColor *osd_pressed_lineart;
+    RrColor *osd_focused_lineart;
     RrColor *menu_title_shadow_color;
     gchar    menu_title_shadow_alpha;
     RrColor *menu_text_normal_shadow_color;
@@ -169,6 +174,9 @@ struct _RrTheme {
     RrAppearance *osd_hilite_label; /* can be parent relative */
     RrAppearance *osd_unhilite_bg; /* can never be parent relative */
     RrAppearance *osd_unhilite_label; /* can be parent relative */
+    RrAppearance *osd_pressed_button;
+    RrAppearance *osd_unpressed_button;
+    RrAppearance *osd_focused_button;
 
     gchar *name;
 };

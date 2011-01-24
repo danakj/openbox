@@ -121,7 +121,6 @@ GSource* watch_sys_create_source(ObtWatchNotifyFunc notify)
             g_str_hash, g_str_equal, NULL, (GDestroyNotify)target_free);
         ino_source->pfd = (GPollFD){ fd, G_IO_IN, G_IO_IN };
         g_source_add_poll(source, &ino_source->pfd);
-        g_source_attach(source, NULL);
     }
     return source;
 }
@@ -158,7 +157,9 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
     state = READING_EVENT;
     len = event_len = name_len = 0;
 
-    while (TRUE) {
+    /* sometimes we can end up here even tho no events have been reported by
+       the kernel.  blame glib?  but we'll block if we read in that case. */
+    while (ino_source->pfd.revents) {
         if (pos == len || !len || event_len) {
             /* refill the buffer */
 
@@ -169,10 +170,16 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
 
             len = read(ino_source->pfd.fd, &buffer[pos], BUF_LEN-pos);
 
-            if (len < 0 && errno != EINTR) {
-                gchar *s = strerror(errno);
-                g_warning("Failed to read from inotify: %s", s);
-                return FALSE; /* won't read any more */
+            if (len < 0) {
+                if (errno != EINTR) {
+                    gchar *s = strerror(errno);
+                    g_warning("Failed to read from inotify: %s", s);
+                    return FALSE; /* won't read any more */
+                }
+                else {
+                    g_warning("Interrupted reading from inotify");
+                    return TRUE;
+                }
             }
             if (len == 0) {
                 g_debug("Done reading from inotify");

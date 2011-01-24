@@ -301,6 +301,11 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
                 }
 
                 g_free(full_path);
+
+                /* only read one event at a time, so poll can tell us if there
+                   is another one ready, and we don't block on the read()
+                   needlessly. */
+                break;
             }
 
             if (state == READING_NAME_HEAP)

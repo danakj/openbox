@@ -97,10 +97,9 @@ ObtLinkType obt_link_type (ObtLink *e);
 /*! Returns TRUE if the .desktop file should be displayed to users, given the
     current	environment.  If FALSE,	the .desktop file should not be showed.
 	This also uses the TryExec option if it is present.
-    @env A semicolon-deliminated list of environemnts.  Can be one or more of:
-         GNOME, KDE, ROX, XFCE.  Other environments not listed here may also
-         be supported.  This can be null also if not listing any environment. */
-gboolean obt_link_display(ObtLink *e, const gchar *env);
+    @param environments A bitflags of values from ObtLinkEnvFlags indicating
+      the active environments. */
+gboolean obt_link_display(ObtLink *e, const guint environments);
 
 const gchar* obt_link_name           (ObtLink *e);
 const gchar* obt_link_generic_name   (ObtLink *e);

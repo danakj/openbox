@@ -87,7 +87,9 @@ void obt_watch_unref(ObtWatch *w)
             g_source_remove(w->ino_watch);
 
         g_hash_table_destroy(w->targets);
+#ifdef HAVE_SYS_INOTIFY_H
         g_hash_table_destroy(w->targets_by_wd);
+#endif
 
         g_slice_free(ObtWatch, w);
     }
@@ -175,7 +177,9 @@ static ObtWatchTarget* target_new(ObtWatch *w, const gchar *path,
 
     t = g_slice_new0(ObtWatchTarget);
     t->w = w;
+#ifdef HAVE_SYS_INOTIFY_H
     t->wd = -1;
+#endif
     t->path = g_strdup(path);
     t->func = func;
     t->data = data;

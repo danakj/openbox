@@ -54,6 +54,9 @@ struct _ObtLinkBase {
     /*! This holds the paths in which we look for links, and the data is an
       integer that is the priority of that directory. */
     GHashTable *path_to_priority;
+
+    ObtLinkBaseUpdateFunc update_func;
+    gpointer update_data;
 };
 
 static void base_entry_free(ObtLinkBaseEntry *e)
@@ -117,18 +120,27 @@ static void update(ObtWatch *w, const gchar *base_path,
         break;
     case OBT_WATCH_REMOVED:
         it = find_base_entry_path(list, full_path);
-        list = g_slist_delete_link(list, it);
-        base_entry_free(it->data);
+        if (it) {
+            /* it may be false if the link was skipped during the add because
+               it did not want to be displayed */
+            list = g_slist_delete_link(list, it);
+            base_entry_free(it->data);
 
-        /* this will free 'id' */
-        g_hash_table_insert(self->base, id, list);
-        id = NULL;
+            /* this will free 'id' */
+            g_hash_table_insert(self->base, id, list);
+            id = NULL;
+        }
         break;
     case OBT_WATCH_MODIFIED:
         it = find_base_entry_path(list, full_path);
-        list = g_slist_delete_link(list, it);
-        base_entry_free(it->data);
-        add = TRUE; /* this will put the modified list into the hash table */
+        if (it) {
+            /* it may be false if the link was skipped during the add because
+               it did not want to be displayed */
+            list = g_slist_delete_link(list, it);
+            base_entry_free(it->data);
+            /* this will put the modified list into the hash table */
+            add = TRUE;
+        }
         break;
     case OBT_WATCH_ADDED:
         priority = g_hash_table_lookup(self->path_to_priority, base_path);
@@ -151,22 +163,27 @@ static void update(ObtWatch *w, const gchar *base_path,
         link = obt_link_from_ddfile(full_path, self->paths,
                                     self->language, self->country,
                                     self->modifier);
-        if (!obt_link_display(link, self->environments)) {
-            obt_link_unref(link);
-        }
-        else {
-            ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
-            e->priority = *priority;
-            e->link = link;
-            list = g_slist_insert_before(list, it, e);
+        if (link) {
+            if (!obt_link_display(link, self->environments)) {
+                obt_link_unref(link);
+            }
+            else {
+                ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
+                e->priority = *priority;
+                e->link = link;
+                list = g_slist_insert_before(list, it, e);
 
-            /* this will free 'id' */
-            g_hash_table_insert(self->base, id, list);
-            id = NULL;
+                /* this will free 'id' */
+                g_hash_table_insert(self->base, id, list);
+                id = NULL;
+            }
         }
     }
 
     g_free(id);
+
+    if (self->update_func)
+        self->update_func(self, self->update_data);
 }
 
 ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
@@ -270,4 +287,11 @@ void obt_linkbase_unref(ObtLinkBase *self)
         obt_paths_unref(self->paths);
         g_slice_free(ObtLinkBase, self);
     }
+}
+
+void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
+                                  gpointer data)
+{
+    lb->update_func = func;
+    lb->update_data = data;
 }

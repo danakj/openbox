@@ -27,6 +27,8 @@ G_BEGIN_DECLS
 
 typedef struct _ObtLinkBase ObtLinkBase;
 
+typedef void (*ObtLinkBaseUpdateFunc)(ObtLinkBase *lb, gpointer data);
+
 /*! Create a new database of ObtLinks.
   @param paths An ObtPaths structure.
   @param locale The value of LC_MESSAGES.
@@ -37,6 +39,9 @@ ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths, const gchar *locale,
                               guint environments);
 void obt_linkbase_ref(ObtLinkBase *lb);
 void obt_linkbase_unref(ObtLinkBase *lb);
+
+void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
+                                  gpointer data);
 
 G_END_DECLS
 

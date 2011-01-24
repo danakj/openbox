@@ -250,6 +250,8 @@ openbox_openbox_SOURCES = \
 	openbox/action_list_run.h \
 	openbox/action_parser.c \
 	openbox/action_parser.h \
+	openbox/apps_menu.c \
+	openbox/apps_menu.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

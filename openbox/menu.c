@@ -33,6 +33,7 @@
 #include "geom.h"
 #include "misc.h"
 #include "client_menu.h"
+#include "apps_menu.h"
 #include "client_list_menu.h"
 #include "client_list_combined_menu.h"
 #include "gettext.h"
@@ -70,6 +71,7 @@ void menu_startup(gboolean reconfig)
     menu_hash = g_hash_table_new_full(g_str_hash, g_str_equal, NULL,
                                       (GDestroyNotify)menu_destroy_hash_value);
 
+    apps_menu_startup(reconfig);
     client_list_menu_startup(reconfig);
     client_list_combined_menu_startup(reconfig);
     client_menu_startup();
@@ -123,6 +125,7 @@ void menu_shutdown(gboolean reconfig)
 
     client_list_combined_menu_shutdown(reconfig);
     client_list_menu_shutdown(reconfig);
+    apps_menu_shutdown(reconfig);
 
     g_hash_table_destroy(menu_hash);
     menu_hash = NULL;

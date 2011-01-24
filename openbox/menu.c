@@ -115,10 +115,11 @@ void menu_shutdown(gboolean reconfig)
     obt_xml_instance_unref(menu_parse_inst);
     menu_parse_inst = NULL;
 
-    client_list_menu_shutdown(reconfig);
-    client_list_combined_menu_shutdown(reconfig);
-
     menu_frame_hide_all();
+
+    client_list_combined_menu_shutdown(reconfig);
+    client_list_menu_shutdown(reconfig);
+
     g_hash_table_destroy(menu_hash);
     menu_hash = NULL;
 }

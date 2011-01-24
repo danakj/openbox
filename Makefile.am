@@ -157,6 +157,8 @@ obt_libobt_la_SOURCES = \
 	obt/signal.h \
 	obt/signal.c \
 	obt/util.h \
+	obt/watch.h \
+	obt/watch.c \
 	obt/xqueue.h \
 	obt/xqueue.c
 
@@ -472,6 +474,7 @@ obtpubinclude_HEADERS = \
 	obt/signal.h \
 	obt/util.h \
 	obt/version.h \
+	obt/watch.h \
 	obt/xqueue.h
 
 nodist_pkgconfig_DATA = \

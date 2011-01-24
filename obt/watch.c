@@ -88,6 +88,8 @@ ObtWatch* obt_watch_new()
         w->targets_by_path = g_hash_table_new_full(
             g_str_hash, g_str_equal, NULL, (GDestroyNotify)target_free);
         w->source = source;
+
+        g_source_attach(source, NULL);
     }
     return w;
 }

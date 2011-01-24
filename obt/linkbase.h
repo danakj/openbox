@@ -30,8 +30,11 @@ typedef struct _ObtLinkBase ObtLinkBase;
 /*! Create a new database of ObtLinks.
   @param paths An ObtPaths structure.
   @param locale The value of LC_MESSAGES.
+  @param environments A bitflag of values from ObtLinkEnvFlags indicating
+    which environments are to be considered active.
 */
-ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths, const gchar *locale);
+ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths, const gchar *locale,
+                              guint environments);
 void obt_linkbase_ref(ObtLinkBase *lb);
 void obt_linkbase_unref(ObtLinkBase *lb);
 

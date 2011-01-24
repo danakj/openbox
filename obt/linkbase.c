@@ -38,6 +38,10 @@ struct _ObtLinkBaseEntry {
 struct _ObtLinkBase {
     gint ref;
 
+    /*! A bitflag of values from ObtLinkEnvFlags indicating which environments
+      are to be considered active. */
+    guint environments;
+
     const gchar *language;
     const gchar *country;
     const gchar *modifier;
@@ -142,22 +146,31 @@ static void update(ObtWatch *w, const gchar *base_path,
     }
 
     if (add) {
-        ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
-        e->priority = *priority;
-        e->link = obt_link_from_ddfile(full_path, self->paths,
-                                       self->language, self->country,
-                                       self->modifier);
-        list = g_slist_insert_before(list, it, e);
+        ObtLink *link;
 
-        /* this will free 'id' */
-        g_hash_table_insert(self->base, id, list);
-        id = NULL;
+        link = obt_link_from_ddfile(full_path, self->paths,
+                                    self->language, self->country,
+                                    self->modifier);
+        if (!obt_link_display(link, self->environments)) {
+            obt_link_unref(link);
+        }
+        else {
+            ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
+            e->priority = *priority;
+            e->link = link;
+            list = g_slist_insert_before(list, it, e);
+
+            /* this will free 'id' */
+            g_hash_table_insert(self->base, id, list);
+            id = NULL;
+        }
     }
 
     g_free(id);
 }
 
-ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale)
+ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
+                              guint environments)
 {
     ObtLinkBase *self;
     GSList *it;
@@ -165,6 +178,7 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale)
     gint i;
     
     self = g_slice_new0(ObtLinkBase);
+    self->environments = environments;
     self->watch = obt_watch_new();
     self->base = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
                                     (GDestroyNotify)base_entry_list_free);

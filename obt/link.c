@@ -252,3 +252,16 @@ gchar* obt_link_id_from_ddfile(const gchar *filename)
 {
     return obt_ddparse_file_to_id(filename);
 }
+
+gboolean obt_link_display(ObtLink *e, const guint environments)
+{
+    return
+        /* display if the link wants to be displayed and TryExec passed */
+        e->display &&
+        /* display if no environment is required, or we match at least one of
+           the requirements */
+        (!e->env_required || (e->env_required & environments)) &&
+        /* display if no environment is restricted, or we do not match any of
+           the restrictions */
+        (!e->env_restricted || !(e->env_restricted & environments));
+}

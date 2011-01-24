@@ -1046,8 +1046,11 @@ gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
         parent->child_entry = parent_entry;
     }
 
-    if (!menu_frame_show(self))
+    if (!menu_frame_show(self)) {
+        parent->child = NULL;
+        parent->child_entry = NULL;
         return FALSE;
+    }
 
     menu_frame_place_submenu(self, &x, &y);
     menu_frame_move_on_screen(self, x, y, &dx, &dy);
@@ -1272,7 +1275,8 @@ void menu_entry_frame_show_submenu(ObMenuEntryFrame *self)
     /* pass our direction on to our child */
     f->direction_right = self->frame->direction_right;
 
-    menu_frame_show_submenu(f, self->frame, self);
+    if (!menu_frame_show_submenu(f, self->frame, self))
+        menu_frame_free(f);
 }
 
 void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)

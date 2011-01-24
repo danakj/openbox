@@ -173,6 +173,8 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale)
     self->paths = paths;
     obt_paths_ref(paths);
 
+    /* parse the locale string to determine the language, country, and
+       modifier settings */
     for (i = 0; ; ++i)
         if (!locale[i] || locale[i] == '_' || locale[i] == '.' ||
             locale[i] == '@')
@@ -213,6 +215,9 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale)
                 break;
     }
 
+    /* run through each directory, foo, in the XDG_DATA_DIRS, and add
+       foo/applications to the list of directories to watch here, with
+       increasing priority (decreasing importance). */
     priority = 0;
     for (it = obt_paths_data_dirs(paths); it; it = g_slist_next(it)) {
         if (!g_hash_table_lookup(self->path_to_priority, it->data)) {

@@ -11,7 +11,7 @@ AC_DEFUN([X11_DEVEL],
   # Store these
   OLDLIBS=$LIBS
   OLDCPPFLAGS=$CPPFLAGS
-     
+
   CPPFLAGS="$CPPFLAGS $X_CFLAGS"
   X_LIBS="$X_PRE_LIBS $X_LIBS -lX11"
   LIBS="$LIBS $X_LIBS"
@@ -38,44 +38,52 @@ AC_DEFUN([X11_EXT_XKB],
 [
   AC_REQUIRE([X11_DEVEL])
 
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS"
+  AC_ARG_ENABLE([xkb],
+  AC_HELP_STRING(
+  [--disable-xkb],
+  [build without support for xkb extension [default=enabled]]),
+  [USE=$enableval], [USE="yes"])
 
-  AC_CHECK_LIB([X11], [XkbBell],
-    AC_MSG_CHECKING([for X11/XKBlib.h])
-    AC_TRY_LINK(
-    [
-      #include <X11/Xlib.h>
-      #include <X11/Xutil.h>
-      #include <X11/XKBlib.h>
-    ],
-    [
-      Display *d;
-      Window w;
-      XkbBell(d, w, 0, 0);
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      XKB="yes"
-      AC_DEFINE([XKB], [1], [Found the XKB extension])
+  if test "$USE" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
 
-      XKB_CFLAGS=""
-      XKB_LIBS=""
-      AC_SUBST(XKB_CFLAGS)
-      AC_SUBST(XKB_LIBS)
-    ],
-    [ 
-      AC_MSG_RESULT([no])
-      XKB="no"
-    ])
-  )
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS"
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
+    AC_CHECK_LIB([X11], [XkbBell],
+      AC_MSG_CHECKING([for X11/XKBlib.h])
+      AC_TRY_LINK(
+      [
+        #include <X11/Xlib.h>
+        #include <X11/Xutil.h>
+        #include <X11/XKBlib.h>
+      ],
+      [
+        Display *d;
+        Window w;
+        XkbBell(d, w, 0, 0);
+      ],
+      [
+        AC_MSG_RESULT([yes])
+        XKB="yes"
+        AC_DEFINE([XKB], [1], [Found the XKB extension])
+
+        XKB_CFLAGS=""
+        XKB_LIBS=""
+        AC_SUBST(XKB_CFLAGS)
+        AC_SUBST(XKB_LIBS)
+      ],
+      [
+        AC_MSG_RESULT([no])
+        XKB="no"
+      ])
+    )
+
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
 
   AC_MSG_CHECKING([for the Xkb extension])
   if test "$XKB" = "yes"; then
@@ -94,45 +102,53 @@ AC_DEFUN([X11_EXT_XRANDR],
 [
   AC_REQUIRE([X11_DEVEL])
 
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS -lXext -lXrender -lXrandr"
+  AC_ARG_ENABLE([xrandr],
+  AC_HELP_STRING(
+  [--disable-xrandr],
+  [build without support for xrandr extension [default=enabled]]),
+  [USE=$enableval], [USE="yes"])
 
-  AC_CHECK_LIB([Xrandr], [XRRSelectInput],
-    AC_MSG_CHECKING([for X11/extensions/Xrandr.h])
-    AC_TRY_LINK(
-    [
-      #include <X11/Xlib.h>
-      #include <X11/extensions/Xrandr.h>
-    ],
-    [
-      Display *d;
-      Drawable r;
-      int i;
-      XRRQueryExtension(d, &i, &i);
-      XRRGetScreenInfo(d, r);
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      XRANDR="yes"
-      AC_DEFINE([XRANDR], [1], [Found the XRandR extension])
+  if test "$USE" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
 
-      XRANDR_CFLAGS=""
-      XRANDR_LIBS="-lXext -lXrender -lXrandr"
-      AC_SUBST(XRANDR_CFLAGS)
-      AC_SUBST(XRANDR_LIBS)
-    ],
-    [ 
-      AC_MSG_RESULT([no])
-      XRANDR="no"
-    ])
-  )
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS -lXext -lXrender -lXrandr"
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
+    AC_CHECK_LIB([Xrandr], [XRRSelectInput],
+      AC_MSG_CHECKING([for X11/extensions/Xrandr.h])
+      AC_TRY_LINK(
+      [
+        #include <X11/Xlib.h>
+        #include <X11/extensions/Xrandr.h>
+      ],
+      [
+        Display *d;
+        Drawable r;
+        int i;
+        XRRQueryExtension(d, &i, &i);
+        XRRGetScreenInfo(d, r);
+      ],
+      [
+        AC_MSG_RESULT([yes])
+        XRANDR="yes"
+        AC_DEFINE([XRANDR], [1], [Found the XRandR extension])
+
+        XRANDR_CFLAGS=""
+        XRANDR_LIBS="-lXext -lXrender -lXrandr"
+        AC_SUBST(XRANDR_CFLAGS)
+        AC_SUBST(XRANDR_LIBS)
+      ],
+      [
+        AC_MSG_RESULT([no])
+        XRANDR="no"
+      ])
+    )
+
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
 
   AC_MSG_CHECKING([for the XRandR extension])
   if test "$XRANDR" = "yes"; then
@@ -151,43 +167,51 @@ AC_DEFUN([X11_EXT_SHAPE],
 [
   AC_REQUIRE([X11_DEVEL])
 
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS"
+  AC_ARG_ENABLE([xshape],
+  AC_HELP_STRING(
+  [--disable-xshape],
+  [build without support for xshape extension [default=enabled]]),
+  [USE=$enableval], [USE="yes"])
 
-  AC_CHECK_LIB([Xext], [XShapeCombineShape],
-    AC_MSG_CHECKING([for X11/extensions/shape.h])
-    AC_TRY_LINK(
-    [
-      #include <X11/Xlib.h>
-      #include <X11/Xutil.h>
-      #include <X11/extensions/shape.h>
-    ],
-    [
-      long foo = ShapeSet;
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      SHAPE="yes"
-      AC_DEFINE([SHAPE], [1], [Found the XShape extension])
+  if test "$USE" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
 
-      XSHAPE_CFLAGS=""
-      XSHAPE_LIBS="-lXext"
-      AC_SUBST(XSHAPE_CFLAGS)
-      AC_SUBST(XSHAPE_LIBS)
-    ],
-    [ 
-      AC_MSG_RESULT([no])
-      SHAPE="no"
-    ])
-  )
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS"
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
- 
+    AC_CHECK_LIB([Xext], [XShapeCombineShape],
+      AC_MSG_CHECKING([for X11/extensions/shape.h])
+      AC_TRY_LINK(
+      [
+        #include <X11/Xlib.h>
+        #include <X11/Xutil.h>
+        #include <X11/extensions/shape.h>
+      ],
+      [
+        long foo = ShapeSet;
+      ],
+      [
+        AC_MSG_RESULT([yes])
+        SHAPE="yes"
+        AC_DEFINE([SHAPE], [1], [Found the XShape extension])
+
+        XSHAPE_CFLAGS=""
+        XSHAPE_LIBS="-lXext"
+        AC_SUBST(XSHAPE_CFLAGS)
+        AC_SUBST(XSHAPE_LIBS)
+      ],
+      [
+        AC_MSG_RESULT([no])
+        SHAPE="no"
+      ])
+    )
+
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
+
   AC_MSG_CHECKING([for the Shape extension])
   if test "$SHAPE" = "yes"; then
     AC_MSG_RESULT([yes])
@@ -206,39 +230,47 @@ AC_DEFUN([X11_EXT_XINERAMA],
 [
   AC_REQUIRE([X11_DEVEL])
 
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS -lXext"
+  AC_ARG_ENABLE([xinerama],
+  AC_HELP_STRING(
+  [--disable-xinerama],
+  [build without support for xinerama [default=enabled]]),
+  [USE=$enableval], [USE="yes"])
 
-  AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
-  [
-    AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
-    AC_TRY_LINK(
+  if test "$USE" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
+
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS -lXext"
+
+    AC_CHECK_LIB([Xinerama], [XineramaQueryExtension],
     [
-      #include <X11/Xlib.h>
-      #include <X11/extensions/Xinerama.h>
-    ],
-    [
-      XineramaScreenInfo foo;
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      XINERAMA="yes"
-      AC_DEFINE([XINERAMA], [1], [Enable support of the Xinerama extension])
-      XINERAMA_LIBS="-lXext -lXinerama"
-      AC_SUBST(XINERAMA_LIBS)
-    ],
-    [
-      AC_MSG_RESULT([no])
-      XINERAMA="no"
+      AC_MSG_CHECKING([for X11/extensions/Xinerama.h])
+      AC_TRY_LINK(
+      [
+        #include <X11/Xlib.h>
+        #include <X11/extensions/Xinerama.h>
+      ],
+      [
+        XineramaScreenInfo foo;
+      ],
+      [
+        AC_MSG_RESULT([yes])
+        XINERAMA="yes"
+        AC_DEFINE([XINERAMA], [1], [Enable support of the Xinerama extension])
+        XINERAMA_LIBS="-lXext -lXinerama"
+        AC_SUBST(XINERAMA_LIBS)
+      ],
+      [
+        AC_MSG_RESULT([no])
+        XINERAMA="no"
+      ])
     ])
-  ])
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
 
   AC_MSG_CHECKING([for the Xinerama extension])
   if test "$XINERAMA" = "yes"; then
@@ -257,43 +289,51 @@ AC_DEFUN([X11_EXT_SYNC],
 [
   AC_REQUIRE([X11_DEVEL])
 
-  # Store these
-  OLDLIBS=$LIBS
-  OLDCPPFLAGS=$CPPFLAGS
-     
-  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
-  LIBS="$LIBS $X_LIBS"
+  AC_ARG_ENABLE([xsync],
+  AC_HELP_STRING(
+  [--disable-xsync],
+  [build without support for xsync extension [default=enabled]]),
+  [USE=$enableval], [USE="yes"])
 
-  AC_CHECK_LIB([Xext], [XSyncInitialize],
-    AC_MSG_CHECKING([for X11/extensions/sync.h])
-    AC_TRY_LINK(
-    [
-      #include <X11/Xlib.h>
-      #include <X11/Xutil.h>
-      #include <X11/extensions/sync.h>
-    ],
-    [
-      XSyncValueType foo;
-    ],
-    [
-      AC_MSG_RESULT([yes])
-      SYNC="yes"
-      AC_DEFINE([SYNC], [1], [Found the XSync extension])
+  if test "$USE" = "yes"; then
+    # Store these
+    OLDLIBS=$LIBS
+    OLDCPPFLAGS=$CPPFLAGS
 
-      XSYNC_CFLAGS=""
-      XSYNC_LIBS="-lXext"
-      AC_SUBST(XSYNC_CFLAGS)
-      AC_SUBST(XSYNC_LIBS)
-    ],
-    [ 
-      AC_MSG_RESULT([no])
-      SYNC="no"
-    ])
-  )
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    LIBS="$LIBS $X_LIBS"
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
- 
+    AC_CHECK_LIB([Xext], [XSyncInitialize],
+      AC_MSG_CHECKING([for X11/extensions/sync.h])
+      AC_TRY_LINK(
+      [
+        #include <X11/Xlib.h>
+        #include <X11/Xutil.h>
+        #include <X11/extensions/sync.h>
+      ],
+      [
+        XSyncValueType foo;
+      ],
+      [
+        AC_MSG_RESULT([yes])
+        SYNC="yes"
+        AC_DEFINE([SYNC], [1], [Found the XSync extension])
+
+        XSYNC_CFLAGS=""
+        XSYNC_LIBS="-lXext"
+        AC_SUBST(XSYNC_CFLAGS)
+        AC_SUBST(XSYNC_LIBS)
+      ],
+      [
+        AC_MSG_RESULT([no])
+        SYNC="no"
+      ])
+    )
+
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
+
   AC_MSG_CHECKING([for the Sync extension])
   if test "$SYNC" = "yes"; then
     AC_MSG_RESULT([yes])
@@ -365,14 +405,15 @@ AC_DEFUN([X11_SM],
 
   AC_ARG_ENABLE([session-management],
   AC_HELP_STRING(
-  [--disable-session-management], [build without support for session managers [[default=enabled]]]),
+  [--disable-session-management],
+  [build without support for session managers [default=enabled]]),
   [SM=$enableval], [SM="yes"])
-  
+
   if test "$SM" = "yes"; then
     # Store these
     OLDLIBS=$LIBS
     OLDCPPFLAGS=$CPPFLAGS
-     
+
     CPPFLAGS="$CPPFLAGS $X_CFLAGS"
     LIBS="$LIBS $X_LIBS"
 
@@ -388,10 +429,10 @@ AC_DEFUN([X11_SM],
         SM="yes"
       ])
     ])
-  fi
 
-  LIBS=$OLDLIBS
-  CPPFLAGS=$OLDCPPFLAGS
+    LIBS=$OLDLIBS
+    CPPFLAGS=$OLDCPPFLAGS
+  fi
 
   AC_MSG_CHECKING([for session management support])
   if test "$SM" = "yes"; then

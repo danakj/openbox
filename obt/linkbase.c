@@ -55,6 +55,12 @@ struct _ObtLinkBase {
       integer that is the priority of that directory. */
     GHashTable *path_to_priority;
 
+    /*! This maps GQuark main categories to GSLists of ObtLink objects found in
+      the category. The ObtLink objects are not reffed to be placed in this
+      structure since they will always be in the base hash table as well. So
+      they are not unreffed when they are removed. */
+    GHashTable *main_categories;
+
     ObtLinkBaseUpdateFunc update_func;
     gpointer update_data;
 };
@@ -98,6 +104,27 @@ static GSList* find_base_entry_priority(GSList *list, gint priority)
     return it;
 }
 
+static void main_category_add(ObtLinkBase *lb, GQuark cat, ObtLink *link)
+{
+    GSList *list;
+
+    list = g_hash_table_lookup(lb->main_categories, &cat);
+    list = g_slist_prepend(list, link);
+    g_hash_table_insert(lb->main_categories, &cat, list);
+}
+
+static void main_category_remove(ObtLinkBase *lb, GQuark cat, ObtLink *link)
+{
+    GSList *list, *it;
+
+    list = g_hash_table_lookup(lb->main_categories, &cat);
+    it = list;
+    while (it->data != link)
+        it = g_slist_next(it);
+    list = g_slist_delete_link(list, it);
+    g_hash_table_insert(lb->main_categories, &cat, list);
+}
+
 /*! Called when a change happens in the filesystem. */
 static void update(ObtWatch *w, const gchar *base_path,
                    const gchar *sub_path,
@@ -125,6 +152,13 @@ static void update(ObtWatch *w, const gchar *base_path,
         if (it) {
             /* it may be false if the link was skipped during the add because
                it did not want to be displayed */
+
+            ObtLink *link = it->data;
+
+            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
+                main_category_remove(
+                    self, obt_link_app_main_category(link), link);
+
             list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
 
@@ -145,6 +179,13 @@ static void update(ObtWatch *w, const gchar *base_path,
         if (it) {
             /* it may be false if the link was skipped during the add because
                it did not want to be displayed */
+
+            ObtLink *link = it->data;
+
+            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
+                main_category_remove(
+                    self, obt_link_app_main_category(link), link);
+
             list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
             /* this will put the modified list into the hash table */
@@ -185,6 +226,10 @@ static void update(ObtWatch *w, const gchar *base_path,
                 /* this will free 'id' */
                 g_hash_table_insert(self->base, id, list);
                 id = NULL;
+
+                if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
+                    main_category_add(
+                        self, obt_link_app_main_category(link), link);
             }
         }
     }
@@ -209,6 +254,7 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
     self->base = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
     self->path_to_priority = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
+    self->main_categories = g_hash_table_new(g_int_hash, g_int_equal);
     self->paths = paths;
     obt_paths_ref(paths);
 
@@ -298,6 +344,7 @@ void obt_linkbase_unref(ObtLinkBase *self)
         g_hash_table_foreach(self->base, base_entry_list_free, NULL);
 
         obt_watch_unref(self->watch);
+        g_hash_table_unref(self->main_categories);
         g_hash_table_unref(self->path_to_priority);
         g_hash_table_unref(self->base);
         obt_paths_unref(self->paths);

@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
  
    obt/link.h for the Openbox window manager
-   Copyright (c) 2009        Dana Jansens
+   Copyright (c) 2009-2011   Dana Jansens
  
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -117,8 +117,16 @@ const gchar*  obt_link_app_executable      (ObtLink *e);
 /*! Returns the path in which the application should be run */
 const gchar*  obt_link_app_path            (ObtLink *e);
 gboolean      obt_link_app_run_in_terminal (ObtLink *e);
-const gchar*const* obt_link_app_mime_types      (ObtLink *e);
+const gchar*const* obt_link_app_mime_types (ObtLink *e);
+
+/*! Returns the first main category listed by the link. This may be 0 if the
+  application does not list a category. */
+GQuark obt_link_app_main_category          (ObtLink *e);
+
+/*! Returns a list of categories listed by the link.  This may be empty if the
+  application does not list a category. */
 const GQuark* obt_link_app_categories      (ObtLink *e, gulong *n);
+
 /*! Returns a combination of values in the ObtLinkAppOpen enum,
     specifying if the application can be launched to open one or more files
     and URLs. */

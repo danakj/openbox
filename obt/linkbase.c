@@ -65,9 +65,11 @@ static void base_entry_free(ObtLinkBaseEntry *e)
     g_slice_free(ObtLinkBaseEntry, e);
 }
 
-static void base_entry_list_free(GSList *list)
+static void base_entry_list_free(gpointer key, gpointer value, gpointer data)
 {
-    GSList *it;
+    GSList *it, *list; (void)key; (void)data;
+
+    list = value;
     for (it = list; it; it = g_slist_next(it))
         base_entry_free(it->data);
     g_slist_free(list);
@@ -126,9 +128,16 @@ static void update(ObtWatch *w, const gchar *base_path,
             list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
 
-            /* this will free 'id' */
-            g_hash_table_insert(self->base, id, list);
-            id = NULL;
+            if (list) {
+                /* this will free 'id' */
+                g_hash_table_insert(self->base, id, list);
+                id = NULL;
+            }
+            else {
+                /* the value is already freed by deleting it above so we don't
+                   need to free it here. id will still need to be freed tho. */
+                g_hash_table_remove(self->base, id);
+            }
         }
         break;
     case OBT_WATCH_MODIFIED:
@@ -197,8 +206,7 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
     self = g_slice_new0(ObtLinkBase);
     self->environments = environments;
     self->watch = obt_watch_new();
-    self->base = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-                                    (GDestroyNotify)base_entry_list_free);
+    self->base = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
     self->path_to_priority = g_hash_table_new_full(g_str_hash, g_str_equal,
                                                 g_free, g_free);
     self->paths = paths;
@@ -281,6 +289,14 @@ void obt_linkbase_ref(ObtLinkBase *self)
 void obt_linkbase_unref(ObtLinkBase *self)
 {
     if (--self->ref < 1) {
+        /* free all the values in the hash table
+           we can't do this with a value_destroy_function in the hash table,
+           because when we replace values, we are doing so with the same list
+           (modified), and that would cause it to free the list we are putting
+           back in.
+         */
+        g_hash_table_foreach(self->base, base_entry_list_free, NULL);
+
         obt_watch_unref(self->watch);
         g_hash_table_unref(self->path_to_priority);
         g_hash_table_unref(self->base);

@@ -1050,15 +1050,20 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_hilite_label->texture[0].data.text.shadow_alpha =
         theme->osd_text_active_shadow_alpha;
 
-    theme->osd_unpressed_button->texture[0] =
-    theme->osd_pressed_button->texture[0] =
-    theme->osd_focused_button->texture[0] =
-        theme->osd_hilite_label->texture[0];
+    theme->osd_unpressed_button->texture[0].type =
+    theme->osd_pressed_button->texture[0].type =
+    theme->osd_focused_button->texture[0].type =
+        RR_TEXTURE_TEXT;
 
     theme->osd_unpressed_button->texture[0].data.text.justify =
     theme->osd_pressed_button->texture[0].data.text.justify =
     theme->osd_focused_button->texture[0].data.text.justify =
         RR_JUSTIFY_CENTER;
+
+    theme->osd_unpressed_button->texture[0].data.text.font =
+    theme->osd_pressed_button->texture[0].data.text.font =
+    theme->osd_focused_button->texture[0].data.text.font =
+        theme->osd_font_hilite;
 
     theme->osd_unpressed_button->texture[0].data.text.color =
         theme->osd_unpressed_color;

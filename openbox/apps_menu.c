@@ -35,12 +35,6 @@ static ObMenu *apps_menu;
 static ObtLinkBase *linkbase;
 static gboolean dirty;
 
-static void self_destroy(ObMenu *menu, gpointer data)
-{
-    obt_linkbase_unref(linkbase);
-    linkbase = NULL;
-}
-
 static void self_cleanup(ObMenu *menu, gpointer data)
 {
     menu_clear_entries(menu);
@@ -111,10 +105,14 @@ void apps_menu_startup(gboolean reconfig)
     menu_set_update_func(apps_menu, self_update);
     menu_set_cleanup_func(apps_menu, self_cleanup);
     menu_set_execute_func(apps_menu, menu_execute);
-    menu_set_destroy_func(apps_menu, self_destroy);
 }
 
 void apps_menu_shutdown(gboolean reconfig)
 {
+    if (!reconfig) {
+        obt_linkbase_unref(linkbase);
+        linkbase = NULL;
+    }
+
     /* freed by the hash table */
 }

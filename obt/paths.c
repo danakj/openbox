@@ -88,8 +88,10 @@ static GSList* split_paths(const gchar *paths)
     if (!paths)
         return NULL;
     spl = g_strsplit(paths, ":", -1);
-    for (it = spl; *it; ++it)
-        list = slist_path_add(list, *it, (GSListFunc) g_slist_append);
+    for (it = spl; *it; ++it) {
+        if ((*it)[0]) /* skip empty strings */
+            list = slist_path_add(list, *it, (GSListFunc) g_slist_append);
+    }
     g_free(spl);
     return list;
 }

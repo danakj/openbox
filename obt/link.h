@@ -119,10 +119,6 @@ const gchar*  obt_link_app_path            (ObtLink *e);
 gboolean      obt_link_app_run_in_terminal (ObtLink *e);
 const gchar*const* obt_link_app_mime_types (ObtLink *e);
 
-/*! Returns the first main category listed by the link. This may be 0 if the
-  application does not list a category. */
-GQuark obt_link_app_main_category          (ObtLink *e);
-
 /*! Returns a list of categories listed by the link.  This may be empty if the
   application does not list a category. */
 const GQuark* obt_link_app_categories      (ObtLink *e, gulong *n);

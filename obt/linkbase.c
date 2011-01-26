@@ -25,7 +25,8 @@
 # include <string.h>
 #endif
 
-typedef struct _ObtLinkBaseEntry ObtLinkBaseEntry;
+typedef struct _ObtLinkBaseEntry    ObtLinkBaseEntry;
+typedef struct _ObtLinkBaseCategory ObtLinkBaseCategory;
 
 struct _ObtLinkBaseEntry {
     /*! Links come from a set of paths.  Links found in earlier paths get lower
@@ -33,6 +34,11 @@ struct _ObtLinkBaseEntry {
       paths of the base directory under which the link was found. */
     gint priority;
     ObtLink *link;
+};
+
+struct _ObtLinkBaseCategory {
+    GQuark cat;
+    GSList *links;
 };
 
 struct _ObtLinkBase {
@@ -55,11 +61,12 @@ struct _ObtLinkBase {
       integer that is the priority of that directory. */
     GHashTable *path_to_priority;
 
-    /*! This maps GQuark main categories to GSLists of ObtLink objects found in
+    /*! This maps GQuark main categories to ObtLinkBaseCategory objects,
+      containing lists of ObtLink objects found in
       the category. The ObtLink objects are not reffed to be placed in this
       structure since they will always be in the base hash table as well. So
       they are not unreffed when they are removed. */
-    GHashTable *main_categories;
+    GHashTable *categories;
 
     ObtLinkBaseUpdateFunc update_func;
     gpointer update_data;
@@ -104,25 +111,39 @@ static GSList* find_base_entry_priority(GSList *list, gint priority)
     return it;
 }
 
-static void main_category_add(ObtLinkBase *lb, GQuark cat, ObtLink *link)
+static void category_add(ObtLinkBase *lb, GQuark cat, ObtLink *link)
 {
-    GSList *list;
+    ObtLinkBaseCategory *lc;
 
-    list = g_hash_table_lookup(lb->main_categories, &cat);
-    list = g_slist_prepend(list, link);
-    g_hash_table_insert(lb->main_categories, &cat, list);
+    lc = g_hash_table_lookup(lb->categories, &cat);
+    if (!lc) {
+        lc = g_slice_new(ObtLinkBaseCategory);
+        lc->cat = cat;
+        lc->links = NULL;
+        g_hash_table_insert(lb->categories, &lc->cat, lc);
+    }
+    lc->links = g_slist_prepend(lc->links, link);
 }
 
-static void main_category_remove(ObtLinkBase *lb, GQuark cat, ObtLink *link)
+static void category_remove(ObtLinkBase *lb, GQuark cat, ObtLink *link)
 {
-    GSList *list, *it;
+    ObtLinkBaseCategory *lc;
+    GSList *it;
 
-    list = g_hash_table_lookup(lb->main_categories, &cat);
-    it = list;
+    lc = g_hash_table_lookup(lb->categories, &cat);
+
+    it = lc->links;
     while (it->data != link)
         it = g_slist_next(it);
-    list = g_slist_delete_link(list, it);
-    g_hash_table_insert(lb->main_categories, &cat, list);
+    lc->links = g_slist_delete_link(lc->links, it);
+    if (!lc->links)
+        g_hash_table_remove(lb->categories, &cat);
+}
+
+static void category_free(ObtLinkBaseCategory *lc)
+{
+    g_slist_free(lc->links);
+    g_slice_free(ObtLinkBaseCategory, lc);
 }
 
 /*! Called when a change happens in the filesystem. */
@@ -155,9 +176,14 @@ static void update(ObtWatch *w, const gchar *base_path,
 
             ObtLink *link = it->data;
 
-            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
-                main_category_remove(
-                    self, obt_link_app_main_category(link), link);
+            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
+                const GQuark *cats;
+                gulong i, n;
+
+                cats = obt_link_app_categories(link, &n);
+                for (i = 0; i < n; ++i)
+                    category_remove(self, cats[i], link);
+            }
 
             list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
@@ -182,9 +208,14 @@ static void update(ObtWatch *w, const gchar *base_path,
 
             ObtLink *link = it->data;
 
-            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
-                main_category_remove(
-                    self, obt_link_app_main_category(link), link);
+            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
+                const GQuark *cats;
+                gulong i, n;
+
+                cats = obt_link_app_categories(link, &n);
+                for (i = 0; i < n; ++i)
+                    category_remove(self, cats[i], link);
+            }
 
             list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
@@ -227,9 +258,14 @@ static void update(ObtWatch *w, const gchar *base_path,
                 g_hash_table_insert(self->base, id, list);
                 id = NULL;
 
-                if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION)
-                    main_category_add(
-                        self, obt_link_app_main_category(link), link);
+                if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
+                    const GQuark *cats;
+                    gulong i, n;
+
+                    cats = obt_link_app_categories(link, &n);
+                    for (i = 0; i < n; ++i)
+                        category_add(self, cats[i], link);
+                }
             }
         }
     }
@@ -252,9 +288,10 @@ ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
     self->environments = environments;
     self->watch = obt_watch_new();
     self->base = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-    self->path_to_priority = g_hash_table_new_full(g_str_hash, g_str_equal,
-                                                g_free, g_free);
-    self->main_categories = g_hash_table_new(g_int_hash, g_int_equal);
+    self->path_to_priority = g_hash_table_new_full(
+        g_str_hash, g_str_equal, g_free, g_free);
+    self->categories = g_hash_table_new_full(
+        g_int_hash, g_int_equal, NULL, (GDestroyNotify)category_free);
     self->paths = paths;
     obt_paths_ref(paths);
 
@@ -344,7 +381,7 @@ void obt_linkbase_unref(ObtLinkBase *self)
         g_hash_table_foreach(self->base, base_entry_list_free, NULL);
 
         obt_watch_unref(self->watch);
-        g_hash_table_unref(self->main_categories);
+        g_hash_table_unref(self->categories);
         g_hash_table_unref(self->path_to_priority);
         g_hash_table_unref(self->base);
         obt_paths_unref(self->paths);

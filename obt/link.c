@@ -55,7 +55,6 @@ struct _ObtLink {
 
             gchar **mime; /*!< Mime types the app can open */
 
-            GQuark main_category; /*!< The first main category listed */
             GQuark *categories; /*!< Array of quarks representing the
                                   application's categories */
             gulong  n_categories; /*!< Number of categories for the app */
@@ -71,30 +70,6 @@ struct _ObtLink {
     } d;
 };
 
-#define NUM_MAIN_CATEGORIES 10
-static GQuark MAIN_CATEGORIES[NUM_MAIN_CATEGORIES];
-static gboolean setup = FALSE;
-
-static void startup()
-{
-    if (setup) return;
-
-    setup = TRUE;
-
-    /* From http://standards.freedesktop.org/menu-spec/latest/apa.html */
-    MAIN_CATEGORIES[0] = g_quark_from_static_string("AudioVideo");
-    MAIN_CATEGORIES[1] = g_quark_from_static_string("Development");
-    MAIN_CATEGORIES[2] = g_quark_from_static_string("Education");
-    MAIN_CATEGORIES[3] = g_quark_from_static_string("Game");
-    MAIN_CATEGORIES[4] = g_quark_from_static_string("Graphics");
-    MAIN_CATEGORIES[5] = g_quark_from_static_string("Network");
-    MAIN_CATEGORIES[6] = g_quark_from_static_string("Office");
-    MAIN_CATEGORIES[7] = g_quark_from_static_string("Settings");
-    MAIN_CATEGORIES[8] = g_quark_from_static_string("System");
-    MAIN_CATEGORIES[9] = g_quark_from_static_string("Utility");
-    qsort(MAIN_CATEGORIES, NUM_MAIN_CATEGORIES, sizeof(guint), obt_guint_cmp);
-}
-
 ObtLink* obt_link_from_ddfile(const gchar *path, ObtPaths *p,
                               const gchar *language,
                               const gchar *country,
@@ -104,8 +79,6 @@ ObtLink* obt_link_from_ddfile(const gchar *path, ObtPaths *p,
     GHashTable *groups, *keys;
     ObtDDParseGroup *g;
     ObtDDParseValue *v;
-
-    startup();
 
     /* parse the file, and get a hash table of the groups */
     groups = obt_ddparse_file(path, language, country, modifier);
@@ -209,29 +182,13 @@ ObtLink* obt_link_from_ddfile(const gchar *path, ObtPaths *p,
 
         if ((v = g_hash_table_lookup(keys, "Categories"))) {
             gulong i;
-            gchar *end;
-            gboolean found_main;
-            GQuark cat;
 
             link->d.app.categories = g_new(GQuark, v->value.strings.n);
             link->d.app.n_categories = v->value.strings.n;
 
-            found_main = FALSE;
             for (i = 0; i < v->value.strings.n; ++i) {
-                cat = link->d.app.categories[i] =
+                link->d.app.categories[i] =
                     g_quark_from_string(v->value.strings.a[i]);
-
-                if (!found_main) {
-                    BSEARCH_SETUP(guint);
-                    BSEARCH(guint, MAIN_CATEGORIES, 0, NUM_MAIN_CATEGORIES,
-                            cat);
-                    if (BSEARCH_FOUND()) {
-                        found_main = TRUE;
-                        link->d.app.main_category = cat;
-                    }
-                }
-
-                c = end = end+1; /* next */
             }
         }
 
@@ -285,14 +242,6 @@ ObtLinkType obt_link_type (ObtLink *e)
     g_return_val_if_fail(e != NULL, 0);
 
     return e->type;
-}
-
-GQuark obt_link_app_main_category          (ObtLink *e)
-{
-    g_return_val_if_fail(e != NULL, 0);
-    g_return_val_if_fail(e->type == OBT_LINK_TYPE_APPLICATION, 0);
-
-    return e->d.app.main_category;
 }
 
 const GQuark* obt_link_app_categories(ObtLink *e, gulong *n)

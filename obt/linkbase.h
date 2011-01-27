@@ -25,9 +25,19 @@ struct _ObtPaths;
 
 G_BEGIN_DECLS
 
+struct _ObtLink;
+
 typedef struct _ObtLinkBase ObtLinkBase;
 
-typedef void (*ObtLinkBaseUpdateFunc)(ObtLinkBase *lb, gpointer data);
+typedef enum {
+    OBT_LINKBASE_ADDED,
+    OBT_LINKBASE_REMOVED,
+} ObtLinkBaseUpdateType;
+
+typedef void (*ObtLinkBaseUpdateFunc)(ObtLinkBase *lb,
+                                      ObtLinkBaseUpdateType type,
+                                      struct _ObtLink *link,
+                                      gpointer data);
 
 /*! Create a new database of ObtLinks.
   @param paths An ObtPaths structure.
@@ -42,6 +52,9 @@ void obt_linkbase_unref(ObtLinkBase *lb);
 
 void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
                                   gpointer data);
+
+/*! Returns a list of all known ObtLink* which belong in the given category. */
+GSList *obt_linkbase_category(ObtLinkBase *lb, GQuark category);
 
 G_END_DECLS
 

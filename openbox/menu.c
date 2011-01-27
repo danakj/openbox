@@ -385,6 +385,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     self->shortcut = parse_shortcut(title, allow_shortcut_selection,
                                     &self->title, &self->shortcut_position,
                                     &self->shortcut_always_show);
+    self->collate_key = g_utf8_collate_key(self->title, -1);
 
     g_hash_table_replace(menu_hash, self->name, self);
 
@@ -400,6 +401,7 @@ ObMenu* menu_new(const gchar *name, const gchar *title,
     self->more_menu = g_slice_new0(ObMenu);
     self->more_menu->name = _("More...");
     self->more_menu->title = _("More...");
+    self->more_menu->collate_key = "\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff";
     self->more_menu->data = data;
     self->more_menu->shortcut = g_unichar_tolower(g_utf8_get_char("M"));
 
@@ -426,6 +428,7 @@ static void menu_destroy_hash_value(ObMenu *self)
     menu_clear_entries(self);
     g_free(self->name);
     g_free(self->title);
+    g_free(self->collate_key);
     g_free(self->execute);
     g_slice_free(ObMenu, self->more_menu);
 
@@ -541,6 +544,7 @@ void menu_entry_unref(ObMenuEntry *self)
         case OB_MENU_ENTRY_TYPE_NORMAL:
             RrImageUnref(self->data.normal.icon);
             g_free(self->data.normal.label);
+            g_free(self->data.normal.collate_key);
             while (self->data.normal.actions) {
                 actions_act_unref(self->data.normal.actions->data);
                 self->data.normal.actions =
@@ -714,10 +718,13 @@ void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
         break;
     case OB_MENU_ENTRY_TYPE_NORMAL:
         g_free(self->data.normal.label);
+        g_free(self->data.normal.collate_key);
         self->data.normal.shortcut =
             parse_shortcut(label, allow_shortcut, &self->data.normal.label,
                            &self->data.normal.shortcut_position,
                            &self->data.normal.shortcut_always_show);
+        self->data.normal.collate_key =
+            g_utf8_collate_key(self->data.normal.label, -1);
         break;
     default:
         g_assert_not_reached();
@@ -727,4 +734,70 @@ void menu_entry_set_label(ObMenuEntry *self, const gchar *label,
 void menu_show_all_shortcuts(ObMenu *self, gboolean show)
 {
     self->show_all_shortcuts = show;
+}
+
+static int sort_func(const void *a, const void *b) {
+    const ObMenuEntry *e[2] = {*(ObMenuEntry**)a, *(ObMenuEntry**)b};
+    const gchar *k[2];
+    gint i;
+
+    for (i = 0; i < 2; ++i) {
+        if (e[i]->type == OB_MENU_ENTRY_TYPE_NORMAL)
+            k[i] = e[i]->data.normal.collate_key;
+        else {
+            g_assert(e[i]->type == OB_MENU_ENTRY_TYPE_SUBMENU);
+            if (e[i]->data.submenu.submenu)
+                k[i] = e[i]->data.submenu.submenu->collate_key;
+            else
+                return -1; /* arbitrary really.. the submenu doesn't exist. */
+        }
+    }
+    return strcmp(k[0], k[1]);
+}
+
+/*!
+  @param start The first entry in the range to sort.
+  @param end The last entry in the range to sort.
+*/
+static void sort_range(ObMenu *self, GList *start, GList *end, guint len)
+{
+    ObMenuEntry **ar;
+    GList *it;
+    guint i;
+    if (!len) return;
+
+    ar = g_slice_alloc(sizeof(ObMenuEntry*) * len);
+    for (i = 0, it = start; it != g_list_next(end); ++i, it = g_list_next(it))
+        ar[i] = it->data;
+    qsort(ar, len, sizeof(ObMenuEntry*), sort_func);
+    for (i = 0, it = start; it != g_list_next(end); ++i, it = g_list_next(it))
+        it->data = ar[i];
+    g_slice_free1(sizeof(ObMenuEntry*) * len, ar);
+}
+
+void menu_sort_entries(ObMenu *self)
+{
+    GList *it, *start, *end, *last;
+    guint len;
+
+    /* need the submenus to know their labels for sorting */
+    menu_find_submenus(self);
+
+    start = self->entries;
+    len = 0;
+    for (it = self->entries; it; it = g_list_next(it)) {
+        ObMenuEntry *e = it->data;
+        if (e->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
+            end = g_list_previous(it);
+            sort_range(self, start, end, len);
+
+            it = g_list_next(it); /* skip over the separator */
+            start = it;
+            len = 0;
+        }
+        else
+            len += 1;
+        last = it;
+    }
+    sort_range(self, start, last, len);
 }

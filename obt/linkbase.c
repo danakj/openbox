@@ -176,6 +176,10 @@ static void update(ObtWatch *w, const gchar *base_path,
 
             ObtLink *link = it->data;
 
+            if (self->update_func)
+                self->update_func(
+                    self, OBT_LINKBASE_REMOVED, link, self->update_data);
+
             if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
                 const GQuark *cats;
                 gulong i, n;
@@ -207,6 +211,10 @@ static void update(ObtWatch *w, const gchar *base_path,
                it did not want to be displayed */
 
             ObtLink *link = it->data;
+
+            if (self->update_func)
+                self->update_func(
+                    self, OBT_LINKBASE_REMOVED, link, self->update_data);
 
             if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
                 const GQuark *cats;
@@ -252,6 +260,11 @@ static void update(ObtWatch *w, const gchar *base_path,
                 ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
                 e->priority = *priority;
                 e->link = link;
+
+                if (self->update_func)
+                    self->update_func(
+                        self, OBT_LINKBASE_ADDED, link, self->update_data);
+
                 list = g_slist_insert_before(list, it, e);
 
                 /* this will free 'id' */
@@ -271,9 +284,6 @@ static void update(ObtWatch *w, const gchar *base_path,
     }
 
     g_free(id);
-
-    if (self->update_func)
-        self->update_func(self, self->update_data);
 }
 
 ObtLinkBase* obt_linkbase_new(ObtPaths *paths, const gchar *locale,
@@ -394,4 +404,13 @@ void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
 {
     lb->update_func = func;
     lb->update_data = data;
+}
+
+GSList *obt_linkbase_category(ObtLinkBase *lb, GQuark category)
+{
+    ObtLinkBaseCategory *cat;
+
+    cat = g_hash_table_lookup(lb->categories, &category);
+    if (!cat) return NULL;
+    else      return cat->links;
 }

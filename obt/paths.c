@@ -335,7 +335,7 @@ static inline gboolean try_exec(const ObtPaths *const p,
                                 const gchar *const path)
 {
     struct stat st;
-    BSEARCH_SETUP(guint);
+    BSEARCH_SETUP();
 
     if (stat(path, &st) != 0)
         return FALSE;

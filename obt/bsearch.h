@@ -23,13 +23,22 @@
 
 G_BEGIN_DECLS
 
-/*! Setup to do a binary search on an array holding elements of type @t */
-#define BSEARCH_SETUP(t) \
-    register t l_BSEARCH, r_BSEARCH, out_BSEARCH;
+/*! Setup to do a binary search on an array. */
+#define BSEARCH_SETUP() \
+    register guint l_BSEARCH, r_BSEARCH, out_BSEARCH;
+
+/*! Helper macro that just returns the input */
+#define BSEARCH_IS_T(t) (t)
 
 /*! Search an array @ar holding elements of type @t, starting at index @start,
   with @size elements, looking for value @val. */
-#define BSEARCH(t, ar, start, size, val)         \
+#define BSEARCH(t, ar, start, size, val) \
+    BSEARCH_CMP(t, ar, start, size, val, BSEARCH_IS_T)
+
+/*! Search an array @ar, starting at index @start,
+  with @size elements, looking for value @val of type @t,
+  using the macro @to_t to convert values in the arrau @ar to type @t.*/
+#define BSEARCH_CMP(t, ar, start, size, val, to_t)  \
 { \
     l_BSEARCH = (start);              \
     r_BSEARCH = (start)+(size)-1;     \
@@ -37,10 +46,10 @@ G_BEGIN_DECLS
         /* m is in the middle, but to the left if there's an even number \
            of elements */ \
         out_BSEARCH = l_BSEARCH + (r_BSEARCH - l_BSEARCH)/2;      \
-        if ((val) == (ar)[out_BSEARCH]) {                           \
+        if ((val) == to_t((ar)[out_BSEARCH])) {             \
             break; \
         } \
-        else if ((val) < (ar)[out_BSEARCH] && out_BSEARCH > 0) {     \
+        else if ((val) < to_t((ar)[out_BSEARCH]) && out_BSEARCH > 0) {   \
             r_BSEARCH = out_BSEARCH-1; /* search to the left side */ \
         } \
         else \

@@ -59,6 +59,7 @@ struct _ObMenu
     gchar *name;
     /* Displayed title */
     gchar *title;
+    gchar *collate_key;
     /*! The shortcut key that would be used to activate this menu if it was
       displayed as a submenu */
     gunichar shortcut;
@@ -108,6 +109,7 @@ struct _ObNormalMenuEntry {
     gint     icon_alpha;
 
     gchar *label;
+    gchar *collate_key;
     /*! The shortcut key that would be used to activate this menu entry */
     gunichar shortcut;
     /*! The shortcut's position in the string */
@@ -211,7 +213,10 @@ ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
 ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
 ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
 
-void menu_clear_entries(ObMenu *menu);
+/*! This sorts groups of menu entries between consecutive separators */
+void menu_sort_entries(ObMenu *self);
+
+void menu_clear_entries(ObMenu *self);
 void menu_entry_remove(ObMenuEntry *self);
 
 void menu_entry_set_label(ObMenuEntry *self, const gchar *label,

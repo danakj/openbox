@@ -63,7 +63,7 @@ typedef enum {
 typedef struct _ObtLink     ObtLink;
 
 /*! Parse a .desktop (dd) file.
-  @param path The full path to the .desktop file.
+  @param path The full path to the .desktop file, encoded in UTF-8.
   @param o An ObtPaths structure, which contains the executable paths.
 */
 ObtLink* obt_link_from_ddfile(const gchar *path,
@@ -130,6 +130,14 @@ ObtLinkAppOpen obt_link_app_open(ObtLink *e);
 
 ObtLinkAppStartup obt_link_app_startup_notify(ObtLink *e);
 const gchar* obt_link_app_startup_wmclass(ObtLink *e);
+
+/*! Compares two ObtLink objects.
+  @param a An ObtLink** (pointer to a pointer)
+  @param b An ObtLink** (pointer to a pointer)
+  @return Returns 0 if their names are the same, a number < 0 if a has a name
+    which comes first, and a number > 0 if b has a name which comes first.
+*/
+int obt_link_cmp_by_name(const void *a, const void *b);
 
 
 G_END_DECLS

@@ -30,10 +30,12 @@
 struct _ObtLink {
     guint ref;
 
-    gchar *path; /*!< The path to the file where the link came from */
+    gchar *path; /*!< The path to the file where the link came from.
+                   Encoded in UTF-8. */
 
     ObtLinkType type;
     gchar *name; /*!< Specific name for the object (eg Firefox) */
+    gchar *collate_key; /*!< Internal key for sorting by name. */
     gboolean display; /*<! When false, do not display this link in menus or
                            launchers, etc */
     gboolean deleted; /*<! When true, the Link could exist but is deleted
@@ -48,8 +50,10 @@ struct _ObtLink {
 
     union _ObtLinkData {
         struct _ObtLinkApp {
-            gchar *exec; /*!< Executable to run for the app */
-            gchar *wdir; /*!< Working dir to run the app in */
+            gchar *exec; /*!< Executable to run for the app.
+                           Encoded in UTF-8. */
+            gchar *wdir; /*!< Working dir to run the app in.
+                           Encoded in UTF-8. */
             gboolean term; /*!< Run the app in a terminal or not */
             ObtLinkAppOpen open;
 
@@ -99,6 +103,11 @@ ObtLink* obt_link_from_ddfile(const gchar *path, ObtPaths *p,
     v = g_hash_table_lookup(keys, "Type");
     g_assert(v);
     link->type = v->value.enumerable;
+
+    v = g_hash_table_lookup(keys, "Name");
+    g_assert(v);
+    link->name = v->value.string, v->value.string = NULL; /* steal it */
+    link->collate_key = g_utf8_collate_key(link->name, -1);
 
     if ((v = g_hash_table_lookup(keys, "Hidden")))
         link->deleted = v->value.boolean;
@@ -221,6 +230,7 @@ void obt_link_unref(ObtLink *dd)
 {
     if (--dd->ref < 1) {
         g_free(dd->name);
+        g_free(dd->collate_key);
         g_free(dd->generic);
         g_free(dd->comment);
         g_free(dd->icon);
@@ -264,6 +274,21 @@ gchar* obt_link_id_from_ddfile(const gchar *filename)
     return obt_ddparse_file_to_id(filename);
 }
 
+const gchar* obt_link_name(ObtLink *e)
+{
+    return e->name;
+}
+
+const gchar* obt_link_generic_name(ObtLink *e)
+{
+    return e->generic;
+}
+
+const gchar* obt_link_comment(ObtLink *e)
+{
+    return e->comment;
+}
+
 gboolean obt_link_display(ObtLink *e, const guint environments)
 {
     return
@@ -275,4 +300,13 @@ gboolean obt_link_display(ObtLink *e, const guint environments)
         /* display if no environment is restricted, or we do not match any of
            the restrictions */
         (!e->env_restricted || !(e->env_restricted & environments));
+}
+
+int obt_link_cmp_by_name(const void *a, const void *b)
+{
+    const ObtLink *const la = *(ObtLink**)a, *const lb = *(ObtLink**)b;
+    int r = strcmp(la->collate_key, lb->collate_key);
+    if (r) return r;
+    /* fallback to differentiating on the path */
+    return strcmp(la->path, lb->path);
 }

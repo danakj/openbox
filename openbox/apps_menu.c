@@ -23,6 +23,7 @@
 #include "apps_menu.h"
 #include "config.h"
 #include "gettext.h"
+#include "obt/bsearch.h"
 #include "obt/linkbase.h"
 #include "obt/link.h"
 #include "obt/paths.h"
@@ -34,9 +35,21 @@
 typedef struct _ObAppsMenuCategory ObAppsMenuCategory;
 
 struct _ObAppsMenuCategory {
+    /*! The quark for the internal name of the category, eg. AudioVideo. These
+      come from the XDG menu specification. */
     GQuark q;
-    gchar *friendly;
-    ObMenu *m;
+    /*! The user-visible (translated) name for the category. */
+    const gchar *friendly;
+    /*! The string identifier of the menu */
+    gchar *menu_name;
+    /*! The submenu for this category.  Its label will be "apps-menu-<category>
+      where <category> is the internal name of the category referred to by q.
+    */
+    ObMenu *menu;
+    /*! The menu entry in the apps menu for this. */
+    ObMenuEntry *entry;
+    /*! */
+    GPtrArray *links;
 };
 
 static ObMenu *apps_menu;
@@ -56,72 +69,188 @@ static void self_destroy(ObMenu *menu, gpointer data)
 
 static gboolean self_update(ObMenuFrame *frame, gpointer data)
 {
-    ObMenu *menu = frame->menu;
-    ObMenuEntry *e;
     guint i;
-
-    g_print("UPDATE DIRTY %d\n", dirty);
+    gboolean sort;
 
     if (!dirty) return TRUE;  /* nothing has changed to be updated */
 
-    menu_clear_entries(menu);
-
+    sort = FALSE;
     for (i = 0; i < n_categories; ++i) {
-        menu_free(categories[i].m);
-        categories[i].m = NULL;
+        ObAppsMenuCategory *cat = &categories[i];
+        GList *it, *entries;
+        guint j;
+        gboolean sort_submenu;
+
+        sort_submenu = FALSE; /* sort the category's submenu? */
+
+        /* add/remove categories from the main apps menu if they were/are
+           empty. */
+        if (cat->links->len == 0) {
+            if (cat->entry) {
+                menu_entry_remove(cat->entry);
+                cat->entry = NULL;
+            }
+        }
+        else if (!cat->entry) {
+            cat->entry = menu_add_submenu(apps_menu, 0, cat->menu_name);
+            sort = TRUE;
+        }
+
+        /* add/remove links from this category. */
+        entries = g_list_copy(cat->menu->entries);
+        it = entries; /* iterates through the entries list */
+        j = 0; /* iterates through the valid ObtLinks list */
+        while (j < cat->links->len) {
+            ObtLink *m, *l;
+            int r;
+
+            /* get the next link from the menu */
+            if (it)
+                m = ((ObMenuEntry*)it->data)->data.normal.data;
+            else
+                m = NULL;
+            /* get the next link from our list */
+            l = g_ptr_array_index(cat->links, j);
+
+            if (it && m == NULL) {
+                /* the entry was removed from the linkbase and nulled here, so
+                   drop it from the menu */
+                menu_entry_remove(it->data);
+                r = 0;
+            }
+            else {
+                if (it)
+                    r = obt_link_cmp_by_name(&m, &l);
+                else
+                    /* we reached the end of the menu, but there's more in
+                       the list, so just add it */
+                    r = 1;
+
+                if (r > 0) {
+                    /* the menu progressed faster than the list, the list has
+                       something it doesn't, so add that */
+                    ObMenuEntry *e;
+                    e = menu_add_normal(
+                        cat->menu, 0, obt_link_name(l), NULL, FALSE);
+                    e->data.normal.data = l; /* save the link in the entry */
+                    sort_submenu = TRUE;
+                }
+                else
+                    /* if r < 0 then we didn't null something that was removed
+                       from the list */
+                    g_assert(r == 0);
+            }
+
+            if (r == 0 && it)
+                /* if we added something to the menu, then don't move
+                   forward in the menu, as we were inserting something before
+                   this entry */
+                it = g_list_next(it);
+            ++j;
+        }
+
+        if (sort_submenu)
+            menu_sort_entries(cat->menu);
     }
 
-
-    for (i = 0; i < n_categories; ++i) {
-        // XXX if not empty
-        ObAppsMenuCategory *cat = sorted_categories[i];
-        const gchar *label = g_quark_to_string(cat->q);
-        if (!cat->m)
-            cat->m = menu_new(label, cat->friendly, FALSE, NULL);
-        e = menu_add_submenu(menu, i, label);
+    if (sort) {
+        menu_sort_entries(apps_menu);
     }
-/*
-    menu_add_separator(menu, SEPARATOR, screen_desktop_names[desktop]);
-
-    gchar *title = g_strdup_printf("(%s)", c->icon_title);
-    e = menu_add_normal(menu, desktop, title, NULL, FALSE);
-    g_free(title);
-
-    if (config_menu_show_icons) {
-        e->data.normal.icon = client_icon(c);
-        RrImageRef(e->data.normal.icon);
-        e->data.normal.icon_alpha =
-            c->iconic ? OB_ICONIC_ALPHA : 0xff;
-    }
-
-    e->data.normal.data = link;
-*/
-
 
     dirty = FALSE;
     return TRUE; /* always show the menu */
 }
 
-static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
-                         ObClient *c, guint state, gpointer data)
+static gboolean add_link_to_category(ObtLink *link, ObAppsMenuCategory *cat)
 {
-#if 0
-    ObClient *t = self->data.normal.data;
-    if (t) { /* it's set to NULL if its destroyed */
-        gboolean here = state & ShiftMask;
+    guint i;
+    gboolean add;
 
-        client_activate(t, TRUE, here, TRUE, TRUE, TRUE);
-        /* if the window is omnipresent then we need to go to its
-           desktop */
-        if (!here && t->desktop == DESKTOP_ALL)
-            screen_set_desktop(self->id, FALSE);
+    /* check for link in our existing list */
+    add = TRUE;
+    for (i = 0; i < cat->links->len; ++i) {
+        ObtLink *l = g_ptr_array_index(cat->links, i);
+        if (l == link) {
+            add = FALSE;
+            break;
+        }
     }
-#endif
+
+    if (add) { /* wasn't found in our list already */
+        g_ptr_array_add(cat->links, link);
+        obt_link_ref(link);
+
+        dirty = TRUE; /* never set dirty to FALSE here.. */
+    }
+    return add;
 }
 
-static void linkbase_update(ObtLinkBase *lb, gpointer data)
+static gboolean remove_link_from_category(ObtLink *link,
+                                          ObAppsMenuCategory *cat)
 {
-    dirty = TRUE;
+    gboolean rm;
+
+    rm = g_ptr_array_remove(cat->links, link);
+
+    if (rm) {
+        GList *it;
+
+        dirty = TRUE; /* never set dirty to FALSE here.. */
+
+        /* set the data inside any visible menus for this link to NULL since it
+           stops existing now */
+        for (it = menu_frame_visible; it; it = g_list_next(it)) {
+            ObMenuFrame *frame = it->data;
+            if (frame->menu == cat->menu) {
+                GList *eit;
+
+                for (eit = frame->entries; eit; eit = g_list_next(eit)) {
+                    ObMenuEntryFrame *e = it->data;
+                    /* our submenus only contain normal entries */
+                    if (e->entry->data.normal.data == link) {
+                        /* this menu entry points to this link, but the
+                           link is going away, so point it at NULL. */
+                        e->entry->data.normal.data = NULL;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+    return rm;
+}
+
+static void linkbase_update(ObtLinkBase *lb, ObtLinkBaseUpdateType type,
+                            ObtLink *link, gpointer data)
+{
+    const GQuark *cats;
+    gulong n_cats, i;
+
+    if (obt_link_type(link) != OBT_LINK_TYPE_APPLICATION)
+        return;  /* not in our menu */
+
+    /* For each category in the link, search our list of categories and
+       if we are showing that category in the menu, add the link to it (or
+       remove the link from it). */
+    cats = obt_link_app_categories(link, &n_cats);
+    for (i = 0; i < n_cats; ++i) {
+        BSEARCH_SETUP();
+
+#define CAT_TO_INT(c) (c.q)
+        BSEARCH_CMP(ObAppsMenuCategory, categories, 0, n_categories,
+                    cats[i], CAT_TO_INT);
+#undef  CAT_TO_INT
+
+        if (BSEARCH_FOUND()) {
+            if (type == OBT_LINKBASE_ADDED) {
+                add_link_to_category(link, &categories[BSEARCH_AT()]);
+                g_ptr_array_sort(categories[i].links, obt_link_cmp_by_name);
+            }
+            else
+                remove_link_from_category(link, &categories[BSEARCH_AT()]);
+        }
+    }
 }
 
 static int cat_cmp(const void *a, const void *b)
@@ -149,46 +278,69 @@ void apps_menu_startup(gboolean reconfig)
         obt_paths_unref(paths);
         obt_linkbase_set_update_func(linkbase, linkbase_update, NULL);
 
-        dirty = TRUE;
+        dirty = FALSE;
 
         /* From http://standards.freedesktop.org/menu-spec/latest/apa.html */
-        n_categories = 10;
-        categories = g_new0(ObAppsMenuCategory, n_categories);
-        sorted_categories = g_new(ObAppsMenuCategory*, n_categories);
+        {
+            struct {
+                const gchar *name;
+                const gchar *friendly;
+            } const cats[] = {
+                { "AudioVideo", "Sound & Video" },
+                { "Development", "Programming" },
+                { "Education", "Education" },
+                { "Game", "Games" },
+                { "Graphics", "Graphics" },
+                { "Network", "Internet" },
+                { "Office", "Office" },
+                { "Settings", "Settings" },
+                { "System", "System" },
+                { "Utility", "Accessories" },
+                { NULL, NULL }
+            };
+            guint i;
 
-        categories[0].q = g_quark_from_static_string("AudioVideo");
-        categories[0].friendly = _("Sound & Video");
-        categories[1].q = g_quark_from_static_string("Development");
-        categories[1].friendly = _("Programming");
-        categories[2].q = g_quark_from_static_string("Education");
-        categories[2].friendly = _("Education");
-        categories[3].q = g_quark_from_static_string("Game");
-        categories[3].friendly = _("Games");
-        categories[4].q = g_quark_from_static_string("Graphics");
-        categories[4].friendly = _("Graphics");
-        categories[5].q = g_quark_from_static_string("Network");
-        categories[5].friendly = _("Internet");
-        categories[6].q = g_quark_from_static_string("Office");
-        categories[6].friendly = _("Office");
-        categories[7].q = g_quark_from_static_string("Settings");
-        categories[7].friendly = _("Settings");
-        categories[8].q = g_quark_from_static_string("System");
-        categories[8].friendly = _("System");
-        categories[9].q = g_quark_from_static_string("Utility");
-        categories[9].friendly = _("Utility");
-        /* Sort them by their quark values */
+            for (i = 0; cats[i].name; ++i); /* count them */
+            n_categories = i;
+
+            categories = g_new0(ObAppsMenuCategory, n_categories);
+            sorted_categories = g_new(ObAppsMenuCategory*, n_categories);
+
+            for (i = 0; cats[i].name; ++i) {
+                categories[i].q = g_quark_from_static_string(cats[i].name);
+                categories[i].friendly = _(cats[i].friendly);
+                categories[i].menu_name = g_strdup_printf(
+                    "%s-%s", MENU_NAME, cats[i].name);
+                categories[i].menu = menu_new(categories[i].menu_name,
+                                              categories[i].friendly, FALSE,
+                                              &categories[i]);
+                categories[i].links = g_ptr_array_new_with_free_func(
+                    (GDestroyNotify)obt_link_unref);
+            }
+        }
+        /* Sort the categories by their quark values so we can binary search */
         qsort(categories, n_categories, sizeof(ObAppsMenuCategory), cat_cmp);
 
         for (i = 0; i < n_categories; ++i)
             sorted_categories[i] = &categories[i];
         qsort(sorted_categories, n_categories, sizeof(void*),
               cat_friendly_cmp);
+
+        /* add all the existing links */
+        for (i = 0; i < n_categories; ++i) {
+            GSList *links, *it;
+
+            links = obt_linkbase_category(linkbase, categories[i].q);
+            for (it = links; it; it = g_slist_next(it))
+                add_link_to_category(it->data, &categories[i]);
+
+            g_ptr_array_sort(categories[i].links, obt_link_cmp_by_name);
+        }
     }
 
-    apps_menu = menu_new(MENU_NAME, _("Applications"), TRUE, NULL);
+    apps_menu = menu_new(MENU_NAME, _("Applications"), FALSE, NULL);
     menu_set_update_func(apps_menu, self_update);
     menu_set_destroy_func(apps_menu, self_destroy);
-    menu_set_execute_func(apps_menu, menu_execute);
 }
 
 void apps_menu_shutdown(gboolean reconfig)
@@ -199,9 +351,12 @@ void apps_menu_shutdown(gboolean reconfig)
         obt_linkbase_unref(linkbase);
         linkbase = NULL;
 
-        for (i = 0; i < n_categories; ++i)
-            if (categories[i].m)
-                menu_free(categories[i].m);
+        for (i = 0; i < n_categories; ++i) {
+
+            menu_free(categories[i].menu);
+            g_free(categories[i].menu_name);
+            g_ptr_array_unref(categories[i].links);
+        }
         g_free(categories);
         categories = NULL;
         g_free(sorted_categories);

@@ -854,6 +854,7 @@ GHashTable* obt_ddparse_file(const gchar *filename,
     ObtDDParseGroup *desktop_entry;
     FILE *f;
     gboolean success;
+    gchar *fs_filename;
 
     if (!g_utf8_validate(filename, -1, NULL)) {
         g_warning("Filename contains bad utf8: %s", filename);
@@ -877,7 +878,8 @@ GHashTable* obt_ddparse_file(const gchar *filename,
     g_hash_table_insert(parse.group_hash, desktop_entry->name, desktop_entry);
 
     success = FALSE;
-    if ((f = fopen(parse.filename, "r"))) {
+    fs_filename = g_filename_from_utf8(filename, -1, NULL, NULL, NULL);
+    if ((f = fopen(fs_filename, "r"))) {
         parse.lineno = 1;
         parse.flags = 0;
         if ((success = parse_file(f, &parse))) {
@@ -906,6 +908,7 @@ GHashTable* obt_ddparse_file(const gchar *filename,
         }
         fclose(f);
     }
+    g_free(fs_filename);
     if (!success) {
         g_hash_table_destroy(parse.group_hash);
         parse.group_hash = NULL;

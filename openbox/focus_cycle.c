@@ -93,7 +93,8 @@ void focus_cycle_reorder()
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
             focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-                        TRUE, TRUE, TRUE, TRUE, TRUE);
+                        TRUE, TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
+                        TRUE, TRUE);
     }
 }
 

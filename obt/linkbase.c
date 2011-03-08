@@ -189,8 +189,8 @@ static void update(ObtWatch *w, const gchar *base_path,
                     category_remove(self, cats[i], link);
             }
 
-            list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
+            list = g_slist_delete_link(list, it);
 
             if (list) {
                 /* this will free 'id' */
@@ -225,8 +225,8 @@ static void update(ObtWatch *w, const gchar *base_path,
                     category_remove(self, cats[i], link);
             }
 
-            list = g_slist_delete_link(list, it);
             base_entry_free(it->data);
+            list = g_slist_delete_link(list, it);
             /* this will put the modified list into the hash table */
             add = TRUE;
         }

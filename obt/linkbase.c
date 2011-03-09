@@ -54,7 +54,7 @@ struct _ObtLinkBase {
 
     ObtPaths *paths;
     ObtWatch *watch;
-    /*! This holds a GSList of ObtLinkBaseEntrys sorted by priority in
+    /*! This holds a GList of ObtLinkBaseEntrys sorted by priority in
       increasing order (by precedence in decreasing order). */
     GHashTable *base;
     /*! This holds the paths in which we look for links, and the data is an
@@ -80,18 +80,18 @@ static void base_entry_free(ObtLinkBaseEntry *e)
 
 static void base_entry_list_free(gpointer key, gpointer value, gpointer data)
 {
-    GSList *it, *list; (void)key; (void)data;
+    GList *it, *list; (void)key; (void)data;
 
     list = value;
-    for (it = list; it; it = g_slist_next(it))
+    for (it = list; it; it = g_list_next(it))
         base_entry_free(it->data);
-    g_slist_free(list);
+    g_list_free(list);
 }
 
-static GSList* find_base_entry_path(GSList *list, const gchar *full_path)
+static GList* find_base_entry_path(GList *list, const gchar *full_path)
 {
-    GSList *it;
-    for (it = list; it; it = g_slist_next(it)) {
+    GList *it;
+    for (it = list; it; it = g_list_next(it)) {
         ObtLinkBaseEntry *e = it->data;
         if (strcmp(obt_link_source_file(e->link), full_path) == 0)
             break;
@@ -100,10 +100,10 @@ static GSList* find_base_entry_path(GSList *list, const gchar *full_path)
 }
 
 /*! Finds the first entry in the list with a priority number >= @priority. */
-static GSList* find_base_entry_priority(GSList *list, gint priority)
+static GList* find_base_entry_priority(GList *list, gint priority)
 {
-    GSList *it;
-    for (it = list; it; it = g_slist_next(it)) {
+    GList *it;
+    for (it = list; it; it = g_list_next(it)) {
         ObtLinkBaseEntry *e = it->data;
         if (e->priority >= priority)
             break;
@@ -140,6 +140,30 @@ static void category_remove(ObtLinkBase *lb, GQuark cat, ObtLink *link)
         g_hash_table_remove(lb->categories, &cat);
 }
 
+static void category_add_app(ObtLinkBase *lb, ObtLink *link)
+{
+    if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
+        const GQuark *cats;
+        gulong i, n;
+
+        cats = obt_link_app_categories(link, &n);
+        for (i = 0; i < n; ++i)
+            category_add(lb, cats[i], link);
+    }
+}
+
+static void category_remove_app(ObtLinkBase *lb, ObtLink *link)
+{
+    if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
+        const GQuark *cats;
+        gulong i, n;
+
+        cats = obt_link_app_categories(link, &n);
+        for (i = 0; i < n; ++i)
+            category_remove(lb, cats[i], link);
+    }
+}
+
 static void category_free(ObtLinkBaseCategory *lc)
 {
     g_slist_free(lc->links);
@@ -154,10 +178,14 @@ static void update(ObtWatch *w, const gchar *base_path,
                    gpointer data)
 {
     ObtLinkBase *self = data;
+    ObtLinkBaseEntry *add = NULL;
+    ObtLinkBaseEntry *remove = NULL;
+    ObtLinkBaseEntry *show, *hide;
+    ObtLink *link;
     gchar *id;
-    GSList *list, *it;
+    GList *list, *it;
+    GList *remove_it = NULL;
     gint *priority;
-    gboolean add = FALSE;
 
     if (!g_str_has_suffix(sub_path, ".desktop"))
         return; /* ignore non-.desktop files */
@@ -168,121 +196,99 @@ static void update(ObtWatch *w, const gchar *base_path,
     switch (type) {
     case OBT_WATCH_SELF_REMOVED:
         break;
-    case OBT_WATCH_REMOVED:
-        it = find_base_entry_path(list, full_path);
-        if (it) {
-            /* it may be false if the link was skipped during the add because
-               it did not want to be displayed */
-
-            ObtLink *link = it->data;
-
-            if (self->update_func)
-                self->update_func(
-                    self, OBT_LINKBASE_REMOVED, link, self->update_data);
-
-            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
-                const GQuark *cats;
-                gulong i, n;
-
-                cats = obt_link_app_categories(link, &n);
-                for (i = 0; i < n; ++i)
-                    category_remove(self, cats[i], link);
-            }
-
-            base_entry_free(it->data);
-            list = g_slist_delete_link(list, it);
-
-            if (list) {
-                /* this will free 'id' */
-                g_hash_table_insert(self->base, id, list);
-                id = NULL;
-            }
-            else {
-                /* the value is already freed by deleting it above so we don't
-                   need to free it here. id will still need to be freed tho. */
-                g_hash_table_remove(self->base, id);
-            }
-        }
-        break;
-    case OBT_WATCH_MODIFIED:
-        it = find_base_entry_path(list, full_path);
-        if (it) {
-            /* it may be false if the link was skipped during the add because
-               it did not want to be displayed */
-
-            ObtLink *link = it->data;
-
-            if (self->update_func)
-                self->update_func(
-                    self, OBT_LINKBASE_REMOVED, link, self->update_data);
-
-            if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
-                const GQuark *cats;
-                gulong i, n;
-
-                cats = obt_link_app_categories(link, &n);
-                for (i = 0; i < n; ++i)
-                    category_remove(self, cats[i], link);
-            }
-
-            base_entry_free(it->data);
-            list = g_slist_delete_link(list, it);
-            /* this will put the modified list into the hash table */
-            add = TRUE;
-        }
-        break;
     case OBT_WATCH_ADDED:
         priority = g_hash_table_lookup(self->path_to_priority, base_path);
-        add = TRUE;
 
-        /* find the first position in the list with a higher priority value */
-        if ((it = find_base_entry_priority(list, *priority))) {
-            const ObtLinkBaseEntry *e = it->data;
+        /* make sure an entry doesn't already exist from the same
+           @base_path */
+        it = find_base_entry_priority(list, *priority);
+        if (it) {
+            ObtLinkBaseEntry *e = it->data;
             if (e->priority == *priority) {
-                /* already exists */
-                add = FALSE;
+                break;
             }
         }
-        break;
-    }
-
-    if (add) {
-        ObtLink *link;
-
+    case OBT_WATCH_MODIFIED:
         link = obt_link_from_ddfile(full_path, self->paths,
                                     self->language, self->country,
                                     self->modifier);
+        if (link && !obt_link_display(link, self->environments)) {
+            obt_link_unref(link);
+            link = NULL;
+        }
         if (link) {
-            if (!obt_link_display(link, self->environments)) {
-                obt_link_unref(link);
-            }
-            else {
-                ObtLinkBaseEntry *e = g_slice_new(ObtLinkBaseEntry);
-                e->priority = *priority;
-                e->link = link;
+            add = g_slice_new(ObtLinkBaseEntry);
+            add->priority = *priority;
+            add->link = link;
+        }
 
-                if (self->update_func)
-                    self->update_func(
-                        self, OBT_LINKBASE_ADDED, link, self->update_data);
+        if (type != OBT_WATCH_MODIFIED)
+            break;
+    case OBT_WATCH_REMOVED:
+        /* this may be NULL if the link was skipped during the add because
+           it did not want to be displayed */
+        remove_it = find_base_entry_path(list, full_path);
+        remove = remove_it ? remove_it->data : NULL;
+        break;
+    }
 
-                list = g_slist_insert_before(list, it, e);
+    /* figure out which entry should be shown (which will have highest
+       precedence) */
+    show = hide = NULL;
+    if (add) {
+        ObtLinkBaseEntry *first = list ? list->data : NULL;
 
-                /* this will free 'id' */
-                g_hash_table_insert(self->base, id, list);
-                id = NULL;
+        /* a greater priority means a lower precedence, so
+           the new one will replace the current front of the list */
+        if (!first || first->priority >= add->priority) {
+            show = add;
+            hide = first;
+        }
+    }
+    else if (remove) {
+        ObtLinkBaseEntry *first = list ? list->data : NULL;
 
-                if (obt_link_type(link) == OBT_LINK_TYPE_APPLICATION) {
-                    const GQuark *cats;
-                    gulong i, n;
-
-                    cats = obt_link_app_categories(link, &n);
-                    for (i = 0; i < n; ++i)
-                        category_add(self, cats[i], link);
-                }
-            }
+        if (first == remove) {
+            hide = first;
+            show = list->next ? list->next->data : NULL;
         }
     }
 
+    if (hide)
+        category_remove_app(self, hide->link);
+    if (show)
+        category_add_app(self, show->link);
+
+    if ((remove || add) && self->update_func) {
+        ObtLink *const a = show ? show->link : NULL;
+        ObtLink *const r = hide ? hide->link : NULL;
+        self->update_func(
+            self, r, a, self->update_data);
+    }
+
+    /* do the actual removal/addition to the base list for the @id */
+    if (remove_it) {
+        base_entry_free(remove_it->data);
+        list = g_list_delete_link(list, remove_it);
+    }
+    if (add) {
+        it = find_base_entry_priority(list, *priority);
+        list = g_list_insert_before(list, it, add);
+    }
+
+    if (remove || add) {
+        /* update the list in the hash table */
+        if (list) {
+            /* this will free 'id' */
+            g_hash_table_insert(self->base, id, list);
+            id = NULL;
+        }
+        else {
+            /* the value is already freed by deleting it above so we don't
+               need to free it here. id will still need to be freed tho. */
+            g_hash_table_steal(self->base, id);
+        }
+    }
     g_free(id);
 }
 

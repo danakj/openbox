@@ -29,14 +29,9 @@ struct _ObtLink;
 
 typedef struct _ObtLinkBase ObtLinkBase;
 
-typedef enum {
-    OBT_LINKBASE_ADDED,
-    OBT_LINKBASE_REMOVED,
-} ObtLinkBaseUpdateType;
-
 typedef void (*ObtLinkBaseUpdateFunc)(ObtLinkBase *lb,
-                                      ObtLinkBaseUpdateType type,
-                                      struct _ObtLink *link,
+                                      struct _ObtLink *removed,
+                                      struct _ObtLink *added,
                                       gpointer data);
 
 /*! Create a new database of ObtLinks.

@@ -221,36 +221,41 @@ static gboolean remove_link_from_category(ObtLink *link,
     return rm;
 }
 
-static void linkbase_update(ObtLinkBase *lb, ObtLinkBaseUpdateType type,
-                            ObtLink *link, gpointer data)
+static void linkbase_update(ObtLinkBase *lb, ObtLink *removed,
+                            ObtLink *added, gpointer data)
 {
     const GQuark *cats;
     gulong n_cats, i;
 
-    if (obt_link_type(link) != OBT_LINK_TYPE_APPLICATION)
-        return;  /* not in our menu */
-
     /* For each category in the link, search our list of categories and
        if we are showing that category in the menu, add the link to it (or
        remove the link from it). */
-    cats = obt_link_app_categories(link, &n_cats);
-    for (i = 0; i < n_cats; ++i) {
-        BSEARCH_SETUP();
 
 #define CAT_TO_INT(c) (c.q)
-        BSEARCH_CMP(ObAppsMenuCategory, categories, 0, n_categories,
+    if (removed) {
+        cats = obt_link_app_categories(removed, &n_cats);
+        for (i = 0; i < n_cats; ++i) {
+            BSEARCH_SETUP();
+            BSEARCH_CMP(ObAppsMenuCategory, categories, 0, n_categories,
                     cats[i], CAT_TO_INT);
-#undef  CAT_TO_INT
-
-        if (BSEARCH_FOUND()) {
-            if (type == OBT_LINKBASE_ADDED) {
-                add_link_to_category(link, &categories[BSEARCH_AT()]);
-                g_ptr_array_sort(categories[i].links, obt_link_cmp_by_name);
-            }
-            else
-                remove_link_from_category(link, &categories[BSEARCH_AT()]);
+            if (BSEARCH_FOUND())
+                remove_link_from_category(removed, &categories[BSEARCH_AT()]);
         }
     }
+
+    if (added) {
+        cats = obt_link_app_categories(added, &n_cats);
+        for (i = 0; i < n_cats; ++i) {
+            BSEARCH_SETUP();
+            BSEARCH_CMP(ObAppsMenuCategory, categories, 0, n_categories,
+                        cats[i], CAT_TO_INT);
+            if (BSEARCH_FOUND()) {
+                add_link_to_category(added, &categories[BSEARCH_AT()]);
+                g_ptr_array_sort(categories[i].links, obt_link_cmp_by_name);
+            }
+        }
+    }
+#undef  CAT_TO_INT
 }
 
 static int cat_cmp(const void *a, const void *b)

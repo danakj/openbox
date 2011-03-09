@@ -113,10 +113,17 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
             l = g_ptr_array_index(cat->links, j);
 
             if (it && m == NULL) {
+                GList *next = it->next;
+
                 /* the entry was removed from the linkbase and nulled here, so
                    drop it from the menu */
                 menu_entry_remove(it->data);
                 r = 0;
+
+                /* don't move forward in the category list, as we're removing
+                   something from the menu here, but do continue moving
+                   in the menu in a safe way. */
+                it = next;
             }
             else {
                 if (it)
@@ -139,14 +146,17 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
                     /* if r < 0 then we didn't null something that was removed
                        from the list */
                     g_assert(r == 0);
-            }
 
-            if (r == 0 && it)
-                /* if we added something to the menu, then don't move
-                   forward in the menu, as we were inserting something before
-                   this entry */
-                it = g_list_next(it);
-            ++j;
+                if (r == 0)
+                    /* if we did not add anything ot the menu, then move
+                       forward in the menu. otherwise, stay put as we inserted
+                       something just before this item, and want to compare
+                       it again. */
+                    it = g_list_next(it);
+                /* the category link was either found in the menu or added to
+                   it, so move to the next */
+                ++j;
+            }
         }
 
         if (sort_submenu)
@@ -197,24 +207,18 @@ static gboolean remove_link_from_category(ObtLink *link,
 
         dirty = TRUE; /* never set dirty to FALSE here.. */
 
-        /* set the data inside any visible menus for this link to NULL since it
-           stops existing now */
-        for (it = menu_frame_visible; it; it = g_list_next(it)) {
-            ObMenuFrame *frame = it->data;
-            if (frame->menu == cat->menu) {
-                GList *eit;
-
-                for (eit = frame->entries; eit; eit = g_list_next(eit)) {
-                    ObMenuEntryFrame *e = it->data;
-                    /* our submenus only contain normal entries */
-                    if (e->entry->data.normal.data == link) {
-                        /* this menu entry points to this link, but the
-                           link is going away, so point it at NULL. */
-                        e->entry->data.normal.data = NULL;
-                        break;
-                    }
+        /* set the data inside the category's menu for this link to NULL
+           since it stops existing now */
+        if (cat->menu) {
+            for (it = cat->menu->entries; it; it = g_list_next(it)) {
+                ObMenuEntry *e = it->data;
+                /* our submenus only contain normal entries */
+                if (e->data.normal.data == link) {
+                    /* this menu entry points to this link, but the
+                       link is going away, so point it at NULL. */
+                    e->data.normal.data = NULL;
+                    break;
                 }
-                break;
             }
         }
     }
@@ -251,7 +255,8 @@ static void linkbase_update(ObtLinkBase *lb, ObtLink *removed,
                         cats[i], CAT_TO_INT);
             if (BSEARCH_FOUND()) {
                 add_link_to_category(added, &categories[BSEARCH_AT()]);
-                g_ptr_array_sort(categories[i].links, obt_link_cmp_by_name);
+                g_ptr_array_sort(categories[BSEARCH_AT()].links,
+                                 obt_link_cmp_by_name);
             }
         }
     }

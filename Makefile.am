@@ -47,8 +47,7 @@ nodist_rc_SCRIPTS = \
 	data/autostart/autostart
 
 dist_libexec_SCRIPTS = \
-	data/autostart/openbox-xdg-autostart \
-	data/autostart/openbox-autostart
+	data/autostart/openbox-xdg-autostart
 
 nodist_libexec_SCRIPTS = \
 	data/autostart/openbox-autostart
@@ -468,6 +467,7 @@ dist_rc_DATA = \
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
 	-e 's!@configdir\@!$(configdir)!' \
+	-e 's!@rcdir\@!$(rcdir)!' \
 	-e 's!@libexecdir\@!$(libexecdir)!' \
 	-e 's!@bindir\@!$(bindir)!'
 

@@ -11,7 +11,7 @@ elif which xsetroot >/dev/null; then
 fi
 test -z $BG || $BG -solid "#303030"
 
-GLOBALAUTOSTART="@configdir@/autostart"
+GLOBALAUTOSTART="@rcdir@/autostart"
 AUTOSTART="${XDG_CONFIG_HOME:-"$HOME/.config"}/openbox/autostart"
 
 # Run the global openbox autostart script

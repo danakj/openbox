@@ -355,11 +355,11 @@ gint main(gint argc, gchar **argv)
                 }
             }
 
-            reconfigure = FALSE;
-
             ob_set_state(OB_STATE_RUNNING);
 
-            if (startup_cmd) run_startup_cmd();
+            if (!reconfigure && startup_cmd) run_startup_cmd();
+
+            reconfigure = FALSE;
 
             /* look for parsing errors */
             {

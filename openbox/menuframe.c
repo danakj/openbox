@@ -324,11 +324,18 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
                                gint *dx, gint *dy)
 {
     const Rect *a = NULL;
-    gint pos, half;
+    Rect search = self->area;
+    gint pos, half, monitor;
 
     *dx = *dy = 0;
+    RECT_SET_POINT(search, x, y);
 
-    a = screen_physical_area_monitor(screen_find_monitor_point(x, y));
+    if (self->parent)
+        monitor = self->parent->monitor;
+    else
+        monitor = screen_find_monitor(&search);
+
+    a = screen_physical_area_monitor(monitor);
 
     half = g_list_length(self->entries) / 2;
     pos = g_list_index(self->entries, self->selected);

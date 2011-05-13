@@ -437,6 +437,10 @@ void client_manage(Window window, ObPrompt *prompt)
     client_apply_startup_state(self, place.x, place.y,
                                place.width, place.height);
 
+    /* set the initial value of the desktop hint, when one wasn't requested
+       on map. */
+    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
+
     /* grab mouse bindings before showing the window */
     mouse_grab_for_client(self, TRUE);
 
@@ -2791,9 +2795,6 @@ static void client_apply_startup_state(ObClient *self,
     */
     self->area = oldarea;
     client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
-
-    /* set the desktop hint, to make sure that it always exists */
-    OBT_PROP_SET32(self->window, NET_WM_DESKTOP, CARDINAL, self->desktop);
 
     /* nothing to do for the other states:
        skip_taskbar

@@ -302,6 +302,59 @@ AC_DEFUN([X11_EXT_SYNC],
   fi
 ])
 
+# X11_EXT_AUTH()
+#
+# Check for the presence of the "Xau" X Window System extension.
+# Defines "AUTH, sets the $(AUTH) variable to "yes", and sets the $(LIBS)
+# appropriately if the extension is present.
+AC_DEFUN([X11_EXT_AUTH],
+[
+  AC_REQUIRE([X11_DEVEL])
+
+  # Store these
+  OLDLIBS=$LIBS
+  OLDCPPFLAGS=$CPPFLAGS
+
+  CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+  LIBS="$LIBS $X_LIBS"
+
+  AC_CHECK_LIB([Xau], [XauReadAuth],
+    AC_MSG_CHECKING([for X11/Xauth.h])
+    AC_TRY_LINK(
+    [
+      #include <X11/Xlib.h>
+      #include <X11/Xutil.h>
+      #include <X11/Xauth.h>
+    ],
+    [
+    ],
+    [
+      AC_MSG_RESULT([yes])
+      AUTH="yes"
+      AC_DEFINE([AUTH], [1], [Found the Xauth extension])
+
+      XAUTH_CFLAGS=""
+      XAUTH_LIBS="-lXau"
+      AC_SUBST(XAUTH_CFLAGS)
+      AC_SUBST(XAUTH_LIBS)
+    ],
+    [
+      AC_MSG_RESULT([no])
+      AUTH="no"
+    ])
+  )
+
+  LIBS=$OLDLIBS
+  CPPFLAGS=$OLDCPPFLAGS
+
+  AC_MSG_CHECKING([for the Xauth extension])
+  if test "$AUTH" = "yes"; then
+    AC_MSG_RESULT([yes])
+  else
+    AC_MSG_RESULT([no])
+  fi
+])
+
 # X11_SM()
 #
 # Check for the presence of SMlib for session management.

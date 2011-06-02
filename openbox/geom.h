@@ -102,6 +102,10 @@ typedef struct _Rect {
      (r).height = MIN((a).y + (a).height - 1, \
                       (b).y + (b).height - 1) - (r).y + 1)
 
+/* Returns the 2-dimensional area of Rect r */
+#define RECT_AREA(r) \
+    (((r).width) * ((r).height))
+
 typedef struct _Strut {
     int left;
     int top;

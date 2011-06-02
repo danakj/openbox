@@ -25,6 +25,7 @@
 #include "config.h"
 #include "dock.h"
 #include "debug.h"
+#include "overlap.h"
 
 extern ObDock *dock;
 
@@ -558,6 +559,59 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     return FALSE;
 }
 
+static gboolean place_least_overlap(ObClient *c, gboolean foreground, gint *x, gint *y)
+{
+    /* assemble the list of "interesting" windows to calculate overlap against */
+    GSList* interesting_clients = NULL;
+    int n_client_rects = 0;
+
+    /* if we're "showing desktop", ignore all existing windows */
+    if (!screen_showing_desktop) {
+        GList* it;
+        for (it = client_list; it != NULL; it = g_list_next(it)) {
+            ObClient* maybe_client = (ObClient*) it->data;
+            if (maybe_client == c)
+                continue;
+            if (maybe_client->iconic)
+                continue;
+            if (c->desktop != DESKTOP_ALL) {
+                if (maybe_client->desktop != c->desktop &&
+                    maybe_client->desktop != DESKTOP_ALL) continue;
+            } else {
+                if (maybe_client->desktop != screen_desktop &&
+                    maybe_client->desktop != DESKTOP_ALL) continue;
+            }
+            if (maybe_client->type == OB_CLIENT_TYPE_SPLASH ||
+                maybe_client->type == OB_CLIENT_TYPE_DESKTOP) continue;
+            /* it is interesting, so add it */
+            interesting_clients = g_slist_prepend(interesting_clients, maybe_client);
+            n_client_rects += 1;
+        }
+    }
+    Rect client_rects[n_client_rects];
+    GSList* it;
+    unsigned int i = 0;
+    for (it = interesting_clients; it != NULL; it = g_slist_next(it)) {
+        ObClient* interesting_client = (ObClient*) it->data;
+        client_rects[i] = interesting_client->frame->area;
+        i += 1;
+    }
+    g_slist_free(interesting_clients);
+
+    /* add the monitor */
+    Rect * const head = pick_head(c, foreground);
+
+    Point result;
+    Size req_size;
+    SIZE_SET(req_size, c->frame->area.width, c->frame->area.height);
+    overlap_find_least_placement(client_rects, n_client_rects, head,
+                                 &req_size, &result);
+    *x = result.x;
+    *y = result.y;
+
+    return TRUE;
+}
+
 /*! Return TRUE if openbox chose the position for the window, and FALSE if
   the application chose it */
 gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
@@ -579,8 +633,8 @@ gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
     /* try a number of methods */
     ret = place_per_app_setting(client, area, x, y, settings) ||
         place_transient_splash(client, area, x, y) ||
-        (config_place_policy == OB_PLACE_POLICY_MOUSE &&
-         place_under_mouse(client, x, y)) ||
+        (config_place_policy == OB_PLACE_POLICY_MOUSE        && place_under_mouse  (client,       x, y)) ||
+        (config_place_policy == OB_PLACE_POLICY_LEASTOVERLAP && place_least_overlap(client, foreground, x, y)) ||
         place_nooverlap(client, area, x, y) ||
         place_random(client, area, x, y);
     g_assert(ret);

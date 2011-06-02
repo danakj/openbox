@@ -533,7 +533,7 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     return FALSE;
 }
 
-static gboolean place_least_overlap(ObClient *c, gboolean foreground, gint *x, gint *y)
+static gboolean place_least_overlap(ObClient *c, gboolean foreground, gint *x, gint *y, Rect * const head)
 {
     /* assemble the list of "interesting" windows to calculate overlap against */
     GSList* interesting_clients = NULL;
@@ -572,9 +572,6 @@ static gboolean place_least_overlap(ObClient *c, gboolean foreground, gint *x, g
     }
     g_slist_free(interesting_clients);
 
-    /* add the monitor */
-    Rect * const head = pick_head(c, foreground);
-
     Point result;
     Size req_size;
     SIZE_SET(req_size, c->frame->area.width, c->frame->area.height);
@@ -607,8 +604,10 @@ gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
     /* try a number of methods */
     ret = place_per_app_setting(client, x, y, settings) ||
         place_transient_splash(client, area, x, y) ||
-        (config_place_policy == OB_PLACE_POLICY_MOUSE        && place_under_mouse  (client,       x, y)) ||
-        (config_place_policy == OB_PLACE_POLICY_LEASTOVERLAP && place_least_overlap(client, foreground, x, y)) ||
+        (config_place_policy == OB_PLACE_POLICY_MOUSE
+            && place_under_mouse  (client, x, y)) ||
+        (config_place_policy == OB_PLACE_POLICY_LEASTOVERLAP
+            && place_least_overlap(client, foreground, x, y, area)) ||
         place_nooverlap(client, area, x, y) ||
         place_random(client, area, x, y);
     g_assert(ret);

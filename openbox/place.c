@@ -533,7 +533,7 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     return FALSE;
 }
 
-static gboolean place_least_overlap(ObClient *c, gboolean foreground, gint *x, gint *y, Rect * const head)
+static gboolean place_least_overlap(ObClient *c, gint *x, gint *y, Rect * const head)
 {
     /* assemble the list of "interesting" windows to calculate overlap against */
     GSList* interesting_clients = NULL;
@@ -607,7 +607,7 @@ gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
         (config_place_policy == OB_PLACE_POLICY_MOUSE
             && place_under_mouse  (client, x, y)) ||
         (config_place_policy == OB_PLACE_POLICY_LEASTOVERLAP
-            && place_least_overlap(client, foreground, x, y, area)) ||
+            && place_least_overlap(client, x, y, area)) ||
         place_nooverlap(client, area, x, y) ||
         place_random(client, area, x, y);
     g_assert(ret);

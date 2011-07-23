@@ -11,6 +11,7 @@ Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
 libxml2 2.0+ library/headers (devel package)
 Pango 1.10+ library/headers (devel package)
 cvs
+Imlib2 library/headers (devel package)
 
 Optionally you may want:
 X Cursor library/headers (devel package)
@@ -40,21 +41,19 @@ See the man pages for details about them.  If you want to run Openbox on its
 
 
 ----
-In debian unstable, you want these packages:
+In Ubuntu, you want these packages:
+
 gcc
 gettext
-automake1.9
+automake
 autoconf
 libtool
 libpango1.0-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev
-libxcursor-dev
 libstartup-notification0-dev
-xlibs-dev
-
-tip: run "update-alternatives --config automake" and select automake1.9 before
-  running ./configure
+xorg-dev
+libimlib2-dev
 
 ----

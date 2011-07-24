@@ -277,6 +277,25 @@ static int cat_friendly_cmp(const void *a, const void *b)
 
 void apps_menu_startup(gboolean reconfig)
 {
+    /* From http://standards.freedesktop.org/menu-spec/latest/apa.html */
+    struct {
+        const gchar *name;
+        const gchar *friendly;
+    } const cats[] = {
+        { "AudioVideo", "Sound & Video" },
+        { "Development", "Programming" },
+        { "Education", "Education" },
+        { "Game", "Games" },
+        { "Graphics", "Graphics" },
+        { "Network", "Internet" },
+        { "Office", "Office" },
+        { "Settings", "Settings" },
+        { "System", "System" },
+        { "Utility", "Accessories" },
+        { NULL, NULL }
+    };
+    guint i;
+
     if (reconfig) {
         /* Force a re-read of the applications available in case we are not
            getting notifications about changes. */
@@ -284,7 +303,6 @@ void apps_menu_startup(gboolean reconfig)
     }
     else {
         ObtPaths *paths;
-        guint i;
 
         paths = obt_paths_new();
         /* XXX allow more environments, like GNOME or KDE, to be included */
@@ -295,44 +313,21 @@ void apps_menu_startup(gboolean reconfig)
 
         dirty = FALSE;
 
-        /* From http://standards.freedesktop.org/menu-spec/latest/apa.html */
-        {
-            struct {
-                const gchar *name;
-                const gchar *friendly;
-            } const cats[] = {
-                { "AudioVideo", "Sound & Video" },
-                { "Development", "Programming" },
-                { "Education", "Education" },
-                { "Game", "Games" },
-                { "Graphics", "Graphics" },
-                { "Network", "Internet" },
-                { "Office", "Office" },
-                { "Settings", "Settings" },
-                { "System", "System" },
-                { "Utility", "Accessories" },
-                { NULL, NULL }
-            };
-            guint i;
+        for (i = 0; cats[i].name; ++i); /* count them */
+        n_categories = i;
 
-            for (i = 0; cats[i].name; ++i); /* count them */
-            n_categories = i;
+        categories = g_new0(ObAppsMenuCategory, n_categories);
+        sorted_categories = g_new(ObAppsMenuCategory*, n_categories);
 
-            categories = g_new0(ObAppsMenuCategory, n_categories);
-            sorted_categories = g_new(ObAppsMenuCategory*, n_categories);
-
-            for (i = 0; cats[i].name; ++i) {
-                categories[i].q = g_quark_from_static_string(cats[i].name);
-                categories[i].friendly = _(cats[i].friendly);
-                categories[i].menu_name = g_strdup_printf(
-                    "%s-%s", MENU_NAME, cats[i].name);
-                categories[i].menu = menu_new(categories[i].menu_name,
-                                              categories[i].friendly, FALSE,
-                                              &categories[i]);
-                categories[i].links = g_ptr_array_new_with_free_func(
-                    (GDestroyNotify)obt_link_unref);
-            }
+        for (i = 0; cats[i].name; ++i) {
+            categories[i].q = g_quark_from_static_string(cats[i].name);
+            categories[i].friendly = _(cats[i].friendly);
+            categories[i].menu_name = g_strdup_printf(
+                "%s-%s", MENU_NAME, cats[i].name);
+            categories[i].links = g_ptr_array_new_with_free_func(
+                (GDestroyNotify)obt_link_unref);
         }
+
         /* Sort the categories by their quark values so we can binary search */
         qsort(categories, n_categories, sizeof(ObAppsMenuCategory), cat_cmp);
 
@@ -353,22 +348,37 @@ void apps_menu_startup(gboolean reconfig)
         }
     }
 
+    /* recreate menus every time since reconfiguring destroys them */
+
     apps_menu = menu_new(MENU_NAME, _("Applications"), FALSE, NULL);
     menu_set_update_func(apps_menu, self_update);
     menu_set_destroy_func(apps_menu, self_destroy);
+
+    for (i = 0; cats[i].name; ++i)
+        categories[i].menu = menu_new(categories[i].menu_name,
+                                      categories[i].friendly, FALSE,
+                                      &categories[i]);
+
 }
 
 void apps_menu_shutdown(gboolean reconfig)
 {
-    if (!reconfig) {
-        guint i;
+    guint i;
 
+    /* the menu structures get freed automatically by the menu_hash table
+       so we must not keep any pointers around to them, and want to update
+       the menu next time we display it, so we mark it dirty. */
+    for (i = 0; i < n_categories; ++i) {
+        categories[i].menu = NULL;
+        categories[i].entry = NULL;
+    }
+    dirty = TRUE;
+
+    if (!reconfig) {
         obt_linkbase_unref(linkbase);
         linkbase = NULL;
 
         for (i = 0; i < n_categories; ++i) {
-
-            menu_free(categories[i].menu);
             g_free(categories[i].menu_name);
             g_ptr_array_unref(categories[i].links);
         }
@@ -378,5 +388,5 @@ void apps_menu_shutdown(gboolean reconfig)
         sorted_categories = NULL;
     }
 
-    /* freed by the hash table */
+    apps_menu = NULL;
 }

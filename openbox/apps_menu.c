@@ -277,7 +277,12 @@ static int cat_friendly_cmp(const void *a, const void *b)
 
 void apps_menu_startup(gboolean reconfig)
 {
-    if (!reconfig) {
+    if (reconfig) {
+        /* Force a re-read of the applications available in case we are not
+           getting notifications about changes. */
+        obt_linkbase_refresh(linkbase);
+    }
+    else {
         ObtPaths *paths;
         guint i;
 

@@ -406,6 +406,11 @@ void obt_linkbase_unref(ObtLinkBase *self)
     }
 }
 
+void obt_linkbase_refresh(ObtLinkBase *lb)
+{
+    obt_watch_refresh(lb->watch);
+}
+
 void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
                                   gpointer data)
 {

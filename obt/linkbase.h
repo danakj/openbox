@@ -45,6 +45,8 @@ ObtLinkBase* obt_linkbase_new(struct _ObtPaths *paths, const gchar *locale,
 void obt_linkbase_ref(ObtLinkBase *lb);
 void obt_linkbase_unref(ObtLinkBase *lb);
 
+void obt_linkbase_refresh(ObtLinkBase *lb);
+
 void obt_linkbase_set_update_func(ObtLinkBase *lb, ObtLinkBaseUpdateFunc func,
                                   gpointer data);
 

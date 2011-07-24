@@ -250,31 +250,41 @@ static guint parse_value_environments(const gchar *in,
     while (*s) {
         switch (*(s++)) {
         case 'G':
-            if (strcmp(s, "NOME") == 0) {
+            if (strncmp(s, "NOME", 4) == 0 ||
+                strncmp(s, "NOME;", 5 == 0))
+            {
                 mask |= OBT_LINK_ENV_GNOME;
                 s += 4;
             }
             break;
         case 'K':
-            if (strcmp(s, "DE") == 0) {
+            if (strncmp(s, "DE", 2) == 0 ||
+                strncmp(s, "DE;", 3) == 0)
+            {
                 mask |= OBT_LINK_ENV_KDE;
                 s += 2;
             }
             break;
         case 'L':
-            if (strcmp(s, "XDE") == 0) {
+            if (strncmp(s, "XDE", 3) == 0 ||
+                strncmp(s, "XDE;", 4) == 0)
+            {
                 mask |= OBT_LINK_ENV_LXDE;
                 s += 3;
             }
             break;
         case 'R':
-            if (strcmp(s, "OX") == 0) {
+            if (strncmp(s, "OX", 2) == 0 ||
+                strncmp(s, "OX;", 3) == 0)
+            {
                 mask |= OBT_LINK_ENV_ROX;
                 s += 2;
             }
             break;
         case 'X':
-            if (strcmp(s, "FCE") == 0) {
+            if (strncmp(s, "FCE", 3) == 0 ||
+                strncmp(s, "FCE;", 4) == 0)
+            {
                 mask |= OBT_LINK_ENV_XFCE;
                 s += 3;
             }
@@ -282,13 +292,17 @@ static guint parse_value_environments(const gchar *in,
         case 'O':
             switch (*(s++)) {
             case 'l':
-                if (strcmp(s, "d") == 0) {
+                if (strncmp(s, "d", 1) == 0 ||
+                    strncmp(s, "d;", 2) == 0)
+                {
                     mask |= OBT_LINK_ENV_OLD;
                     s += 1;
                 }
                 break;
             case 'P':
-                if (strcmp(s, "ENBOX") == 0) {
+                if (strncmp(s, "ENBOX", 5) == 0 ||
+                    strncmp(s, "ENBOX;", 6) == 0)
+                {
                     mask |= OBT_LINK_ENV_OPENBOX;
                     s += 5;
                 }
@@ -672,7 +686,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
                 v.type = OBT_DDPARSE_BOOLEAN; break;
             case 't': /* NotShowIn */
                 if (strcmp(key+3, "ShowIn")) return FALSE;
-                v.type = OBT_DDPARSE_STRINGS; break;
+                v.type = OBT_DDPARSE_ENVIRONMENTS; break;
             default:
                 return FALSE;
             }
@@ -681,6 +695,9 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
             return FALSE;
         }
         break;
+    case 'O': /* OnlyShowIn */
+        if (strcmp(key+1, "nlyShowIn")) return FALSE;
+        v.type = OBT_DDPARSE_ENVIRONMENTS; break;
     case 'P': /* Path */
         if (strcmp(key+1, "ath")) return FALSE;
         v.type = OBT_DDPARSE_STRING; break;

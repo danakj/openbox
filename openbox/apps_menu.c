@@ -307,7 +307,7 @@ void apps_menu_startup(gboolean reconfig)
         paths = obt_paths_new();
         /* XXX allow more environments, like GNOME or KDE, to be included */
         linkbase = obt_linkbase_new(paths, ob_locale_msg,
-                                    OBT_LINK_ENV_OPENBOX);
+                                    OBT_LINK_ENV_OPENBOX|OBT_LINK_ENV_GNOME);
         obt_paths_unref(paths);
         obt_linkbase_set_update_func(linkbase, linkbase_update, NULL);
 

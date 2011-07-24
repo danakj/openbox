@@ -19,6 +19,7 @@
 #ifdef HAVE_SYS_INOTIFY_H
 
 #include "watch.h"
+#include "watch_interface.h"
 
 #include <sys/inotify.h>
 #ifdef HAVE_UNISTD_H
@@ -34,45 +35,24 @@
 #include <glib.h>
 
 typedef struct _InoSource InoSource;
-typedef struct _InoTarget InoTarget;
-
-/*! Callback function in the watch general system.
-  Matches definition in watch.c
-*/
-typedef void (*ObtWatchNotifyFunc)(const gchar *sub_path,
-                                   const gchar *full_path, gpointer target,
-                                   ObtWatchNotifyType type);
+typedef struct _InoData InoData;
 
 struct _InoSource {
     GSource source;
 
     GPollFD pfd;
-    ObtWatchNotifyFunc notify;
     GHashTable *targets_by_key;
-    GHashTable *targets_by_path;
+    GHashTable *files_by_key;
 };
 
-struct _InoTarget {
+struct _InoData {
     gint key;
-    gchar *path;
-    guint base_len; /* the length of the prefix of path which is the
-                       target's path */
-    gpointer watch_target;
-    gboolean is_dir;
-    gboolean watch_hidden;
 };
 
 static gboolean source_check(GSource *source);
 static gboolean source_prepare(GSource *source, gint *timeout);
 static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data);
 static void source_finalize(GSource *source);
-static gint add_target(GSource *source, InoTarget *parent,
-                       const gchar *path, gboolean watch_hidden,
-                       gpointer target);
-static void remove_target(GSource *source, InoTarget *target);
-static void target_free(InoTarget *target);
-static void notify_target(GSource *source, InoTarget *ino_target,
-                          const gchar *path, ObtWatchNotifyType type);
 
 static GSourceFuncs source_funcs = {
     source_prepare,
@@ -81,28 +61,11 @@ static GSourceFuncs source_funcs = {
     source_finalize
 };
 
-gint watch_sys_add_target(GSource *source, const char *path,
-                          gboolean watch_hidden, gpointer target)
-{
-    return add_target(source, NULL, path, watch_hidden, target);
-}
-
-void watch_sys_remove_target(GSource *source, gint key)
-{
-    InoSource *ino_source = (InoSource*)source;
-    InoTarget *t;
-
-    t = g_hash_table_lookup(ino_source->targets_by_key, &key);
-    remove_target(source, t);
-}
-
-GSource* watch_sys_create_source(ObtWatchNotifyFunc notify)
+GSource* watch_sys_create_source(void)
 {
     gint fd;
     GSource *source;
     InoSource *ino_source;
-
-    g_return_val_if_fail(notify != NULL, NULL);
 
     source = NULL;
     fd = inotify_init();
@@ -111,15 +74,14 @@ GSource* watch_sys_create_source(ObtWatchNotifyFunc notify)
         g_warning("Failed to initialize inotify: %s", s);
     }
     else {
-        g_debug("initialized inotify on fd %d", fd);
+        g_debug("initialized inotify on fd %u", fd);
         source = g_source_new(&source_funcs, sizeof(InoSource));
         ino_source = (InoSource*)source;
-        ino_source->notify = notify;
         ino_source->targets_by_key = g_hash_table_new_full(
             g_int_hash, g_int_equal, NULL, NULL);
-        ino_source->targets_by_path = g_hash_table_new_full(
-            g_str_hash, g_str_equal, NULL, (GDestroyNotify)target_free);
-        ino_source->pfd = (GPollFD){ fd, G_IO_IN, G_IO_IN };
+        ino_source->files_by_key = g_hash_table_new_full(
+            g_int_hash, g_int_equal, NULL, NULL);
+        ino_source->pfd = (GPollFD){ fd, G_IO_IN, 0 };
         g_source_add_poll(source, &ino_source->pfd);
     }
     return source;
@@ -133,7 +95,9 @@ static gboolean source_prepare(GSource *source, gint *timeout)
 
 static gboolean source_check(GSource *source)
 {
-    return TRUE;
+    InoSource *ino_source = (InoSource*)source;
+
+    return ino_source->pfd.revents;
 }
 
 static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
@@ -235,72 +199,65 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
             name_len == event.len)
         {
             /* done reading the file name ! */
-            InoTarget *t;
-            gboolean report;
-            ObtWatchNotifyType type;
-            gchar *full_path;
 
-            g_debug("read filename %s mask %x", name, event.mask);
+            if (event.len)
+                g_debug("read filename %s mask %x", name, event.mask);
+            else
+                g_debug("read no filename mask %x", event.mask);
 
             event.mask &= ~IN_IGNORED;  /* skip this one, we watch for things
                                            to get removed explicitly so this
                                            will just be double-reporting */
             if (event.mask) {
+                ObtWatchTarget *t;
+                ObtWatchFile *f;
+                gchar **name_split;
+                gchar **c;
 
+                f = g_hash_table_lookup(ino_source->files_by_key, &event.wd);
                 t = g_hash_table_lookup(ino_source->targets_by_key, &event.wd);
-                g_assert(t != NULL);
+                g_assert(f != NULL);
 
-                full_path = g_build_filename(t->path, name, NULL);
-                g_debug("full path to change: %s", full_path);
+                if (event.len)
+                    name_split = g_strsplit(name, G_DIR_SEPARATOR_S, 0);
+                else
+                    name_split = g_strsplit("", G_DIR_SEPARATOR_S, 0);
 
-                /* don't report hidden stuff inside a directory watch */
-                report = !t->is_dir || name[0] != '.' || t->watch_hidden;
-                if (event.mask & IN_MOVE_SELF) {
-                    g_warning("Watched target was moved away: %s", t->path);
-                    type = OBT_WATCH_SELF_REMOVED;
-                }
-                else if (event.mask & IN_ISDIR) {
-                    if (event.mask & IN_MOVED_TO ||
-                        event.mask & IN_CREATE)
-                    {
-                        add_target(source, t, full_path, t->watch_hidden,
-                                   t->watch_target);
-                        g_debug("added %s", full_path);
+                if (f) {
+                    if (event.mask & IN_MOVED_TO || event.mask & IN_CREATE) {
+                        ObtWatchFile *parent = f;
+                        for (c = name_split; *(c+1); ++c) {
+                            parent = watch_main_file_child(parent, *c);
+                            g_assert(parent);
+                        }
+                        watch_main_notify_add(t, parent, *c);
                     }
                     else if (event.mask & IN_MOVED_FROM ||
-                             event.mask & IN_DELETE)
+                             event.mask & IN_MOVE_SELF ||
+                             event.mask & IN_DELETE ||
+                             event.mask & IN_DELETE_SELF)
                     {
-                        InoTarget *subt;
-
-                        subt = g_hash_table_lookup(ino_source->targets_by_path,
-                                                   full_path);
-                        g_assert(subt);
-                        remove_target(source, subt);
-                        g_debug("removed %s", full_path);
+                        ObtWatchFile *file = f;
+                        for (c = name_split; *c; ++c)
+                            file = watch_main_file_child(file, *c);
+                        if (file) /* may not have been tracked */
+                            watch_main_notify_remove(t, file);
                     }
-                    report = FALSE;
-                }
-                else {
-                    if (event.mask & IN_MOVED_TO || event.mask & IN_CREATE)
-                        type = OBT_WATCH_ADDED;
-                    else if (event.mask & IN_MOVED_FROM ||
-                             event.mask & IN_DELETE)
-                        type = OBT_WATCH_REMOVED;
-                    else if (event.mask & IN_MODIFY)
-                        type = OBT_WATCH_MODIFIED;
+                    else if (event.mask & IN_MODIFY) {
+                        ObtWatchFile *file = f;
+                        for (c = name_split; *c; ++c)
+                            file = watch_main_file_child(file, *c);
+                        if (file) /* may not have been tracked */
+                            watch_main_notify_modify(t, file);
+                    }
                     else
                         g_assert_not_reached();
-                }
 
-                if (report) {
                     /* call the GSource callback if there is one */
                     if (cb) cb(data);
-
-                    /* call the WatchNotify callback */
-                    notify_target(source, t, full_path, type);
                 }
 
-                g_free(full_path);
+                g_strfreev(name_split);
 
                 /* only read one event at a time, so poll can tell us if there
                    is another one ready, and we don't block on the read()
@@ -313,6 +270,7 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
             state = READING_EVENT;
         }
     }
+    return TRUE;
 }
 
 static void source_finalize(GSource *source)
@@ -321,30 +279,34 @@ static void source_finalize(GSource *source)
     g_debug("source_finalize");
     close(ino_source->pfd.fd);
     g_hash_table_destroy(ino_source->targets_by_key);
+    g_hash_table_destroy(ino_source->files_by_key);
 }
 
-static gint add_target(GSource *source, InoTarget *parent,
-                       const gchar *path,
-                       gboolean watch_hidden, gpointer target)
+
+gpointer watch_sys_add_file(GSource *source,
+                            ObtWatchTarget *target,
+                            ObtWatchFile *file,
+                            gboolean is_dir)
 {
     InoSource *ino_source;
-    InoTarget *ino_target;
+    InoData *ino_data;
     guint32 mask;
     gint key;
-    gboolean is_dir;
+    gchar *path;
 
     ino_source = (InoSource*)source;
 
-    is_dir = g_file_test(path, G_FILE_TEST_IS_DIR);
     if (is_dir)
         mask = IN_MODIFY | IN_CREATE | IN_DELETE | IN_MOVE;
     else
         mask = IN_MODIFY;
     /* only watch IN_MOVE_SELF on the top-most target of the watch */
-    if (!parent)
-        mask |= IN_MOVE_SELF;
+    if (watch_main_target_root(target) == file)
+        mask |= IN_MOVE_SELF | IN_DELETE_SELF;
 
-    ino_target = NULL;
+    path = watch_main_target_file_full_path(target, file);
+
+    ino_data = NULL;
     key = inotify_add_watch(ino_source->pfd.fd, path, mask);
     g_debug("added watch descriptor %d for fd %d on path %s",
             key, ino_source->pfd.fd, path);
@@ -353,72 +315,41 @@ static gint add_target(GSource *source, InoTarget *parent,
         g_warning("Unable to watch path %s: %s", path, s);
     }
     else {
-        ino_target = g_slice_new(InoTarget);
-        ino_target->key = key;
-        ino_target->path = g_strdup(path);
-        ino_target->base_len = (parent ? parent->base_len : strlen(path));
-        ino_target->is_dir = is_dir;
-        ino_target->watch_hidden = watch_hidden;
-        ino_target->watch_target = target;
-        g_hash_table_insert(ino_source->targets_by_key, &ino_target->key,
-                            ino_target);
-        g_hash_table_insert(ino_source->targets_by_path, ino_target->path,
-                            ino_target);
+        ino_data = g_slice_new(InoData);
+        ino_data->key = key;
+        g_hash_table_insert(ino_source->targets_by_key,
+                            &ino_data->key,
+                            target);
+        g_hash_table_insert(ino_source->files_by_key,
+                            &ino_data->key,
+                            file);
     }
 
-    if (key >= 0 && is_dir) {
-        /* recurse */
-        GDir *dir;
+    g_free(path);
 
-        dir = g_dir_open(path, 0, NULL);
-        if (dir) {
-            const gchar *name;
+    return ino_data;
+}
 
-            while ((name = g_dir_read_name(dir))) {
-                if (name[0] != '.' || watch_hidden) {
-                    gchar *subpath;
+void watch_sys_remove_file(GSource *source,
+                           ObtWatchTarget *target,
+                           ObtWatchFile *file,
+                           gpointer data)
+{
+    InoSource *ino_source;
+    InoData *ino_data;
 
-                    subpath = g_build_filename(path, name, NULL);
-                    if (g_file_test(subpath, G_FILE_TEST_IS_DIR))
-                        add_target(source, ino_target, subpath,
-                                   watch_hidden, target);
-                    else
-                        /* notify for each file in the directory on startup */
-                        notify_target(source, ino_target, subpath,
-                                      OBT_WATCH_ADDED);
-                    g_free(subpath);
-                }
-            }
-        }
-        g_dir_close(dir);
+    if (data) {
+        ino_source = (InoSource*)source;
+        ino_data = data;
+
+        g_debug("removing wd %d for fd %d", ino_data->key, ino_source->pfd.fd);
+        inotify_rm_watch(ino_source->pfd.fd, (guint32)ino_data->key);
+
+        g_hash_table_remove(ino_source->targets_by_key, &ino_data->key);
+        g_hash_table_remove(ino_source->files_by_key, &ino_data->key);
+        g_slice_free(InoData, ino_data);
     }
-
-    return key;
 }
 
-static void remove_target(GSource *source, InoTarget *target)
-{
-    InoSource *ino_source = (InoSource*)source;
-    g_debug("removing wd %d for fd %d", target->key, ino_source->pfd.fd);
-    inotify_rm_watch(ino_source->pfd.fd, (guint32)target->key);
-    g_hash_table_remove(ino_source->targets_by_key, &target->key);
-    g_hash_table_remove(ino_source->targets_by_path, target->path);
-}
-
-static void target_free(InoTarget *target)
-{
-    g_free(target->path);
-    g_slice_free(InoTarget, target);
-}
-
-static void notify_target(GSource *source, InoTarget *ino_target,
-                          const gchar *path, ObtWatchNotifyType type)
-{
-    InoSource *ino_source = (InoSource*)source;
-    ino_source->notify(path + ino_target->base_len,
-                       path,
-                       ino_target->watch_target,
-                       type);
-}
 
 #endif

@@ -173,7 +173,6 @@ static void category_free(ObtLinkBaseCategory *lc)
 /*! Called when a change happens in the filesystem. */
 static void update(ObtWatch *w, const gchar *base_path,
                    const gchar *sub_path,
-                   const gchar *full_path,
                    ObtWatchNotifyType type,
                    gpointer data)
 {
@@ -182,7 +181,7 @@ static void update(ObtWatch *w, const gchar *base_path,
     ObtLinkBaseEntry *remove = NULL;
     ObtLinkBaseEntry *show, *hide;
     ObtLink *link;
-    gchar *id;
+    gchar *id, *full_path;
     GList *list, *it;
     GList *remove_it = NULL;
     gint *priority;
@@ -192,6 +191,7 @@ static void update(ObtWatch *w, const gchar *base_path,
 
     id = obt_link_id_from_ddfile(sub_path);
     list = g_hash_table_lookup(self->base, id);
+    full_path = g_build_filename(base_path, sub_path, NULL);
 
     switch (type) {
     case OBT_WATCH_SELF_REMOVED:
@@ -289,6 +289,7 @@ static void update(ObtWatch *w, const gchar *base_path,
             g_hash_table_steal(self->base, id);
         }
     }
+    g_free(full_path);
     g_free(id);
 }
 

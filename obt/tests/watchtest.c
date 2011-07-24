@@ -28,23 +28,52 @@ exit
 #include "obt/watch.h"
 #include <glib.h>
 
-void func(ObtWatch *w, const gchar *base_path,
-          const gchar *subpath, ObtWatchNotifyType type,
-          gpointer data)
+static GMainLoop *loop;
+
+void func(ObtWatch *w, const gchar *base_path, const gchar *subpath,
+          ObtWatchNotifyType type, gpointer data)
 {
     g_print("base path: %s subpath: %s type=%d\n", base_path, subpath, type);
+}
+
+gboolean force_refresh(gpointer data)
+{
+    ObtWatch *w = data;
+    obt_watch_refresh(w);
+    return TRUE;
+}
+
+static void sighandler(gint signal)
+{
+    g_main_loop_quit(loop);
 }
 
 gint main()
 {
     ObtWatch *watch;
-    GMainLoop *loop;
+    struct sigaction action, oldaction;
+    sigset_t sigset;
+
+    loop = g_main_loop_new(NULL, FALSE);
+    g_return_val_if_fail(loop != NULL, 1);
 
     watch = obt_watch_new();
     obt_watch_add(watch, "/tmp/a", FALSE, func, NULL);
 
-    loop = g_main_loop_new(NULL, FALSE);
+
+    sigemptyset(&sigset);
+    action.sa_handler = sighandler;
+    action.sa_mask = sigset;
+    action.sa_flags = SA_NOCLDSTOP;
+    sigaction(SIGINT, &action, &oldaction);
+
+    g_timeout_add(5000, force_refresh, watch);
+
     g_main_loop_run(loop);
+
+    g_print("bye\n");
+
+    obt_watch_unref(watch);
 
     return 0;
 }

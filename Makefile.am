@@ -160,8 +160,10 @@ obt_libobt_la_SOURCES = \
 	obt/signal.c \
 	obt/util.h \
 	obt/watch.h \
+	obt/watch_interface.h \
 	obt/watch.c \
 	obt/watch_inotify.c \
+	obt/watch_manual.c \
 	obt/xqueue.h \
 	obt/xqueue.c
 

@@ -32,9 +32,11 @@ typedef enum _ObtWatchNotifyType ObtWatchNotifyType;
     notification is about the watch target itself, the subpath will be
     an empty string.
 */
-typedef void (*ObtWatchFunc)(ObtWatch *w, const gchar *base_path,
-                             const gchar *sub_path, const gchar *full_path,
-                             ObtWatchNotifyType type, gpointer data);
+typedef void (*ObtWatchFunc)(ObtWatch *w,
+                             const gchar *base_path,
+                             const gchar *sub_path,
+                             ObtWatchNotifyType type,
+                             gpointer data);
 
 enum _ObtWatchNotifyType {
     OBT_WATCH_ADDED, /*!< A file/dir was added in a watched dir */
@@ -62,6 +64,13 @@ gboolean obt_watch_add(ObtWatch *w, const gchar *path,
                        gboolean watch_hidden,
                        ObtWatchFunc func, gpointer data);
 void obt_watch_remove(ObtWatch *w, const gchar *path);
+
+/*! Force a refresh of the watcher.
+  This will report any changes since the last time the watcher refreshed its
+  view of the file system.  Note that any watchers that work off notifications
+  will have nothing to report for this function.
+*/
+void obt_watch_refresh(ObtWatch *w);
 
 G_END_DECLS
 

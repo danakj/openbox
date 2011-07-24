@@ -359,7 +359,7 @@ gboolean obt_paths_try_exec(ObtPaths *p, const gchar *path)
         GSList *it;
 
         for (it = p->exec_dirs; it; it = g_slist_next(it)) {
-            gchar *f = g_strdup_printf(it->data, G_DIR_SEPARATOR_S, path);
+            gchar *f = g_build_filename(it->data, path, NULL);
             gboolean e = try_exec(p, f);
             g_free(f);
             if (e) return TRUE;

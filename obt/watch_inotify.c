@@ -74,7 +74,7 @@ GSource* watch_sys_create_source(void)
         g_warning("Failed to initialize inotify: %s", s);
     }
     else {
-        g_debug("initialized inotify on fd %u", fd);
+        /*g_debug("initialized inotify on fd %u", fd);*/
         source = g_source_new(&source_funcs, sizeof(InoSource));
         ino_source = (InoSource*)source;
         ino_source->targets_by_key = g_hash_table_new_full(
@@ -146,11 +146,11 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
                 }
             }
             if (len == 0) {
-                g_debug("Done reading from inotify");
+                /*g_debug("Done reading from inotify");*/
                 return TRUE;
             }
 
-            g_debug("read %d bytes", len);
+            /*g_debug("read %d bytes", len);*/
         }
 
         if (state == READING_EVENT) {
@@ -161,24 +161,24 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
                 guint i;
                 for (i = 0; i < remain; ++i)
                     buffer[i] = buffer[pos+i];
-                g_debug("leftover %d bytes of event struct", remain);
+                /*g_debug("leftover %d bytes of event struct", remain);*/
             }
             else {
                 event = *(struct inotify_event*)&buffer[pos];
                 pos += sizeof(struct inotify_event);
 
-                g_debug("read event: wd %d mask %x len %d",
-                        event.wd, event.mask, event.len);
+                /*g_debug("read event: wd %d mask %x len %d",
+                          event.wd, event.mask, event.len);*/
 
                 if (remain >= event.len) {
-                    g_debug("name fits in buffer");
+                    /*g_debug("name fits in buffer");*/
                     state = READING_NAME_BUFFER;
                     name = &buffer[pos];
                     name_len = event.len;
                     pos += event.len;
                 }
                 else { /* remain < event.len */
-                    g_debug("name doesn't fit in buffer");
+                    /*g_debug("name doesn't fit in buffer");*/
                     state = READING_NAME_HEAP;
                     name = g_new(gchar, event.len);
                     memcpy(name, &buffer[pos], remain);
@@ -200,10 +200,12 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
         {
             /* done reading the file name ! */
 
+            /*
             if (event.len)
                 g_debug("read filename %s mask %x", name, event.mask);
             else
                 g_debug("read no filename mask %x", event.mask);
+            */
 
             event.mask &= ~IN_IGNORED;  /* skip this one, we watch for things
                                            to get removed explicitly so this
@@ -276,7 +278,7 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
 static void source_finalize(GSource *source)
 {
     InoSource *ino_source = (InoSource*)source;
-    g_debug("source_finalize");
+    /*g_debug("source_finalize");*/
     close(ino_source->pfd.fd);
     g_hash_table_destroy(ino_source->targets_by_key);
     g_hash_table_destroy(ino_source->files_by_key);
@@ -308,8 +310,8 @@ gpointer watch_sys_add_file(GSource *source,
 
     ino_data = NULL;
     key = inotify_add_watch(ino_source->pfd.fd, path, mask);
-    g_debug("added watch descriptor %d for fd %d on path %s",
-            key, ino_source->pfd.fd, path);
+    /*g_debug("added watch descriptor %d for fd %d on path %s",
+              key, ino_source->pfd.fd, path);*/
     if (key < 0) {
         gchar *s = strerror(errno);
         g_warning("Unable to watch path %s: %s", path, s);
@@ -342,7 +344,8 @@ void watch_sys_remove_file(GSource *source,
         ino_source = (InoSource*)source;
         ino_data = data;
 
-        g_debug("removing wd %d for fd %d", ino_data->key, ino_source->pfd.fd);
+        /*g_debug("removing wd %d for fd %d", ino_data->key,
+                  ino_source->pfd.fd); */
         inotify_rm_watch(ino_source->pfd.fd, (guint32)ino_data->key);
 
         g_hash_table_remove(ino_source->targets_by_key, &ino_data->key);

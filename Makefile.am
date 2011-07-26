@@ -233,6 +233,10 @@ openbox_openbox_SOURCES = \
 	openbox/actions/unfocus.c \
 	openbox/actions.c \
 	openbox/actions.h \
+	openbox/actions_list.c \
+	openbox/actions_list.h \
+	openbox/actions_parser.c \
+	openbox/actions_parser.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

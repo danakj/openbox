@@ -251,6 +251,33 @@ ObActionsAct* actions_parse(xmlNodePtr node)
     return act;
 }
 
+ObActionsAct* actions_act_new(const gchar *name, GList *keys, GList *values)
+{
+    ObActionsAct *act = NULL;
+
+    act = actions_build_act_from_string(name);
+    if (act) {
+        /* there is more stuff to parse here */
+        if (act->def->canbeinteractive) {
+            if (act->def->setup.i)
+//XXX                act->options = act->def->setup.i(keys, values,
+                act->options = act->def->setup.i(NULL,
+                                                 &act->i_pre,
+                                                 &act->i_input,
+                                                 &act->i_cancel,
+                                                 &act->i_post);
+        }
+        else {
+            if (act->def->setup.n)
+//XXX                act->options = act->def->setup.n(keys, values);
+                act->options = act->def->setup.n(NULL);
+        }
+    }
+    g_free(name);
+
+    return act;
+}
+
 gboolean actions_act_is_interactive(ObActionsAct *act)
 {
     return act->i_input != NULL;

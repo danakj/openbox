@@ -88,6 +88,14 @@ ObActionsAct* actions_parse_string(const gchar *name);
 
 gboolean actions_act_is_interactive(ObActionsAct *act);
 
+/*! Create a new ObActionAct structure.
+  @name The name of the action.
+  @keys The names of the options passed to the action.
+  @values The values of the options passed to the action, paired with the
+    keys.  These are ObActionsListValue objects.
+*/
+ObActionsAct* actions_act_new(const gchar *name, GList *keys, GList *values);
+
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
 

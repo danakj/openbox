@@ -107,10 +107,10 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
     gchar buffer[BUF_LEN];
     gchar *name;
     guint name_len; /* number of bytes read for the name */
-    guint event_len; /* number of bytes read for the event */
     gint len; /* number of bytes in the buffer */
     gint pos; /* position in the buffer */
     enum {
+        READING_DONE,
         READING_EVENT,
         READING_NAME_BUFFER,
         READING_NAME_HEAP
@@ -118,20 +118,19 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
     struct inotify_event event;
 
     pos = BUF_LEN;
-    state = READING_EVENT;
-    len = event_len = name_len = 0;
+    state = READING_DONE;
+    len = name_len = 0;
 
     /* sometimes we can end up here even tho no events have been reported by
        the kernel.  blame glib?  but we'll block if we read in that case. */
-    while (ino_source->pfd.revents) {
-        if (pos == len || !len || event_len) {
+    if (ino_source->pfd.revents)
+        state = READING_EVENT;
+
+    while (state != READING_DONE) {
+        if (pos == len || !len) {
             /* refill the buffer */
 
-            if (event_len)
-                pos = event_len;
-            else
-                pos = 0;
-
+            pos = 0;
             len = read(ino_source->pfd.fd, &buffer[pos], BUF_LEN-pos);
 
             if (len < 0) {
@@ -269,7 +268,11 @@ static gboolean source_read(GSource *source, GSourceFunc cb, gpointer data)
 
             if (state == READING_NAME_HEAP)
                 g_free(name);
-            state = READING_EVENT;
+            /* is there another event in the buffer after this one */
+            if (pos == len)
+                state = READING_DONE;
+            else
+                state = READING_EVENT;
         }
     }
     return TRUE;

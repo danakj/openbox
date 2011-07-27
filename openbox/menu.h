@@ -25,6 +25,7 @@
 
 #include <glib.h>
 
+struct _ObActionsList;
 struct _ObClient;
 struct _ObMenuFrame;
 struct _ObMenuEntryFrame;
@@ -120,8 +121,7 @@ struct _ObNormalMenuEntry {
     /* state */
     gboolean enabled;
 
-    /* List of ObActions */
-    GSList *actions;
+    struct _ObActionsList *actions;
 
     /* Mask icon */
     RrPixmapMask *mask;
@@ -209,7 +209,8 @@ void menu_set_place_func(ObMenu *menu, ObMenuPlaceFunc func);
 /*! @param allow_shortcut this should be false when the label is coming from
            outside data like window or desktop titles */
 ObMenuEntry* menu_add_normal(ObMenu *menu, gint id, const gchar *label,
-                             GSList *actions, gboolean allow_shortcut);
+                             struct _ObActionsList *actions,
+                             gboolean allow_shortcut);
 ObMenuEntry* menu_add_submenu(ObMenu *menu, gint id, const gchar *submenu);
 ObMenuEntry* menu_add_separator(ObMenu *menu, gint id, const gchar *label);
 

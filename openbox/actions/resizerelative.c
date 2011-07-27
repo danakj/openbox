@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -15,7 +16,7 @@ typedef struct {
     gint bottom_denom;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -24,32 +25,25 @@ void action_resizerelative_startup(void)
     actions_register("ResizeRelative", setup_func, free_func, run_func);
 }
 
-static void xml_node_relative(xmlNodePtr n, gint *num, gint *denom)
+static gpointer setup_func(GHashTable *config)
 {
-    gchar *s;
-
-    s = obt_xml_node_string(n);
-    config_parse_relative_number(s, num, denom);
-    g_free(s);
-}
-
-static gpointer setup_func(xmlNodePtr node)
-{
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "left")))
-        xml_node_relative(n, &o->left, &o->left_denom);
-    if ((n = obt_xml_find_node(node, "right")))
-        xml_node_relative(n, &o->right, &o->right_denom);
-    if ((n = obt_xml_find_node(node, "top")) ||
-        (n = obt_xml_find_node(node, "up")))
-        xml_node_relative(n, &o->top, &o->top_denom);
-    if ((n = obt_xml_find_node(node, "bottom")) ||
-        (n = obt_xml_find_node(node, "down")))
-        xml_node_relative(n, &o->bottom, &o->bottom_denom);
+    v = g_hash_table_lookup(config, "left");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->left, &o->left_denom);
+    v = g_hash_table_lookup(config, "right");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->right, &o->right_denom);
+    v = g_hash_table_lookup(config, "top");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->top, &o->top_denom);
+    v = g_hash_table_lookup(config, "bottom");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->bottom, &o->bottom_denom);
 
     return o;
 }

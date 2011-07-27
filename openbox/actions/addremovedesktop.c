@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/screen.h"
 #include <glib.h>
 
@@ -7,16 +8,16 @@ typedef struct {
     gboolean add;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
-static gpointer setup_add_func(xmlNodePtr node);
-static gpointer setup_remove_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
+static gpointer setup_add_func(GHashTable *config);
+static gpointer setup_remove_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
-static gpointer setup_addcurrent_func(xmlNodePtr node);
-static gpointer setup_addlast_func(xmlNodePtr node);
-static gpointer setup_removecurrent_func(xmlNodePtr node);
-static gpointer setup_removelast_func(xmlNodePtr node);
+static gpointer setup_addcurrent_func(GHashTable *config);
+static gpointer setup_addlast_func(GHashTable *config);
+static gpointer setup_removecurrent_func(GHashTable *config);
+static gpointer setup_removelast_func(GHashTable *config);
 
 void action_addremovedesktop_startup(void)
 {
@@ -34,35 +35,35 @@ void action_addremovedesktop_startup(void)
                      free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "where"))) {
-        gchar *s = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "where");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
         if (!g_ascii_strcasecmp(s, "last"))
             o->current = FALSE;
         else if (!g_ascii_strcasecmp(s, "current"))
             o->current = TRUE;
-        g_free(s);
     }
 
     return o;
 }
 
-static gpointer setup_add_func(xmlNodePtr node)
+static gpointer setup_add_func(GHashTable *config)
 {
-    Options *o = setup_func(node);
+    Options *o = setup_func(config);
     o->add = TRUE;
     return o;
 }
 
-static gpointer setup_remove_func(xmlNodePtr node)
+static gpointer setup_remove_func(GHashTable *config)
 {
-    Options *o = setup_func(node);
+    Options *o = setup_func(config);
     o->add = FALSE;
     return o;
 }
@@ -90,30 +91,30 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_addcurrent_func(xmlNodePtr node)
+static gpointer setup_addcurrent_func(GHashTable *config)
 {
-    Options *o = setup_add_func(node);
+    Options *o = setup_add_func(config);
     o->current = TRUE;
     return o;
 }
 
-static gpointer setup_addlast_func(xmlNodePtr node)
+static gpointer setup_addlast_func(GHashTable *config)
 {
-    Options *o = setup_add_func(node);
+    Options *o = setup_add_func(config);
     o->current = FALSE;
     return o;
 }
 
-static gpointer setup_removecurrent_func(xmlNodePtr node)
+static gpointer setup_removecurrent_func(GHashTable *config)
 {
-    Options *o = setup_remove_func(node);
+    Options *o = setup_remove_func(config);
     o->current = TRUE;
     return o;
 }
 
-static gpointer setup_removelast_func(xmlNodePtr node)
+static gpointer setup_removelast_func(GHashTable *config)
 {
-    Options *o = setup_remove_func(node);
+    Options *o = setup_remove_func(config);
     o->current = FALSE;
     return o;
 }

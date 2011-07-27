@@ -25,6 +25,7 @@
 #include "grab.h"
 #include "client.h"
 #include "actions.h"
+#include "actions_list.h"
 #include "menuframe.h"
 #include "config.h"
 #include "keytree.h"
@@ -139,13 +140,15 @@ void keyboard_chroot(GList *keylist)
     }
 }
 
-gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
+gboolean keyboard_bind(GList *keylist, ObActionsList *actions)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
 
     g_assert(keylist != NULL);
-    g_assert(action != NULL);
+
+    if (!actions)
+        return TRUE;
 
     if (!(tree = tree_build(keylist)))
         return FALSE;
@@ -167,7 +170,9 @@ gboolean keyboard_bind(GList *keylist, ObActionsAct *action)
     for (; t->first_child; t = t->first_child);
 
     /* set the action */
-    t->actions = g_slist_append(t->actions, action);
+    actions_list_ref(actions);
+    t->actions = actions_list_concat(t->actions, actions);
+
     /* assimilate this built tree into the main tree. assimilation
        destroys/uses the tree */
     if (tree) tree_assimilate(tree);
@@ -259,16 +264,14 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
             } else if (p->chroot)         /* an empty chroot */
                 set_curpos(p);
             else {
-                GSList *it;
+                gboolean i;
 
-                for (it = p->actions; it; it = g_slist_next(it))
-                    if (actions_act_is_interactive(it->data)) break;
-                if (it == NULL) /* reset if the actions are not interactive */
+                i = actions_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                                     e->xkey.state,
+                                     e->xkey.x_root, e->xkey.y_root,
+                                     0, OB_FRAME_CONTEXT_NONE, client);
+                if (!i) /* reset if an interactive was not run */
                     keyboard_reset_chains(0);
-
-                actions_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                                 e->xkey.state, e->xkey.x_root, e->xkey.y_root,
-                                 0, OB_FRAME_CONTEXT_NONE, client);
             }
             break;
             used = TRUE;
@@ -292,12 +295,7 @@ static void node_rebind(KeyBindingTree *node)
     }
     else {
         /* for leaf nodes, rebind each action assigned to it */
-        while (node->actions) {
-            /* add each action, and remove them from the original tree so
-               they don't get free'd on us */
-            keyboard_bind(node->keylist, node->actions->data);
-            node->actions = g_slist_delete_link(node->actions, node->actions);
-        }
+        keyboard_bind(node->keylist, node->actions);
 
         if (node->chroot)
             keyboard_chroot(node->keylist);

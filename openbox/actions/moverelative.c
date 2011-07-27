@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -11,7 +12,7 @@ typedef struct {
     gint y_denom;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -20,24 +21,19 @@ void action_moverelative_startup(void)
     actions_register("MoveRelative", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
-    gchar *s;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "x"))) {
-        s = obt_xml_node_string(n);
-        config_parse_relative_number(s, &o->x, &o->x_denom);
-        g_free(s);
-    }
-    if ((n = obt_xml_find_node(node, "y"))) {
-        s = obt_xml_node_string(n);
-        config_parse_relative_number(s, &o->y, &o->y_denom);
-        g_free(s);
-    }
+    v = g_hash_table_lookup(config, "x");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->x, &o->x_denom);
+    v = g_hash_table_lookup(config, "y");
+    if (v && actions_value_is_string(v))
+        actions_value_fraction(v, &o->y, &o->y_denom);
 
     return o;
 }

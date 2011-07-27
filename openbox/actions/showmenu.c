@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/menu.h"
 #include <glib.h>
 
@@ -6,7 +7,7 @@ typedef struct {
     gchar   *name;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -15,15 +16,16 @@ void action_showmenu_startup(void)
     actions_register("ShowMenu", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "menu")))
-        o->name = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "menu");
+    if (v && actions_value_is_string(v))
+        o->name = g_strdup(actions_value_string(v));
     return o;
 }
 

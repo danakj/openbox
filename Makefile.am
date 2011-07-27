@@ -210,7 +210,6 @@ openbox_openbox_SOURCES = \
 	openbox/actions/fullscreen.c \
 	openbox/actions/growtoedge.c \
 	openbox/actions/iconify.c \
-	openbox/actions/if.c \
 	openbox/actions/kill.c \
 	openbox/actions/layer.c \
 	openbox/actions/lower.c \
@@ -237,6 +236,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions_list.h \
 	openbox/actions_parser.c \
 	openbox/actions_parser.h \
+	openbox/actions_value.c \
+	openbox/actions_value.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

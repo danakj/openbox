@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -21,11 +22,11 @@ typedef struct {
     gint monitor;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
-static gpointer setup_center_func(xmlNodePtr node);
+static gpointer setup_center_func(GHashTable *config);
 
 void action_moveresizeto_startup(void)
 {
@@ -34,9 +35,9 @@ void action_moveresizeto_startup(void)
     actions_register("MoveToCenter", setup_center_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -46,27 +47,25 @@ static gpointer setup_func(xmlNodePtr node)
     o->h = G_MININT;
     o->monitor = CURRENT_MONITOR;
 
-    if ((n = obt_xml_find_node(node, "x")))
-        config_parse_gravity_coord(n, &o->x);
+    v = g_hash_table_lookup(config, "x");
+    if (v && actions_value_is_string(v))
+        actions_value_gravity_coord(v, &o->x);
+    v = g_hash_table_lookup(config, "y");
+    if (v && actions_value_is_string(v))
+        actions_value_gravity_coord(v, &o->y);
 
-    if ((n = obt_xml_find_node(node, "y")))
-        config_parse_gravity_coord(n, &o->y);
+    v = g_hash_table_lookup(config, "width");
+    if (v && actions_value_is_string(v))
+        if (g_ascii_strcasecmp(actions_value_string(v), "current") != 0)
+            actions_value_fraction(v, &o->w, &o->w_denom);
+    v = g_hash_table_lookup(config, "height");
+    if (v && actions_value_is_string(v))
+        if (g_ascii_strcasecmp(actions_value_string(v), "current") != 0)
+            actions_value_fraction(v, &o->h, &o->h_denom);
 
-    if ((n = obt_xml_find_node(node, "width"))) {
-        gchar *s = obt_xml_node_string(n);
-        if (g_ascii_strcasecmp(s, "current") != 0)
-            config_parse_relative_number(s, &o->w, &o->w_denom);
-        g_free(s);
-    }
-    if ((n = obt_xml_find_node(node, "height"))) {
-        gchar *s = obt_xml_node_string(n);
-        if (g_ascii_strcasecmp(s, "current") != 0)
-            config_parse_relative_number(s, &o->h, &o->h_denom);
-        g_free(s);
-    }
-
-    if ((n = obt_xml_find_node(node, "monitor"))) {
-        gchar *s = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "monitor");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
@@ -75,9 +74,8 @@ static gpointer setup_func(xmlNodePtr node)
             else if(!g_ascii_strcasecmp(s, "prev"))
                 o->monitor = PREV_MONITOR;
             else
-                o->monitor = obt_xml_node_int(n) - 1;
+                o->monitor = actions_value_int(v) - 1;
         }
-        g_free(s);
     }
 
     return o;
@@ -173,7 +171,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_center_func(xmlNodePtr node)
+static gpointer setup_center_func(GHashTable *config)
 {
     Options *o;
 

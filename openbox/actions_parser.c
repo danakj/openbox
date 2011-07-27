@@ -17,25 +17,33 @@
 */
 
 #include "actions_parser.h"
+#include "actions.h"
+#include "actions_list.h"
+#include "actions_value.h"
 #include "gettext.h"
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
 #endif
 
+struct _ObActionsList;
+struct _ObActionsListTest;
+struct _ObActionsValue;
+
 #define SKIP " \t"
-#define IDENTIFIER_FIRST G_CSET_a_2_z G_CSET_A_2_Z
-#define IDENTIFIER_NTH G_CSET_a_2_z G_CSET_A_2_Z \
-    G_CSET_DIGITS G_CSET_LATINS G_CSET_LATINC "_-"
+#define IDENTIFIER_FIRST G_CSET_a_2_z G_CSET_A_2_Z G_CSET_DIGITS "-_"
+#define IDENTIFIER_NTH IDENTIFIER_FIRST G_CSET_LATINS G_CSET_LATINC
 #define ESCAPE_SEQS "\"()"
 
-ObActionsList* parse_list(ObActionsParser *p, GTokenType end, gboolean *e);
-ObActionsList* parse_action(ObActionsParser *p, gboolean *e);
-ObActionsList* parse_filter(ObActionsParser *p, gboolean *e);
-ObActionsListTest* parse_filter_test(ObActionsParser *p, gboolean *e);
-ObActionsListValue* parse_value(ObActionsParser *p,
-                                gboolean allow_actions,
-                                gboolean *e);
+struct _ObActionsList* parse_list(ObActionsParser *p,
+                                  GTokenType end,
+                                  gboolean *e);
+struct _ObActionsList* parse_action(ObActionsParser *p, gboolean *e);
+struct _ObActionsList* parse_filter(ObActionsParser *p, gboolean *e);
+struct _ObActionsListTest* parse_filter_test(ObActionsParser *p, gboolean *e);
+struct _ObActionsValue* parse_value(ObActionsParser *p,
+                                        gboolean allow_actions,
+                                        gboolean *e);
 gchar* parse_string(ObActionsParser *p, guchar end, gboolean *e);
 
 struct _ObActionsParser
@@ -103,6 +111,7 @@ ObActionsList* actions_parser_read_string(ObActionsParser *p,
     g_scanner_input_text(p->scan, text, strlen(text));
     p->scan->input_name = "(console)";
 
+    e = FALSE;
     return parse_list(p, G_TOKEN_EOF, &e);
 }
 
@@ -119,6 +128,7 @@ ObActionsList* actions_parser_read_file(ObActionsParser *p,
     g_scanner_input_file(p->scan, g_io_channel_unix_get_fd(ch));
     p->scan->input_name = file;
 
+    e = FALSE;
     return parse_list(p, G_TOKEN_EOF, &e);
 }
 
@@ -126,9 +136,10 @@ ObActionsList* actions_parser_read_file(ObActionsParser *p,
 BNF for the language:
 
 TEST       := KEY=VALUE | KEY
-ACTION     := [FILTER] ACTION ACTIONELSE | ACTIONNAME ACTIONOPTS | {ACTIONLIST}
+ACTION     := [FILTER] ACTION ELSE END | ACTIONNAME ACTIONOPTS | {ACTIONLIST}
+ELSE       := nil | \| ACTION
+END        := \n | ; | EOF
 ACTIONLIST := ACTION ACTIONLIST | ACTION
-ACTIONELSE := nil | \| ACTION
 FILTER     := FILTERORS
 FILTERORS  := FILTERANDS \| FILTERORS | FILTERANDS
 FILTERANDS := TEST, FILTERANDS | TEST
@@ -160,7 +171,10 @@ ObActionsList* parse_list(ObActionsParser *p, GTokenType end, gboolean *e)
     while (t != end && t != G_TOKEN_EOF) {
         if (t == '\n')
             g_scanner_get_next_token(p->scan); /* skip empty lines */
-        else {
+        else if (t == ';') {
+            g_scanner_get_next_token(p->scan); /* separator */
+        }
+        else if (t == G_TOKEN_IDENTIFIER) {
             ObActionsList *next;
 
             /* parse the next action and stick it on the end of the list */
@@ -168,9 +182,14 @@ ObActionsList* parse_list(ObActionsParser *p, GTokenType end, gboolean *e)
             if (last) last->next = next;
             if (!first) first = next;
             last = next;
-
-            if (*e) break; /* don't parse any more after an error */
         }
+        else {
+            g_scanner_get_next_token(p->scan);
+            parse_error(p, (end ? end : G_TOKEN_NONE),
+                        _("Expected an action or end of action list"), e);
+        }
+
+        if (*e) break; /* don't parse any more after an error */
 
         t = g_scanner_peek_next_token(p->scan);
     }
@@ -186,7 +205,7 @@ ObActionsList* parse_action(ObActionsParser *p, gboolean *e)
     GTokenType t;
     ObActionsList *al;
     gchar *name;
-    GList *keys, *values;
+    GHashTable *config;
 
     t = g_scanner_get_next_token(p->scan);
 
@@ -199,44 +218,57 @@ ObActionsList* parse_action(ObActionsParser *p, gboolean *e)
 
     /* read the action's name */
     name = g_strdup(p->scan->value.v_string);
-    keys = values = NULL;
+    config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
+                                   (GDestroyNotify)actions_value_unref);
 
     /* read the action's options key:value pairs */
     t = g_scanner_peek_next_token(p->scan);
-    while (t == G_TOKEN_IDENTIFIER) {
-        gchar *key;
-        ObActionsListValue *value;
-
-        g_scanner_get_next_token(p->scan); /* eat the key */
-        t = g_scanner_peek_next_token(p->scan); /* check for ':' */
-        if (t != ':') {
-            parse_error(p, ':', NULL, e);
-            break; /* don't read any more options */
+    while (t == G_TOKEN_IDENTIFIER || t == '\\') {
+        if (t == '\\') {
+            g_scanner_get_next_token(p->scan); /* eat it */
+            t = g_scanner_get_next_token(p->scan); /* check for '\n' */
+            if (t != '\n')
+                parse_error(p, G_TOKEN_NONE, _("Expected newline"), e);
         }
+        else {
+            gchar *key;
+            ObActionsValue *value;
 
-        /* save the key */
-        key = g_strdup(p->scan->value.v_string);
-        g_scanner_get_next_token(p->scan); /* eat the ':' */
+            g_scanner_get_next_token(p->scan); /* eat the key */
+            t = g_scanner_peek_next_token(p->scan); /* check for ':' */
+            if (t != ':') {
+                g_scanner_get_next_token(p->scan);
+                parse_error(p, ':', NULL, e);
+                break; /* don't read any more options */
+            }
 
-        /* read the value */
-        value = parse_value(p, TRUE, e);
+            /* save the key */
+            key = g_strdup(p->scan->value.v_string);
+            g_scanner_get_next_token(p->scan); /* eat the ':' */
 
-        /* check if we read a value (regardless of errors), and save
-           the key:value pair if we did. */
-        if (value) {
-            keys = g_list_prepend(keys, key);
-            values = g_list_prepend(values, value);
+            /* read the value */
+            value = parse_value(p, TRUE, e);
+
+            /* check if we read a value (regardless of errors), and save
+               the key:value pair if we did. */
+            if (value)
+                g_hash_table_replace(config, key, value);
+            else
+                g_free(key); /* didn't read any value */
         }
-        else
-            g_free(key); /* didn't read any value */
 
         if (*e) break; /* don't parse any more if there was an error */
+
+        t = g_scanner_peek_next_token(p->scan);
     }
 
     al = g_slice_new(ObActionsList);
     al->ref = 1;
     al->isfilter = FALSE;
-    al->u.action = actions_act_new(name, keys, values);
+    al->u.action = actions_act_new(name, config);
+    al->next = NULL;
+    g_free(name);
+    g_hash_table_unref(config);
     return al;
 }
 
@@ -274,6 +306,7 @@ ObActionsList* parse_filter(ObActionsParser *p, gboolean *e)
     al->u.f.test = test;
     al->u.f.thendo = thendo;
     al->u.f.elsedo = elsedo;
+    al->next = NULL;
     return al;
 }
 
@@ -281,7 +314,7 @@ ObActionsListTest* parse_filter_test(ObActionsParser *p, gboolean *e)
 {
     GTokenType t;
     gchar *key;
-    ObActionsListValue *value;
+    ObActionsValue *value;
     gboolean and;
     ObActionsListTest *next;
 
@@ -309,31 +342,29 @@ ObActionsListTest* parse_filter_test(ObActionsParser *p, gboolean *e)
     /* don't allow any errors (but value can be null if not present) */
     if (*e) {
         g_free(key);
-        actions_list_value_unref(value);
+        actions_value_unref(value);
         return NULL;
     }
 
     /* check if there is another test and how we're connected */
     t = g_scanner_get_next_token(p->scan);
-    switch (t) {
-    case ',': /* and */
+    if (t == ',') { /* and */
         and = TRUE;
         next = parse_filter_test(p, e);
-        break;
-    case '|': /* or */
+    }
+    else if (t == '|') { /* or */
         and = FALSE;
         next = parse_filter_test(p, e);
-        break;
-    case ']': /* end of the filter */
-        break;
-    default:
-        parse_error(p, ']', NULL, e);
     }
+    else if (t == ']') /* end of the filter */
+        ;
+    else
+        parse_error(p, ']', NULL, e);
 
     /* don't allow any errors */
     if (*e) {
         g_free(key);
-        actions_list_value_unref(value);
+        actions_value_unref(value);
         actions_list_test_destroy(next);
         return NULL;
     }
@@ -349,26 +380,25 @@ ObActionsListTest* parse_filter_test(ObActionsParser *p, gboolean *e)
     }
 }
 
-ObActionsListValue* parse_value(ObActionsParser *p,
+ObActionsValue* parse_value(ObActionsParser *p,
                                 gboolean allow_actions,
                                 gboolean *e)
 {
     GTokenType t;
-    ObActionsListValue *v;
+    ObActionsValue *v;
 
     v = NULL;
     t = g_scanner_get_next_token(p->scan);
-    if (t == G_TOKEN_IDENTIFIER)
-        v = actions_list_value_new_string(p->scan->value.v_string);
-    else if (t == G_TOKEN_INT)
-        v = actions_list_value_new_int(p->scan->value.v_int);
+    if (t == G_TOKEN_IDENTIFIER) {
+        v = actions_value_new_string(p->scan->value.v_string);
+    }
     else if (t == '"')
-        v = actions_list_value_new_string(parse_string(p, '"', e));
+        v = actions_value_new_string(parse_string(p, '"', e));
     else if (t == '(')
-        v = actions_list_value_new_string(parse_string(p, ')', e));
+        v = actions_value_new_string(parse_string(p, ')', e));
     else if (t == '{' && allow_actions) {
         ObActionsList *l = parse_list(p, '}', e);
-        if (l) v = actions_list_value_new_actions_list(l);
+        if (l) v = actions_value_new_actions_list(l);
     }
     else
         parse_error(p, G_TOKEN_NONE, _("Expected an option value"), e);
@@ -391,27 +421,22 @@ gchar* parse_string(ObActionsParser *p, guchar end, gboolean *e)
 
     t = g_scanner_get_next_token(p->scan);
     while (t != end) {
-        switch (t) {
-        case G_TOKEN_IDENTIFIER:
+        if (t == G_TOKEN_IDENTIFIER)
             g_string_append(buf, p->scan->value.v_string);
-            break;
-        case G_TOKEN_EOF:
+        else if (t == G_TOKEN_EOF) {
             error_message = _("Missing end of quoted string");
             goto parse_string_error;
-        case G_TOKEN_NONE:
-            error_message = _("Unknown token in quoted string");
-            goto parse_string_error;
-        case '\\': /* escape sequence */
+        }
+        else if (t == '\\') { /* escape sequence */
             t = g_scanner_get_next_token(p->scan);
             if (!strchr(ESCAPE_SEQS, t)) {
                 error_message = _("Unknown escape sequence");
                 goto parse_string_error;
             }
             g_string_append_c(buf, t);
-            break;
-        default: /* other single character */
-            g_string_append_c(buf, t);
         }
+        else /* other single character */
+            g_string_append_c(buf, t);
 
         t = g_scanner_get_next_token(p->scan);
     }

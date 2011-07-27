@@ -17,26 +17,14 @@
 */
 
 #include "actions_list.h"
+#include "actions.h"
+#include "actions_value.h"
 
 #include <glib.h>
 
-struct _ObActionsListValue {
-    gint ref;
-    enum {
-        OB_AL_STRING,
-        OB_AL_INTEGER,
-        OB_AL_ACTIONSLIST
-    } type;
-    union {
-        gchar *string;
-        guint integer;
-        ObActionsList *actions;
-    } v;
-};
-
 void actions_list_ref(ObActionsList *l)
 {
-    ++l->ref;
+    if (l) ++l->ref;
 }
 
 void actions_list_unref(ObActionsList *l)
@@ -63,97 +51,18 @@ void actions_list_test_destroy(ObActionsListTest *t)
         ObActionsListTest *n = t->next;
 
         g_free(t->key);
-        actions_list_value_unref(t->value);
+        actions_value_unref(t->value);
         g_slice_free(ObActionsListTest, t);
         t = n;
     }
 }
 
-ObActionsListValue* actions_list_value_new_string(const gchar *s)
+ObActionsList* actions_list_concat(ObActionsList *a, ObActionsList *b)
 {
-    return actions_list_value_new_string_steal(g_strdup(s));
-}
+    ObActionsList *start = a;
 
-ObActionsListValue* actions_list_value_new_string_steal(gchar *s)
-{
-    ObActionsListValue *v = g_slice_new(ObActionsListValue);
-    v->ref = 1;
-    v->type = OB_AL_STRING;
-    v->v.string = s;
-    return v;
+    if (!start) return b;
+    while (a->next) a = a->next;
+    a->next = b;
+    return start;
 }
-
-ObActionsListValue* actions_list_value_new_int(gint i)
-{
-    ObActionsListValue *v = g_slice_new(ObActionsListValue);
-    v->ref = 1;
-    v->type = OB_AL_INTEGER;
-    v->v.integer = i;
-    return v;
-}
-
-ObActionsListValue* actions_list_value_new_actions_list(ObActionsList *al)
-{
-    ObActionsListValue *v = g_slice_new(ObActionsListValue);
-    v->ref = 1;
-    v->type = OB_AL_ACTIONSLIST;
-    v->v.actions = al;
-    actions_list_ref(al);
-    return v;
-}
-
-void actions_list_value_ref(ObActionsListValue *v)
-{
-    ++v->ref;
-}
-
-void actions_list_value_unref(ObActionsListValue *v)
-{
-    if (v && --v->ref < 1) {
-        switch (v->type) {
-        case OB_AL_STRING:
-            g_free(v->v.string);
-            break;
-        case OB_AL_ACTIONSLIST:
-            actions_list_unref(v->v.actions);
-            break;
-        case OB_AL_INTEGER:
-            break;
-        }
-        g_slice_free(ObActionsListValue, v);
-    }
-}
-
-gboolean actions_list_value_is_string(ObActionsListValue *v)
-{
-    return v->type == OB_AL_STRING;
-}
-
-gboolean actions_list_value_is_int(ObActionsListValue *v)
-{
-    return v->type == OB_AL_INTEGER;
-}
-
-gboolean actions_list_value_is_actions_list(ObActionsListValue *v)
-{
-    return v->type == OB_AL_ACTIONSLIST;
-}
-
-gchar* actions_list_value_string(ObActionsListValue *v)
-{
-    g_return_val_if_fail(v->type == OB_AL_STRING, NULL);
-    return v->v.string;
-}
-
-gint actions_list_value_int(ObActionsListValue *v)
-{
-    g_return_val_if_fail(v->type == OB_AL_INTEGER, 0);
-    return v->v.integer;
-}
-
-ObActionsList* actions_list_value_actions_list(ObActionsListValue *v)
-{
-    g_return_val_if_fail(v->type == OB_AL_ACTIONSLIST, NULL);
-    return v->v.actions;
-}
-

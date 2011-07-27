@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
 #include "openbox/client.h"
@@ -21,7 +22,7 @@ typedef struct {
     ObActionsData *data;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static void shutdown_func(void);
@@ -48,34 +49,33 @@ static void client_dest(ObClient *client, gpointer data)
     }
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "command")) ||
-        (n = obt_xml_find_node(node, "execute")))
-    {
-        gchar *s = obt_xml_node_string(n);
-        o->cmd = obt_paths_expand_tilde(s);
-        g_free(s);
-    }
+    v = g_hash_table_lookup(config, "command");
+    if (v && actions_value_is_string(v))
+        o->cmd = obt_paths_expand_tilde(actions_value_string(v));
 
-    if ((n = obt_xml_find_node(node, "prompt")))
-        o->prompt = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "prompt");
+    if (v && actions_value_is_string(v))
+        o->prompt = g_strdup(actions_value_string(v));
 
-    if ((n = obt_xml_find_node(node, "startupnotify"))) {
-        xmlNodePtr m;
-        if ((m = obt_xml_find_node(n->children, "enabled")))
-            o->sn = obt_xml_node_bool(m);
-        if ((m = obt_xml_find_node(n->children, "name")))
-            o->sn_name = obt_xml_node_string(m);
-        if ((m = obt_xml_find_node(n->children, "icon")))
-            o->sn_icon = obt_xml_node_string(m);
-        if ((m = obt_xml_find_node(n->children, "wmclass")))
-            o->sn_wmclass = obt_xml_node_string(m);
+    v = g_hash_table_lookup(config, "startupnotify");
+    if (v && actions_value_is_string(v) && actions_value_bool(v)) {
+        o->sn = TRUE;
+        v = g_hash_table_lookup(config, "name");
+        if (v && actions_value_is_string(v))
+            o->sn_name = g_strdup(actions_value_string(v));
+        v = g_hash_table_lookup(config, "icon");
+        if (v && actions_value_is_string(v))
+            o->sn_icon = g_strdup(actions_value_string(v));
+        v = g_hash_table_lookup(config, "wmclass");
+        if (v && actions_value_is_string(v))
+            o->sn_wmclass = g_strdup(actions_value_string(v));
     }
     return o;
 }

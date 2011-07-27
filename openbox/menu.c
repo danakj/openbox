@@ -25,6 +25,8 @@
 #include "client.h"
 #include "config.h"
 #include "actions.h"
+#include "actions_list.h"
+#include "actions_parser.h"
 #include "screen.h"
 #include "menuframe.h"
 #include "keyboard.h"
@@ -281,16 +283,24 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
 
         if (obt_xml_attr_string(node, "label", &label)) {
             xmlNodePtr c;
-            GSList *acts = NULL;
+            xmlChar *cc;
+            ObActionsList *acts = NULL;
+            ObActionsParser *p;
 
             c = obt_xml_find_node(node->children, "action");
+            p = actions_parser_new();
             while (c) {
-                ObActionsAct *action = actions_parse(c);
-                if (action)
-                    acts = g_slist_append(acts, action);
+                ObActionsList *al;
+
+                cc = xmlNodeGetContent(c);
+                al = actions_parser_read_string(p, (gchar*)cc);
+                xmlFree(cc);
+                acts = actions_list_concat(acts, al);
+
                 c = obt_xml_find_node(c->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, acts, TRUE);
+            actions_list_unref(acts);
             
             if (config_menu_show_icons &&
                 obt_xml_attr_string(node, "icon", &icon))
@@ -545,12 +555,7 @@ void menu_entry_unref(ObMenuEntry *self)
             RrImageUnref(self->data.normal.icon);
             g_free(self->data.normal.label);
             g_free(self->data.normal.collate_key);
-            while (self->data.normal.actions) {
-                actions_act_unref(self->data.normal.actions->data);
-                self->data.normal.actions =
-                    g_slist_delete_link(self->data.normal.actions,
-                                        self->data.normal.actions);
-            }
+            actions_list_unref(self->data.normal.actions);
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
             RrImageUnref(self->data.submenu.icon);
@@ -594,12 +599,13 @@ void menu_entry_remove(ObMenuEntry *self)
 }
 
 ObMenuEntry* menu_add_normal(ObMenu *self, gint id, const gchar *label,
-                             GSList *actions, gboolean allow_shortcut)
+                             ObActionsList *actions, gboolean allow_shortcut)
 {
     ObMenuEntry *e;
 
     e = menu_entry_new(self, OB_MENU_ENTRY_TYPE_NORMAL, id);
     e->data.normal.actions = actions;
+    actions_list_ref(actions);
 
     menu_entry_set_label(e, label, allow_shortcut);
 

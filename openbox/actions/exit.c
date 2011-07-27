@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/openbox.h"
 #include "openbox/prompt.h"
 #include "openbox/session.h"
@@ -8,7 +9,7 @@ typedef struct {
     gboolean prompt;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -18,16 +19,17 @@ void action_exit_startup(void)
     actions_register("SessionLogout", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->prompt = TRUE;
 
-    if ((n = obt_xml_find_node(node, "prompt")))
-        o->prompt = obt_xml_node_bool(n);
+    v = g_hash_table_lookup(config, "prompt");
+    if (v && actions_value_is_string(v))
+        o->prompt = actions_value_bool(v);
 
     return o;
 }

@@ -24,6 +24,8 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
+struct _ObActionsList;
+
 typedef struct _ObActionsDefinition   ObActionsDefinition;
 typedef struct _ObActionsAct          ObActionsAct;
 typedef struct _ObActionsData         ObActionsData;
@@ -35,7 +37,7 @@ typedef struct _ObActionsSelectorData ObActionsSelectorData;
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,
                                      gpointer options);
-typedef gpointer (*ObActionsDataSetupFunc)(xmlNodePtr node);
+typedef gpointer (*ObActionsDataSetupFunc)(GHashTable *config);
 typedef void     (*ObActionsShutdownFunc)(void);
 
 /* functions for interactive actions */
@@ -49,7 +51,7 @@ typedef gboolean (*ObActionsIInputFunc)(guint initial_state,
                                         gpointer options,
                                         gboolean *used);
 typedef void     (*ObActionsICancelFunc)(gpointer options);
-typedef gpointer (*ObActionsIDataSetupFunc)(xmlNodePtr node,
+typedef gpointer (*ObActionsIDataSetupFunc)(GHashTable *config,
                                             ObActionsIPreFunc *pre,
                                             ObActionsIInputFunc *input,
                                             ObActionsICancelFunc *cancel,
@@ -94,7 +96,7 @@ gboolean actions_act_is_interactive(ObActionsAct *act);
   @values The values of the options passed to the action, paired with the
     keys.  These are ObActionsListValue objects.
 */
-ObActionsAct* actions_act_new(const gchar *name, GList *keys, GList *values);
+ObActionsAct* actions_act_new(const gchar *name, GHashTable *config);
 
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
@@ -108,15 +110,17 @@ void actions_set_need_pointer_replay_before_move(gboolean replay);
   actions then this will be false */
 gboolean actions_get_need_pointer_replay_before_move(void);
 
-/*! Pass in a GSList of ObActionsAct's to be run. */
-void actions_run_acts(GSList *acts,
-                      ObUserAction uact,
-                      guint state,
-                      gint x,
-                      gint y,
-                      gint button,
-                      ObFrameContext con,
-                      struct _ObClient *client);
+/*! Runs a list of actions.
+ @return TRUE if an interactive action was started, FALSE otherwise.
+*/
+gboolean actions_run_acts(struct _ObActionsList *acts,
+                          ObUserAction uact,
+                          guint state,
+                          gint x,
+                          gint y,
+                          gint button,
+                          ObFrameContext con,
+                          struct _ObClient *client);
 
 gboolean actions_interactive_act_running(void);
 void actions_interactive_cancel_act(void);

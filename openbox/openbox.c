@@ -243,7 +243,7 @@ gint main(gint argc, gchar **argv)
                 /* parse/load user options */
                 if ((config_file &&
                      obt_xml_load_file(i, config_file, "openbox_config")) ||
-                    obt_xml_load_config_file(i, "openbox", "rc.xml",
+                    obt_xml_load_config_file(i, "openbox", "rc",
                                              "openbox_config"))
                 {
                     obt_xml_tree_from_root(i);

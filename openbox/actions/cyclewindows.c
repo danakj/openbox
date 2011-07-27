@@ -1,4 +1,7 @@
 #include "openbox/actions.h"
+#include "openbox/actions_list.h"
+#include "openbox/actions_parser.h"
+#include "openbox/actions_value.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
 #include "openbox/event.h"
@@ -17,7 +20,7 @@ typedef struct {
     gboolean bar;
     gboolean raise;
     ObFocusCyclePopupMode dialog_mode;
-    GSList *actions;
+    ObActionsList *actions;
 
 
     /* options for after we're done */
@@ -25,17 +28,17 @@ typedef struct {
     guint state;     /* keyboard state when finished */
 } Options;
 
-static gpointer setup_func(xmlNodePtr node,
+static gpointer setup_func(GHashTable *config,
                            ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *in,
                            ObActionsICancelFunc *c,
                            ObActionsIPostFunc *post);
-static gpointer setup_forward_func(xmlNodePtr node,
+static gpointer setup_forward_func(GHashTable *config,
                                    ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *in,
                                    ObActionsICancelFunc *c,
                                    ObActionsIPostFunc *post);
-static gpointer setup_backward_func(xmlNodePtr node,
+static gpointer setup_backward_func(GHashTable *config,
                                     ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *in,
                                     ObActionsICancelFunc *c,
@@ -57,57 +60,61 @@ void action_cyclewindows_startup(void)
                        run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node,
+static gpointer setup_func(GHashTable *config,
                            ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *input,
                            ObActionsICancelFunc *cancel,
                            ObActionsIPostFunc *post)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->bar = TRUE;
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
 
-    if ((n = obt_xml_find_node(node, "linear")))
-        o->linear = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "dialog"))) {
-        if (obt_xml_node_contains(n, "none"))
+    v = g_hash_table_lookup(config, "linear");
+    if (v && actions_value_is_string(v))
+        o->linear = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "dialog");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
+        if (g_strcasecmp(s, "none") == 0)
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
-        else if (obt_xml_node_contains(n, "icons"))
+        else if (g_strcasecmp(s, "icons") == 0)
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }
-    if ((n = obt_xml_find_node(node, "bar")))
-        o->bar = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "raise")))
-        o->raise = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "panels")))
-        o->dock_windows = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "hilite")))
-        o->only_hilite_windows = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "desktop")))
-        o->desktop_windows = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "allDesktops")))
-        o->all_desktops = obt_xml_node_bool(n);
+    v = g_hash_table_lookup(config, "bar");
+    if (v && actions_value_is_string(v))
+        o->bar = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "raise");
+    if (v && actions_value_is_string(v))
+        o->raise = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "panels");
+    if (v && actions_value_is_string(v))
+        o->dock_windows = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "hilite");
+    if (v && actions_value_is_string(v))
+        o->only_hilite_windows = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "desktop");
+    if (v && actions_value_is_string(v))
+        o->desktop_windows = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "allDesktops");
+    if (v && actions_value_is_string(v))
+        o->all_desktops = actions_value_bool(v);
 
-    if ((n = obt_xml_find_node(node, "finalactions"))) {
-        xmlNodePtr m;
-
-        m = obt_xml_find_node(n->children, "action");
-        while (m) {
-            ObActionsAct *action = actions_parse(m);
-            if (action) o->actions = g_slist_append(o->actions, action);
-            m = obt_xml_find_node(m->next, "action");
-        }
+    v = g_hash_table_lookup(config, "finalactions");
+    if (v && actions_value_is_actions_list(v)) {
+        o->actions = actions_value_actions_list(v);
+        actions_list_ref(o->actions);
     }
     else {
-        o->actions = g_slist_prepend(o->actions,
-                                     actions_parse_string("Focus"));
-        o->actions = g_slist_prepend(o->actions,
-                                     actions_parse_string("Raise"));
-        o->actions = g_slist_prepend(o->actions,
-                                     actions_parse_string("Unshade"));
+        ObActionsParser *p = actions_parser_new();
+        o->actions = actions_parser_read_string(p,
+                                                "focus\n"
+                                                "raise\n"
+                                                "unshade\n");
+        actions_parser_unref(p);
     }
 
     *input = i_input_func;
@@ -116,24 +123,24 @@ static gpointer setup_func(xmlNodePtr node,
     return o;
 }
 
-static gpointer setup_forward_func(xmlNodePtr node,
+static gpointer setup_forward_func(GHashTable *config,
                                    ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *input,
                                    ObActionsICancelFunc *cancel,
                                    ObActionsIPostFunc *post)
 {
-    Options *o = setup_func(node, pre, input, cancel, post);
+    Options *o = setup_func(config, pre, input, cancel, post);
     o->forward = TRUE;
     return o;
 }
 
-static gpointer setup_backward_func(xmlNodePtr node,
+static gpointer setup_backward_func(GHashTable *config,
                                     ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *input,
                                     ObActionsICancelFunc *cancel,
                                     ObActionsIPostFunc *post)
 {
-    Options *o = setup_func(node, pre, input, cancel, post);
+    Options *o = setup_func(config, pre, input, cancel, post);
     o->forward = FALSE;
     return o;
 }
@@ -142,11 +149,7 @@ static void free_func(gpointer options)
 {
     Options *o = options;
 
-    while (o->actions) {
-        actions_act_unref(o->actions->data);
-        o->actions = g_slist_delete_link(o->actions, o->actions);
-    }
-
+    actions_list_unref(o->actions);
     g_slice_free(Options, o);
 }
 

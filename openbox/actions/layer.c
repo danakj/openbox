@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/client.h"
 
 typedef struct {
@@ -6,15 +7,15 @@ typedef struct {
     gboolean toggle;
 } Options;
 
-static gpointer setup_func_top(xmlNodePtr node);
-static gpointer setup_func_bottom(xmlNodePtr node);
-static gpointer setup_func_send(xmlNodePtr node);
+static gpointer setup_func_top(GHashTable *config);
+static gpointer setup_func_bottom(GHashTable *config);
+static gpointer setup_func_send(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
-static gpointer setup_sendtop_func(xmlNodePtr node);
-static gpointer setup_sendbottom_func(xmlNodePtr node);
-static gpointer setup_sendnormal_func(xmlNodePtr node);
+static gpointer setup_sendtop_func(GHashTable *config);
+static gpointer setup_sendbottom_func(GHashTable *config);
+static gpointer setup_sendnormal_func(GHashTable *config);
 
 void action_layer_startup(void)
 {
@@ -33,7 +34,7 @@ void action_layer_startup(void)
                      run_func);
 }
 
-static gpointer setup_func_top(xmlNodePtr node)
+static gpointer setup_func_top(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 1;
@@ -41,7 +42,7 @@ static gpointer setup_func_top(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_func_bottom(xmlNodePtr node)
+static gpointer setup_func_bottom(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->layer = -1;
@@ -49,15 +50,16 @@ static gpointer setup_func_bottom(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_func_send(xmlNodePtr node)
+static gpointer setup_func_send(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "layer"))) {
-        gchar *s = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "layer");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
         if (!g_ascii_strcasecmp(s, "above") ||
             !g_ascii_strcasecmp(s, "top"))
             o->layer = 1;
@@ -67,7 +69,6 @@ static gpointer setup_func_send(xmlNodePtr node)
         else if (!g_ascii_strcasecmp(s, "normal") ||
                  !g_ascii_strcasecmp(s, "middle"))
             o->layer = 0;
-        g_free(s);
     }
 
     return o;
@@ -106,7 +107,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_sendtop_func(xmlNodePtr node)
+static gpointer setup_sendtop_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 1;
@@ -114,7 +115,7 @@ static gpointer setup_sendtop_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_sendbottom_func(xmlNodePtr node)
+static gpointer setup_sendbottom_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->layer = -1;
@@ -122,7 +123,7 @@ static gpointer setup_sendbottom_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_sendnormal_func(xmlNodePtr node)
+static gpointer setup_sendnormal_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 0;

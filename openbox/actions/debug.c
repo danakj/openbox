@@ -1,11 +1,12 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include <glib.h>
 
 typedef struct {
     gchar   *str;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -14,15 +15,16 @@ void action_debug_startup(void)
     actions_register("Debug", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "string")))
-        o->str = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "string");
+    if (v && actions_value_is_string(v))
+        o->str = g_strdup(actions_value_string(v));
     return o;
 }
 

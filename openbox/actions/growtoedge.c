@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
@@ -10,15 +11,15 @@ typedef struct {
     gboolean shrink;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
-static gpointer setup_shrink_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
+static gpointer setup_shrink_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 /* 3.4-compatibility */
-static gpointer setup_north_func(xmlNodePtr node);
-static gpointer setup_south_func(xmlNodePtr node);
-static gpointer setup_east_func(xmlNodePtr node);
-static gpointer setup_west_func(xmlNodePtr node);
+static gpointer setup_north_func(GHashTable *config);
+static gpointer setup_south_func(GHashTable *config);
+static gpointer setup_east_func(GHashTable *config);
+static gpointer setup_west_func(GHashTable *config);
 
 void action_growtoedge_startup(void)
 {
@@ -33,17 +34,18 @@ void action_growtoedge_startup(void)
     actions_register("GrowToEdgeWest", setup_west_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
     o->shrink = FALSE;
 
-    if ((n = obt_xml_find_node(node, "direction"))) {
-        gchar *s = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "direction");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->dir = OB_DIRECTION_NORTH;
@@ -56,17 +58,16 @@ static gpointer setup_func(xmlNodePtr node)
         else if (!g_ascii_strcasecmp(s, "east") ||
                  !g_ascii_strcasecmp(s, "right"))
             o->dir = OB_DIRECTION_EAST;
-        g_free(s);
     }
 
     return o;
 }
 
-static gpointer setup_shrink_func(xmlNodePtr node)
+static gpointer setup_shrink_func(GHashTable *config)
 {
     Options *o;
 
-    o = setup_func(node);
+    o = setup_func(config);
     o->shrink = TRUE;
 
     return o;
@@ -167,7 +168,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_north_func(xmlNodePtr node)
+static gpointer setup_north_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -175,7 +176,7 @@ static gpointer setup_north_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_south_func(xmlNodePtr node)
+static gpointer setup_south_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -183,7 +184,7 @@ static gpointer setup_south_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_east_func(xmlNodePtr node)
+static gpointer setup_east_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -191,7 +192,7 @@ static gpointer setup_east_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_west_func(xmlNodePtr node)
+static gpointer setup_west_func(GHashTable *config)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;

@@ -21,11 +21,13 @@
 
 #include <glib.h>
 
+struct _ObActionsList;
+
 typedef struct KeyBindingTree {
     guint state;
     guint key;
     GList *keylist;
-    GSList *actions; /* list of Action pointers */
+    struct _ObActionsList *actions;
     gboolean chroot;
 
     /* the level up in the tree */

@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/event.h"
 #include "openbox/client.h"
 #include "openbox/focus.h"
@@ -9,7 +10,7 @@ typedef struct {
     gboolean stop_int;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -18,18 +19,20 @@ void action_focus_startup(void)
     actions_register("Focus", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->stop_int = TRUE;
 
-    if ((n = obt_xml_find_node(node, "here")))
-        o->here = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "stopInteractive")))
-        o->stop_int = obt_xml_node_bool(n);
+    v = g_hash_table_lookup(config, "here");
+    if (v && actions_value_is_string(v))
+        o->here = actions_value_bool(v);
+    v = g_hash_table_lookup(config, "stopInteractive");
+    if (v && actions_value_is_string(v))
+        o->stop_int = actions_value_bool(v);
     return o;
 }
 

@@ -16,9 +16,9 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "actions_list.h"
-
 #include <glib.h>
+
+struct _ObActionsList;
 
 typedef struct _ObActionsParser ObActionsParser;
 
@@ -27,8 +27,8 @@ ObActionsParser* actions_parser_new(void);
 void actions_parser_ref(ObActionsParser *p);
 void actions_parser_unref(ObActionsParser *p);
 
-ObActionsList* actions_parser_read_string(ObActionsParser *p,
-                                          const gchar *text);
-ObActionsList* actions_parser_read_file(ObActionsParser *p,
-                                        const gchar *file,
-                                        GError **error);
+struct _ObActionsList* actions_parser_read_string(ObActionsParser *p,
+                                                  const gchar *text);
+struct _ObActionsList* actions_parser_read_file(ObActionsParser *p,
+                                                const gchar *file,
+                                                GError **error);

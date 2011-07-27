@@ -17,6 +17,7 @@
 */
 
 #include "actions.h"
+#include "actions_list.h"
 #include "gettext.h"
 #include "grab.h"
 #include "screen.h"
@@ -33,7 +34,7 @@ static void     actions_definition_ref(ObActionsDefinition *def);
 static void     actions_definition_unref(ObActionsDefinition *def);
 static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state);
 static void     actions_interactive_end_act();
-static ObActionsAct* actions_build_act_from_string(const gchar *name);
+static ObActionsAct* actions_act_find_name(const gchar *name);
 
 static ObActionsAct *interactive_act = NULL;
 static guint         interactive_initial_state = 0;
@@ -169,7 +170,7 @@ static void actions_definition_unref(ObActionsDefinition *def)
     }
 }
 
-static ObActionsAct* actions_build_act_from_string(const gchar *name)
+static ObActionsAct* actions_act_find_name(const gchar *name)
 {
     GSList *it;
     ObActionsDefinition *def = NULL;
@@ -205,7 +206,7 @@ ObActionsAct* actions_parse_string(const gchar *name)
 {
     ObActionsAct *act = NULL;
 
-    if ((act = actions_build_act_from_string(name))) {
+    if ((act = actions_act_find_name(name))) {
         if (act->def->canbeinteractive) {
             if (act->def->setup.i)
                 act->options = act->def->setup.i(NULL,
@@ -230,11 +231,11 @@ ObActionsAct* actions_parse(xmlNodePtr node)
     ObActionsAct *act = NULL;
 
     if (obt_xml_attr_string(node, "name", &name)) {
-        if ((act = actions_build_act_from_string(name))) {
+        if ((act = actions_act_find_name(name))) {
             /* there is more stuff to parse here */
             if (act->def->canbeinteractive) {
                 if (act->def->setup.i)
-                    act->options = act->def->setup.i(node->children,
+                    act->options = act->def->setup.i(NULL,
                                                      &act->i_pre,
                                                      &act->i_input,
                                                      &act->i_cancel,
@@ -242,7 +243,7 @@ ObActionsAct* actions_parse(xmlNodePtr node)
             }
             else {
                 if (act->def->setup.n)
-                    act->options = act->def->setup.n(node->children);
+                    act->options = act->def->setup.n(NULL);
             }
         }
         g_free(name);
@@ -251,17 +252,16 @@ ObActionsAct* actions_parse(xmlNodePtr node)
     return act;
 }
 
-ObActionsAct* actions_act_new(const gchar *name, GList *keys, GList *values)
+ObActionsAct* actions_act_new(const gchar *name, GHashTable *config)
 {
     ObActionsAct *act = NULL;
 
-    act = actions_build_act_from_string(name);
+    act = actions_act_find_name(name);
     if (act) {
         /* there is more stuff to parse here */
         if (act->def->canbeinteractive) {
             if (act->def->setup.i)
-//XXX                act->options = act->def->setup.i(keys, values,
-                act->options = act->def->setup.i(NULL,
+                act->options = act->def->setup.i(config,
                                                  &act->i_pre,
                                                  &act->i_input,
                                                  &act->i_cancel,
@@ -269,11 +269,9 @@ ObActionsAct* actions_act_new(const gchar *name, GList *keys, GList *values)
         }
         else {
             if (act->def->setup.n)
-//XXX                act->options = act->def->setup.n(keys, values);
-                act->options = act->def->setup.n(NULL);
+                act->options = act->def->setup.n(config);
         }
     }
-    g_free(name);
 
     return act;
 }
@@ -318,16 +316,16 @@ static void actions_setup_data(ObActionsData *data,
     data->client = client;
 }
 
-void actions_run_acts(GSList *acts,
-                      ObUserAction uact,
-                      guint state,
-                      gint x,
-                      gint y,
-                      gint button,
-                      ObFrameContext con,
-                      struct _ObClient *client)
+gboolean actions_run_acts(ObActionsList *acts,
+                          ObUserAction uact,
+                          guint state,
+                          gint x,
+                          gint y,
+                          gint button,
+                          ObFrameContext con,
+                          struct _ObClient *client)
 {
-    GSList *it;
+    gboolean ran_interactive;
     gboolean update_user_time;
 
     /* Don't allow saving the initial state when running things from the
@@ -338,11 +336,21 @@ void actions_run_acts(GSList *acts,
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
 
+    ran_interactive = FALSE;
     update_user_time = FALSE;
-    for (it = acts; it; it = g_slist_next(it)) {
+    while (acts) {
+        ObActionsAct *act;
         ObActionsData data;
-        ObActionsAct *act = it->data;
         gboolean ok = TRUE;
+
+        if (acts->isfilter) {
+            g_warning("filters not implemented!");
+            acts = acts->next;
+            continue;
+        }
+        else {
+            act = acts->u.action;
+        }
 
         actions_setup_data(&data, uact, state, x, y, button, con, client);
 
@@ -356,10 +364,13 @@ void actions_run_acts(GSList *acts,
                 if (act->i_pre)
                     if (!act->i_pre(state, act->options))
                         act->i_input = NULL; /* remove the interactivity */
+                ran_interactive = TRUE;
             }
             /* check again cuz it might have been cancelled */
-            if (actions_act_is_interactive(act))
+            if (actions_act_is_interactive(act)) {
                 ok = actions_interactive_begin_act(act, state);
+                ran_interactive = TRUE;
+            }
         }
 
         /* fire the action's run function with this data */
@@ -377,9 +388,11 @@ void actions_run_acts(GSList *acts,
                 break;
             }
         }
+        acts = acts->next;
     }
     if (update_user_time)
         event_update_user_time();
+    return ran_interactive;
 }
 
 gboolean actions_interactive_act_running(void)

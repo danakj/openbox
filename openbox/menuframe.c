@@ -22,6 +22,7 @@
 #include "menu.h"
 #include "screen.h"
 #include "actions.h"
+#include "actions_list.h"
 #include "event.h"
 #include "grab.h"
 #include "openbox.h"
@@ -1289,7 +1290,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
         ObMenuEntry *entry = self->entry;
         ObMenuExecuteFunc func = self->frame->menu->execute_func;
         gpointer data = self->frame->menu->data;
-        GSList *acts = self->entry->data.normal.actions;
+        ObActionsList *acts = self->entry->data.normal.actions;
         ObClient *client = self->frame->client;
         ObMenuFrame *frame = self->frame;
         guint mods = obt_keyboard_only_modmasks(state);

@@ -1,4 +1,5 @@
 #include "openbox/actions.h"
+#include "openbox/actions_value.h"
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
@@ -9,7 +10,7 @@ typedef struct {
     guint32 corner;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
 
@@ -21,15 +22,16 @@ void action_resize_startup(void)
     actions_register("Resize", setup_func, free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node)
+static gpointer setup_func(GHashTable *config)
 {
-    xmlNodePtr n;
+    ObActionsValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
-    if ((n = obt_xml_find_node(node, "edge"))) {
-        gchar *s = obt_xml_node_string(n);
+    v = g_hash_table_lookup(config, "edge");
+    if (v && actions_value_is_string(v)) {
+        const gchar *s = actions_value_string(v);
 
         o->corner_specified = TRUE;
         if (!g_ascii_strcasecmp(s, "top"))
@@ -50,8 +52,6 @@ static gpointer setup_func(xmlNodePtr node)
             o->corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT);
         else
             o->corner_specified = FALSE;
-
-        g_free(s);
     }
     return o;
 }

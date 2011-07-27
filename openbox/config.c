@@ -21,6 +21,8 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "actions.h"
+#include "actions_list.h"
+#include "actions_parser.h"
 #include "translate.h"
 #include "client.h"
 #include "screen.h"
@@ -411,11 +413,20 @@ static void parse_key(xmlNodePtr node, GList *keylist)
         }
         else if ((n = obt_xml_find_node(node->children, "action"))) {
             while (n) {
-                ObActionsAct *action;
+                ObActionsParser *p;
+                ObActionsList *actions;
+                xmlChar *c;
 
-                action = actions_parse(n);
-                if (action)
-                    keyboard_bind(keylist, action);
+                c = xmlNodeGetContent(node);
+                p = actions_parser_new();
+                actions = actions_parser_read_string(p, (gchar*)c);
+                xmlFree(c);
+                actions_parser_unref(p);
+
+                if (actions)
+                    keyboard_bind(keylist, actions);
+
+                actions_list_unref(actions);
                 n = obt_xml_find_node(n->next, "action");
             }
         }
@@ -526,11 +537,18 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
                 nact = obt_xml_find_node(nbut->children, "action");
                 while (nact) {
-                    ObActionsAct *action;
+                    ObActionsList *actions;
+                    ObActionsParser *p;
+                    xmlChar *c;
 
-                    if ((action = actions_parse(nact)))
-                        mouse_bind(buttonstr, cx, mact, action);
+                    c = xmlNodeGetContent(nact);
+                    p = actions_parser_new();
+                    if ((actions = actions_parser_read_string(p, (gchar*)c)))
+                        mouse_bind(buttonstr, cx, mact, actions);
                     nact = obt_xml_find_node(nact->next, "action");
+                    actions_list_unref(actions);
+                    xmlFree(c);
+                    actions_parser_unref(p);
                 }
             g_free(buttonstr);
             next_nbut:
@@ -906,22 +924,31 @@ static void parse_resistance(xmlNodePtr node, gpointer d)
 typedef struct
 {
     const gchar *key;
-    const gchar *actname;
+    const gchar *actiontext;
 } ObDefKeyBind;
 
 static void bind_default_keyboard(void)
 {
     ObDefKeyBind *it;
     ObDefKeyBind binds[] = {
+        { "Left",
+          "Execute startupnotify:yes name:Konqueror              \\\n"
+          "  command:(kfmclient openProfile filemanagement)" },
         { "A-Tab", "NextWindow" },
         { "S-A-Tab", "PreviousWindow" },
         { "A-F4", "Close" },
         { NULL, NULL }
     };
+    ObActionsParser *p;
+
+    p = actions_parser_new();
     for (it = binds; it->key; ++it) {
         GList *l = g_list_append(NULL, g_strdup(it->key));
-        keyboard_bind(l, actions_parse_string(it->actname));
+        ObActionsList *actions = actions_parser_read_string(p, it->actiontext);
+        keyboard_bind(l, actions);
+        actions_list_unref(actions);
     }
+    actions_parser_unref(p);
 }
 
 typedef struct
@@ -985,10 +1012,17 @@ static void bind_default_mouse(void)
         { "A-Middle", "Frame", OB_MOUSE_ACTION_MOTION, "Resize" },
         { NULL, NULL, 0, NULL }
     };
+    ObActionsParser *p;
+    ObActionsList *actions;
 
-    for (it = binds; it->button; ++it)
+    p = actions_parser_new();
+    for (it = binds; it->button; ++it) {
+        actions = actions_parser_read_string(p, it->actname);
         mouse_bind(it->button, frame_context_from_string(it->context),
-                   it->mact, actions_parse_string(it->actname));
+                   it->mact, actions);
+        actions_list_unref(actions);
+    }
+    actions_parser_unref(p);
 }
 
 void config_startup(ObtXmlInst *i)

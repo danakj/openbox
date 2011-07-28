@@ -29,10 +29,6 @@ struct _ObActionsList;
 typedef struct _ObActionsDefinition   ObActionsDefinition;
 typedef struct _ObActionsAct          ObActionsAct;
 typedef struct _ObActionsData         ObActionsData;
-typedef struct _ObActionsAnyData      ObActionsAnyData;
-typedef struct _ObActionsGlobalData   ObActionsGlobalData;
-typedef struct _ObActionsClientData   ObActionsClientData;
-typedef struct _ObActionsSelectorData ObActionsSelectorData;
 
 typedef void     (*ObActionsDataFreeFunc)(gpointer options);
 typedef gboolean (*ObActionsRunFunc)(ObActionsData *data,

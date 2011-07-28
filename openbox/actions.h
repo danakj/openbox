@@ -81,9 +81,6 @@ gboolean actions_register(const gchar *name,
 gboolean actions_set_shutdown(const gchar *name,
                               ObActionsShutdownFunc shutdown);
 
-ObActionsAct* actions_parse(xmlNodePtr node);
-ObActionsAct* actions_parse_string(const gchar *name);
-
 gboolean actions_act_is_interactive(ObActionsAct *act);
 
 /*! Create a new ObActionAct structure.

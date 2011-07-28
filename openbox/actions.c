@@ -202,56 +202,6 @@ static ObActionsAct* actions_act_find_name(const gchar *name)
     return act;
 }
 
-ObActionsAct* actions_parse_string(const gchar *name)
-{
-    ObActionsAct *act = NULL;
-
-    if ((act = actions_act_find_name(name))) {
-        if (act->def->canbeinteractive) {
-            if (act->def->setup.i)
-                act->options = act->def->setup.i(NULL,
-                                                 &act->i_pre,
-                                                 &act->i_input,
-                                                 &act->i_cancel,
-                                                 &act->i_post);
-        }
-        else {
-            if (act->def->setup.n)
-                act->options = act->def->setup.n(NULL);
-        }
-    }
-                
-
-    return act;
-}
-
-ObActionsAct* actions_parse(xmlNodePtr node)
-{
-    gchar *name;
-    ObActionsAct *act = NULL;
-
-    if (obt_xml_attr_string(node, "name", &name)) {
-        if ((act = actions_act_find_name(name))) {
-            /* there is more stuff to parse here */
-            if (act->def->canbeinteractive) {
-                if (act->def->setup.i)
-                    act->options = act->def->setup.i(NULL,
-                                                     &act->i_pre,
-                                                     &act->i_input,
-                                                     &act->i_cancel,
-                                                     &act->i_post);
-            }
-            else {
-                if (act->def->setup.n)
-                    act->options = act->def->setup.n(NULL);
-            }
-        }
-        g_free(name);
-    }
-
-    return act;
-}
-
 ObActionsAct* actions_act_new(const gchar *name, GHashTable *config)
 {
     ObActionsAct *act = NULL;

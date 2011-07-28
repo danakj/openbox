@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
@@ -12,26 +12,26 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
                            gboolean shaded);
 
 void action_resize_startup(void)
 {
-    actions_register("Resize", setup_func, free_func, run_func);
+    action_register("Resize", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "edge");
-    if (v && actions_value_is_string(v)) {
-        const gchar *s = actions_value_string(v);
+    if (v && action_value_is_string(v)) {
+        const gchar *s = action_value_string(v);
 
         o->corner_specified = TRUE;
         if (!g_ascii_strcasecmp(s, "top"))
@@ -62,7 +62,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 

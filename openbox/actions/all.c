@@ -1,6 +1,6 @@
 #include "all.h"
 
-void action_all_startup(void)
+void actions_all_startup(void)
 {
     action_execute_startup();
     action_debug_startup();
@@ -38,6 +38,4 @@ void action_all_startup(void)
     action_movetoedge_startup();
     action_growtoedge_startup();
     action_focustobottom_startup();
-    /* 3.4-compatibility */
-    action_shadelowerraise_startup();
 }

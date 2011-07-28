@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/event.h"
 #include "openbox/client.h"
 #include "openbox/focus.h"
@@ -12,27 +12,27 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_focus_startup(void)
 {
-    actions_register("Focus", setup_func, free_func, run_func);
+    action_register("Focus", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->stop_int = TRUE;
 
     v = g_hash_table_lookup(config, "here");
-    if (v && actions_value_is_string(v))
-        o->here = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->here = action_value_bool(v);
     v = g_hash_table_lookup(config, "stopInteractive");
-    if (v && actions_value_is_string(v))
-        o->stop_int = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->stop_int = action_value_bool(v);
     return o;
 }
 
@@ -42,7 +42,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 
@@ -58,15 +58,15 @@ static gboolean run_func(ObActionsData *data, gpointer options)
              data->context != OB_FRAME_CONTEXT_FRAME))
         {
             if (o->stop_int)
-                actions_interactive_cancel_act();
+                action_interactive_cancel_act();
 
-            actions_client_move(data, TRUE);
+            action_client_move(data, TRUE);
             client_activate(data->client, TRUE, o->here, FALSE, FALSE, TRUE);
-            actions_client_move(data, FALSE);
+            action_client_move(data, FALSE);
         }
     } else if (data->context == OB_FRAME_CONTEXT_DESKTOP) {
         if (o->stop_int)
-            actions_interactive_cancel_act();
+            action_interactive_cancel_act();
 
         /* focus action on the root window. make keybindings work for this
            openbox instance, but don't focus any specific client */

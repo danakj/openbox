@@ -1,18 +1,16 @@
-#include "openbox/actions.h"
+#include "openbox/action.h"
 #include "openbox/moveresize.h"
 #include "obt/prop.h"
 
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_move_startup(void)
 {
-    actions_register("Move",
-                     NULL, NULL,
-                     run_func);
+    action_register("Move", NULL, NULL, run_func);
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     if (data->client) {
         guint32 corner;

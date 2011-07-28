@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -18,32 +18,32 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_resizerelative_startup(void)
 {
-    actions_register("ResizeRelative", setup_func, free_func, run_func);
+    action_register("ResizeRelative", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "left");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->left, &o->left_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->left, &o->left_denom);
     v = g_hash_table_lookup(config, "right");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->right, &o->right_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->right, &o->right_denom);
     v = g_hash_table_lookup(config, "top");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->top, &o->top_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->top, &o->top_denom);
     v = g_hash_table_lookup(config, "bottom");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->bottom, &o->bottom_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->bottom, &o->bottom_denom);
 
     return o;
 }
@@ -54,7 +54,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 
@@ -89,9 +89,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         yoff = yoff == 0 ? 0 :
             (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
 
-        actions_client_move(data, TRUE);
+        action_client_move(data, TRUE);
         client_move_resize(c, x + xoff, y + yoff, nw, nh);
-        actions_client_move(data, FALSE);
+        action_client_move(data, FALSE);
     }
 
     return FALSE;

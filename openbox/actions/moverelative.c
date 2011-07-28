@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -14,26 +14,26 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_moverelative_startup(void)
 {
-    actions_register("MoveRelative", setup_func, free_func, run_func);
+    action_register("MoveRelative", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "x");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->x, &o->x_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->x, &o->x_denom);
     v = g_hash_table_lookup(config, "y");
-    if (v && actions_value_is_string(v))
-        actions_value_fraction(v, &o->y, &o->y_denom);
+    if (v && action_value_is_string(v))
+        action_value_fraction(v, &o->y, &o->y_denom);
 
     return o;
 }
@@ -44,7 +44,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 
@@ -71,9 +71,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
         client_find_onscreen(c, &x, &y, w, h, FALSE);
 
-        actions_client_move(data, TRUE);
+        action_client_move(data, TRUE);
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
-        actions_client_move(data, FALSE);
+        action_client_move(data, FALSE);
     }
 
     return FALSE;

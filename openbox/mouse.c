@@ -19,8 +19,8 @@
 
 #include "openbox.h"
 #include "config.h"
-#include "actions.h"
-#include "actions_list.h"
+#include "action.h"
+#include "action_list.h"
 #include "event.h"
 #include "client.h"
 #include "grab.h"
@@ -35,7 +35,7 @@
 typedef struct {
     guint state;
     guint button;
-    ObActionsList *actions[OB_NUM_MOUSE_ACTIONS];
+    ObActionList *actions[OB_NUM_MOUSE_ACTIONS];
 } ObMouseBinding;
 
 /* Array of GSList*s of ObMouseBinding*s. */
@@ -151,7 +151,7 @@ void mouse_unbind_all(void)
             gint j;
 
             for (j = 0; j < OB_NUM_MOUSE_ACTIONS; ++j)
-                actions_list_unref(b->actions[j]);
+                action_list_unref(b->actions[j]);
             g_slice_free(ObMouseBinding, b);
         }
         g_slist_free(bound_contexts[i]);
@@ -188,8 +188,8 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     /* if not bound, then nothing to do! */
     if (it == NULL) return FALSE;
 
-    actions_run_acts(b->actions[a], mouse_action_to_user_action(a),
-                     state, x, y, button, context, c);
+    action_run_acts(b->actions[a], mouse_action_to_user_action(a),
+                    state, x, y, button, context, c);
     return TRUE;
 }
 
@@ -360,7 +360,7 @@ gboolean mouse_event(ObClient *client, XEvent *e)
 }
 
 gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
-                    ObMouseAction mact, ObActionsList *actions)
+                    ObMouseAction mact, ObActionList *actions)
 {
     guint state, button;
     ObMouseBinding *b;
@@ -376,8 +376,8 @@ gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
     for (it = bound_contexts[context]; it; it = g_slist_next(it)) {
         b = it->data;
         if (b->state == state && b->button == button) {
-            actions_list_ref(actions);
-            b->actions[mact] = actions_list_concat(b->actions[mact], actions);
+            action_list_ref(actions);
+            b->actions[mact] = action_list_concat(b->actions[mact], actions);
             return TRUE;
         }
     }
@@ -387,7 +387,7 @@ gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
     b->state = state;
     b->button = button;
     b->actions[mact] = actions;
-    actions_list_ref(actions);
+    action_list_ref(actions);
     bound_contexts[context] = g_slist_append(bound_contexts[context], b);
 
     return TRUE;

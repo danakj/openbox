@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions_value.c for the Openbox window manager
+   action_value.c for the Openbox window manager
    Copyright (c) 2011        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,87 +16,87 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "actions_value.h"
-#include "actions_list.h"
+#include "action_value.h"
+#include "action_list.h"
 #include "geom.h"
 
 #include "stdlib.h"
 
-struct _ObActionsValue {
+struct _ObActionValue {
     gint ref;
     enum {
         OB_AV_STRING,
-        OB_AV_ACTIONSLIST
+        OB_AV_ACTIONLIST
     } type;
     union {
         gchar *string;
         gboolean boolean;
         guint integer;
-        ObActionsList *actions;
+        ObActionList *actions;
     } v;
 };
 
-ObActionsValue* actions_value_new_string(const gchar *s)
+ObActionValue* action_value_new_string(const gchar *s)
 {
-    return actions_value_new_string_steal(g_strdup(s));
+    return action_value_new_string_steal(g_strdup(s));
 }
 
-ObActionsValue* actions_value_new_string_steal(gchar *s)
+ObActionValue* action_value_new_string_steal(gchar *s)
 {
-    ObActionsValue *v = g_slice_new(ObActionsValue);
+    ObActionValue *v = g_slice_new(ObActionValue);
     v->ref = 1;
     v->type = OB_AV_STRING;
     v->v.string = s;
     return v;
 }
 
-ObActionsValue* actions_value_new_actions_list(ObActionsList *al)
+ObActionValue* action_value_new_action_list(ObActionList *al)
 {
-    ObActionsValue *v = g_slice_new(ObActionsValue);
+    ObActionValue *v = g_slice_new(ObActionValue);
     v->ref = 1;
-    v->type = OB_AV_ACTIONSLIST;
+    v->type = OB_AV_ACTIONLIST;
     v->v.actions = al;
-    actions_list_ref(al);
+    action_list_ref(al);
     return v;
 }
 
-void actions_value_ref(ObActionsValue *v)
+void action_value_ref(ObActionValue *v)
 {
     ++v->ref;
 }
 
-void actions_value_unref(ObActionsValue *v)
+void action_value_unref(ObActionValue *v)
 {
     if (v && --v->ref < 1) {
         switch (v->type) {
         case OB_AV_STRING:
             g_free(v->v.string);
             break;
-        case OB_AV_ACTIONSLIST:
-            actions_list_unref(v->v.actions);
+        case OB_AV_ACTIONLIST:
+            action_list_unref(v->v.actions);
             break;
         }
-        g_slice_free(ObActionsValue, v);
+        g_slice_free(ObActionValue, v);
     }
 }
 
-gboolean actions_value_is_string(ObActionsValue *v)
+gboolean action_value_is_string(ObActionValue *v)
 {
     return v->type == OB_AV_STRING;
 }
 
-gboolean actions_value_is_actions_list(ObActionsValue *v)
+gboolean action_value_is_action_list(ObActionValue *v)
 {
-    return v->type == OB_AV_ACTIONSLIST;
+    return v->type == OB_AV_ACTIONLIST;
 }
 
-const gchar* actions_value_string(ObActionsValue *v)
+const gchar* action_value_string(ObActionValue *v)
 {
     g_return_val_if_fail(v->type == OB_AV_STRING, NULL);
     return v->v.string;
 }
 
-gboolean actions_value_bool(ObActionsValue *v)
+gboolean action_value_bool(ObActionValue *v)
 {
     g_return_val_if_fail(v->type == OB_AV_STRING, FALSE);
     if (g_strcasecmp(v->v.string, "true") == 0 ||
@@ -106,7 +106,7 @@ gboolean actions_value_bool(ObActionsValue *v)
         return FALSE;
 }
 
-gint actions_value_int(ObActionsValue *v)
+gint action_value_int(ObActionValue *v)
 {
     gchar *s;
 
@@ -115,7 +115,7 @@ gint actions_value_int(ObActionsValue *v)
     return strtol(s, &s, 10);
 }
 
-void actions_value_fraction(ObActionsValue *v, gint *numer, gint *denom)
+void action_value_fraction(ObActionValue *v, gint *numer, gint *denom)
 {
     gchar *s;
 
@@ -131,7 +131,7 @@ void actions_value_fraction(ObActionsValue *v, gint *numer, gint *denom)
         *denom = atoi(s+1);
 }
 
-void actions_value_gravity_coord(ObActionsValue *v, GravityCoord *c)
+void action_value_gravity_coord(ObActionValue *v, GravityCoord *c)
 {
     gchar *s;
 
@@ -159,8 +159,8 @@ void actions_value_gravity_coord(ObActionsValue *v, GravityCoord *c)
     }
 }
 
-ObActionsList* actions_value_actions_list(ObActionsValue *v)
+ObActionList* action_value_action_list(ObActionValue *v)
 {
-    g_return_val_if_fail(v->type == OB_AV_ACTIONSLIST, NULL);
+    g_return_val_if_fail(v->type == OB_AV_ACTIONLIST, NULL);
     return v->v.actions;
 }

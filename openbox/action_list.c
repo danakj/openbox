@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions_list.c for the Openbox window manager
+   action_list.c for the Openbox window manager
    Copyright (c) 2011        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,50 +16,50 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "actions_list.h"
-#include "actions.h"
-#include "actions_value.h"
+#include "action_list.h"
+#include "action.h"
+#include "action_value.h"
 
 #include <glib.h>
 
-void actions_list_ref(ObActionsList *l)
+void action_list_ref(ObActionList *l)
 {
     if (l) ++l->ref;
 }
 
-void actions_list_unref(ObActionsList *l)
+void action_list_unref(ObActionList *l)
 {
     while (l && --l->ref < 1) {
-        ObActionsList *n = l->next;
+        ObActionList *n = l->next;
 
         if (l->isfilter) {
-            actions_list_test_destroy(l->u.f.test);
-            actions_list_unref(l->u.f.thendo);
-            actions_list_unref(l->u.f.elsedo);
+            action_list_test_destroy(l->u.f.test);
+            action_list_unref(l->u.f.thendo);
+            action_list_unref(l->u.f.elsedo);
         }
         else {
-            actions_act_unref(l->u.action);
+            action_unref(l->u.action);
         }
-        g_slice_free(ObActionsList, l);
+        g_slice_free(ObActionList, l);
         l = n;
     }
 }
 
-void actions_list_test_destroy(ObActionsListTest *t)
+void action_list_test_destroy(ObActionListTest *t)
 {
     while (t) {
-        ObActionsListTest *n = t->next;
+        ObActionListTest *n = t->next;
 
         g_free(t->key);
-        actions_value_unref(t->value);
-        g_slice_free(ObActionsListTest, t);
+        action_value_unref(t->value);
+        g_slice_free(ObActionListTest, t);
         t = n;
     }
 }
 
-ObActionsList* actions_list_concat(ObActionsList *a, ObActionsList *b)
+ObActionList* action_list_concat(ObActionList *a, ObActionList *b)
 {
-    ObActionsList *start = a;
+    ObActionList *start = a;
 
     if (!start) return b;
     while (a->next) a = a->next;

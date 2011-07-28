@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions_parser.h for the Openbox window manager
+   action_parser.h for the Openbox window manager
    Copyright (c) 2011        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -18,17 +18,17 @@
 
 #include <glib.h>
 
-struct _ObActionsList;
+struct _ObActionList;
 
-typedef struct _ObActionsParser ObActionsParser;
+typedef struct _ObActionParser ObActionParser;
 
-ObActionsParser* actions_parser_new(void);
+ObActionParser* action_parser_new(void);
 
-void actions_parser_ref(ObActionsParser *p);
-void actions_parser_unref(ObActionsParser *p);
+void action_parser_ref(ObActionParser *p);
+void action_parser_unref(ObActionParser *p);
 
-struct _ObActionsList* actions_parser_read_string(ObActionsParser *p,
-                                                  const gchar *text);
-struct _ObActionsList* actions_parser_read_file(ObActionsParser *p,
-                                                const gchar *file,
-                                                GError **error);
+struct _ObActionList* action_parser_read_string(ObActionParser *p,
+                                                const gchar *text);
+struct _ObActionList* action_parser_read_file(ObActionParser *p,
+                                              const gchar *file,
+                                              GError **error);

@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions_value.h for the Openbox window manager
+   action_value.h for the Openbox window manager
    Copyright (c) 2011        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -19,27 +19,27 @@
 #include <glib.h>
 
 struct _GravityCoord;
-struct _ObActionsList;
+struct _ObActionList;
 
-typedef struct _ObActionsValue        ObActionsValue;
+typedef struct _ObActionValue ObActionValue;
 
 /*! Creates a new value by making a copy of the given string. */
-ObActionsValue* actions_value_new_string(const gchar *s);
+ObActionValue* action_value_new_string(const gchar *s);
 /*! Creates a new value from a string, and steals ownership of the string. It
   will be freed when then value is destroyed. */
-ObActionsValue* actions_value_new_string_steal(gchar *s);
+ObActionValue* action_value_new_string_steal(gchar *s);
 /*! Creates a new value with a given actions list. */
-ObActionsValue* actions_value_new_actions_list(struct _ObActionsList *al);
+ObActionValue* action_value_new_action_list(struct _ObActionList *al);
 
-void actions_value_ref(ObActionsValue *v);
-void actions_value_unref(ObActionsValue *v);
+void action_value_ref(ObActionValue *v);
+void action_value_unref(ObActionValue *v);
 
-gboolean actions_value_is_string(ObActionsValue *v);
-gboolean actions_value_is_actions_list(ObActionsValue *v);
+gboolean action_value_is_string(ObActionValue *v);
+gboolean action_value_is_action_list(ObActionValue *v);
 
-const gchar* actions_value_string(ObActionsValue *v);
-gboolean actions_value_bool(ObActionsValue *v);
-gint actions_value_int(ObActionsValue *v);
-void actions_value_fraction(ObActionsValue *v, gint *numer, gint *denom);
-void actions_value_gravity_coord(ObActionsValue *v, struct _GravityCoord *c);
-struct _ObActionsList* actions_value_actions_list(ObActionsValue *v);
+const gchar* action_value_string(ObActionValue *v);
+gboolean action_value_bool(ObActionValue *v);
+gint action_value_int(ObActionValue *v);
+void action_value_fraction(ObActionValue *v, gint *numer, gint *denom);
+void action_value_gravity_coord(ObActionValue *v, struct _GravityCoord *c);
+struct _ObActionList* action_value_action_list(ObActionValue *v);

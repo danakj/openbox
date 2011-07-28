@@ -24,8 +24,8 @@
 #include "event.h"
 #include "grab.h"
 #include "client.h"
-#include "actions.h"
-#include "actions_list.h"
+#include "action.h"
+#include "action_list.h"
 #include "menuframe.h"
 #include "config.h"
 #include "keytree.h"
@@ -140,7 +140,7 @@ void keyboard_chroot(GList *keylist)
     }
 }
 
-gboolean keyboard_bind(GList *keylist, ObActionsList *actions)
+gboolean keyboard_bind(GList *keylist, ObActionList *actions)
 {
     KeyBindingTree *tree, *t;
     gboolean conflict;
@@ -170,8 +170,8 @@ gboolean keyboard_bind(GList *keylist, ObActionsList *actions)
     for (; t->first_child; t = t->first_child);
 
     /* set the action */
-    actions_list_ref(actions);
-    t->actions = actions_list_concat(t->actions, actions);
+    action_list_ref(actions);
+    t->actions = action_list_concat(t->actions, actions);
 
     /* assimilate this built tree into the main tree. assimilation
        destroys/uses the tree */
@@ -266,10 +266,10 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
             else {
                 gboolean i;
 
-                i = actions_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                                     e->xkey.state,
-                                     e->xkey.x_root, e->xkey.y_root,
-                                     0, OB_FRAME_CONTEXT_NONE, client);
+                i = action_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                                    e->xkey.state,
+                                    e->xkey.x_root, e->xkey.y_root,
+                                    0, OB_FRAME_CONTEXT_NONE, client);
                 if (!i) /* reset if an interactive was not run */
                     keyboard_reset_chains(0);
             }

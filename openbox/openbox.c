@@ -25,7 +25,7 @@
 #include "menu.h"
 #include "client.h"
 #include "screen.h"
-#include "actions.h"
+#include "action.h"
 #include "startupnotify.h"
 #include "focus.h"
 #include "focus_cycle.h"
@@ -236,7 +236,7 @@ gint main(gint argc, gchar **argv)
                 i = obt_xml_instance_new();
 
                 /* register all the available actions */
-                actions_startup(reconfigure);
+                action_startup(reconfigure);
                 /* start up config which sets up with the parser */
                 config_startup(i);
 
@@ -407,7 +407,7 @@ gint main(gint argc, gchar **argv)
             sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
-            actions_shutdown(reconfigure);
+            action_shutdown(reconfigure);
         } while (reconfigure);
     }
 

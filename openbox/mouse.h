@@ -24,13 +24,13 @@
 
 #include <X11/Xlib.h>
 
-struct _ObActionsList;
+struct _ObActionList;
 
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);
 
 gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
-                    ObMouseAction mact, struct _ObActionsList *actions);
+                    ObMouseAction mact, struct _ObActionList *actions);
 void mouse_unbind_all(void);
 
 gboolean mouse_event(struct _ObClient *client, XEvent *e);

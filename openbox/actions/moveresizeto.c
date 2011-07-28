@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
@@ -24,20 +24,16 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
-/* 3.4-compatibility */
-static gpointer setup_center_func(GHashTable *config);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_moveresizeto_startup(void)
 {
-    actions_register("MoveResizeTo", setup_func, free_func, run_func);
-    /* 3.4-compatibility */
-    actions_register("MoveToCenter", setup_center_func, free_func, run_func);
+    action_register("MoveResizeTo", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -48,24 +44,24 @@ static gpointer setup_func(GHashTable *config)
     o->monitor = CURRENT_MONITOR;
 
     v = g_hash_table_lookup(config, "x");
-    if (v && actions_value_is_string(v))
-        actions_value_gravity_coord(v, &o->x);
+    if (v && action_value_is_string(v))
+        action_value_gravity_coord(v, &o->x);
     v = g_hash_table_lookup(config, "y");
-    if (v && actions_value_is_string(v))
-        actions_value_gravity_coord(v, &o->y);
+    if (v && action_value_is_string(v))
+        action_value_gravity_coord(v, &o->y);
 
     v = g_hash_table_lookup(config, "width");
-    if (v && actions_value_is_string(v))
-        if (g_ascii_strcasecmp(actions_value_string(v), "current") != 0)
-            actions_value_fraction(v, &o->w, &o->w_denom);
+    if (v && action_value_is_string(v))
+        if (g_ascii_strcasecmp(action_value_string(v), "current") != 0)
+            action_value_fraction(v, &o->w, &o->w_denom);
     v = g_hash_table_lookup(config, "height");
-    if (v && actions_value_is_string(v))
-        if (g_ascii_strcasecmp(actions_value_string(v), "current") != 0)
-            actions_value_fraction(v, &o->h, &o->h_denom);
+    if (v && action_value_is_string(v))
+        if (g_ascii_strcasecmp(action_value_string(v), "current") != 0)
+            action_value_fraction(v, &o->h, &o->h_denom);
 
     v = g_hash_table_lookup(config, "monitor");
-    if (v && actions_value_is_string(v)) {
-        const gchar *s = actions_value_string(v);
+    if (v && action_value_is_string(v)) {
+        const gchar *s = action_value_string(v);
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
@@ -74,7 +70,7 @@ static gpointer setup_func(GHashTable *config)
             else if(!g_ascii_strcasecmp(s, "prev"))
                 o->monitor = PREV_MONITOR;
             else
-                o->monitor = actions_value_int(v) - 1;
+                o->monitor = action_value_int(v) - 1;
         }
     }
 
@@ -87,7 +83,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 
@@ -159,29 +155,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         /* force it on screen if its moving to another monitor */
         client_find_onscreen(c, &x, &y, w, h, mon != cmon);
 
-        actions_client_move(data, TRUE);
+        action_client_move(data, TRUE);
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
-        actions_client_move(data, FALSE);
+        action_client_move(data, FALSE);
 
         g_slice_free(Rect, area);
         g_slice_free(Rect, carea);
     }
 
     return FALSE;
-}
-
-/* 3.4-compatibility */
-static gpointer setup_center_func(GHashTable *config)
-{
-    Options *o;
-
-    o = g_slice_new0(Options);
-    o->x.pos = G_MININT;
-    o->y.pos = G_MININT;
-    o->w = G_MININT;
-    o->h = G_MININT;
-    o->monitor = -1;
-    o->x.center = TRUE;
-    o->y.center = TRUE;
-    return o;
 }

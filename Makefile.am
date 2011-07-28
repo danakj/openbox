@@ -226,18 +226,17 @@ openbox_openbox_SOURCES = \
 	openbox/actions/resizerelative.c \
 	openbox/actions/restart.c \
 	openbox/actions/shade.c \
-	openbox/actions/shadelowerraise.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \
-	openbox/actions.c \
-	openbox/actions.h \
-	openbox/actions_list.c \
-	openbox/actions_list.h \
-	openbox/actions_parser.c \
-	openbox/actions_parser.h \
-	openbox/actions_value.c \
-	openbox/actions_value.h \
+	openbox/action.c \
+	openbox/action.h \
+	openbox/action_list.c \
+	openbox/action_list.h \
+	openbox/action_parser.c \
+	openbox/action_parser.h \
+	openbox/action_value.c \
+	openbox/action_value.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \

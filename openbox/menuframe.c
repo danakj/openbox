@@ -21,8 +21,8 @@
 #include "client.h"
 #include "menu.h"
 #include "screen.h"
-#include "actions.h"
-#include "actions_list.h"
+#include "action.h"
+#include "action_list.h"
 #include "event.h"
 #include "grab.h"
 #include "openbox.h"
@@ -1291,7 +1291,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
         ObMenuEntry *entry = self->entry;
         ObMenuExecuteFunc func = self->frame->menu->execute_func;
         gpointer data = self->frame->menu->data;
-        ObActionsList *acts = self->entry->data.normal.actions;
+        ObActionList *acts = self->entry->data.normal.actions;
         ObClient *client = self->frame->client;
         ObMenuFrame *frame = self->frame;
         guint mods = obt_keyboard_only_modmasks(state);
@@ -1305,8 +1305,8 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
         if (func)
             func(entry, frame, client, state, data);
         else
-            actions_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
-                             state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, client);
+            action_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
+                            state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, client);
     }
 }
 

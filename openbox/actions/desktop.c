@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/screen.h"
 #include "openbox/client.h"
 #include "openbox/openbox.h"
@@ -31,17 +31,17 @@ typedef struct {
 } Options;
 
 static gpointer setup_go_func(GHashTable *config,
-                              ObActionsIPreFunc *pre,
-                              ObActionsIInputFunc *input,
-                              ObActionsICancelFunc *cancel,
-                              ObActionsIPostFunc *post);
+                              ObActionIPreFunc *pre,
+                              ObActionIInputFunc *input,
+                              ObActionICancelFunc *cancel,
+                              ObActionIPostFunc *post);
 static gpointer setup_send_func(GHashTable *config,
-                                ObActionsIPreFunc *pre,
-                                ObActionsIInputFunc *input,
-                                ObActionsICancelFunc *cancel,
-                                ObActionsIPostFunc *post);
+                                ObActionIPreFunc *pre,
+                                ObActionIInputFunc *input,
+                                ObActionICancelFunc *cancel,
+                                ObActionIPostFunc *post);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 static gboolean i_pre_func(guint state, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -54,17 +54,17 @@ static void i_post_func(gpointer options);
 
 void action_desktop_startup(void)
 {
-    actions_register_i("GoToDesktop", setup_go_func, free_func, run_func);
-    actions_register_i("SendToDesktop", setup_send_func, free_func, run_func);
+    action_register_i("GoToDesktop", setup_go_func, free_func, run_func);
+    action_register_i("SendToDesktop", setup_send_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config,
-                           ObActionsIPreFunc *pre,
-                           ObActionsIInputFunc *input,
-                           ObActionsICancelFunc *cancel,
-                           ObActionsIPostFunc *post)
+                           ObActionIPreFunc *pre,
+                           ObActionIInputFunc *input,
+                           ObActionICancelFunc *cancel,
+                           ObActionIPostFunc *post)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -75,8 +75,8 @@ static gpointer setup_func(GHashTable *config,
     o->u.rel.wrap = TRUE;
 
     v = g_hash_table_lookup(config, "to");
-    if (v && actions_value_is_string(v)) {
-        const gchar *s = actions_value_string(v);
+    if (v && action_value_is_string(v)) {
+        const gchar *s = action_value_string(v);
         if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "current"))
@@ -118,18 +118,18 @@ static gpointer setup_func(GHashTable *config,
     }
 
     v = g_hash_table_lookup(config, "wrap");
-    if (v && actions_value_is_string(v))
-        o->u.rel.wrap = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->u.rel.wrap = action_value_bool(v);
 
     return o;
 }
 
 
 static gpointer setup_go_func(GHashTable *config,
-                              ObActionsIPreFunc *pre,
-                              ObActionsIInputFunc *input,
-                              ObActionsICancelFunc *cancel,
-                              ObActionsIPostFunc *post)
+                              ObActionIPreFunc *pre,
+                              ObActionIInputFunc *input,
+                              ObActionICancelFunc *cancel,
+                              ObActionIPostFunc *post)
 {
     Options *o;
 
@@ -145,12 +145,12 @@ static gpointer setup_go_func(GHashTable *config,
 }
 
 static gpointer setup_send_func(GHashTable *config,
-                                ObActionsIPreFunc *pre,
-                                ObActionsIInputFunc *input,
-                                ObActionsICancelFunc *cancel,
-                                ObActionsIPostFunc *post)
+                                ObActionIPreFunc *pre,
+                                ObActionIInputFunc *input,
+                                ObActionICancelFunc *cancel,
+                                ObActionIPostFunc *post)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = setup_func(config, pre, input, cancel, post);
@@ -158,8 +158,8 @@ static gpointer setup_send_func(GHashTable *config,
     o->follow = TRUE;
 
     v = g_hash_table_lookup(config, "follow");
-    if (v && actions_value_is_string(v))
-        o->follow = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->follow = action_value_bool(v);
 
     if (o->type == RELATIVE && o->follow) {
         o->interactive = TRUE;
@@ -176,7 +176,7 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
     guint d;
@@ -204,7 +204,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
          (data->client && data->client->desktop != screen_desktop))) {
         gboolean go = TRUE;
 
-        actions_client_move(data, TRUE);
+        action_client_move(data, TRUE);
         if (o->send && data->client && client_normal(data->client)) {
             client_set_desktop(data->client, d, o->follow, FALSE);
             go = o->follow;
@@ -216,7 +216,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
                 client_bring_helper_windows(data->client);
         }
 
-        actions_client_move(data, FALSE);
+        action_client_move(data, FALSE);
     }
 
     return o->interactive;

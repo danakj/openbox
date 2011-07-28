@@ -1,7 +1,7 @@
-#include "openbox/actions.h"
-#include "openbox/actions_list.h"
-#include "openbox/actions_parser.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_list.h"
+#include "openbox/action_parser.h"
+#include "openbox/action_value.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
 #include "openbox/event.h"
@@ -20,7 +20,7 @@ typedef struct {
     gboolean bar;
     gboolean raise;
     ObFocusCyclePopupMode dialog_mode;
-    ObActionsList *actions;
+    ObActionList *actions;
 
 
     /* options for after we're done */
@@ -29,22 +29,22 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(GHashTable *config,
-                           ObActionsIPreFunc *pre,
-                           ObActionsIInputFunc *in,
-                           ObActionsICancelFunc *c,
-                           ObActionsIPostFunc *post);
+                           ObActionIPreFunc *pre,
+                           ObActionIInputFunc *in,
+                           ObActionICancelFunc *c,
+                           ObActionIPostFunc *post);
 static gpointer setup_forward_func(GHashTable *config,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *in,
-                                   ObActionsICancelFunc *c,
-                                   ObActionsIPostFunc *post);
+                                   ObActionIPreFunc *pre,
+                                   ObActionIInputFunc *in,
+                                   ObActionICancelFunc *c,
+                                   ObActionIPostFunc *post);
 static gpointer setup_backward_func(GHashTable *config,
-                                    ObActionsIPreFunc *pre,
-                                    ObActionsIInputFunc *in,
-                                    ObActionsICancelFunc *c,
-                                    ObActionsIPostFunc *post);
+                                    ObActionIPreFunc *pre,
+                                    ObActionIInputFunc *in,
+                                    ObActionICancelFunc *c,
+                                    ObActionIPostFunc *post);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
                              ObtIC *ic,
@@ -55,18 +55,18 @@ static void     i_post_func(gpointer options);
 
 void action_cyclewindows_startup(void)
 {
-    actions_register_i("NextWindow", setup_forward_func, free_func, run_func);
-    actions_register_i("PreviousWindow", setup_backward_func, free_func,
-                       run_func);
+    action_register_i("NextWindow", setup_forward_func, free_func, run_func);
+    action_register_i("PreviousWindow", setup_backward_func, free_func,
+                      run_func);
 }
 
 static gpointer setup_func(GHashTable *config,
-                           ObActionsIPreFunc *pre,
-                           ObActionsIInputFunc *input,
-                           ObActionsICancelFunc *cancel,
-                           ObActionsIPostFunc *post)
+                           ObActionIPreFunc *pre,
+                           ObActionIInputFunc *input,
+                           ObActionICancelFunc *cancel,
+                           ObActionIPostFunc *post)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -74,11 +74,11 @@ static gpointer setup_func(GHashTable *config,
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
 
     v = g_hash_table_lookup(config, "linear");
-    if (v && actions_value_is_string(v))
-        o->linear = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->linear = action_value_bool(v);
     v = g_hash_table_lookup(config, "dialog");
-    if (v && actions_value_is_string(v)) {
-        const gchar *s = actions_value_string(v);
+    if (v && action_value_is_string(v)) {
+        const gchar *s = action_value_string(v);
         if (g_strcasecmp(s, "none") == 0)
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
         else if (g_strcasecmp(s, "no") == 0)
@@ -87,36 +87,36 @@ static gpointer setup_func(GHashTable *config,
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }
     v = g_hash_table_lookup(config, "bar");
-    if (v && actions_value_is_string(v))
-        o->bar = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->bar = action_value_bool(v);
     v = g_hash_table_lookup(config, "raise");
-    if (v && actions_value_is_string(v))
-        o->raise = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->raise = action_value_bool(v);
     v = g_hash_table_lookup(config, "panels");
-    if (v && actions_value_is_string(v))
-        o->dock_windows = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->dock_windows = action_value_bool(v);
     v = g_hash_table_lookup(config, "hilite");
-    if (v && actions_value_is_string(v))
-        o->only_hilite_windows = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->only_hilite_windows = action_value_bool(v);
     v = g_hash_table_lookup(config, "desktop");
-    if (v && actions_value_is_string(v))
-        o->desktop_windows = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->desktop_windows = action_value_bool(v);
     v = g_hash_table_lookup(config, "allDesktops");
-    if (v && actions_value_is_string(v))
-        o->all_desktops = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->all_desktops = action_value_bool(v);
 
     v = g_hash_table_lookup(config, "finalactions");
-    if (v && actions_value_is_actions_list(v)) {
-        o->actions = actions_value_actions_list(v);
-        actions_list_ref(o->actions);
+    if (v && action_value_is_action_list(v)) {
+        o->actions = action_value_action_list(v);
+        action_list_ref(o->actions);
     }
     else {
-        ObActionsParser *p = actions_parser_new();
-        o->actions = actions_parser_read_string(p,
+        ObActionParser *p = action_parser_new();
+        o->actions = action_parser_read_string(p,
                                                 "focus\n"
                                                 "raise\n"
                                                 "unshade\n");
-        actions_parser_unref(p);
+        action_parser_unref(p);
     }
 
     *input = i_input_func;
@@ -126,10 +126,10 @@ static gpointer setup_func(GHashTable *config,
 }
 
 static gpointer setup_forward_func(GHashTable *config,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+                                   ObActionIPreFunc *pre,
+                                   ObActionIInputFunc *input,
+                                   ObActionICancelFunc *cancel,
+                                   ObActionIPostFunc *post)
 {
     Options *o = setup_func(config, pre, input, cancel, post);
     o->forward = TRUE;
@@ -137,10 +137,10 @@ static gpointer setup_forward_func(GHashTable *config,
 }
 
 static gpointer setup_backward_func(GHashTable *config,
-                                    ObActionsIPreFunc *pre,
-                                    ObActionsIInputFunc *input,
-                                    ObActionsICancelFunc *cancel,
-                                    ObActionsIPostFunc *post)
+                                    ObActionIPreFunc *pre,
+                                    ObActionIInputFunc *input,
+                                    ObActionICancelFunc *cancel,
+                                    ObActionIPostFunc *post)
 {
     Options *o = setup_func(config, pre, input, cancel, post);
     o->forward = FALSE;
@@ -151,11 +151,11 @@ static void free_func(gpointer options)
 {
     Options *o = options;
 
-    actions_list_unref(o->actions);
+    action_list_unref(o->actions);
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
     struct _ObClient *ft;
@@ -246,8 +246,8 @@ static void i_post_func(gpointer options)
                      TRUE, o->cancel);
 
     if (ft)
-        actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
-                         o->state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
+        action_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                        o->state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
 
     stacking_restore();
 }

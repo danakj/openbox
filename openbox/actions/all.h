@@ -1,7 +1,7 @@
 #ifndef __actions_all_h
 #define __actions_all_h
 
-void action_all_startup(void);
+void actions_all_startup(void);
 
 void action_execute_startup(void);
 void action_debug_startup(void);
@@ -39,7 +39,5 @@ void action_layer_startup(void);
 void action_movetoedge_startup(void);
 void action_growtoedge_startup(void);
 void action_focustobottom_startup(void);
-/* 3.4-compatibility */
-void action_shadelowerraise_startup(void);
 
 #endif

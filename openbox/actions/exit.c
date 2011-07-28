@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/openbox.h"
 #include "openbox/prompt.h"
 #include "openbox/session.h"
@@ -11,25 +11,24 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_exit_startup(void)
 {
-    actions_register("Exit", setup_func, free_func, run_func);
-    actions_register("SessionLogout", setup_func, free_func, run_func);
+    action_register("Exit", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->prompt = TRUE;
 
     v = g_hash_table_lookup(config, "prompt");
-    if (v && actions_value_is_string(v))
-        o->prompt = actions_value_bool(v);
+    if (v && action_value_is_string(v))
+        o->prompt = action_value_bool(v);
 
     return o;
 }
@@ -61,7 +60,7 @@ static void prompt_cleanup(ObPrompt *p, gpointer data)
 
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 

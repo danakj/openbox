@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
 #include "openbox/client.h"
@@ -19,12 +19,12 @@ typedef struct {
     gchar   *sn_icon;
     gchar   *sn_wmclass;
     gchar   *prompt;
-    ObActionsData *data;
+    ObActionData *data;
 } Options;
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 static void shutdown_func(void);
 static void client_dest(ObClient *client, gpointer data);
 
@@ -32,8 +32,8 @@ static GSList *prompt_opts = NULL;
 
 void action_execute_startup(void)
 {
-    actions_register("Execute", setup_func, free_func, run_func);
-    actions_set_shutdown("Execute", shutdown_func);
+    action_register("Execute", setup_func, free_func, run_func);
+    action_set_shutdown("Execute", shutdown_func);
 
     client_add_destroy_notify(client_dest, NULL);
 }
@@ -51,31 +51,31 @@ static void client_dest(ObClient *client, gpointer data)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "command");
-    if (v && actions_value_is_string(v))
-        o->cmd = obt_paths_expand_tilde(actions_value_string(v));
+    if (v && action_value_is_string(v))
+        o->cmd = obt_paths_expand_tilde(action_value_string(v));
 
     v = g_hash_table_lookup(config, "prompt");
-    if (v && actions_value_is_string(v))
-        o->prompt = g_strdup(actions_value_string(v));
+    if (v && action_value_is_string(v))
+        o->prompt = g_strdup(action_value_string(v));
 
     v = g_hash_table_lookup(config, "startupnotify");
-    if (v && actions_value_is_string(v) && actions_value_bool(v)) {
+    if (v && action_value_is_string(v) && action_value_bool(v)) {
         o->sn = TRUE;
         v = g_hash_table_lookup(config, "name");
-        if (v && actions_value_is_string(v))
-            o->sn_name = g_strdup(actions_value_string(v));
+        if (v && action_value_is_string(v))
+            o->sn_name = g_strdup(action_value_string(v));
         v = g_hash_table_lookup(config, "icon");
-        if (v && actions_value_is_string(v))
-            o->sn_icon = g_strdup(actions_value_string(v));
+        if (v && action_value_is_string(v))
+            o->sn_icon = g_strdup(action_value_string(v));
         v = g_hash_table_lookup(config, "wmclass");
-        if (v && actions_value_is_string(v))
-            o->sn_wmclass = g_strdup(actions_value_string(v));
+        if (v && action_value_is_string(v))
+            o->sn_wmclass = g_strdup(action_value_string(v));
     }
     return o;
 }
@@ -97,12 +97,12 @@ static void free_func(gpointer options)
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
         g_free(o->prompt);
-        if (o->data) g_slice_free(ObActionsData, o->data);
+        if (o->data) g_slice_free(ObActionData, o->data);
         g_slice_free(Options, o);
     }
 }
 
-static Options* dup_options(Options *in, ObActionsData *data)
+static Options* dup_options(Options *in, ObActionData *data)
 {
     Options *o = g_slice_new(Options);
     o->cmd = g_strdup(in->cmd);
@@ -111,8 +111,8 @@ static Options* dup_options(Options *in, ObActionsData *data)
     o->sn_icon = g_strdup(in->sn_icon);
     o->sn_wmclass = g_strdup(in->sn_wmclass);
     o->prompt = NULL;
-    o->data = g_slice_new(ObActionsData);
-    memcpy(o->data, data, sizeof(ObActionsData));
+    o->data = g_slice_new(ObActionData);
+    memcpy(o->data, data, sizeof(ObActionData));
     return o;
 }
 
@@ -131,7 +131,7 @@ static void prompt_cleanup(ObPrompt *p, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     GError *e;
     gchar **argv = NULL;

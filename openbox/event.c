@@ -22,7 +22,7 @@
 #include "window.h"
 #include "openbox.h"
 #include "dock.h"
-#include "actions.h"
+#include "action.h"
 #include "client.h"
 #include "config.h"
 #include "screen.h"
@@ -2061,7 +2061,7 @@ static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
-    if (actions_interactive_input_event(e) || moveresize_event(e))
+    if (action_interactive_input_event(e) || moveresize_event(e))
         return TRUE;
 
     if (moveresize_in_progress)
@@ -2196,8 +2196,8 @@ static gboolean is_enter_focus_event_ignored(gulong serial)
 
 void event_cancel_all_key_grabs(void)
 {
-    if (actions_interactive_act_running()) {
-        actions_interactive_cancel_act();
+    if (action_interactive_act_running()) {
+        action_interactive_cancel_act();
         ob_debug("KILLED interactive action");
     }
     else if (menu_frame_visible) {

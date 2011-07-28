@@ -1,5 +1,5 @@
-#include "openbox/actions.h"
-#include "openbox/actions_value.h"
+#include "openbox/action.h"
+#include "openbox/action_value.h"
 #include "openbox/menu.h"
 #include <glib.h>
 
@@ -9,23 +9,23 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionsData *data, gpointer options);
+static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_showmenu_startup(void)
 {
-    actions_register("ShowMenu", setup_func, free_func, run_func);
+    action_register("ShowMenu", setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionsValue *v;
+    ObActionValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "menu");
-    if (v && actions_value_is_string(v))
-        o->name = g_strdup(actions_value_string(v));
+    if (v && action_value_is_string(v))
+        o->name = g_strdup(action_value_string(v));
     return o;
 }
 
@@ -37,7 +37,7 @@ static void free_func(gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionData *data, gpointer options)
 {
     Options *o = options;
 

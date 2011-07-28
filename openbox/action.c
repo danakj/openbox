@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions.c for the Openbox window manager
-   Copyright (c) 2007        Dana Jansens
+   action.c for the Openbox window manager
+   Copyright (c) 2007-2011   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "actions.h"
-#include "actions_list.h"
+#include "action.h"
+#include "action_list.h"
 #include "gettext.h"
 #include "grab.h"
 #include "screen.h"
@@ -30,71 +30,71 @@
 
 #include "actions/all.h"
 
-static void     actions_definition_ref(ObActionsDefinition *def);
-static void     actions_definition_unref(ObActionsDefinition *def);
-static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state);
-static void     actions_interactive_end_act();
-static ObActionsAct* actions_act_find_name(const gchar *name);
+static void     action_definition_ref(ObActionDefinition *def);
+static void     action_definition_unref(ObActionDefinition *def);
+static gboolean action_interactive_begin_act(ObAction *act, guint state);
+static void     action_interactive_end_act();
+static ObAction* action_find_by_name(const gchar *name);
 
-static ObActionsAct *interactive_act = NULL;
-static guint         interactive_initial_state = 0;
+static ObAction *interactive_act = NULL;
+static guint     interactive_initial_state = 0;
 
-struct _ObActionsDefinition {
+struct _ObActionDefinition {
     guint ref;
 
     gchar *name;
 
     gboolean canbeinteractive;
     union {
-        ObActionsIDataSetupFunc i;
-        ObActionsDataSetupFunc n;
+        ObActionIDataSetupFunc i;
+        ObActionDataSetupFunc n;
     } setup;
-    ObActionsDataFreeFunc free;
-    ObActionsRunFunc run;
-    ObActionsShutdownFunc shutdown;
+    ObActionDataFreeFunc free;
+    ObActionRunFunc run;
+    ObActionShutdownFunc shutdown;
 };
 
-struct _ObActionsAct {
+struct _ObAction {
     guint ref;
 
-    ObActionsDefinition *def;
-    ObActionsIPreFunc i_pre;
-    ObActionsIInputFunc i_input;
-    ObActionsICancelFunc i_cancel;
-    ObActionsIPostFunc i_post;
+    ObActionDefinition *def;
+    ObActionIPreFunc i_pre;
+    ObActionIInputFunc i_input;
+    ObActionICancelFunc i_cancel;
+    ObActionIPostFunc i_post;
     gpointer options;
 };
 
 static GSList *registered = NULL;
 
-void actions_startup(gboolean reconfig)
+void action_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    action_all_startup();
+    actions_all_startup();
 }
 
-void actions_shutdown(gboolean reconfig)
+void action_shutdown(gboolean reconfig)
 {
-    actions_interactive_cancel_act();
+    action_interactive_cancel_act();
 
     if (reconfig) return;
 
     /* free all the registered actions */
     while (registered) {
-        ObActionsDefinition *d = registered->data;
+        ObActionDefinition *d = registered->data;
         if (d->shutdown) d->shutdown();
-        actions_definition_unref(d);
+        action_definition_unref(d);
         registered = g_slist_delete_link(registered, registered);
     }
 }
 
-ObActionsDefinition* do_register(const gchar *name,
-                                 ObActionsDataFreeFunc free,
-                                 ObActionsRunFunc run)
+ObActionDefinition* do_register(const gchar *name,
+                                ObActionDataFreeFunc free,
+                                ObActionRunFunc run)
 {
     GSList *it;
-    ObActionsDefinition *def;
+    ObActionDefinition *def;
 
     g_assert(run != NULL);
 
@@ -104,7 +104,7 @@ ObActionsDefinition* do_register(const gchar *name,
             return NULL;
     }
 
-    def = g_slice_new(ObActionsDefinition);
+    def = g_slice_new(ObActionDefinition);
     def->ref = 1;
     def->name = g_strdup(name);
     def->free = free;
@@ -115,12 +115,12 @@ ObActionsDefinition* do_register(const gchar *name,
     return def;
 }
 
-gboolean actions_register_i(const gchar *name,
-                            ObActionsIDataSetupFunc setup,
-                            ObActionsDataFreeFunc free,
-                            ObActionsRunFunc run)
+gboolean action_register_i(const gchar *name,
+                           ObActionIDataSetupFunc setup,
+                           ObActionDataFreeFunc free,
+                           ObActionRunFunc run)
 {
-    ObActionsDefinition *def = do_register(name, free, run);
+    ObActionDefinition *def = do_register(name, free, run);
     if (def) {
         def->canbeinteractive = TRUE;
         def->setup.i = setup;
@@ -128,12 +128,12 @@ gboolean actions_register_i(const gchar *name,
     return def != NULL;
 }
 
-gboolean actions_register(const gchar *name,
-                          ObActionsDataSetupFunc setup,
-                          ObActionsDataFreeFunc free,
-                          ObActionsRunFunc run)
+gboolean action_register(const gchar *name,
+                         ObActionDataSetupFunc setup,
+                         ObActionDataFreeFunc free,
+                         ObActionRunFunc run)
 {
-    ObActionsDefinition *def = do_register(name, free, run);
+    ObActionDefinition *def = do_register(name, free, run);
     if (def) {
         def->canbeinteractive = FALSE;
         def->setup.n = setup;
@@ -141,11 +141,11 @@ gboolean actions_register(const gchar *name,
     return def != NULL;
 }
 
-gboolean actions_set_shutdown(const gchar *name,
-                              ObActionsShutdownFunc shutdown)
+gboolean action_set_shutdown(const gchar *name,
+                             ObActionShutdownFunc shutdown)
 {
     GSList *it;
-    ObActionsDefinition *def;
+    ObActionDefinition *def;
 
     for (it = registered; it; it = g_slist_next(it)) {
         def = it->data;
@@ -157,24 +157,24 @@ gboolean actions_set_shutdown(const gchar *name,
     return FALSE;
 }
 
-static void actions_definition_ref(ObActionsDefinition *def)
+static void action_definition_ref(ObActionDefinition *def)
 {
     ++def->ref;
 }
 
-static void actions_definition_unref(ObActionsDefinition *def)
+static void action_definition_unref(ObActionDefinition *def)
 {
     if (def && --def->ref == 0) {
         g_free(def->name);
-        g_slice_free(ObActionsDefinition, def);
+        g_slice_free(ObActionDefinition, def);
     }
 }
 
-static ObActionsAct* actions_act_find_name(const gchar *name)
+static ObAction* action_find_by_name(const gchar *name)
 {
     GSList *it;
-    ObActionsDefinition *def = NULL;
-    ObActionsAct *act = NULL;
+    ObActionDefinition *def = NULL;
+    ObAction *act = NULL;
 
     /* find the requested action */
     for (it = registered; it; it = g_slist_next(it)) {
@@ -186,10 +186,10 @@ static ObActionsAct* actions_act_find_name(const gchar *name)
 
     /* if we found the action */
     if (def) {
-        act = g_slice_new(ObActionsAct);
+        act = g_slice_new(ObAction);
         act->ref = 1;
         act->def = def;
-        actions_definition_ref(act->def);
+        action_definition_ref(act->def);
         act->i_pre = NULL;
         act->i_input = NULL;
         act->i_cancel = NULL;
@@ -202,11 +202,11 @@ static ObActionsAct* actions_act_find_name(const gchar *name)
     return act;
 }
 
-ObActionsAct* actions_act_new(const gchar *name, GHashTable *config)
+ObAction* action_new(const gchar *name, GHashTable *config)
 {
-    ObActionsAct *act = NULL;
+    ObAction *act = NULL;
 
-    act = actions_act_find_name(name);
+    act = action_find_by_name(name);
     if (act) {
         /* there is more stuff to parse here */
         if (act->def->canbeinteractive) {
@@ -226,36 +226,36 @@ ObActionsAct* actions_act_new(const gchar *name, GHashTable *config)
     return act;
 }
 
-gboolean actions_act_is_interactive(ObActionsAct *act)
+gboolean action_is_interactive(ObAction *act)
 {
     return act->i_input != NULL;
 }
 
-void actions_act_ref(ObActionsAct *act)
+void action_ref(ObAction *act)
 {
     ++act->ref;
 }
 
-void actions_act_unref(ObActionsAct *act)
+void action_unref(ObAction *act)
 {
     if (act && --act->ref == 0) {
         /* free the action specific options */
         if (act->def->free)
             act->def->free(act->options);
         /* unref the definition */
-        actions_definition_unref(act->def);
-        g_slice_free(ObActionsAct, act);
+        action_definition_unref(act->def);
+        g_slice_free(ObAction, act);
     }
 }
 
-static void actions_setup_data(ObActionsData *data,
-                               ObUserAction uact,
-                               guint state,
-                               gint x,
-                               gint y,
-                               gint button,
-                               ObFrameContext con,
-                               struct _ObClient *client)
+static void action_setup_data(ObActionData *data,
+                              ObUserAction uact,
+                              guint state,
+                              gint x,
+                              gint y,
+                              gint button,
+                              ObFrameContext con,
+                              struct _ObClient *client)
 {
     data->uact = uact;
     data->state = state;
@@ -266,14 +266,14 @@ static void actions_setup_data(ObActionsData *data,
     data->client = client;
 }
 
-gboolean actions_run_acts(ObActionsList *acts,
-                          ObUserAction uact,
-                          guint state,
-                          gint x,
-                          gint y,
-                          gint button,
-                          ObFrameContext con,
-                          struct _ObClient *client)
+gboolean action_run_acts(ObActionList *acts,
+                         ObUserAction uact,
+                         guint state,
+                         gint x,
+                         gint y,
+                         gint button,
+                         ObFrameContext con,
+                         struct _ObClient *client)
 {
     gboolean ran_interactive;
     gboolean update_user_time;
@@ -289,8 +289,8 @@ gboolean actions_run_acts(ObActionsList *acts,
     ran_interactive = FALSE;
     update_user_time = FALSE;
     while (acts) {
-        ObActionsAct *act;
-        ObActionsData data;
+        ObAction *act;
+        ObActionData data;
         gboolean ok = TRUE;
 
         if (acts->isfilter) {
@@ -302,23 +302,23 @@ gboolean actions_run_acts(ObActionsList *acts,
             act = acts->u.action;
         }
 
-        actions_setup_data(&data, uact, state, x, y, button, con, client);
+        action_setup_data(&data, uact, state, x, y, button, con, client);
 
         /* if they have the same run function, then we'll assume they are
            cooperating and not cancel eachother out */
         if (!interactive_act || interactive_act->def->run != act->def->run) {
-            if (actions_act_is_interactive(act)) {
+            if (action_is_interactive(act)) {
                 /* cancel the old one */
                 if (interactive_act)
-                    actions_interactive_cancel_act();
+                    action_interactive_cancel_act();
                 if (act->i_pre)
                     if (!act->i_pre(state, act->options))
                         act->i_input = NULL; /* remove the interactivity */
                 ran_interactive = TRUE;
             }
             /* check again cuz it might have been cancelled */
-            if (actions_act_is_interactive(act)) {
-                ok = actions_interactive_begin_act(act, state);
+            if (action_is_interactive(act)) {
+                ok = action_interactive_begin_act(act, state);
                 ran_interactive = TRUE;
             }
         }
@@ -326,8 +326,8 @@ gboolean actions_run_acts(ObActionsList *acts,
         /* fire the action's run function with this data */
         if (ok) {
             if (!act->def->run(&data, act->options)) {
-                if (actions_act_is_interactive(act))
-                    actions_interactive_end_act();
+                if (action_is_interactive(act))
+                    action_interactive_end_act();
                 if (client && client == focus_client)
                     update_user_time = TRUE;
             } else {
@@ -345,25 +345,25 @@ gboolean actions_run_acts(ObActionsList *acts,
     return ran_interactive;
 }
 
-gboolean actions_interactive_act_running(void)
+gboolean action_interactive_act_running(void)
 {
     return interactive_act != NULL;
 }
 
-void actions_interactive_cancel_act(void)
+void action_interactive_cancel_act(void)
 {
     if (interactive_act) {
         if (interactive_act->i_cancel)
             interactive_act->i_cancel(interactive_act->options);
-        actions_interactive_end_act();
+        action_interactive_end_act();
     }
 }
 
-static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
+static gboolean action_interactive_begin_act(ObAction *act, guint state)
 {
     if (grab_keyboard()) {
         interactive_act = act;
-        actions_act_ref(interactive_act);
+        action_ref(interactive_act);
 
         interactive_initial_state = state;
 
@@ -377,10 +377,10 @@ static gboolean actions_interactive_begin_act(ObActionsAct *act, guint state)
         return FALSE;
 }
 
-static void actions_interactive_end_act(void)
+static void action_interactive_end_act(void)
 {
     if (interactive_act) {
-        ObActionsAct *ia = interactive_act;
+        ObAction *ia = interactive_act;
 
         /* set this to NULL first so the i_post() function can't cause this to
            get called again (if it decides it wants to cancel any ongoing
@@ -392,11 +392,11 @@ static void actions_interactive_end_act(void)
         if (ia->i_post)
             ia->i_post(ia->options);
 
-        actions_act_unref(ia);
+        action_unref(ia);
     }
 }
 
-gboolean actions_interactive_input_event(XEvent *e)
+gboolean action_interactive_input_event(XEvent *e)
 {
     gboolean used = FALSE;
     if (interactive_act) {
@@ -406,13 +406,13 @@ gboolean actions_interactive_input_event(XEvent *e)
         {
             used = TRUE; /* if it cancelled the action then it has to of
                             been used */
-            actions_interactive_end_act();
+            action_interactive_end_act();
         }
     }
     return used;
 }
 
-void actions_client_move(ObActionsData *data, gboolean start)
+void action_client_move(ObActionData *data, gboolean start)
 {
     static gulong ignore_start = 0;
     if (start)

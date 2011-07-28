@@ -94,15 +94,6 @@ ObActionsAct* actions_act_new(const gchar *name, GHashTable *config);
 void actions_act_ref(ObActionsAct *act);
 void actions_act_unref(ObActionsAct *act);
 
-/*! When this is true, an XAllowEvents with ReplayPointer will be called
-  if an action is going to maybe try moving windows around on screen (or
-  map/unmap windows)
-*/
-void actions_set_need_pointer_replay_before_move(gboolean replay);
-/*! Returns if a ReplayPointer is still needed.  If it was called while running
-  actions then this will be false */
-gboolean actions_get_need_pointer_replay_before_move(void);
-
 /*! Runs a list of actions.
  @return TRUE if an interactive action was started, FALSE otherwise.
 */

@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   filters/all.c for the Openbox window manager
+   filters/_all.h for the Openbox window manager
    Copyright (c) 2011        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,9 +16,6 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "all.h"
+void filters__all_startup(void);
 
-void filters_all_startup(void)
-{
-    /*filter_foo_startup();*/
-}
+/*void filter_foo_startup(void);*/

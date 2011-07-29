@@ -116,6 +116,7 @@ static guint focus_delay_timeout_id = 0;
 static ObClient *focus_delay_timeout_client = NULL;
 static guint unfocus_delay_timeout_id = 0;
 static ObClient *unfocus_delay_timeout_client = NULL;
+static ObClient *current_target = NULL;
 
 #ifdef USE_SM
 static gboolean ice_handler(GIOChannel *source, GIOCondition cond,
@@ -2047,6 +2048,8 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
 
 static gboolean event_handle_user_input(ObClient *client, XEvent *e)
 {
+    gboolean used = FALSE;
+
     g_assert(e->type == ButtonPress || e->type == ButtonRelease ||
              e->type == MotionNotify || e->type == KeyPress ||
              e->type == KeyRelease);
@@ -2056,32 +2059,36 @@ static gboolean event_handle_user_input(ObClient *client, XEvent *e)
             /* don't use the event if the menu used it, but if the menu
                didn't use it and it's a keypress that is bound, it will
                close the menu and be used */
-            return TRUE;
+            used = TRUE;
     }
 
     /* if the keyboard interactive action uses the event then dont
        use it for bindings. likewise is moveresize uses the event. */
-    if (action_interactive_input_event(e) || moveresize_event(e))
-        return TRUE;
+    else if (action_interactive_input_event(e) || moveresize_event(e))
+        used = TRUE;
 
-    if (moveresize_in_progress)
-        /* make further actions work on the client being
-           moved/resized */
-        client = moveresize_client;
-
-    if (e->type == ButtonPress ||
+    else if (e->type == ButtonPress ||
         e->type == ButtonRelease ||
         e->type == MotionNotify)
     {
         /* the frame may not be "visible" but they can still click on it
            in the case where it is animating before disappearing */
-        if (!client || !frame_iconify_animating(client->frame))
-            return mouse_event(client, e);
-    } else
-        return keyboard_event((focus_cycle_target ? focus_cycle_target :
-                               (client ? client : focus_client)), e);
+        if (!client || !frame_iconify_animating(client->frame)) {
+            current_target = (moveresize_in_progress ? moveresize_client :
+                              client);
+            used = mouse_event(current_target, e);
+            current_target = NULL;
+        }
+    } else {
+        current_target = (focus_cycle_target ? focus_cycle_target :
+                          (moveresize_in_progress ? moveresize_client :
+                           (client ? client :
+                            focus_client)));
+        used = keyboard_event(current_target, e);
+        current_target = NULL;
+    }
 
-    return FALSE;
+    return used;
 }
 
 static void focus_delay_dest(gpointer data)
@@ -2301,4 +2308,9 @@ void event_update_user_time(void)
 void event_reset_user_time(void)
 {
     event_last_user_time = CurrentTime;
+}
+
+struct _ObClient* event_current_target(void)
+{
+    return current_target;
 }

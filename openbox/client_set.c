@@ -23,6 +23,7 @@
 #include <glib.h>
 
 struct _ObClientSet {
+    gboolean all;
     GHashTable *h;
 };
 
@@ -36,6 +37,7 @@ ObClientSet* client_set_empty(void)
     ObClientSet *set;
 
     set = g_slice_new(ObClientSet);
+    set->all = FALSE;
     set->h = g_hash_table_new(g_int_hash, g_int_equal);
     client_add_destroy_notify((ObClientCallback)client_destroyed, set);
     return set;
@@ -57,21 +59,21 @@ ObClientSet* client_set_single(void)
 ObClientSet* client_set_all(void)
 {
     ObClientSet *set;
-    GList *it;
 
     if (!client_list) return NULL;
-    set = client_set_empty();
-    for (it = client_list; it; it = g_list_next(it)) {
-        ObClient *c = it->data;
-        g_hash_table_insert(set->h, &c->window, c);
-    }
+    set = g_slice_new(ObClientSet);
+    set->all = TRUE;
+    set->h = NULL;
     return set;
 }
 
 void client_set_destroy(ObClientSet *set)
 {
-    client_remove_destroy_notify_data((ObClientCallback)client_destroyed, set);
-    g_hash_table_destroy(set->h);
+    if (!set->all) {
+        client_remove_destroy_notify_data((ObClientCallback)client_destroyed,
+                                          set);
+        g_hash_table_destroy(set->h);
+    }
     g_slice_free(ObClientSet, set);
 }
 
@@ -89,6 +91,14 @@ ObClientSet* client_set_union(ObClientSet *a, ObClientSet *b)
     g_return_val_if_fail(a != NULL, NULL);
     g_return_val_if_fail(b != NULL, NULL);
 
+    if (a->all) {
+        client_set_destroy(b);
+        return a;
+    }
+    if (b->all) {
+        client_set_destroy(a);
+        return b;
+    }
     g_hash_table_foreach(b->h, foreach_union, a->h);
     client_set_destroy(b);
     return a;
@@ -107,6 +117,15 @@ ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b)
 {
     g_return_val_if_fail(a != NULL, NULL);
     g_return_val_if_fail(b != NULL, NULL);
+
+    if (a->all) {
+        client_set_destroy(a);
+        return b;
+    }
+    if (b->all) {
+        client_set_destroy(b);
+        return a;
+    }
 
     g_hash_table_foreach_remove(a->h, foreach_intersection, b->h);
     client_set_destroy(b);
@@ -154,3 +173,16 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
     }
     return set;
 }
+
+gboolean client_set_is_empty(ObClientSet *set)
+{
+    if (set->all) return client_list == NULL;
+    else return g_hash_table_size(set->h) == 0;
+}
+
+gboolean client_set_test_boolean(ObClientSet *set)
+{
+    if (set->all) return TRUE;
+    else return g_hash_table_size(set->h) > 0;
+}
+

@@ -56,3 +56,11 @@ ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
   will be added to the set. */
 ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
                                gpointer data);
+
+/*! Returns TRUE if there is nothing in the set. */
+gboolean client_set_is_empty(ObClientSet *set);
+
+/*! Returns TRUE if there is someting in the set, or if it is the special
+  "ALL" set, which contains all clients.  Even when there are no clients
+  present, this set returns TRUE. */
+gboolean client_set_test_boolean(ObClientSet *set);

@@ -88,4 +88,8 @@ void event_update_user_time(void);
 /*! Reset the timestamp for when the user has last used the focused window. */
 void event_reset_user_time(void);
 
+/*! Returns a client that is the current target of a user input event, or NULL
+  if there is none. */
+struct _ObClient* event_current_target(void);
+
 #endif

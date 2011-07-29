@@ -16,11 +16,12 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "client_set.h"
+
 #include <glib.h>
 
 struct _ObActionValue;
 struct _ObClient;
-struct _ObClientSet;
 
 typedef struct _ObActionFilter ObActionFilter;
 typedef struct _ObActionFilterFuncs ObActionFilterFuncs;
@@ -29,14 +30,6 @@ typedef enum _ObActionFilterDefault ObActionFilterDefault;
 typedef gpointer (*ObActionFilterSetupFunc)(gboolean invert,
                                             struct _ObActionValue *v);
 typedef void (*ObActionFilterDestroyFunc)(gpointer data);
-/*! Runs the filter and modifies the client set as appropriate.  This function
-  is given a set of clients and may simply remove clients that do not
-  match its criteria. */
-typedef void (*ObActionFilterReduceFunc)(struct _ObClientSet *set);
-/*! Runs the filter and creates a new client set as appropriate.  This function
-  is given a set of clients and must add all unlisted clients possible that
-  match its criteria. */
-typedef void (*ObActionFilterExpandFunc)(struct _ObClientSet *set);
 
 void action_filter_startup(gboolean reconfig);
 void action_filter_shutdown(gboolean reconfig);
@@ -44,12 +37,12 @@ void action_filter_shutdown(gboolean reconfig);
 gboolean action_filter_register(const gchar *name,
                                 ObActionFilterSetupFunc setup,
                                 ObActionFilterDestroyFunc destroy,
-                                ObActionFilterReduceFunc reduce,
-                                ObActionFilterExpandFunc expand);
+                                ObClientSetReduceFunc reduce,
+                                ObClientSetExpandFunc expand);
 
 ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v);
 void action_filter_ref(ObActionFilter *f);
 void action_filter_unref(ObActionFilter *f);
 
-void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set);
-void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set);
+void action_filter_expand(ObActionFilter *f, ObClientSet *set);
+void action_filter_reduce(ObActionFilter *f, ObClientSet *set);

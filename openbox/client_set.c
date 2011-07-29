@@ -113,23 +113,34 @@ ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b)
     return a;
 }
 
+struct ObClientSetForeachReduce {
+    ObClientSetReduceFunc f;
+    gpointer data;
+};
+
 static gboolean foreach_reduce(gpointer k, gpointer v, gpointer u)
 {
     ObClient *c = v;
-    ObClientSetReduceFunc f = u;
-    return f(c);
+    struct ObClientSetForeachReduce *d = u;
+    return d->f(c, d->data);
 }
 
-ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f)
+ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
+                               gpointer data)
 {
+    struct ObClientSetForeachReduce d;
+
     g_return_val_if_fail(set != NULL, NULL);
     g_return_val_if_fail(f != NULL, NULL);
 
-    g_hash_table_foreach_remove(set->h, foreach_reduce, f);
+    d.f = f;
+    d.data = data;
+    g_hash_table_foreach_remove(set->h, foreach_reduce, &d);
     return set;
 }
 
-ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f)
+ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
+                               gpointer data)
 {
     GList *it;
 
@@ -138,7 +149,7 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f)
 
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
-        if (!g_hash_table_lookup(set->h, &c->window) && f(c))
+        if (!g_hash_table_lookup(set->h, &c->window) && f(c, data))
             g_hash_table_insert(set->h, &c->window, c);
     }
     return set;

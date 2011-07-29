@@ -22,8 +22,8 @@ struct _ObClient;
 
 typedef struct _ObClientSet ObClientSet;
 
-typedef gboolean (*ObClientSetReduceFunc)(struct _ObClient *c);
-typedef gboolean (*ObClientSetExpandFunc)(struct _ObClient *c);
+typedef gboolean (*ObClientSetReduceFunc)(struct _ObClient *c, gpointer data);
+typedef gboolean (*ObClientSetExpandFunc)(struct _ObClient *c, gpointer data);
 
 /*! Returns a new set of clients without anything in it. */
 ObClientSet* client_set_empty(void);
@@ -48,9 +48,11 @@ ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b);
 /*! Reduce a set of clients.  The function @f is called for each client
   currently in the set. For each client that it returns TRUE, the client will
   be removed from the set. */
-ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f);
+ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
+                               gpointer data);
 
 /*! Expand a set of clients.  The function @f is called for each client
   not currently in the set. For each client that it returns TRUE, the client
   will be added to the set. */
-ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f);
+ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
+                               gpointer data);

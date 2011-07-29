@@ -143,11 +143,11 @@ void action_filter_unref(ObActionFilter *f)
 void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    client_set_expand(set, f->def->expand);
+    client_set_expand(set, f->def->expand, f->data);
 }
 
 void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    client_set_reduce(set, f->def->reduce);
+    client_set_reduce(set, f->def->reduce, f->data);
 }

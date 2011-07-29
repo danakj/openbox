@@ -27,8 +27,8 @@ struct _ObActionFilterDefinition {
     gchar *name;
     ObActionFilterSetupFunc setup;
     ObActionFilterDestroyFunc destroy;
-    ObActionFilterReduceFunc reduce;
-    ObActionFilterExpandFunc expand;
+    ObClientSetReduceFunc reduce;
+    ObClientSetExpandFunc expand;
 };
 
 struct _ObActionFilter {
@@ -60,14 +60,13 @@ void action_filter_shutdown(gboolean reconfig)
 gboolean action_filter_register(const gchar *name,
                                 ObActionFilterSetupFunc setup,
                                 ObActionFilterDestroyFunc destroy,
-                                ObActionFilterReduceFunc reduce,
-                                ObActionFilterExpandFunc expand)
+                                ObClientSetReduceFunc reduce,
+                                ObClientSetExpandFunc expand)
 {
     ObActionFilterDefinition *def;
     GSList *it;
 
     g_return_val_if_fail(name != NULL, FALSE);
-    g_return_val_if_fail(setup != NULL, FALSE);
     g_return_val_if_fail(reduce != NULL, FALSE);
     g_return_val_if_fail(expand != NULL, FALSE);
 
@@ -124,7 +123,7 @@ ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v)
     filter = g_slice_new(ObActionFilter);
     filter->ref = 1;
     filter->def = def;
-    filter->data = def->setup(invert, v);
+    filter->data = def->setup ? def->setup(invert, v) : NULL;
     return filter;
 }
 
@@ -144,11 +143,11 @@ void action_filter_unref(ObActionFilter *f)
 void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    return f->def->expand(set);
+    client_set_expand(set, f->def->expand);
 }
 
 void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    return f->def->reduce(set);
+    client_set_reduce(set, f->def->reduce);
 }

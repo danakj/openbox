@@ -19,6 +19,8 @@
 #include "action_filter.h"
 #include "gettext.h"
 
+#include "filters/all.h"
+
 typedef struct _ObActionFilterDefinition ObActionFilterDefinition;
 
 struct _ObActionFilterDefinition {
@@ -43,7 +45,7 @@ static GSList *registered = NULL;
 
 void action_filter_startup(gboolean reconfig)
 {
-    //XXX filters_all_startup();
+    filters_all_startup();
 }
 
 void action_filter_shutdown(gboolean reconfig)

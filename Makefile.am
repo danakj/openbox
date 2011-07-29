@@ -232,6 +232,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \
+	openbox/filters/all.c \
+	openbox/filters/all.h \
 	openbox/action.c \
 	openbox/action.h \
 	openbox/action_filter.c \

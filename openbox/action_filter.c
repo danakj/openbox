@@ -141,16 +141,14 @@ void action_filter_unref(ObActionFilter *f)
     }
 }
 
-void action_filter_expand(ObActionFilter *f, GHashTable *client_set)
+void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    g_return_if_fail(client_set != NULL);
-    return f->def->expand(client_set);
+    return f->def->expand(set);
 }
 
-void action_filter_reduce(ObActionFilter *f, GHashTable *client_set)
+void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set)
 {
     g_return_if_fail(f != NULL);
-    g_return_if_fail(client_set != NULL);
-    return f->def->reduce(client_set);
+    return f->def->reduce(set);
 }

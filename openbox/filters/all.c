@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   filters/_all.c for the Openbox window manager
-   Copyright (c) 2011        Dana Jansens
+   filters/all.c for the Openbox window manager
+   Copyright (c) 2011             Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,10 +16,18 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "_all.h"
+#include "openbox/action_filter.h"
 
-void filters__all_startup(void)
+static gboolean reduce(struct _ObClient *c, gpointer data)
 {
-    filter_all_startup();
-    filter_target_startup();
+    return FALSE; /* remove nothing */
+}
+static gboolean expand(struct _ObClient *c, gpointer data)
+{
+    return TRUE; /* add everything */
+}
+
+void filter_all_startup(void)
+{
+    action_filter_register("all", NULL, NULL, reduce, expand);
 }

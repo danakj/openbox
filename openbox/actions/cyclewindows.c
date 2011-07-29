@@ -55,9 +55,10 @@ static void     i_post_func(gpointer options);
 
 void action_cyclewindows_startup(void)
 {
-    action_register_i("NextWindow", setup_forward_func, free_func, run_func);
-    action_register_i("PreviousWindow", setup_backward_func, free_func,
-                      run_func);
+    action_register_i("NextWindow", OB_ACTION_DEFAULT_FILTER_ALL,
+                      setup_forward_func, free_func, run_func);
+    action_register_i("PreviousWindow", OB_ACTION_DEFAULT_FILTER_ALL,
+                      setup_backward_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config,

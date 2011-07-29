@@ -5,7 +5,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_unfocus_startup(void)
 {
-    action_register("Unfocus", NULL, NULL, run_func);
+    action_register("Unfocus", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func);
 }
 
 /* Always return FALSE because its not interactive */

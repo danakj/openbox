@@ -18,6 +18,7 @@
 
 #include "action.h"
 #include "action_list.h"
+#include "action_filter.h"
 #include "gettext.h"
 #include "grab.h"
 #include "screen.h"
@@ -45,6 +46,7 @@ struct _ObActionDefinition {
     gchar *name;
 
     gboolean canbeinteractive;
+    ObActionDefaultFilter def_filter;
     union {
         ObActionIDataSetupFunc i;
         ObActionDataSetupFunc n;
@@ -90,13 +92,15 @@ void action_shutdown(gboolean reconfig)
 }
 
 ObActionDefinition* do_register(const gchar *name,
+                                ObActionDefaultFilter def_filter,
                                 ObActionDataFreeFunc free,
                                 ObActionRunFunc run)
 {
     GSList *it;
     ObActionDefinition *def;
 
-    g_assert(run != NULL);
+    g_return_val_if_fail(def_filter < OB_NUM_ACTION_DEFAULT_FILTERS, NULL);
+    g_return_val_if_fail(run != NULL, NULL);
 
     for (it = registered; it; it = g_slist_next(it)) {
         def = it->data;
@@ -107,6 +111,7 @@ ObActionDefinition* do_register(const gchar *name,
     def = g_slice_new(ObActionDefinition);
     def->ref = 1;
     def->name = g_strdup(name);
+    def->def_filter = def_filter;
     def->free = free;
     def->run = run;
     def->shutdown = NULL;
@@ -116,11 +121,12 @@ ObActionDefinition* do_register(const gchar *name,
 }
 
 gboolean action_register_i(const gchar *name,
+                           ObActionDefaultFilter def_filter,
                            ObActionIDataSetupFunc setup,
                            ObActionDataFreeFunc free,
                            ObActionRunFunc run)
 {
-    ObActionDefinition *def = do_register(name, free, run);
+    ObActionDefinition *def = do_register(name, def_filter, free, run);
     if (def) {
         def->canbeinteractive = TRUE;
         def->setup.i = setup;
@@ -129,11 +135,12 @@ gboolean action_register_i(const gchar *name,
 }
 
 gboolean action_register(const gchar *name,
+                         ObActionDefaultFilter def_filter,
                          ObActionDataSetupFunc setup,
                          ObActionDataFreeFunc free,
                          ObActionRunFunc run)
 {
-    ObActionDefinition *def = do_register(name, free, run);
+    ObActionDefinition *def = do_register(name, def_filter, free, run);
     if (def) {
         def->canbeinteractive = FALSE;
         def->setup.n = setup;

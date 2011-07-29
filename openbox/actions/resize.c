@@ -19,7 +19,8 @@ static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
 
 void action_resize_startup(void)
 {
-    action_register("Resize", setup_func, free_func, run_func);
+    action_register("Resize", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

@@ -12,7 +12,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_debug_startup(void)
 {
-    action_register("Debug", setup_func, free_func, run_func);
+    action_register("Debug", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

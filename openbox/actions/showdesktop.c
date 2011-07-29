@@ -5,7 +5,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_showdesktop_startup(void)
 {
-    action_register("ToggleShowDesktop", NULL, NULL, run_func);
+    action_register("ToggleShowDesktop", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    NULL, NULL, run_func);
 }
 
 /* Always return FALSE because its not interactive */

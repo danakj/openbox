@@ -21,9 +21,12 @@ static gboolean run_func_toggle(ObActionData *data, gpointer options);
 
 void action_maximize_startup(void)
 {
-    action_register("Maximize", setup_func, free_func, run_func_on);
-    action_register("Unmaximize", setup_func, free_func, run_func_off);
-    action_register("ToggleMaximize", setup_func, free_func, run_func_toggle);
+    action_register("Maximize", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func_on);
+    action_register("Unmaximize", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func_off);
+    action_register("ToggleMaximize", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func_toggle);
 }
 
 static gpointer setup_func(GHashTable *config)

@@ -7,9 +7,12 @@ static gboolean run_func_toggle(ObActionData *data, gpointer options);
 
 void action_shade_startup(void)
 {
-    action_register("Shade", NULL, NULL, run_func_on);
-    action_register("Unshade", NULL, NULL, run_func_off);
-    action_register("ToggleShade", NULL, NULL, run_func_toggle);
+    action_register("Shade", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_on);
+    action_register("Unshade", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_off);
+    action_register("ToggleShade", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_toggle);
 }
 
 /* Always return FALSE because its not interactive */

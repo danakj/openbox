@@ -7,9 +7,12 @@ static gboolean run_func_toggle(ObActionData *data, gpointer options);
 
 void action_decorations_startup(void)
 {
-    action_register("Decorate", NULL, NULL, run_func_on);
-    action_register("Undecorate", NULL, NULL, run_func_off);
-    action_register("ToggleDecorations", NULL, NULL, run_func_toggle);
+    action_register("Decorate", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_on);
+    action_register("Undecorate", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_off);
+    action_register("ToggleDecorations", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_toggle);
 }
 
 /* Always return FALSE because its not interactive */

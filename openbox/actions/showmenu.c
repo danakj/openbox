@@ -13,7 +13,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_showmenu_startup(void)
 {
-    action_register("ShowMenu", setup_func, free_func, run_func);
+    action_register("ShowMenu", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

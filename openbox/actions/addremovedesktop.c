@@ -13,26 +13,13 @@ static gpointer setup_add_func(GHashTable *config);
 static gpointer setup_remove_func(GHashTable *config);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionData *data, gpointer options);
-/* 3.4-compatibility */
-static gpointer setup_addcurrent_func(GHashTable *config);
-static gpointer setup_addlast_func(GHashTable *config);
-static gpointer setup_removecurrent_func(GHashTable *config);
-static gpointer setup_removelast_func(GHashTable *config);
 
 void action_addremovedesktop_startup(void)
 {
-    action_register("AddDesktop", setup_add_func, free_func, run_func);
-    action_register("RemoveDesktop", setup_remove_func, free_func, run_func);
-
-    /* 3.4-compatibility */
-    action_register("AddDesktopLast", setup_addlast_func,
-                    free_func, run_func);
-    action_register("RemoveDesktopLast", setup_removelast_func,
-                    free_func, run_func);
-    action_register("AddDesktopCurrent", setup_addcurrent_func,
-                    free_func, run_func);
-    action_register("RemoveDesktopCurrent", setup_removecurrent_func,
-                    free_func, run_func);
+    action_register("AddDesktop", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    setup_add_func, free_func, run_func);
+    action_register("RemoveDesktop", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    setup_remove_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)
@@ -88,33 +75,4 @@ static gboolean run_func(ObActionData *data, gpointer options)
     action_client_move(data, FALSE);
 
     return FALSE;
-}
-
-/* 3.4-compatibility */
-static gpointer setup_addcurrent_func(GHashTable *config)
-{
-    Options *o = setup_add_func(config);
-    o->current = TRUE;
-    return o;
-}
-
-static gpointer setup_addlast_func(GHashTable *config)
-{
-    Options *o = setup_add_func(config);
-    o->current = FALSE;
-    return o;
-}
-
-static gpointer setup_removecurrent_func(GHashTable *config)
-{
-    Options *o = setup_remove_func(config);
-    o->current = TRUE;
-    return o;
-}
-
-static gpointer setup_removelast_func(GHashTable *config)
-{
-    Options *o = setup_remove_func(config);
-    o->current = FALSE;
-    return o;
 }

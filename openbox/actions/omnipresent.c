@@ -6,7 +6,8 @@ static gboolean run_func_toggle(ObActionData *data, gpointer options);
 
 void action_omnipresent_startup(void)
 {
-    action_register("ToggleOmnipresent", NULL, NULL, run_func_toggle);
+    action_register("ToggleOmnipresent", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_toggle);
 }
 
 /* Always return FALSE because its not interactive */

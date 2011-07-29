@@ -5,7 +5,8 @@ static gboolean run_func_toggle(ObActionData *data, gpointer options);
 
 void action_fullscreen_startup(void)
 {
-    action_register("ToggleFullscreen", NULL, NULL, run_func_toggle);
+    action_register("ToggleFullscreen", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    NULL, NULL, run_func_toggle);
 }
 
 /* Always return FALSE because its not interactive */

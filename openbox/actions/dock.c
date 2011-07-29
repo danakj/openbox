@@ -8,8 +8,10 @@ static gboolean lower_func(ObActionData *data, gpointer options);
 
 void action_dock_startup(void)
 {
-    action_register("RaiseDock", NULL, NULL, raise_func);
-    action_register("LowerDock", NULL, NULL, lower_func);
+    action_register("RaiseDock", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    NULL, NULL, raise_func);
+    action_register("LowerDock", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    NULL, NULL, lower_func);
 }
 
 /* Always return FALSE because its not interactive */

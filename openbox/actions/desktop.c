@@ -54,8 +54,10 @@ static void i_post_func(gpointer options);
 
 void action_desktop_startup(void)
 {
-    action_register_i("GoToDesktop", setup_go_func, free_func, run_func);
-    action_register_i("SendToDesktop", setup_send_func, free_func, run_func);
+    action_register_i("GoToDesktop", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                      setup_go_func, free_func, run_func);
+    action_register_i("SendToDesktop", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                      setup_send_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config,

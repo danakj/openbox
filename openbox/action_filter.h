@@ -20,6 +20,7 @@
 
 struct _ObActionValue;
 struct _ObClient;
+struct _ObClientSet;
 
 typedef struct _ObActionFilter ObActionFilter;
 typedef struct _ObActionFilterFuncs ObActionFilterFuncs;
@@ -30,11 +31,11 @@ typedef void (*ObActionFilterDestroyFunc)(gpointer data);
 /*! Runs the filter and modifies the client set as appropriate.  This function
   is given a set of clients and may simply remove clients that do not
   match its criteria. */
-typedef void (*ObActionFilterReduceFunc)(GHashTable *client_set);
+typedef void (*ObActionFilterReduceFunc)(struct _ObClientSet *set);
 /*! Runs the filter and creates a new client set as appropriate.  This function
   is given a set of clients and must add all unlisted clients possible that
   match its criteria. */
-typedef void (*ObActionFilterExpandFunc)(GHashTable *client_set);
+typedef void (*ObActionFilterExpandFunc)(struct _ObClientSet *set);
 
 void action_filter_startup(gboolean reconfig);
 void action_filter_shutdown(gboolean reconfig);
@@ -49,5 +50,5 @@ ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v);
 void action_filter_ref(ObActionFilter *f);
 void action_filter_unref(ObActionFilter *f);
 
-void action_filter_expand(ObActionFilter *f, GHashTable *client_set);
-void action_filter_reduce(ObActionFilter *f, GHashTable *client_set);
+void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set);
+void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set);

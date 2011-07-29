@@ -29,7 +29,7 @@
 #include "openbox.h"
 #include "debug.h"
 
-#include "actions/all.h"
+#include "actions/_all.h"
 
 static void     action_definition_ref(ObActionDefinition *def);
 static void     action_definition_unref(ObActionDefinition *def);
@@ -73,7 +73,7 @@ void action_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    actions_all_startup();
+    actions__all_startup();
 }
 
 void action_shutdown(gboolean reconfig)

@@ -191,8 +191,8 @@ openbox_openbox_LDADD = \
 openbox_openbox_LDFLAGS = -export-dynamic
 openbox_openbox_SOURCES = \
 	gettext.h \
-	openbox/actions/all.c \
-	openbox/actions/all.h \
+	openbox/actions/_all.c \
+	openbox/actions/_all.h \
 	openbox/actions/addremovedesktop.c \
 	openbox/actions/breakchroot.c \
 	openbox/actions/close.c \
@@ -229,8 +229,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
 	openbox/actions/unfocus.c \
-	openbox/filters/all.c \
-	openbox/filters/all.h \
+	openbox/filters/_all.c \
+	openbox/filters/_all.h \
 	openbox/action.c \
 	openbox/action.h \
 	openbox/action_filter.c \

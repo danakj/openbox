@@ -22,13 +22,16 @@
 
 #include <glib.h>
 
-void client_destroyed(ObClient *client, ObClientSet *set);
-
 struct _ObClientSet {
     GHashTable *h;
 };
 
-static ObClientSet* empty_set(void)
+static void client_destroyed(ObClient *client, ObClientSet *set)
+{
+    g_hash_table_remove(set->h, &client->window);
+}
+
+ObClientSet* client_set_empty(void)
 {
     ObClientSet *set;
 
@@ -45,7 +48,7 @@ ObClientSet* client_set_single(void)
 
     c = event_current_target();
     if (!c) return NULL;
-    set = empty_set();
+    set = client_set_empty();
     g_hash_table_insert(set->h, &c->window, c);
     return set;
 }
@@ -57,19 +60,12 @@ ObClientSet* client_set_all(void)
     GList *it;
 
     if (!client_list) return NULL;
-    set = g_slice_new(ObClientSet);
-    set->h = g_hash_table_new(g_int_hash, g_int_equal);
+    set = client_set_empty();
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         g_hash_table_insert(set->h, &c->window, c);
     }
-    client_add_destroy_notify((ObClientCallback)client_destroyed, set);
     return set;
-}
-
-void client_destroyed(ObClient *client, ObClientSet *set)
-{
-    g_hash_table_remove(set->h, &client->window);
 }
 
 void client_set_destroy(ObClientSet *set)
@@ -90,6 +86,9 @@ static void foreach_union(gpointer k, gpointer v, gpointer u)
 */
 ObClientSet* client_set_union(ObClientSet *a, ObClientSet *b)
 {
+    g_return_val_if_fail(a != NULL, NULL);
+    g_return_val_if_fail(b != NULL, NULL);
+
     g_hash_table_foreach(b->h, foreach_union, a->h);
     client_set_destroy(b);
     return a;
@@ -106,6 +105,9 @@ static gboolean foreach_intersection(gpointer k, gpointer v, gpointer u)
 */
 ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b)
 {
+    g_return_val_if_fail(a != NULL, NULL);
+    g_return_val_if_fail(b != NULL, NULL);
+
     g_hash_table_foreach_remove(a->h, foreach_intersection, b->h);
     client_set_destroy(b);
     return a;
@@ -120,25 +122,24 @@ static gboolean foreach_reduce(gpointer k, gpointer v, gpointer u)
 
 ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f)
 {
+    g_return_val_if_fail(set != NULL, NULL);
+    g_return_val_if_fail(f != NULL, NULL);
+
     g_hash_table_foreach_remove(set->h, foreach_reduce, f);
-    if (g_hash_table_size(set->h) > 0)
-        return set;
-    client_set_destroy(set);
-    return NULL;
+    return set;
 }
 
 ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f)
 {
     GList *it;
 
+    g_return_val_if_fail(set != NULL, NULL);
+    g_return_val_if_fail(f != NULL, NULL);
+
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
-        if (!set || !g_hash_table_lookup(set->h, &c->window)) {
-            if (f(c)) {
-                if (!set) set = empty_set();
-                g_hash_table_insert(set->h, &c->window, c);
-            }
-        }
+        if (!g_hash_table_lookup(set->h, &c->window) && f(c))
+            g_hash_table_insert(set->h, &c->window, c);
     }
     return set;
 }

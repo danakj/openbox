@@ -20,12 +20,13 @@
 
 struct _ObClient;
 
-/*! A set of ObClients. An empty set is always a NULL pointer. */
 typedef struct _ObClientSet ObClientSet;
 
 typedef gboolean (*ObClientSetReduceFunc)(struct _ObClient *c);
 typedef gboolean (*ObClientSetExpandFunc)(struct _ObClient *c);
 
+/*! Returns a new set of clients without anything in it. */
+ObClientSet* client_set_empty(void);
 /*! Returns a new set of clients with a single client in it.
   The client is the currently targeted window. */
 ObClientSet* client_set_single(void);

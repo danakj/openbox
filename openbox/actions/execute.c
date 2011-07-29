@@ -32,7 +32,8 @@ static GSList *prompt_opts = NULL;
 
 void action_execute_startup(void)
 {
-    action_register("Execute", setup_func, free_func, run_func);
+    action_register("Execute", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func);
     action_set_shutdown("Execute", shutdown_func);
 
     client_add_destroy_notify(client_dest, NULL);

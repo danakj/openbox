@@ -24,6 +24,7 @@ struct _ObClientSet;
 
 typedef struct _ObActionFilter ObActionFilter;
 typedef struct _ObActionFilterFuncs ObActionFilterFuncs;
+typedef enum _ObActionFilterDefault ObActionFilterDefault;
 
 typedef gpointer (*ObActionFilterSetupFunc)(gboolean invert,
                                             struct _ObActionValue *v);

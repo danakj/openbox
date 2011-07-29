@@ -15,12 +15,12 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_layer_startup(void)
 {
-    action_register("ToggleAlwaysOnTop", setup_func_top, free_func,
-                    run_func);
-    action_register("ToggleAlwaysOnBottom", setup_func_bottom, free_func,
-                    run_func);
-    action_register("SendToLayer", setup_func_send, free_func,
-                    run_func);
+    action_register("ToggleAlwaysOnTop", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func_top, free_func, run_func);
+    action_register("ToggleAlwaysOnBottom", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func_bottom, free_func, run_func);
+    action_register("SendToLayer", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func_send, free_func, run_func);
 }
 
 static gpointer setup_func_top(GHashTable *config)

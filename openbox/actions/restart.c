@@ -13,7 +13,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_restart_startup(void)
 {
-    action_register("Restart", setup_func, free_func, run_func);
+    action_register("Restart", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

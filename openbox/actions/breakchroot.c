@@ -6,6 +6,7 @@ static gboolean run_func(ObActionData *data, gpointer options);
 void action_breakchroot_startup(void)
 {
     action_register("BreakChroot",
+                    OB_ACTION_DEFAULT_FILTER_EMPTY,
                     NULL, NULL,
                     run_func);
 }

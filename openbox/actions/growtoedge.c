@@ -18,8 +18,10 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_growtoedge_startup(void)
 {
-    action_register("GrowToEdge", setup_func, free_func, run_func);
-    action_register("ShrinkToEdge", setup_shrink_func, free_func, run_func);
+    action_register("GrowToEdge", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func);
+    action_register("ShrinkToEdge", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_shrink_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

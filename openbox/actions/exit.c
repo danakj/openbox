@@ -15,7 +15,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_exit_startup(void)
 {
-    action_register("Exit", setup_func, free_func, run_func);
+    action_register("Exit", OB_ACTION_DEFAULT_FILTER_EMPTY,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

@@ -53,6 +53,15 @@ typedef gpointer (*ObActionIDataSetupFunc)(GHashTable *config,
                                            ObActionICancelFunc *cancel,
                                            ObActionIPostFunc *post);
 
+/*! The default filter an action would like if no filter is provided by the
+  user */
+typedef enum {
+    OB_ACTION_DEFAULT_FILTER_EMPTY,
+    OB_ACTION_DEFAULT_FILTER_SINGLE,
+    OB_ACTION_DEFAULT_FILTER_ALL,
+    OB_NUM_ACTION_DEFAULT_FILTERS
+} ObActionDefaultFilter;
+
 struct _ObActionData {
     ObUserAction uact;
     guint state;
@@ -69,11 +78,13 @@ void action_shutdown(gboolean reconfigure);
 
 /*! Use this if the actions created from this name may be interactive */
 gboolean action_register_i(const gchar *name,
+                           ObActionDefaultFilter def_filter,
                            ObActionIDataSetupFunc setup,
                            ObActionDataFreeFunc free,
                            ObActionRunFunc run);
 
 gboolean action_register(const gchar *name,
+                         ObActionDefaultFilter def_filter,
                          ObActionDataSetupFunc setup,
                          ObActionDataFreeFunc free,
                          ObActionRunFunc run);

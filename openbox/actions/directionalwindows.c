@@ -44,10 +44,10 @@ static void     end_cycle(gboolean cancel, guint state, Options *o);
 
 void action_directionalwindows_startup(void)
 {
-    action_register_i("DirectionalCycleWindows", setup_cycle_func, free_func,
-                      run_func);
-    action_register("DirectionalTargetWindow", setup_target_func, free_func,
-                    run_func);
+    action_register_i("DirectionalCycleWindows", OB_ACTION_DEFAULT_FILTER_ALL,
+                      setup_cycle_func, free_func, run_func);
+    action_register("DirectionalTargetWindow", OB_ACTION_DEFAULT_FILTER_ALL,
+                    setup_target_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

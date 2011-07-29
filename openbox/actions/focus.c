@@ -16,7 +16,8 @@ static gboolean run_func(ObActionData *data, gpointer options);
 
 void action_focus_startup(void)
 {
-    action_register("Focus", setup_func, free_func, run_func);
+    action_register("Focus", OB_ACTION_DEFAULT_FILTER_SINGLE,
+                    setup_func, free_func, run_func);
 }
 
 static gpointer setup_func(GHashTable *config)

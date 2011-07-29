@@ -165,6 +165,21 @@ void client_remove_destroy_notify(ObClientCallback func)
     }
 }
 
+void client_remove_destroy_notify_data(ObClientCallback func, gpointer data)
+{
+    GSList *it;
+
+    for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
+        ClientCallback *d = it->data;
+        if (d->func == func && d->data == data) {
+            g_slice_free(ClientCallback, d);
+            client_destroy_notifies =
+                g_slist_delete_link(client_destroy_notifies, it);
+            break;
+        }
+    }
+}
+
 void client_set_list(void)
 {
     Window *windows, *win_it;

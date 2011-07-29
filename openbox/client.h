@@ -326,6 +326,7 @@ typedef void (*ObClientCallback)(ObClient *client, gpointer data);
 /*! Get notified when the client is unmanaged */
 void client_add_destroy_notify(ObClientCallback func, gpointer data);
 void client_remove_destroy_notify(ObClientCallback func);
+void client_remove_destroy_notify_data(ObClientCallback func, gpointer data);
 
 /*! Manages a given window
   @param prompt This specifies an ObPrompt which is being managed.  It is

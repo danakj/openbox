@@ -234,6 +234,8 @@ openbox_openbox_SOURCES = \
 	openbox/actions/unfocus.c \
 	openbox/filters/_all.c \
 	openbox/filters/_all.h \
+	openbox/filters/all.c \
+	openbox/filters/target.c \
 	openbox/action.c \
 	openbox/action.h \
 	openbox/action_filter.c \

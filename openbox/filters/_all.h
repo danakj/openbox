@@ -18,4 +18,5 @@
 
 void filters__all_startup(void);
 
-/*void filter_foo_startup(void);*/
+void filter_all_startup(void);
+void filter_target_startup(void);

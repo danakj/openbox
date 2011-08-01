@@ -2,14 +2,14 @@
 # Copyright (C) 2007 Mikael Magnusson
 # This file is distributed under the same license as the openbox package.
 # crimeboy, 2007.
-# Og Maciel <ogmaciel@gnome.org>, 2007, 2008.
+# Og Maciel <ogmaciel@gnome.org>, 2007, 2008, 2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Openbox 3.4.7\n"
+"Project-Id-Version: Openbox 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2011-08-01 18:20+0200\n"
-"PO-Revision-Date: 2008-03-04 16:07-0500\n"
+"PO-Revision-Date: 2011-08-01 15:26-0400\n"
 "Last-Translator: Og Maciel <ogmaciel@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-l10n-br@listas.cipsga.org.br>\n"
 "Language: pt_BR\n"
@@ -200,6 +200,8 @@ msgid ""
 "Openbox was compiled without Imlib2 image loading support. Icons in menus "
 "will not be loaded."
 msgstr ""
+"Openbox foi compilado sem suporte para carregamento de imagens Imlib2. "
+"Ícones em menus não serão carregados."
 
 #: openbox/debug.c:55
 #, c-format
@@ -372,7 +374,7 @@ msgstr "  --sync              Executa em modo sincronizado\n"
 
 #: openbox/openbox.c:544
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr ""
+msgstr "  --startup CMD       Executa CMD depois de iniciar\n"
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -386,6 +388,7 @@ msgstr ""
 #: openbox/openbox.c:547
 msgid "  --debug-session     Display debugging output for session management\n"
 msgstr ""
+"  --debug-session     Mostra saída de depuração do gerenciamento da sessão\n"
 
 #: openbox/openbox.c:548
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"

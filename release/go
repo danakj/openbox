@@ -46,10 +46,18 @@ echo Check compile with all options enabled
   error "configure failed"
 make >/dev/null 2>/dev/null || \
   error "make failed"
+grep "HAVE_SYS_INOTIFY_H 1" config.log>/dev/null || error "missing inotify.h"
 grep "XKB 1" config.log >/dev/null || error "missing xkb extension"
 grep "XRANDR 1" config.log >/dev/null || error "missing xrandr extension"
 grep "XINERAMA 1" config.log >/dev/null || error "missing xinerama extension"
 grep "SYNC 1" config.log >/dev/null || error "missing sync extension"
+make clean >/dev/null || error "make clean failed"
+
+echo Check compile with inotify disabled
+./configure -C --disable-inotify >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-inotify) failed"
 make clean >/dev/null || error "make clean failed"
 
 echo Check compile with startup notification disabled

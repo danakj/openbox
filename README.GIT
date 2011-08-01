@@ -1,21 +1,21 @@
 To build Openbox from git you need:
 
 A C Compiler (GNU GCC 3.2+ suggested)
-GNU Gettext 0.14.4
-GNU Autoconf 2.50+
-GNU Automake 1.9 (no more, no less)
-GNU Libtool
-Xlib library/headers (devel package)
-Pkg-Config
-Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
-libxml2 2.0+ library/headers (devel package)
-Pango 1.10+ library/headers (devel package)
-cvs or git or neither, depending on how gettext was installed*
-Imlib2 library/headers (devel package)
+-GNU Gettext 0.14.4
+-GNU Autoconf 2.50+
+-GNU Automake 1.9 (no more, no less)
+-GNU Libtool
+-Xlib library/headers (devel package)
+-Pkg-Config
+-Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
+-libxml2 2.0+ library/headers (devel package)
+-Pango 1.10+ library/headers (devel package)
+-cvs or git or neither, depending on how gettext was installed*
 
-Optionally you may want:
-X Cursor library/headers (devel package)
-Startup Notification library/headers 0.8+ (devel package)
+Also you will probably want:
+-Imlib2 library/headers (devel package)
+-X Cursor library/headers (devel package)
+-Startup Notification library/headers 0.8+ (devel package)
 
 We recommend the latest versions of all these packages.
 
@@ -31,8 +31,8 @@ su to root and
 or
 % sudo make install
 
-Don't try running it from the openbox/ directory without installing, it won't work.
-It needs to be installed before it is run.
+Don't try running it from the openbox/ directory without installing, it won't
+work. It needs to be installed before it is run.
 
 The following commands will be available: openbox-session,
   openbox-gnome-session, openbox-kde-session, and openbox.

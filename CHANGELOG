@@ -1,4 +1,12 @@
-3.5.0-rc1:
+3.5.0:
+  * New alt-tab dialog shows windows in a vertical list.
+  * Improved Xinerama support.
+  * Allow icons in menus.
+  * Theme options for prompt dialogs (osd.button.unpressed.*,
+    osd.button.pressed.*, osd.button.focused.*)
+  * Addresses bug #4877, #4596, #4617, #4752, #4663, #4662, #4586, #2319,
+    #4341, #4519, #4543, #4503, #4355, #4072, #3702, #4284
+  * Lots of additional bug fixes and performance improvements.
 
 3.4.9:
   * Allow focus to move while inside an Openbox menu, or during an interactive

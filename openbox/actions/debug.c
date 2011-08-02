@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include <glib.h>
 
@@ -8,7 +9,7 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_debug_startup(void)
 {
@@ -37,7 +38,7 @@ static void free_func(gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 

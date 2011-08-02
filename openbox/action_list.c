@@ -18,6 +18,7 @@
 
 #include "action_list.h"
 #include "action.h"
+#include "action_filter.h"
 #include "action_value.h"
 
 #include <glib.h>
@@ -32,7 +33,7 @@ void action_list_unref(ObActionList *l)
     while (l && --l->ref < 1) {
         ObActionList *n = l->next;
 
-        if (l->isfilter) {
+        if (l->isfilterset) {
             action_list_test_destroy(l->u.f.test);
             action_list_unref(l->u.f.thendo);
             action_list_unref(l->u.f.elsedo);
@@ -50,8 +51,7 @@ void action_list_test_destroy(ObActionListTest *t)
     while (t) {
         ObActionListTest *n = t->next;
 
-        g_free(t->key);
-        action_value_unref(t->value);
+        action_filter_unref(t->filter);
         g_slice_free(ObActionListTest, t);
         t = n;
     }

@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/screen.h"
 #include "openbox/client.h"
@@ -41,7 +42,7 @@ static gpointer setup_send_func(GHashTable *config,
                                 ObActionICancelFunc *cancel,
                                 ObActionIPostFunc *post);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 static gboolean i_pre_func(guint state, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -178,7 +179,7 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     guint d;

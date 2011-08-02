@@ -19,6 +19,7 @@
 #include <glib.h>
 
 struct _ObActionAct;
+struct _ObActionFilter;
 struct _ObActionValue;
 
 typedef struct _ObActionList      ObActionList;
@@ -28,9 +29,9 @@ typedef struct _ObActionListTest  ObActionListTest;
   an action). */
 struct _ObActionList {
     gint ref;
-    gboolean isfilter;
+    gboolean isfilterset;
     union {
-        struct _ObActionListFilter {
+        struct _ObActionListFilterSet {
             ObActionListTest *test; /* can be null */
             ObActionList *thendo; /* can be null */
             ObActionList *elsedo; /* can be null */
@@ -41,8 +42,7 @@ struct _ObActionList {
 };
 
 struct _ObActionListTest {
-    gchar *key;
-    struct _ObActionValue *value; /* can be null */
+    struct _ObActionFilter *filter;
     gboolean and;
     ObActionListTest *next;
 };

@@ -18,6 +18,7 @@
 
 #include "action_parser.h"
 #include "action.h"
+#include "action_filter.h"
 #include "action_list.h"
 #include "action_value.h"
 #include "gettext.h"
@@ -263,7 +264,7 @@ ObActionList* parse_action(ObActionParser *p, gboolean *e)
 
     al = g_slice_new(ObActionList);
     al->ref = 1;
-    al->isfilter = FALSE;
+    al->isfilterset = FALSE;
     al->u.action = action_new(name, config);
     al->next = NULL;
     g_free(name);
@@ -301,7 +302,7 @@ ObActionList* parse_filter(ObActionParser *p, gboolean *e)
 
     al = g_slice_new(ObActionList);
     al->ref = 1;
-    al->isfilter = TRUE;
+    al->isfilterset = TRUE;
     al->u.f.test = test;
     al->u.f.thendo = thendo;
     al->u.f.elsedo = elsedo;
@@ -315,6 +316,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
     gchar *key;
     ObActionValue *value;
     gboolean and;
+    ObActionFilter *filter;
     ObActionListTest *next;
 
     t = g_scanner_get_next_token(p->scan);
@@ -345,6 +347,19 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
         return NULL;
     }
 
+    filter = action_filter_new(key, value);
+    if (!filter) {
+        gchar *m;
+        m = g_strdup_printf(_("Unable to create filter: %s"), key);
+        parse_error(p, G_TOKEN_NONE, m, e);
+        g_free(m);
+    }
+
+    g_free(key);
+    action_value_unref(value);
+    if (!filter)
+        return NULL;
+
     /* check if there is another test and how we're connected */
     t = g_scanner_get_next_token(p->scan);
     if (t == ',') { /* and */
@@ -362,8 +377,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
 
     /* don't allow any errors */
     if (*e) {
-        g_free(key);
-        action_value_unref(value);
+        action_filter_unref(filter);
         action_list_test_destroy(next);
         return NULL;
     }
@@ -371,8 +385,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
         ObActionListTest *test;
 
         test = g_slice_new(ObActionListTest);
-        test->key = key;
-        test->value = value;
+        test->filter = filter;
         test->and = and;
         test->next = next;
         return test;

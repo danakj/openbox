@@ -242,6 +242,8 @@ openbox_openbox_SOURCES = \
 	openbox/action_filter.h \
 	openbox/action_list.c \
 	openbox/action_list.h \
+	openbox/action_list_run.c \
+	openbox/action_list_run.h \
 	openbox/action_parser.c \
 	openbox/action_parser.h \
 	openbox/action_value.c \

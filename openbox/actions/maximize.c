@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/client.h"
 
@@ -15,9 +16,9 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func_on(ObActionData *data, gpointer options);
-static gboolean run_func_off(ObActionData *data, gpointer options);
-static gboolean run_func_toggle(ObActionData *data, gpointer options);
+static gboolean run_func_on(const ObActionListRun *data, gpointer options);
+static gboolean run_func_off(const ObActionListRun *data, gpointer options);
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options);
 
 void action_maximize_startup(void)
 {
@@ -57,7 +58,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_on(ObActionData *data, gpointer options)
+static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     if (data->client) {
@@ -69,7 +70,7 @@ static gboolean run_func_on(ObActionData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_off(ObActionData *data, gpointer options)
+static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     if (data->client) {
@@ -81,7 +82,7 @@ static gboolean run_func_off(ObActionData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_toggle(ObActionData *data, gpointer options)
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     if (data->client) {

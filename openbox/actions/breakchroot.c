@@ -1,7 +1,8 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/keyboard.h"
 
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_breakchroot_startup(void)
 {
@@ -12,7 +13,7 @@ void action_breakchroot_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     /* break out of one chroot */
     keyboard_reset_chains(1);

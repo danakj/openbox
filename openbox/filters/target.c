@@ -17,18 +17,18 @@
 */
 
 #include "openbox/action_filter.h"
-#include "openbox/event.h"
+#include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 
-static gboolean reduce(struct _ObClient *c, gpointer data)
+static ObClientSet* filter(gboolean invert, const ObActionListRun *data,
+                           gpointer setup_data)
 {
-    return c != event_current_target(); /* remove anything not the target */
-}
-static gboolean expand(struct _ObClient *c, gpointer data)
-{
-    return c == event_current_target(); /* add only the target */
+    ObClientSet *set = client_set_single(data->client);
+    if (invert) set = client_set_minus(client_set_all(), set);
+    return set;
 }
 
 void filter_target_startup(void)
 {
-    action_filter_register("target", NULL, NULL, reduce, expand);
+    action_filter_register("target", NULL, NULL, filter);
 }

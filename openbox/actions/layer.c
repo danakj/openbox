@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/client.h"
 
@@ -11,7 +12,7 @@ static gpointer setup_func_top(GHashTable *config);
 static gpointer setup_func_bottom(GHashTable *config);
 static gpointer setup_func_send(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_layer_startup(void)
 {
@@ -69,7 +70,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 

@@ -17,17 +17,16 @@
 */
 
 #include "openbox/action_filter.h"
+#include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 
-static gboolean reduce(struct _ObClient *c, gpointer data)
+static ObClientSet* filter(gboolean invert, const ObActionListRun *data,
+                           gpointer setup_data)
 {
-    return FALSE; /* remove nothing */
-}
-static gboolean expand(struct _ObClient *c, gpointer data)
-{
-    return TRUE; /* add everything */
+    return invert ? client_set_empty() : client_set_all();
 }
 
 void filter_all_startup(void)
 {
-    action_filter_register("all", NULL, NULL, reduce, expand);
+    action_filter_register("all", NULL, NULL, filter);
 }

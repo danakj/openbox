@@ -1,8 +1,9 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/dock.h"
 #include "openbox/config.h"
 
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_dockautohide_startup(void)
 {
@@ -11,7 +12,7 @@ void action_dockautohide_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     config_dock_hide = !config_dock_hide;
     dock_configure();

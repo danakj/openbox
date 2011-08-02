@@ -21,6 +21,7 @@
 #include "config.h"
 #include "action.h"
 #include "action_list.h"
+#include "action_list_run.h"
 #include "event.h"
 #include "client.h"
 #include "grab.h"
@@ -188,7 +189,7 @@ static gboolean fire_binding(ObMouseAction a, ObFrameContext context,
     /* if not bound, then nothing to do! */
     if (it == NULL) return FALSE;
 
-    action_run_acts(b->actions[a], mouse_action_to_user_action(a),
+    action_list_run(b->actions[a], mouse_action_to_user_action(a),
                     state, x, y, button, context, c);
     return TRUE;
 }

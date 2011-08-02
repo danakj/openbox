@@ -171,7 +171,7 @@
             <xsd:element minOccurs="0" name="edge" type="xsd:string"/>
             <xsd:element minOccurs="0" name="wrap" type="ob:bool"/>
             <xsd:element minOccurs="0" name="follow" type="ob:bool"/>
-            <xsd:element minOccurs="0" name="dialog" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="dialog" type="ob:dialogtype"/>
             <xsd:element minOccurs="0" name="panels" type="ob:bool"/>
             <xsd:element minOccurs="0" name="here" type="ob:bool"/>
             <xsd:element minOccurs="0" name="linear" type="ob:bool"/>
@@ -540,6 +540,13 @@
             <xsd:enumeration value="Always"/>
             <xsd:enumeration value="Never"/>
             <xsd:enumeration value="Nonpixel"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="dialogtype">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="None"/>
+            <xsd:enumeration value="Icons"/>
+            <xsd:enumeration value="List"/>
         </xsd:restriction>
     </xsd:simpleType>
 </xsd:schema>

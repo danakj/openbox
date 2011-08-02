@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   actions.h for the Openbox window manager
+   actions.c for the Openbox window manager
    Copyright (c) 2007        Dana Jansens
 
    This program is free software; you can redistribute it and/or modify

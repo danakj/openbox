@@ -1652,7 +1652,7 @@ guint screen_find_monitor(const Rect *search)
             }
         }
     }
-    return most;
+    return most < screen_num_monitors ? most : screen_monitor_primary(FALSE);
 }
 
 const Rect* screen_physical_area_all_monitors(void)

@@ -1,22 +1,25 @@
 To build Openbox from git you need:
 
 A C Compiler (GNU GCC 3.2+ suggested)
-GNU Gettext 0.14.4
-GNU Autoconf 2.50+
-GNU Automake 1.9 (no more, no less)
-GNU Libtool
-Xlib library/headers (devel package)
-Pkg-Config
-Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
-libxml2 2.0+ library/headers (devel package)
-Pango 1.10+ library/headers (devel package)
-cvs
+-GNU Gettext 0.14.4
+-GNU Autoconf 2.50+
+-GNU Automake 1.9 (no more, no less)
+-GNU Libtool
+-Xlib library/headers (devel package)
+-Pkg-Config
+-Glib 2.0+ library/headers (devel package) (http://www.gtk.org)
+-libxml2 2.0+ library/headers (devel package)
+-Pango 1.10+ library/headers (devel package)
+-cvs or git or neither, depending on how gettext was installed*
 
-Optionally you may want:
-X Cursor library/headers (devel package)
-Startup Notification library/headers 0.8+ (devel package)
+Also you will probably want:
+-Imlib2 library/headers (devel package)
+-X Cursor library/headers (devel package)
+-Startup Notification library/headers 0.8+ (devel package)
 
 We recommend the latest versions of all these packages.
+
+*) for versions below 0.18.1 cvs is needed, above that, see autopoint --version
 
 Do the following to build and install Openbox in git:
 
@@ -28,8 +31,8 @@ su to root and
 or
 % sudo make install
 
-Don't try running it from the openbox/ directory without installing, it won't work.
-It needs to be installed before it is run.
+Don't try running it from the openbox/ directory without installing, it won't
+work. It needs to be installed before it is run.
 
 The following commands will be available: openbox-session,
   openbox-gnome-session, openbox-kde-session, and openbox.
@@ -40,21 +43,19 @@ See the man pages for details about them.  If you want to run Openbox on its
 
 
 ----
-In debian unstable, you want these packages:
+In Ubuntu, you want these packages:
+
 gcc
 gettext
-automake1.9
+automake
 autoconf
 libtool
 libpango1.0-dev
 pkg-config
 libglib2.0-dev
 libxml2-dev
-libxcursor-dev
 libstartup-notification0-dev
-xlibs-dev
-
-tip: run "update-alternatives --config automake" and select automake1.9 before
-  running ./configure
+xorg-dev
+libimlib2-dev
 
 ----

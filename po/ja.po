@@ -8,86 +8,76 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2011-08-01 18:20+0200\n"
 "PO-Revision-Date: 2008-03-04 16:32+0100\n"
 "Last-Translator: Ryoichiro Suzuki <ryoichiro.suzuki@gmail.com>\n"
 "Language-Team: Japanese <ja@li.org>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: openbox/actions.c:149
+#: openbox/actions.c:198
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr ""
 "不正なアクション\"%s\"が要求されました。そのようなアクションは存在しません。"
 
-#: openbox/actions/execute.c:128
+#: openbox/actions/execute.c:147
 msgid "No"
 msgstr "いいえ"
 
-#: openbox/actions/execute.c:129
+#: openbox/actions/execute.c:148
 msgid "Yes"
 msgstr "はい"
 
-#: openbox/actions/execute.c:133
+#: openbox/actions/execute.c:152
 msgid "Execute"
 msgstr "実行する"
 
-#: openbox/actions/execute.c:142
+#: openbox/actions/execute.c:161
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "パス\"%s\"を utf8 から変換するのに失敗しました。"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:69 openbox/client.c:3550
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:70
 msgid "Exit"
 msgstr "終了"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Openbox を終了してもよろしいですか？"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Openbox を終了する"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"Openbox がセッション管理の機能なしに作られたので SessionLogout アクションは利"
-"用できません。"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "ログアウト"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
 msgstr "ログアウトしてもよろしいですか？"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:75
+msgid "Log Out"
+msgstr "ログアウト"
+
+#: openbox/actions/exit.c:78
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Openbox を終了してもよろしいですか？"
+
+#: openbox/actions/exit.c:79
+msgid "Exit Openbox"
+msgstr "Openbox を終了する"
+
+#: openbox/client.c:2037
 msgid "Unnamed Window"
 msgstr "名称未設定"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2051 openbox/client.c:2082
 msgid "Killing..."
 msgstr "強制終了中..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2053 openbox/client.c:2084
 msgid "Not Responding"
 msgstr "応答なし"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3539
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -95,149 +85,164 @@ msgid ""
 msgstr ""
 "ウィンドウ \"%s\" は応答していないようです。%s 信号を送り強制終了しますか？"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3541
 msgid "End Process"
 msgstr "プロセスを終了する"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3545
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "ウィンドウ \"%s\" は応答していないようです。Xサーバから切断しますか？"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3547
 msgid "Disconnect"
 msgstr "切断する"
 
-#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
+#: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
 msgstr "移動する..."
 
-#: openbox/client_list_combined_menu.c:94
+#: openbox/client_list_combined_menu.c:100
 msgid "Manage desktops"
 msgstr "デスクトップを管理"
 
-#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
+#: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
 msgstr "新しくデスクトップを追加(_A)"
 
-#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
 msgstr "最後のデスクトップを削除(_R)"
 
-#: openbox/client_list_combined_menu.c:149
+#: openbox/client_list_combined_menu.c:157
 msgid "Windows"
 msgstr "ウィンドウ"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:214
 msgid "Desktops"
 msgstr "デスクトップ"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:259
 msgid "All desktops"
 msgstr "すべてのデスクトップ(_A)"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Layer"
 msgstr "階層(_L)"
 
-#: openbox/client_menu.c:375
+#: openbox/client_menu.c:376
 msgid "Always on _top"
 msgstr "常に最上層にする(_T)"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:377
 msgid "_Normal"
 msgstr "通常(_N)"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:378
 msgid "Always on _bottom"
 msgstr "常に最下層にする(_B)"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:380
 msgid "_Send to desktop"
 msgstr "デスクトップに送る(_S)"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:384
 msgid "Client menu"
 msgstr "クライアントメニュー"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:394
 msgid "R_estore"
 msgstr "復元(_E)"
 
-#: openbox/client_menu.c:397
+#: openbox/client_menu.c:398
 msgid "_Move"
 msgstr "移動(_M)"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:400
 msgid "Resi_ze"
 msgstr "サイズの変更(_Z)"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:402
 msgid "Ico_nify"
 msgstr "最小化(_N)"
 
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:406
 msgid "Ma_ximize"
 msgstr "最大化(_X)"
 
-#: openbox/client_menu.c:409
+#: openbox/client_menu.c:410
 msgid "_Roll up/down"
 msgstr "巻き上げ/展開(_R)"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "非/装飾(_D)"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "閉じる(_C)"
 
-#: openbox/config.c:781
-#, c-format
-msgid "Invalid button \"%s\" specified in config file"
-msgstr "不正なボタン\"%s\"が設定ファイルで指定されています。"
-
-#: openbox/keyboard.c:157
-msgid "Conflict with key binding in config file"
-msgstr "設定ファイルにキー割り当ての衝突があります。"
-
-#: openbox/menu.c:102 openbox/menu.c:110
-#, c-format
-msgid "Unable to find a valid menu file \"%s\""
-msgstr "正当なメニューファイル\"%s\"を見つけることができません。"
-
-#: openbox/menu.c:170
-#, c-format
-msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "パイプメニューの為のコマンド\"%s\"の実行に失敗しました: %s"
-
-#: openbox/menu.c:184
-#, c-format
-msgid "Invalid output from pipe-menu \"%s\""
-msgstr "パイプメニュー\"%s\"からの不正な出力です。"
-
-#: openbox/menu.c:197
-#, c-format
-msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "メニュー\"%s\"へのアクセスを試みましたが、それは存在しません。"
-
-#: openbox/menu.c:367 openbox/menu.c:368
-msgid "More..."
-msgstr "もっと..."
-
-#: openbox/mouse.c:373
-#, c-format
-msgid "Invalid button \"%s\" in mouse binding"
-msgstr "マウス割り当てに於いて不正なボタン \"%s\""
-
-#: openbox/mouse.c:379
+#: openbox/config.c:503
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "マウス割り当てに於いて不正なコンテクスト \"%s\""
 
-#: openbox/openbox.c:133
+#: openbox/config.c:857
+#, c-format
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "不正なボタン\"%s\"が設定ファイルで指定されています。"
+
+#: openbox/config.c:882
+msgid ""
+"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"will not be loaded."
+msgstr ""
+
+#: openbox/debug.c:55
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "ディレクトリ'%s'を作れません: %s"
+
+#: openbox/debug.c:138 openbox/openbox.c:372
+msgid "Close"
+msgstr "閉じる"
+
+#: openbox/keyboard.c:161
+msgid "Conflict with key binding in config file"
+msgstr "設定ファイルにキー割り当ての衝突があります。"
+
+#: openbox/menu.c:94 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "正当なメニューファイル\"%s\"を見つけることができません。"
+
+#: openbox/menu.c:158
+#, c-format
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "パイプメニューの為のコマンド\"%s\"の実行に失敗しました: %s"
+
+#: openbox/menu.c:172
+#, c-format
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "パイプメニュー\"%s\"からの不正な出力です。"
+
+#: openbox/menu.c:185
+#, c-format
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "メニュー\"%s\"へのアクセスを試みましたが、それは存在しません。"
+
+#: openbox/menu.c:400 openbox/menu.c:401
+msgid "More..."
+msgstr "もっと..."
+
+#: openbox/mouse.c:376
+#, c-format
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "マウス割り当てに於いて不正なボタン \"%s\""
+
+#: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "ホームディレクトリ\"%s\"に移動できません: %s"
@@ -246,27 +251,27 @@ msgstr "ホームディレクトリ\"%s\"に移動できません: %s"
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "環境変数 DISPLAY からディスプレイを開くのに失敗しました。"
 
-#: openbox/openbox.c:183
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "obrender ライブラリの初期化に失敗しました。"
 
-#: openbox/openbox.c:194
+#: openbox/openbox.c:193
 msgid "X server does not support locale."
 msgstr "Xサーバはロケールをサポートしていません。"
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Xサーバの為のロケール修飾子を設定できません。"
 
-#: openbox/openbox.c:263
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "正当な設定ファイルを見つけられません。単純な初期設定を使います。"
 
-#: openbox/openbox.c:297
+#: openbox/openbox.c:286
 msgid "Unable to load a theme."
 msgstr "テーマを読み込めません。"
 
-#: openbox/openbox.c:377
+#: openbox/openbox.c:370
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -277,28 +282,24 @@ msgstr ""
 "は標準出力を見て下さい。最後に見つかったエラーは\"%s\"ファイルの%d 行目で、説"
 "明はこうです：%s"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:372
 msgid "Openbox Syntax Error"
 msgstr "Openbox 構文エラー"
 
-#: openbox/openbox.c:379
-msgid "Close"
-msgstr "閉じる"
-
-#: openbox/openbox.c:448
+#: openbox/openbox.c:438
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "再起動の際新しい実行ファイル\"%s\"の実行に失敗しました: %s"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:517 openbox/openbox.c:519
 msgid "Copyright (c)"
 msgstr "著作権 (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:528
 msgid "Syntax: openbox [options]\n"
 msgstr "用法: openbox [オプション]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:529
 msgid ""
 "\n"
 "Options:\n"
@@ -306,30 +307,30 @@ msgstr ""
 "\n"
 "オプション:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:530
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              この使い方を表示して終了します\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:531
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           バージョンを表示して終了します\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:532
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           現在実行中のウィンドウマネージャを置き換えます\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:536
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file FILE  使用する設定ファイルのパスを指定します\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:537
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        セッションマネージャへの接続を止めます\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:538
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -337,19 +338,19 @@ msgstr ""
 "\n"
 "実行中の Openbox に命令を送ります:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:539
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox の設定を再読み込みします\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:540
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox を再起動します\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:541
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Openbox を終了します\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -357,9 +358,13 @@ msgstr ""
 "\n"
 "デバッグオプション:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:543
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              同期モードで実行します\n"
+
+#: openbox/openbox.c:544
+msgid "  --startup CMD       Run CMD after starting\n"
+msgstr ""
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -371,10 +376,16 @@ msgstr ""
 "  --debug-focus       フォーカスの扱いに関するデバッグ情報を表示します\n"
 
 #: openbox/openbox.c:547
+#, fuzzy
+msgid "  --debug-session     Display debugging output for session management\n"
+msgstr ""
+"  --debug-session     セッションの扱いに関するデバッグ情報を表示します\n"
+
+#: openbox/openbox.c:548
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    偽の xinerama スクリーンに分割表示します\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:549
 #, c-format
 msgid ""
 "\n"
@@ -383,26 +394,27 @@ msgstr ""
 "\n"
 "バグは %s 宛へ報告して下さい\n"
 
-#: openbox/openbox.c:617
-msgid "--config-file requires an argument\n"
-msgstr "--config-file requires an argument\n"
+#: openbox/openbox.c:632 openbox/openbox.c:666
+#, c-format
+msgid "%s requires an argument\n"
+msgstr "%s requires an argument\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:709
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "不正なコマンドライン引数 \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "スクリーン%dでウィンドウマネージャが既に起動しています。"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "スクリーン%dでウィンドウマネージャの選択を取得できませんでした。"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:150
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "スクリーン%dのWMが終了しません。"
@@ -411,7 +423,7 @@ msgstr "スクリーン%dのWMが終了しません。"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -423,31 +435,12 @@ msgstr[0] ""
 "Openbox は %d 個のデスクトップを設定されましたが, 現在のセッションは %d 個"
 "持っています。 Openbox の設定を無視します。"
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "デスクトップ%i"
 
-#: openbox/session.c:104
-#, c-format
-msgid "Unable to make directory \"%s\": %s"
-msgstr "ディレクトリ\"%s\"を作れません: %s"
-
-#: openbox/session.c:466
-#, c-format
-msgid "Unable to save the session to \"%s\": %s"
-msgstr "セッションを\"%s\"に保存できません: %s"
-
-#: openbox/session.c:605
-#, c-format
-msgid "Error while saving the session to \"%s\": %s"
-msgstr "セッションを\"%s\"に保存中にエラーが起きました: %s"
-
-#: openbox/session.c:842
-msgid "Not connected to a session manager"
-msgstr "セッションマネージャに接続されていません。"
-
-#: openbox/startupnotify.c:243
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s"
 msgstr "起動中 %s"
@@ -472,14 +465,35 @@ msgstr "キー割り当ての中の不正なキー名称 \"%s\""
 msgid "Requested key \"%s\" does not exist on the display"
 msgstr "要求されたキー\"%s\"はそのディスプレイに存在しません。"
 
-#: openbox/xerror.c:40
-#, c-format
-msgid "X Error: %s"
-msgstr "Xエラー: %s"
-
-#: openbox/prompt.c:200
+#: openbox/prompt.c:153
 msgid "OK"
 msgstr "OK"
+
+#, fuzzy
+#~ msgid "Openbox"
+#~ msgstr "Openbox を終了する"
+
+#~ msgid "--config-file requires an argument\n"
+#~ msgstr "--config-file requires an argument\n"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "Openbox がセッション管理の機能なしに作られたので SessionLogout アクション"
+#~ "は利用できません。"
+
+#~ msgid "Unable to save the session to \"%s\": %s"
+#~ msgstr "セッションを\"%s\"に保存できません: %s"
+
+#~ msgid "Error while saving the session to \"%s\": %s"
+#~ msgstr "セッションを\"%s\"に保存中にエラーが起きました: %s"
+
+#~ msgid "Not connected to a session manager"
+#~ msgstr "セッションマネージャに接続されていません。"
+
+#~ msgid "X Error: %s"
+#~ msgstr "Xエラー: %s"
 
 #~ msgid "Failed to execute \"%s\": %s"
 #~ msgstr "\"%s\"の実行に失敗しました: %s"

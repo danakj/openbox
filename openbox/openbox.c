@@ -629,7 +629,7 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--startup")) {
             if (i == *argc - 1) /* no args left */
-                g_printerr(_("--startup requires an argument\n"));
+                g_printerr(_("%s requires an argument\n"), "--startup");
             else {
                 /* this will be in the current locale encoding, which is
                    what we want */
@@ -663,7 +663,7 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--config-file")) {
             if (i == *argc - 1) /* no args left */
-                g_printerr(_("--config-file requires an argument\n"));
+                g_printerr(_("%s requires an argument\n"), "--config-file");
             else {
                 /* this will be in the current locale encoding, which is
                    what we want */

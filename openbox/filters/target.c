@@ -23,7 +23,7 @@
 static ObClientSet* filter(gboolean invert, const ObActionListRun *data,
                            gpointer setup_data)
 {
-    ObClientSet *set = client_set_single(data->client);
+    ObClientSet *set = client_set_single(data->target);
     if (invert) set = client_set_minus(client_set_all(), set);
     return set;
 }

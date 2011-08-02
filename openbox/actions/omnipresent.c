@@ -14,10 +14,10 @@ void action_omnipresent_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_set_desktop(data->client,
-                           data->client->desktop == DESKTOP_ALL ?
+        client_set_desktop(data->target,
+                           data->target->desktop == DESKTOP_ALL ?
                            screen_desktop : DESKTOP_ALL, FALSE, TRUE);
         action_client_move(data, FALSE);
     }

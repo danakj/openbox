@@ -46,8 +46,8 @@ static void client_dest(ObClient *client, gpointer data)
 
     for (it = prompt_opts; it; it = g_slist_next(it)) {
         Options *o = it->data;
-        if (o->data->client == client)
-            o->data->client = NULL;
+        if (o->data->target == client)
+            o->data->target = NULL;
     }
 }
 
@@ -164,7 +164,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
         return FALSE;
     }
 
-    if (data->client) {
+    if (data->target) {
         gchar *c, *before, *expand;
 
         /* replace occurrences of $pid and $wid */
@@ -186,7 +186,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
                 expand = g_strdup_printf("%s%s%u",
                                          (expand ? expand : ""),
                                          before,
-                                         data->client->pid);
+                                         data->target->pid);
                 g_free(tmp);
 
                 before = c + 4; /* 4 = strlen("$pid") */
@@ -204,7 +204,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
                 expand = g_strdup_printf("%s%s%lu",
                                          (expand ? expand : ""),
                                          before,
-                                         data->client->window);
+                                         data->target->window);
                 g_free(tmp);
 
                 before = c + 4; /* 4 = strlen("$wid") */
@@ -229,7 +229,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 
     /* If there is a keyboard grab going on then we need to cancel
        it so the application can grab things */
-    if (data->uact != OB_USER_ACTION_MENU_SELECTION)
+    if (data->user_act != OB_USER_ACTION_MENU_SELECTION)
         event_cancel_all_key_grabs();
 
     e = NULL;

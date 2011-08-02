@@ -14,14 +14,15 @@ void action_move_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         guint32 corner;
 
-        corner = data->button != 0 ?
+        corner = data->pointer_button != 0 ?
             OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE) :
             OBT_PROP_ATOM(NET_WM_MOVERESIZE_MOVE_KEYBOARD);
 
-        moveresize_start(data->client, data->x, data->y, data->button, corner);
+        moveresize_start(data->target, data->pointer_x, data->pointer_y,
+                         data->pointer_button, corner);
     }
 
     return FALSE;

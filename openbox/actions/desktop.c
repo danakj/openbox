@@ -204,19 +204,19 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 
     if (d < screen_num_desktops &&
         (d != screen_desktop ||
-         (data->client && data->client->desktop != screen_desktop))) {
+         (data->target && data->target->desktop != screen_desktop))) {
         gboolean go = TRUE;
 
         action_client_move(data, TRUE);
-        if (o->send && data->client && client_normal(data->client)) {
-            client_set_desktop(data->client, d, o->follow, FALSE);
+        if (o->send && data->target && client_normal(data->target)) {
+            client_set_desktop(data->target, d, o->follow, FALSE);
             go = o->follow;
         }
 
         if (go) {
             screen_set_desktop(d, TRUE);
-            if (data->client)
-                client_bring_helper_windows(data->client);
+            if (data->target)
+                client_bring_helper_windows(data->target);
         }
 
         action_client_move(data, FALSE);

@@ -19,9 +19,9 @@ void action_decorations_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_set_undecorated(data->client, FALSE);
+        client_set_undecorated(data->target, FALSE);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -30,9 +30,9 @@ static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_set_undecorated(data->client, TRUE);
+        client_set_undecorated(data->target, TRUE);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -41,9 +41,9 @@ static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_set_undecorated(data->client, !data->client->undecorated);
+        client_set_undecorated(data->target, !data->target->undecorated);
         action_client_move(data, FALSE);
     }
     return FALSE;

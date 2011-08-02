@@ -13,7 +13,7 @@ void action_focustobottom_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client)
-        focus_order_to_bottom(data->client);
+    if (data->target)
+        focus_order_to_bottom(data->target);
     return FALSE;
 }

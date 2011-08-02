@@ -19,9 +19,9 @@ void action_shade_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_shade(data->client, TRUE);
+        client_shade(data->target, TRUE);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -30,9 +30,9 @@ static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_shade(data->client, FALSE);
+        client_shade(data->target, FALSE);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -41,9 +41,9 @@ static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_shade(data->client, !data->client->shaded);
+        client_shade(data->target, !data->target->shaded);
         action_client_move(data, FALSE);
     }
     return FALSE;

@@ -31,15 +31,16 @@ struct _ObActionList;
   it.
 */
 struct _ObActionListRun {
-    ObUserAction uact;
-    guint state;
+    ObUserAction user_act;
+    guint mod_state;
 
-    gint x;
-    gint y;
-    gint button;
-    ObFrameContext context;
-    struct _ObClient *client;
+    gint pointer_x;
+    gint pointer_y;
+    gint pointer_button;
+    ObFrameContext pointer_context;
     struct _ObClient *pointer_over;
+
+    struct _ObClient *target;
 };
 
 /*! Run an action list.

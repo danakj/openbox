@@ -70,19 +70,19 @@ static gboolean do_grow(const ObActionListRun *data, gint x, gint y, gint w, gin
 
     realw = w;
     realh = h;
-    client_try_configure(data->client, &x, &y, &realw, &realh,
+    client_try_configure(data->target, &x, &y, &realw, &realh,
                          &lw, &lh, TRUE);
     /* if it's going to be resized smaller than it intended, don't
        move the window over */
-    if (x != data->client->area.x) x += w - realw;
-    if (y != data->client->area.y) y += h - realh;
+    if (x != data->target->area.x) x += w - realw;
+    if (y != data->target->area.y) y += h - realh;
 
-    if (x != data->client->area.x || y != data->client->area.y ||
-        realw != data->client->area.width ||
-        realh != data->client->area.height)
+    if (x != data->target->area.x || y != data->target->area.y ||
+        realw != data->target->area.width ||
+        realh != data->target->area.height)
     {
         action_client_move(data, TRUE);
-        client_move_resize(data->client, x, y, realw, realh);
+        client_move_resize(data->target, x, y, realw, realh);
         action_client_move(data, FALSE);
         return TRUE;
     }
@@ -102,17 +102,17 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
     ObDirection opp;
     gint half;
 
-    if (!data->client ||
+    if (!data->target ||
         /* don't allow vertical resize if shaded */
         ((o->dir == OB_DIRECTION_NORTH || o->dir == OB_DIRECTION_SOUTH) &&
-         data->client->shaded))
+         data->target->shaded))
     {
         return FALSE;
     }
 
     if (!o->shrink) {
         /* try grow */
-        client_find_resize_directional(data->client, o->dir, TRUE,
+        client_find_resize_directional(data->target, o->dir, TRUE,
                                        &x, &y, &w, &h);
         if (do_grow(data, x, y, w, h))
             return FALSE;
@@ -123,30 +123,30 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
            (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :
             (o->dir == OB_DIRECTION_EAST ? OB_DIRECTION_WEST :
              OB_DIRECTION_EAST)));
-    client_find_resize_directional(data->client, opp, FALSE,
+    client_find_resize_directional(data->target, opp, FALSE,
                                    &x, &y, &w, &h);
     switch (opp) {
     case OB_DIRECTION_NORTH:
-        half = data->client->area.y + data->client->area.height / 2;
+        half = data->target->area.y + data->target->area.height / 2;
         if (y > half) {
             h += y - half;
             y = half;
         }
         break;
     case OB_DIRECTION_SOUTH:
-        half = data->client->area.height / 2;
+        half = data->target->area.height / 2;
         if (h < half)
             h = half;
         break;
     case OB_DIRECTION_WEST:
-        half = data->client->area.x + data->client->area.width / 2;
+        half = data->target->area.x + data->target->area.width / 2;
         if (x > half) {
             w += x - half;
             x = half;
         }
         break;
     case OB_DIRECTION_EAST:
-        half = data->client->area.width / 2;
+        half = data->target->area.width / 2;
         if (w < half)
             w = half;
         break;

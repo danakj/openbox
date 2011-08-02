@@ -14,9 +14,9 @@ void action_lower_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        stacking_lower(CLIENT_AS_WINDOW(data->client));
+        stacking_lower(CLIENT_AS_WINDOW(data->target));
         action_client_move(data, FALSE);
     }
 

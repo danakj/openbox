@@ -13,8 +13,8 @@ void action_kill_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client)
-        client_kill(data->client);
+    if (data->target)
+        client_kill(data->target);
 
     return FALSE;
 }

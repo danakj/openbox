@@ -13,7 +13,7 @@ void action_close_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) client_close(data->client);
+    if (data->target) client_close(data->target);
 
     return FALSE;
 }

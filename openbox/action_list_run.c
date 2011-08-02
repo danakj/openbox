@@ -51,13 +51,13 @@ gboolean action_list_run(ObActionList *acts,
     if (x < 0 && y < 0)
         screen_pointer_pos(&x, &y);
 
-    action_data.uact = uact;
-    action_data.state = state;
-    action_data.x = x;
-    action_data.y = y;
-    action_data.button = button;
-    action_data.context = con;
-    action_data.client = client;
+    action_data.user_act = uact;
+    action_data.mod_state = state;
+    action_data.pointer_x = x;
+    action_data.pointer_y = y;
+    action_data.pointer_button = button;
+    action_data.pointer_context = con;
+    action_data.target = client;
     /* if a pointer started the event clicking on a window, it must be under
        the pointer */
     action_data.pointer_over = client ? client : client_under_pointer();
@@ -80,7 +80,7 @@ static gboolean run_list(ObActionList *acts, const ObActionListRun *data,
     if (!myset) {
         switch (action_default_filter(acts->u.action)) {
         case OB_ACTION_DEFAULT_FILTER_SINGLE:
-            myset = client_set_single(data->client); break;
+            myset = client_set_single(data->target); break;
         case OB_ACTION_DEFAULT_FILTER_EMPTY:
             myset = client_set_empty(); break;
         case OB_ACTION_DEFAULT_FILTER_ALL:

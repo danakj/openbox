@@ -27,9 +27,8 @@ typedef gboolean (*ObClientSetExpandFunc)(struct _ObClient *c, gpointer data);
 
 /*! Returns a new set of clients without anything in it. */
 ObClientSet* client_set_empty(void);
-/*! Returns a new set of clients with a single client in it.
-  The client is the currently targeted window. */
-ObClientSet* client_set_single(void);
+/*! Returns a new set of clients with a single client in it. */
+ObClientSet* client_set_single(struct _ObClient *c);
 /*! Returns a new set of clients with all possible clients in it. */
 ObClientSet* client_set_all(void);
 
@@ -44,6 +43,11 @@ ObClientSet* client_set_union(ObClientSet *a, ObClientSet *b);
    @a and @b are considered freed once passed to this function.
 */
 ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b);
+
+/* Returns a new set which contains all clients in @a but not in @b.  The sets
+   @a and @b are considered freed once passed to this function.
+*/
+ObClientSet* client_set_minus(ObClientSet *a, ObClientSet *b);
 
 /*! Reduce a set of clients.  The function @f is called for each client
   currently in the set. For each client that it returns TRUE, the client will
@@ -64,3 +68,6 @@ gboolean client_set_is_empty(ObClientSet *set);
   "ALL" set, which contains all clients.  Even when there are no clients
   present, this set returns TRUE. */
 gboolean client_set_test_boolean(ObClientSet *set);
+
+/*! Returns TRUE if @set contains @c. */
+gboolean client_set_contains(ObClientSet *set, struct _ObClient *c);

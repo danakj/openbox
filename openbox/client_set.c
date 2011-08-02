@@ -23,6 +23,7 @@
 #include <glib.h>
 
 struct _ObClientSet {
+    guint ref;
     gboolean all;
     GHashTable *h;
 };
@@ -43,12 +44,10 @@ ObClientSet* client_set_empty(void)
     return set;
 }
 
-ObClientSet* client_set_single(void)
+ObClientSet* client_set_single(ObClient *c)
 {
-    struct _ObClient *c;
     ObClientSet *set;
 
-    c = event_current_target();
     if (!c) return NULL;
     set = g_slice_new(ObClientSet);
     set->all = FALSE;
@@ -71,12 +70,14 @@ ObClientSet* client_set_all(void)
 
 void client_set_destroy(ObClientSet *set)
 {
-    if (!set->all) {
-        client_remove_destroy_notify_data((ObClientCallback)client_destroyed,
-                                          set);
-        if (set->h) g_hash_table_destroy(set->h);
+    if (set) {
+        if (!set->all) {
+            client_remove_destroy_notify_data(
+                (ObClientCallback)client_destroyed, set);
+            if (set->h) g_hash_table_destroy(set->h);
+        }
+        g_slice_free(ObClientSet, set);
     }
-    g_slice_free(ObClientSet, set);
 }
 
 static void foreach_union(gpointer k, gpointer v, gpointer u)
@@ -93,6 +94,8 @@ ObClientSet* client_set_union(ObClientSet *a, ObClientSet *b)
     g_return_val_if_fail(a != NULL, NULL);
     g_return_val_if_fail(b != NULL, NULL);
 
+    if (a == b)
+        return a;
     if (a->all) {
         client_set_destroy(b);
         return a;
@@ -129,6 +132,8 @@ ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b)
     g_return_val_if_fail(a != NULL, NULL);
     g_return_val_if_fail(b != NULL, NULL);
 
+    if (a == b)
+        return a;
     if (a->all) {
         client_set_destroy(a);
         return b;
@@ -149,6 +154,39 @@ ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b)
     g_hash_table_foreach_remove(a->h, foreach_intersection, b->h);
     client_set_destroy(b);
     return a;
+}
+
+static gboolean reduce_minus(struct _ObClient *c, gpointer data)
+{
+    ObClientSet *b = data;
+    return client_set_contains(b, c);
+}
+
+ObClientSet* client_set_minus(ObClientSet *a, ObClientSet *b)
+{
+    g_return_val_if_fail(a != NULL, NULL);
+    g_return_val_if_fail(b != NULL, NULL);
+
+    if (a == b) {
+        if (a->h) g_hash_table_unref(a->h);
+        a->all = FALSE;
+        return a;
+    }
+    if (b->all) {
+        client_set_destroy(a);
+        b->all = FALSE; /* make empty */
+        return b;
+    }
+    if (!b->h) {
+        client_set_destroy(b);
+        return a;
+    }
+    if (!a->h) {
+        client_set_destroy(b);
+        return a;
+    }
+
+    return client_set_reduce(a, reduce_minus, b);
 }
 
 struct ObClientSetForeachReduce {
@@ -178,7 +216,7 @@ ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
     g_return_val_if_fail(f != NULL, NULL);
 
     if (set->all) {
-        struct ObClientSetForeachReduce *d;
+        struct ObClientSetForeachReduce d;
 
         /* use set expansion on an empty set rather than building a full set
            and then removing stuff.  but we're given a reduce function.
@@ -197,7 +235,7 @@ ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
     d.data = data;
     g_hash_table_foreach_remove(set->h, foreach_reduce, &d);
     if (g_hash_table_size(set->h) == 0) {
-        g_hash_table_destroy(set->h);
+        g_hash_table_unref(set->h);
         set->h = NULL;
     }
     return set;
@@ -207,7 +245,7 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
                                gpointer data)
 {
     GList *it;
-    gint avail;
+    guint avail;
 
     g_return_val_if_fail(set != NULL, NULL);
     g_return_val_if_fail(f != NULL, NULL);
@@ -226,7 +264,7 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
         ++avail;
     }
     if (g_hash_table_size(set->h) == avail) {
-        g_hash_table_destroy(set->h);
+        g_hash_table_unref(set->h);
         set->h = NULL;
         set->all = TRUE;
     }
@@ -245,3 +283,9 @@ gboolean client_set_test_boolean(ObClientSet *set)
     else return set->h != NULL;
 }
 
+gboolean client_set_contains(ObClientSet *set, struct _ObClient *c)
+{
+    if (set->all) return TRUE;
+    if (!set->h) return FALSE;
+    return g_hash_table_lookup(set->h, &c->window) != NULL;
+}

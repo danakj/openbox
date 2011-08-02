@@ -417,7 +417,7 @@ void action_client_move(const ObActionListRun *data, gboolean start)
                     ob_debug_type(OB_DEBUG_FOCUS,
                                   "Generating fake leave because we did a "
                                   "mouse-event action");
-                    event_enter_client(data->target);
+                    event_leave_client(data->pointer_over);
                 }
             }
         }

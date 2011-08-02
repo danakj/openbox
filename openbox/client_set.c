@@ -33,6 +33,20 @@ static void client_destroyed(ObClient *client, ObClientSet *set)
     g_hash_table_remove(set->h, &client->window);
 }
 
+static void client_set_create_hash(ObClientSet *set)
+{
+    set->h = g_hash_table_new(g_int_hash, g_int_equal);
+    client_add_destroy_notify((ObClientCallback)client_destroyed, set);
+}
+
+static void client_set_destroy_hash(ObClientSet *set)
+{
+    g_hash_table_unref(set->h);
+    client_remove_destroy_notify_data(
+        (ObClientCallback)client_destroyed, set);
+    set->h = NULL;
+}
+
 ObClientSet* client_set_empty(void)
 {
     ObClientSet *set;
@@ -40,7 +54,6 @@ ObClientSet* client_set_empty(void)
     set = g_slice_new(ObClientSet);
     set->all = FALSE;
     set->h = NULL;
-    client_add_destroy_notify((ObClientCallback)client_destroyed, set);
     return set;
 }
 
@@ -51,7 +64,7 @@ ObClientSet* client_set_single(ObClient *c)
     if (!c) return NULL;
     set = g_slice_new(ObClientSet);
     set->all = FALSE;
-    set->h = g_hash_table_new(g_int_hash, g_int_equal);
+    client_set_create_hash(set);
     g_hash_table_insert(set->h, &c->window, c);
     return set;
 }
@@ -68,13 +81,37 @@ ObClientSet* client_set_all(void)
     return set;
 }
 
+static void foreach_clone(gpointer k, gpointer v, gpointer u)
+{
+    ObClient *c = v;
+    GHashTable *seth = u;
+    g_hash_table_insert(seth, &c->window, c);
+}
+
+ObClientSet* client_set_clone(ObClientSet *a)
+{
+    ObClientSet *set;
+
+    if (!a) return NULL;
+    set = g_slice_new(ObClientSet);
+    set->all = a->all;
+    if (!a->h) set->h = NULL;
+    else {
+        client_set_create_hash(set);
+        g_hash_table_foreach(a->h, foreach_clone, set->h);
+    }
+    return set;
+}
+
 void client_set_destroy(ObClientSet *set)
 {
     if (set) {
         if (!set->all) {
-            client_remove_destroy_notify_data(
-                (ObClientCallback)client_destroyed, set);
-            if (set->h) g_hash_table_destroy(set->h);
+            if (set->h) {
+                client_remove_destroy_notify_data(
+                    (ObClientCallback)client_destroyed, set);
+                g_hash_table_destroy(set->h);
+            }
         }
         g_slice_free(ObClientSet, set);
     }
@@ -168,7 +205,8 @@ ObClientSet* client_set_minus(ObClientSet *a, ObClientSet *b)
     g_return_val_if_fail(b != NULL, NULL);
 
     if (a == b) {
-        if (a->h) g_hash_table_unref(a->h);
+        if (a->h)
+            client_set_destroy_hash(a);
         a->all = FALSE;
         return a;
     }
@@ -234,10 +272,8 @@ ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
     d.f = f;
     d.data = data;
     g_hash_table_foreach_remove(set->h, foreach_reduce, &d);
-    if (g_hash_table_size(set->h) == 0) {
-        g_hash_table_unref(set->h);
-        set->h = NULL;
-    }
+    if (g_hash_table_size(set->h) == 0)
+        client_set_destroy_hash(set);
     return set;
 }
 
@@ -258,14 +294,13 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
         if (!set->h || !g_hash_table_lookup(set->h, &c->window))
             if (f(c, data)) {
                 if (!set->h)
-                    set->h = g_hash_table_new(g_int_hash, g_int_equal);
+                    client_set_create_hash(set);
                 g_hash_table_insert(set->h, &c->window, c);
             }
         ++avail;
     }
     if (g_hash_table_size(set->h) == avail) {
-        g_hash_table_unref(set->h);
-        set->h = NULL;
+        client_set_destroy_hash(set);
         set->all = TRUE;
     }
     return set;

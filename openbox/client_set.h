@@ -32,20 +32,23 @@ ObClientSet* client_set_single(struct _ObClient *c);
 /*! Returns a new set of clients with all possible clients in it. */
 ObClientSet* client_set_all(void);
 
+/*! Returns an identical set to @a. */
+ObClientSet* client_set_clone(ObClientSet *a);
+
 void client_set_destroy(ObClientSet *set);
 
-/* Returns a new set which contains all clients in either @a or @b.  The sets
-   @a and @b are considered freed once passed to this function.
+/*! Returns a new set which contains all clients in either @a or @b.  The sets
+  @a and @b are considered freed once passed to this function.
 */
 ObClientSet* client_set_union(ObClientSet *a, ObClientSet *b);
 
-/* Returns a new set which contains all clients in both @a and @b.  The sets
-   @a and @b are considered freed once passed to this function.
+/*! Returns a new set which contains all clients in both @a and @b.  The sets
+  @a and @b are considered freed once passed to this function.
 */
 ObClientSet* client_set_intersection(ObClientSet *a, ObClientSet *b);
 
-/* Returns a new set which contains all clients in @a but not in @b.  The sets
-   @a and @b are considered freed once passed to this function.
+/*! Returns a new set which contains all clients in @a but not in @b.  The sets
+  @a and @b are considered freed once passed to this function.
 */
 ObClientSet* client_set_minus(ObClientSet *a, ObClientSet *b);
 

@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "action.h"
 #include "action_list.h"
+#include "action_list_run.h"
 #include "event.h"
 #include "grab.h"
 #include "openbox.h"
@@ -1305,7 +1306,7 @@ void menu_entry_frame_execute(ObMenuEntryFrame *self, guint state)
         if (func)
             func(entry, frame, client, state, data);
         else
-            action_run_acts(acts, OB_USER_ACTION_MENU_SELECTION,
+            action_list_run(acts, OB_USER_ACTION_MENU_SELECTION,
                             state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, client);
     }
 }

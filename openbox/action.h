@@ -25,22 +25,25 @@
 #include <X11/Xlib.h>
 
 struct _ObActionList;
+struct _ObActionListRun;
+struct _ObClientSet;
 
 typedef struct _ObActionDefinition   ObActionDefinition;
 typedef struct _ObAction             ObAction;
 typedef struct _ObActionData         ObActionData;
 
 typedef void     (*ObActionDataFreeFunc)(gpointer options);
-typedef gboolean (*ObActionRunFunc)(ObActionData *data,
+typedef gboolean (*ObActionRunFunc)(const struct _ObActionListRun *data,
                                     gpointer options);
 typedef gpointer (*ObActionDataSetupFunc)(GHashTable *config);
 typedef void     (*ObActionShutdownFunc)(void);
 
 /* functions for interactive actions */
-/* return TRUE if the action is going to be interactive, or false to change
-   your mind and make it not */
+/*! Returns TRUE if the action is going to be interactive, or FALSE to change
+  your mind and make it not. */
 typedef gboolean (*ObActionIPreFunc)(guint initial_state, gpointer options);
 typedef void     (*ObActionIPostFunc)(gpointer options);
+/*! Returns TRUE to continue the interactive action, and FALSE to end it. */
 typedef gboolean (*ObActionIInputFunc)(guint initial_state,
                                        XEvent *e,
                                        ObtIC *ic,
@@ -61,17 +64,6 @@ typedef enum {
     OB_ACTION_DEFAULT_FILTER_ALL,
     OB_NUM_ACTION_DEFAULT_FILTERS
 } ObActionDefaultFilter;
-
-struct _ObActionData {
-    ObUserAction uact;
-    guint state;
-    gint x;
-    gint y;
-    gint button;
-
-    struct _ObClient *client;
-    ObFrameContext context;
-};
 
 void action_startup(gboolean reconfigure);
 void action_shutdown(gboolean reconfigure);
@@ -105,17 +97,13 @@ ObAction* action_new(const gchar *name, GHashTable *config);
 void action_ref(ObAction *act);
 void action_unref(ObAction *act);
 
-/*! Runs a list of actions.
- @return TRUE if an interactive action was started, FALSE otherwise.
+ObActionDefaultFilter action_default_filter(ObAction *act);
+
+/*! Runs an action.
+  @return TRUE if an interactive action was started, FALSE otherwise.
 */
-gboolean action_run_acts(struct _ObActionList *acts,
-                         ObUserAction uact,
-                         guint state,
-                         gint x,
-                         gint y,
-                         gint button,
-                         ObFrameContext con,
-                         struct _ObClient *client);
+gboolean action_run(ObAction *act, const struct _ObActionListRun *data,
+                    struct _ObClientSet *set);
 
 gboolean action_interactive_act_running(void);
 void action_interactive_cancel_act(void);
@@ -123,4 +111,5 @@ void action_interactive_cancel_act(void);
 gboolean action_interactive_input_event(XEvent *e);
 
 /*! Function for actions to call when they are moving a client around */
-void action_client_move(ObActionData *data, gboolean start);
+void action_client_move(const struct _ObActionListRun *data,
+                        gboolean start);

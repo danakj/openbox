@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
@@ -14,7 +15,7 @@ typedef struct {
 static gpointer setup_func(GHashTable *config);
 static gpointer setup_shrink_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_growtoedge_startup(void)
 {
@@ -63,7 +64,7 @@ static gpointer setup_shrink_func(GHashTable *config)
     return o;
 }
 
-static gboolean do_grow(ObActionData *data, gint x, gint y, gint w, gint h)
+static gboolean do_grow(const ObActionListRun *data, gint x, gint y, gint w, gint h)
 {
     gint realw, realh, lw, lh;
 
@@ -94,7 +95,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     gint x, y, w, h;

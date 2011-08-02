@@ -17,6 +17,8 @@
 */
 
 #include "action_filter.h"
+#include "action_list_run.h"
+#include "client_set.h"
 #include "gettext.h"
 
 #include "filters/_all.h"
@@ -27,14 +29,14 @@ struct _ObActionFilterDefinition {
     gchar *name;
     ObActionFilterSetupFunc setup;
     ObActionFilterDestroyFunc destroy;
-    ObClientSetReduceFunc reduce;
-    ObClientSetExpandFunc expand;
+    ObActionFilterFunc set;
 };
 
 struct _ObActionFilter {
     gint ref;
 
     ObActionFilterDefinition *def;
+    gboolean invert;
     gpointer data;
 };
 
@@ -60,15 +62,13 @@ void action_filter_shutdown(gboolean reconfig)
 gboolean action_filter_register(const gchar *name,
                                 ObActionFilterSetupFunc setup,
                                 ObActionFilterDestroyFunc destroy,
-                                ObClientSetReduceFunc reduce,
-                                ObClientSetExpandFunc expand)
+                                ObActionFilterFunc set)
 {
     ObActionFilterDefinition *def;
     GSList *it;
 
     g_return_val_if_fail(name != NULL, FALSE);
-    g_return_val_if_fail(reduce != NULL, FALSE);
-    g_return_val_if_fail(expand != NULL, FALSE);
+    g_return_val_if_fail(set != NULL, FALSE);
 
     for (it = registered; it; it = it->next) {
         def = it->data;
@@ -80,8 +80,7 @@ gboolean action_filter_register(const gchar *name,
     def->name = g_strdup(name);
     def->setup = setup;
     def->destroy = destroy;
-    def->reduce = reduce;
-    def->expand = expand;
+    def->set = set;
     registered = g_slist_prepend(registered, def);
 
     return TRUE;
@@ -123,6 +122,7 @@ ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v)
     filter = g_slice_new(ObActionFilter);
     filter->ref = 1;
     filter->def = def;
+    filter->invert = invert;
     filter->data = def->setup ? def->setup(invert, v) : NULL;
     return filter;
 }
@@ -140,14 +140,8 @@ void action_filter_unref(ObActionFilter *f)
     }
 }
 
-void action_filter_expand(ObActionFilter *f, struct _ObClientSet *set)
+struct _ObClientSet* action_filter_set(ObActionFilter *f,
+                                       const ObActionListRun *run)
 {
-    g_return_if_fail(f != NULL);
-    client_set_expand(set, f->def->expand, f->data);
-}
-
-void action_filter_reduce(ObActionFilter *f, struct _ObClientSet *set)
-{
-    g_return_if_fail(f != NULL);
-    client_set_reduce(set, f->def->reduce, f->data);
+    return f->def->set(f->invert, run, f->data);
 }

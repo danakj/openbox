@@ -26,6 +26,7 @@
 #include "client.h"
 #include "action.h"
 #include "action_list.h"
+#include "action_list_run.h"
 #include "menuframe.h"
 #include "config.h"
 #include "keytree.h"
@@ -266,7 +267,7 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
             else {
                 gboolean i;
 
-                i = action_run_acts(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
+                i = action_list_run(p->actions, OB_USER_ACTION_KEYBOARD_KEY,
                                     e->xkey.state,
                                     e->xkey.x_root, e->xkey.y_root,
                                     0, OB_FRAME_CONTEXT_NONE, client);

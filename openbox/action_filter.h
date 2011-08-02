@@ -16,12 +16,12 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "client_set.h"
-
 #include <glib.h>
 
+struct _ObActionListRun;
 struct _ObActionValue;
 struct _ObClient;
+struct _ObClientSet;
 
 typedef struct _ObActionFilter ObActionFilter;
 typedef struct _ObActionFilterFuncs ObActionFilterFuncs;
@@ -30,19 +30,35 @@ typedef enum _ObActionFilterDefault ObActionFilterDefault;
 typedef gpointer (*ObActionFilterSetupFunc)(gboolean invert,
                                             struct _ObActionValue *v);
 typedef void (*ObActionFilterDestroyFunc)(gpointer data);
+typedef struct _ObClientSet* (*ObActionFilterFunc)(
+    gboolean invert, const struct _ObActionListRun *run, gpointer data);
 
 void action_filter_startup(gboolean reconfig);
 void action_filter_shutdown(gboolean reconfig);
 
+/*! Registers a filter test in the system.
+  @name The name of the key for the filter. [foo] or [foo=bar] would register
+    "foo" as its name.
+  @setup A setup function which takes the parameter given to the filter.
+    This would receive the bar in [foo=bar].  This returns a pointer to data
+    used by the filter.
+  @destroy Destroys the data returned from @setup.
+  @filter A function that returns an ObClientSet* of clients that this filter
+    includes.
+  @return TRUE if the registration was successful.
+*/
 gboolean action_filter_register(const gchar *name,
                                 ObActionFilterSetupFunc setup,
                                 ObActionFilterDestroyFunc destroy,
-                                ObClientSetReduceFunc reduce,
-                                ObClientSetExpandFunc expand);
+                                ObActionFilterFunc set);
 
 ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v);
 void action_filter_ref(ObActionFilter *f);
 void action_filter_unref(ObActionFilter *f);
 
-void action_filter_expand(ObActionFilter *f, ObClientSet *set);
-void action_filter_reduce(ObActionFilter *f, ObClientSet *set);
+/*! Returns a set of clients for a filter.
+  @f The filter.
+  @run Data for the user event which caused this filter to be run.
+*/
+struct _ObClientSet* action_filter_set(ObActionFilter *f,
+                                       const struct _ObActionListRun *run);

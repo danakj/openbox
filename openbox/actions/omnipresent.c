@@ -1,8 +1,9 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/client.h"
 #include "openbox/screen.h"
 
-static gboolean run_func_toggle(ObActionData *data, gpointer options);
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options);
 
 void action_omnipresent_startup(void)
 {
@@ -11,7 +12,7 @@ void action_omnipresent_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_toggle(ObActionData *data, gpointer options)
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
     if (data->client) {
         action_client_move(data, TRUE);

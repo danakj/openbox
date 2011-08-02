@@ -18,6 +18,7 @@
 
 #include "action.h"
 #include "action_list.h"
+#include "action_list_run.h"
 #include "action_filter.h"
 #include "gettext.h"
 #include "grab.h"
@@ -25,6 +26,7 @@
 #include "event.h"
 #include "config.h"
 #include "client.h"
+#include "client_set.h"
 #include "focus.h"
 #include "openbox.h"
 #include "debug.h"
@@ -37,8 +39,8 @@ static gboolean action_interactive_begin_act(ObAction *act, guint state);
 static void     action_interactive_end_act();
 static ObAction* action_find_by_name(const gchar *name);
 
-static ObAction *interactive_act = NULL;
-static guint     interactive_initial_state = 0;
+static ObAction *current_i_act = NULL;
+static guint     current_i_initial_state = 0;
 
 struct _ObActionDefinition {
     guint ref;
@@ -255,113 +257,79 @@ void action_unref(ObAction *act)
     }
 }
 
-static void action_setup_data(ObActionData *data,
-                              ObUserAction uact,
-                              guint state,
-                              gint x,
-                              gint y,
-                              gint button,
-                              ObFrameContext con,
-                              struct _ObClient *client)
-{
-    data->uact = uact;
-    data->state = state;
-    data->x = x;
-    data->y = y;
-    data->button = button;
-    data->context = con;
-    data->client = client;
-}
-
-gboolean action_run_acts(ObActionList *acts,
-                         ObUserAction uact,
-                         guint state,
-                         gint x,
-                         gint y,
-                         gint button,
-                         ObFrameContext con,
-                         struct _ObClient *client)
+gboolean action_run(ObAction *act, const ObActionListRun *data,
+                    struct _ObClientSet *set)
 {
     gboolean ran_interactive;
     gboolean update_user_time;
-
-    /* Don't allow saving the initial state when running things from the
-       menu */
-    if (uact == OB_USER_ACTION_MENU_SELECTION)
-        state = 0;
-    /* If x and y are < 0 then use the current pointer position */
-    if (x < 0 && y < 0)
-        screen_pointer_pos(&x, &y);
+    gboolean run, run_i;
 
     ran_interactive = FALSE;
     update_user_time = FALSE;
-    while (acts) {
-        ObAction *act;
-        ObActionData data;
-        gboolean ok = TRUE;
 
-        if (acts->isfilter) {
-            g_warning("filters not implemented!");
-            acts = acts->next;
-            continue;
-        }
-        else {
-            act = acts->u.action;
-        }
+    /* If we're starting an interactive action:
+       - if the current interactive action is the same, do nothing and
+         just use the run function.
+       - otherwise...
+       - cancel the current interactive action (if any)
+       - run the pre function. if it returns false then the action will
+         not be treated as interactive.
+       - set up for a new interactive action with action_interactive_begin_act.
+         this may fail in which case we don't run the action at all.
+       Then execute the action's run function.
+       If the action is doing something to the currently focused window,
+         then we want to update its user_time to indicate it was used by a
+         human now.
+    */
 
-        action_setup_data(&data, uact, state, x, y, button, con, client);
+    run_i = FALSE;
+    if (action_is_interactive(act)) {
+        ObActionRunFunc this_run = act->def->run;
+        ObActionRunFunc i_run = (current_i_act ?
+                                 current_i_act->def->run : NULL);
 
-        /* if they have the same run function, then we'll assume they are
-           cooperating and not cancel eachother out */
-        if (!interactive_act || interactive_act->def->run != act->def->run) {
-            if (action_is_interactive(act)) {
-                /* cancel the old one */
-                if (interactive_act)
-                    action_interactive_cancel_act();
-                if (act->i_pre)
-                    if (!act->i_pre(state, act->options))
-                        act->i_input = NULL; /* remove the interactivity */
-                ran_interactive = TRUE;
-            }
-            /* check again cuz it might have been cancelled */
-            if (action_is_interactive(act)) {
-                ok = action_interactive_begin_act(act, state);
-                ran_interactive = TRUE;
-            }
-        }
-
-        /* fire the action's run function with this data */
-        if (ok) {
-            if (!act->def->run(&data, act->options)) {
-                if (action_is_interactive(act))
-                    action_interactive_end_act();
-                if (client && client == focus_client)
-                    update_user_time = TRUE;
-            } else {
-                /* make sure its interactive if it returned TRUE */
-                g_assert(act->i_input);
-
-                /* no actions are run after the interactive one */
-                break;
-            }
-        }
-        acts = acts->next;
+        if (i_run && i_run != this_run)
+            action_interactive_cancel_act();
+        run_i = TRUE;
+        if (i_run != this_run && act->i_pre)
+            run_i = act->i_pre(data->state, act->options);
     }
-    if (update_user_time)
-        event_update_user_time();
+
+    run = TRUE;
+    if (run_i) {
+        run = action_interactive_begin_act(act, data->state);
+        ran_interactive = TRUE;
+    }
+
+    if (run) {
+        gboolean end;
+
+        /* XXX pass the set here */
+        end = !act->def->run(data, act->options);
+        g_assert(end || action_is_interactive(act));
+
+        if (end) {
+            if (action_is_interactive(act))
+                action_interactive_end_act();
+            /* XXX else if (client_set_contains(focus_client)) */
+            else if (data->client && data->client == focus_client)
+                event_update_user_time();
+        }
+    }
+
     return ran_interactive;
 }
 
 gboolean action_interactive_act_running(void)
 {
-    return interactive_act != NULL;
+    return current_i_act != NULL;
 }
 
 void action_interactive_cancel_act(void)
 {
-    if (interactive_act) {
-        if (interactive_act->i_cancel)
-            interactive_act->i_cancel(interactive_act->options);
+    if (current_i_act) {
+        if (current_i_act->i_cancel)
+            current_i_act->i_cancel(current_i_act->options);
         action_interactive_end_act();
     }
 }
@@ -369,8 +337,8 @@ void action_interactive_cancel_act(void)
 static gboolean action_interactive_begin_act(ObAction *act, guint state)
 {
     if (grab_keyboard()) {
-        interactive_act = act;
-        action_ref(interactive_act);
+        current_i_act = act;
+        action_ref(current_i_act);
 
         interactive_initial_state = state;
 
@@ -386,13 +354,13 @@ static gboolean action_interactive_begin_act(ObAction *act, guint state)
 
 static void action_interactive_end_act(void)
 {
-    if (interactive_act) {
-        ObAction *ia = interactive_act;
+    if (current_i_act) {
+        ObAction *ia = current_i_act;
 
         /* set this to NULL first so the i_post() function can't cause this to
            get called again (if it decides it wants to cancel any ongoing
            interactive action). */
-        interactive_act = NULL;
+        current_i_act = NULL;
 
         ungrab_keyboard();
 
@@ -406,10 +374,10 @@ static void action_interactive_end_act(void)
 gboolean action_interactive_input_event(XEvent *e)
 {
     gboolean used = FALSE;
-    if (interactive_act) {
-        if (!interactive_act->i_input(interactive_initial_state, e,
-                                      grab_input_context(),
-                                      interactive_act->options, &used))
+    if (current_i_act) {
+        if (!current_i_act->i_input(current_i_initial_state, e,
+                                    grab_input_context(),
+                                    current_i_act->options, &used))
         {
             used = TRUE; /* if it cancelled the action then it has to of
                             been used */
@@ -419,7 +387,7 @@ gboolean action_interactive_input_event(XEvent *e)
     return used;
 }
 
-void action_client_move(ObActionData *data, gboolean start)
+void action_client_move(const ObActionListRun *data, gboolean start)
 {
     static gulong ignore_start = 0;
     if (start)
@@ -457,4 +425,9 @@ void action_client_move(ObActionData *data, gboolean start)
         else if (!data->button && !config_focus_under_mouse)
             event_end_ignore_all_enters(ignore_start);
     }
+}
+
+ObActionDefaultFilter action_default_filter(ObAction *act)
+{
+    return act->def->def_filter;
 }

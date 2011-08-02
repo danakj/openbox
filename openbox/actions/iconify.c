@@ -1,7 +1,8 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/client.h"
 
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 
 void action_iconify_startup(void)
 {
@@ -10,7 +11,7 @@ void action_iconify_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     if (data->client) {
         action_client_move(data, TRUE);

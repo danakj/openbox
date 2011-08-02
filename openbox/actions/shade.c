@@ -1,9 +1,10 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/client.h"
 
-static gboolean run_func_on(ObActionData *data, gpointer options);
-static gboolean run_func_off(ObActionData *data, gpointer options);
-static gboolean run_func_toggle(ObActionData *data, gpointer options);
+static gboolean run_func_on(const ObActionListRun *data, gpointer options);
+static gboolean run_func_off(const ObActionListRun *data, gpointer options);
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options);
 
 void action_shade_startup(void)
 {
@@ -16,7 +17,7 @@ void action_shade_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_on(ObActionData *data, gpointer options)
+static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 {
     if (data->client) {
         action_client_move(data, TRUE);
@@ -27,7 +28,7 @@ static gboolean run_func_on(ObActionData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_off(ObActionData *data, gpointer options)
+static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 {
     if (data->client) {
         action_client_move(data, TRUE);
@@ -38,7 +39,7 @@ static gboolean run_func_off(ObActionData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_toggle(ObActionData *data, gpointer options)
+static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
     if (data->client) {
         action_client_move(data, TRUE);

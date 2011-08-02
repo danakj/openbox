@@ -1,4 +1,5 @@
 #include "openbox/action.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/event.h"
 #include "openbox/startupnotify.h"
@@ -19,12 +20,12 @@ typedef struct {
     gchar   *sn_icon;
     gchar   *sn_wmclass;
     gchar   *prompt;
-    ObActionData *data;
+    ObActionListRun *data;
 } Options;
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 static void shutdown_func(void);
 static void client_dest(ObClient *client, gpointer data);
 
@@ -98,12 +99,12 @@ static void free_func(gpointer options)
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
         g_free(o->prompt);
-        if (o->data) g_slice_free(ObActionData, o->data);
+        if (o->data) g_slice_free(ObActionListRun, o->data);
         g_slice_free(Options, o);
     }
 }
 
-static Options* dup_options(Options *in, ObActionData *data)
+static Options* dup_options(Options *in, const ObActionListRun *data)
 {
     Options *o = g_slice_new(Options);
     o->cmd = g_strdup(in->cmd);
@@ -112,8 +113,8 @@ static Options* dup_options(Options *in, ObActionData *data)
     o->sn_icon = g_strdup(in->sn_icon);
     o->sn_wmclass = g_strdup(in->sn_wmclass);
     o->prompt = NULL;
-    o->data = g_slice_new(ObActionData);
-    memcpy(o->data, data, sizeof(ObActionData));
+    o->data = g_slice_new(ObActionListRun);
+    memcpy(o->data, data, sizeof(ObActionListRun));
     return o;
 }
 
@@ -132,7 +133,7 @@ static void prompt_cleanup(ObPrompt *p, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     GError *e;
     gchar **argv = NULL;

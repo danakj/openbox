@@ -61,11 +61,11 @@ ObClientSet* client_set_single(ObClient *c)
 {
     ObClientSet *set;
 
-    if (!c) return NULL;
-    set = g_slice_new(ObClientSet);
-    set->all = FALSE;
-    client_set_create_hash(set);
-    g_hash_table_insert(set->h, &c->window, c);
+    set = client_set_empty();
+    if (c) {
+        client_set_create_hash(set);
+        g_hash_table_insert(set->h, &c->window, c);
+    }
     return set;
 }
 

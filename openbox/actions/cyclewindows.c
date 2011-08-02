@@ -1,5 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list.h"
+#include "openbox/action_list_run.h"
 #include "openbox/action_parser.h"
 #include "openbox/action_value.h"
 #include "openbox/stacking.h"
@@ -44,7 +45,7 @@ static gpointer setup_backward_func(GHashTable *config,
                                     ObActionICancelFunc *c,
                                     ObActionIPostFunc *post);
 static void     free_func(gpointer options);
-static gboolean run_func(ObActionData *data, gpointer options);
+static gboolean run_func(const ObActionListRun *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
                              ObtIC *ic,
@@ -156,7 +157,7 @@ static void free_func(gpointer options)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(ObActionData *data, gpointer options)
+static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     struct _ObClient *ft;
@@ -247,7 +248,7 @@ static void i_post_func(gpointer options)
                      TRUE, o->cancel);
 
     if (ft)
-        action_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
+        action_list_run(o->actions, OB_USER_ACTION_KEYBOARD_KEY,
                         o->state, -1, -1, 0, OB_FRAME_CONTEXT_NONE, ft);
 
     stacking_restore();

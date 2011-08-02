@@ -47,6 +47,7 @@ typedef struct _RrImage            RrImage;
 typedef struct _RrImageSet         RrImageSet;
 typedef struct _RrImagePic         RrImagePic;
 typedef struct _RrImageCache       RrImageCache;
+typedef struct _RrButton           RrButton;
 
 typedef guint32 RrPixel32;  /* RGBA format */
 typedef guint16 RrPixel16;
@@ -221,7 +222,7 @@ struct _RrTexture {
 
 struct _RrAppearance {
     const RrInstance *inst;
-
+    
     RrSurface surface;
     gint textures;
     RrTexture *texture;
@@ -286,6 +287,52 @@ struct _RrImageSet
     gint n_resized;
 };
 
+struct _RrButton {
+    const RrInstance *inst;
+
+    /* colors */
+    RrColor *focused_unpressed_color;
+    RrColor *unfocused_unpressed_color;
+    RrColor *focused_pressed_color;
+    RrColor *unfocused_pressed_color;
+    RrColor *disabled_focused_color;
+    RrColor *disabled_unfocused_color;
+    RrColor *hover_focused_color;
+    RrColor *hover_unfocused_color;
+    RrColor *toggled_hover_focused_color;
+    RrColor *toggled_hover_unfocused_color;
+    RrColor *toggled_focused_pressed_color;
+    RrColor *toggled_unfocused_pressed_color;
+    RrColor *toggled_focused_unpressed_color;
+    RrColor *toggled_unfocused_unpressed_color;
+    
+    /* masks */
+    RrPixmapMask *mask;
+    RrPixmapMask *pressed_mask;
+    RrPixmapMask *disabled_mask;
+    RrPixmapMask *hover_mask;
+    RrPixmapMask *toggled_mask;
+    RrPixmapMask *toggled_hover_mask;
+    RrPixmapMask *toggled_pressed_mask;
+   
+    /* textures */
+    RrAppearance *a_focused_unpressed;
+    RrAppearance *a_unfocused_unpressed;
+    RrAppearance *a_focused_pressed;
+    RrAppearance *a_unfocused_pressed;
+    RrAppearance *a_disabled_focused;
+    RrAppearance *a_disabled_unfocused;
+    RrAppearance *a_hover_focused;
+    RrAppearance *a_hover_unfocused;
+    RrAppearance *a_toggled_focused_unpressed;
+    RrAppearance *a_toggled_unfocused_unpressed;
+    RrAppearance *a_toggled_focused_pressed;
+    RrAppearance *a_toggled_unfocused_pressed;
+    RrAppearance *a_toggled_hover_focused;
+    RrAppearance *a_toggled_hover_unfocused;
+
+};
+
 /* these are the same on all endian machines because it seems to be dependant
    on the endianness of the gfx card, not the cpu. */
 #define RrDefaultAlphaOffset 24
@@ -318,6 +365,7 @@ gint     RrGreenMask    (const RrInstance *inst);
 gint     RrBlueMask     (const RrInstance *inst);
 
 RrColor *RrColorNew   (const RrInstance *inst, gint r, gint g, gint b);
+RrColor *RrColorCopy  (RrColor *c);
 RrColor *RrColorParse (const RrInstance *inst, gchar *colorname);
 void     RrColorFree  (RrColor *in);
 
@@ -334,6 +382,9 @@ void          RrAppearanceRemoveTextures(RrAppearance *a);
 void          RrAppearanceAddTextures(RrAppearance *a, gint numtex);
 /*! Always call this when changing the type of a texture in an appearance */
 void          RrAppearanceClearTextures(RrAppearance *a);
+
+RrButton *RrButtonNew (const RrInstance *inst);
+void      RrButtonFree(RrButton *b);
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);

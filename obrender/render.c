@@ -231,6 +231,8 @@ void RrAppearanceClearTextures(RrAppearance *a)
     memset(a->texture, 0, a->textures * sizeof(RrTexture));
 }
 
+/* deep copy of orig, means reset ref to 1 on copy
+ * and copy each thing memwise. */
 RrAppearance *RrAppearanceCopy(RrAppearance *orig)
 {
     RrSurface *spo, *spc;
@@ -316,6 +318,7 @@ RrAppearance *RrAppearanceCopy(RrAppearance *orig)
     return copy;
 }
 
+/* now decrements ref counter, and frees only if ref <= 0 */
 void RrAppearanceFree(RrAppearance *a)
 {
     if (a) {

@@ -101,6 +101,11 @@ RrColor *RrColorNew(const RrInstance *inst, gint r, gint g, gint b)
     return out;
 }
 
+RrColor *RrColorCopy(RrColor* c)
+{
+    return RrColorNew(c->inst, c->r, c->g, c->b);
+}
+
 void RrColorFree(RrColor *c)
 {
     if (c) {

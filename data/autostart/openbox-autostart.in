@@ -31,4 +31,4 @@ fi
 # Run the XDG autostart stuff.  These are found in /etc/xdg/autostart and
 # in $HOME/.config/autostart.  This requires PyXDG to be installed.
 # See openbox-xdg-autostart --help for more details.
-@libexecdir@/openbox-xdg-autostart OPENBOX
+@libexecdir@/openbox-xdg-autostart "$@"

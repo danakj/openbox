@@ -1,5 +1,5 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.5.0-rc1], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.5.0], [http://bugzilla.icculus.org])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
@@ -18,16 +18,16 @@ dnl if MAJOR or MINOR version changes, be sure to change AC_INIT above to match
 dnl
 RR_MAJOR_VERSION=3
 RR_MINOR_VERSION=5
-RR_MICRO_VERSION=27
-RR_INTERFACE_AGE=0
-RR_BINARY_AGE=0
+RR_MICRO_VERSION=28
+RR_INTERFACE_AGE=1
+RR_BINARY_AGE=1
 RR_VERSION=$RR_MAJOR_VERSION.$RR_MINOR_VERSION
 
 OBT_MAJOR_VERSION=3
 OBT_MINOR_VERSION=5
-OBT_MICRO_VERSION=0
-OBT_INTERFACE_AGE=0
-OBT_BINARY_AGE=0
+OBT_MICRO_VERSION=1
+OBT_INTERFACE_AGE=1
+OBT_BINARY_AGE=1
 OBT_VERSION=$OBT_MAJOR_VERSION.$OBT_MINOR_VERSION
 
 AC_SUBST(RR_MAJOR_VERSION)
@@ -87,11 +87,9 @@ AC_PROG_INSTALL
 AM_GNU_GETTEXT_VERSION(0.15)
 AM_GNU_GETTEXT([external])
 
-AC_CHECK_HEADERS(ctype.h fcntl.h grp.h locale.h pwd.h signal.h string.h)
-AC_CHECK_HEADERS(stdio.h stdlib.h unistd.h sys/stat.h sys/select.h)
-AC_CHECK_HEADERS(sys/socket.h sys/time.h sys/wait.h)
-# AC_HEADER_TIME
-# AC_TYPE_SIGNAL
+AC_CHECK_HEADERS(ctype.h dirent.h errno.h fcntl.h grp.h locale.h pwd.h)
+AC_CHECK_HEADERS(signal.h string.h stdio.h stdlib.h unistd.h sys/stat.h)
+AC_CHECK_HEADERS(sys/select.h sys/socket.h sys/time.h sys/types.h sys/wait.h)
 
 AC_PATH_PROG([SED], [sed], [no])
 if test "$SED" = "no"; then
@@ -118,7 +116,7 @@ AC_SUBST(XML_LIBS)
 AC_ARG_ENABLE(startup-notification,
   AC_HELP_STRING(
     [--disable-startup-notification],
-    [disable the startup notification library. [[default=enabled]]]
+    [disable the startup notification library. [default=enabled]]
   ),
   [enable_sn=$enableval],
   [enable_sn=yes]
@@ -143,7 +141,7 @@ fi
 AC_ARG_ENABLE(xcursor,
   AC_HELP_STRING(
     [--disable-xcursor],
-    [disable use of the X Cursor library. [[default=enabled]]]
+    [disable use of the X Cursor library. [default=enabled]]
   ),
   [enable_xcursor=$enableval],
   [enable_xcursor=yes]
@@ -168,7 +166,7 @@ fi
 AC_ARG_ENABLE(imlib2,
   AC_HELP_STRING(
     [--disable-imlib2],
-    [disable use of Imlib2 image library for loading icons. [[default=enabled]]]
+    [disable use of Imlib2 image library for loading icons. [default=enabled]]
   ),
   [enable_imlib2=$enableeval],
   [enable_imlib2=yes]
@@ -208,6 +206,7 @@ X11_EXT_XRANDR
 X11_EXT_SHAPE
 X11_EXT_XINERAMA
 X11_EXT_SYNC
+X11_EXT_AUTH
 
 AC_CONFIG_FILES([
   Makefile

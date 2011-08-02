@@ -7,84 +7,74 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2011-08-01 18:20+0200\n"
 "PO-Revision-Date: 2008-05-24 15:08+0300\n"
 "Last-Translator: Tutku Dalmaz <mektup@tutkudalmaz.org>\n"
 "Language-Team: Turkish\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions.c:149
+#: openbox/actions.c:198
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "\"%s\" geçersiz eylem isteği. Böyle bir eylem yok."
 
-#: openbox/actions/execute.c:128
+#: openbox/actions/execute.c:147
 msgid "No"
 msgstr "Hayır"
 
-#: openbox/actions/execute.c:129
+#: openbox/actions/execute.c:148
 msgid "Yes"
 msgstr "Evet"
 
-#: openbox/actions/execute.c:133
+#: openbox/actions/execute.c:152
 msgid "Execute"
 msgstr "Çalıştır"
 
-#: openbox/actions/execute.c:142
+#: openbox/actions/execute.c:161
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "\"%s\" yolu utf8'e çevrilmesi başarısız oldu"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:69 openbox/client.c:3550
 msgid "Cancel"
 msgstr "İptal"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:70
 msgid "Exit"
 msgstr "Çık"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Openbox'tan çıkmak istediğinize emin misiniz?"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Openbox'tan Çık"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"Openbox oturum yönetim desteği olmaksızın yapılandırıldığı için "
-"SessionLogout eylemi geçerli değildir."
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Oturumu Kapat"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
 msgstr "Oturumu kapatmak istediğinizden emin misiniz?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:75
+msgid "Log Out"
+msgstr "Oturumu Kapat"
+
+#: openbox/actions/exit.c:78
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Openbox'tan çıkmak istediğinize emin misiniz?"
+
+#: openbox/actions/exit.c:79
+msgid "Exit Openbox"
+msgstr "Openbox'tan Çık"
+
+#: openbox/client.c:2037
 msgid "Unnamed Window"
 msgstr "İsimsiz Pencere"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2051 openbox/client.c:2082
 msgid "Killing..."
 msgstr "Sonlandırılıyor..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2053 openbox/client.c:2084
 msgid "Not Responding"
 msgstr "Cevap Vermiyor"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3539
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,11 +83,11 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. %s sinyali göndererek zorla "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3541
 msgid "End Process"
 msgstr "Süreci Sonlandır"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3545
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -106,138 +96,153 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. X sunucusu ile bağlantısını "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3547
 msgid "Disconnect"
 msgstr "Bağlantıyı Kes"
 
-#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
+#: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
 msgstr "Oraya git..."
 
-#: openbox/client_list_combined_menu.c:94
+#: openbox/client_list_combined_menu.c:100
 msgid "Manage desktops"
 msgstr "Masaüstlerini yönet"
 
-#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
+#: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
 msgstr "_Yeni masaüstü ekle"
 
-#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
 msgstr "_Son masaüstünü kaldır"
 
-#: openbox/client_list_combined_menu.c:149
+#: openbox/client_list_combined_menu.c:157
 msgid "Windows"
 msgstr "Pencereler"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:214
 msgid "Desktops"
 msgstr "Masaüstleri"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:259
 msgid "All desktops"
 msgstr "Tüm masaüstleri"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Layer"
 msgstr "_Katman"
 
-#: openbox/client_menu.c:375
+#: openbox/client_menu.c:376
 msgid "Always on _top"
 msgstr "_Her zaman üstte"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:377
 msgid "_Normal"
 msgstr "_Normal"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:378
 msgid "Always on _bottom"
 msgstr "_Her zaman altta"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:380
 msgid "_Send to desktop"
 msgstr "_Masaüstüne gönder"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:384
 msgid "Client menu"
 msgstr "İstemci menüsü"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:394
 msgid "R_estore"
 msgstr "_Eski durumuna getir"
 
-#: openbox/client_menu.c:397
+#: openbox/client_menu.c:398
 msgid "_Move"
 msgstr "_Taşı"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:400
 msgid "Resi_ze"
 msgstr "_Yeniden boyutlandır"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:402
 msgid "Ico_nify"
 msgstr "_Simge durumuna küçült"
 
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:406
 msgid "Ma_ximize"
 msgstr "_Ekranı kapla"
 
-#: openbox/client_menu.c:409
+#: openbox/client_menu.c:410
 msgid "_Roll up/down"
 msgstr "_Dürele/Aç"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "Geri Al/Kapla"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "_Kapat"
 
-#: openbox/config.c:781
-#, c-format
-msgid "Invalid button \"%s\" specified in config file"
-msgstr "Yapılandırılma dosyasında belirtilmiş geçersiz \"%s\" düğmesi"
-
-#: openbox/keyboard.c:157
-msgid "Conflict with key binding in config file"
-msgstr "Yapılandırma dosyasındaki tuş bağlantısında çakışma"
-
-#: openbox/menu.c:102 openbox/menu.c:110
-#, c-format
-msgid "Unable to find a valid menu file \"%s\""
-msgstr "\"%s\" geçerli menü dosyası bulunamadı"
-
-#: openbox/menu.c:170
-#, c-format
-msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "İletim menüsü için \"%s\": %s komutunun çalıştırılması başarısız oldu"
-
-#: openbox/menu.c:184
-#, c-format
-msgid "Invalid output from pipe-menu \"%s\""
-msgstr "\"%s\" iletim menüsü için geçersiz çıkış"
-
-#: openbox/menu.c:197
-#, c-format
-msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "\"%s\" menüsüne erişilmeye çalışıldı fakat bu menü yok"
-
-#: openbox/menu.c:367 openbox/menu.c:368
-msgid "More..."
-msgstr "Daha..."
-
-#: openbox/mouse.c:373
-#, c-format
-msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Fare bağında geçersiz \"%s\" tuşu"
-
-#: openbox/mouse.c:379
+#: openbox/config.c:503
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Fare bağında geçersinz \"%s\" içeriği"
 
-#: openbox/openbox.c:133
+#: openbox/config.c:857
+#, c-format
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Yapılandırılma dosyasında belirtilmiş geçersiz \"%s\" düğmesi"
+
+#: openbox/config.c:882
+msgid ""
+"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"will not be loaded."
+msgstr ""
+
+#: openbox/debug.c:55
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "'%s': %s dizini oluşturulamadı"
+
+#: openbox/debug.c:138 openbox/openbox.c:372
+msgid "Close"
+msgstr "Kapat"
+
+#: openbox/keyboard.c:161
+msgid "Conflict with key binding in config file"
+msgstr "Yapılandırma dosyasındaki tuş bağlantısında çakışma"
+
+#: openbox/menu.c:94 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "\"%s\" geçerli menü dosyası bulunamadı"
+
+#: openbox/menu.c:158
+#, c-format
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "İletim menüsü için \"%s\": %s komutunun çalıştırılması başarısız oldu"
+
+#: openbox/menu.c:172
+#, c-format
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "\"%s\" iletim menüsü için geçersiz çıkış"
+
+#: openbox/menu.c:185
+#, c-format
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "\"%s\" menüsüne erişilmeye çalışıldı fakat bu menü yok"
+
+#: openbox/menu.c:400 openbox/menu.c:401
+msgid "More..."
+msgstr "Daha..."
+
+#: openbox/mouse.c:376
+#, c-format
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Fare bağında geçersiz \"%s\" tuşu"
+
+#: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "\"%s\": %s ev dizini değiştirilemedi"
@@ -246,29 +251,29 @@ msgstr "\"%s\": %s ev dizini değiştirilemedi"
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "DISPLAY çevre değişkeninde görüntünün açılması başarısız oldu."
 
-#: openbox/openbox.c:183
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "ObRender kitaplığının sıfırlanması başarısız oldu."
 
-#: openbox/openbox.c:194
+#: openbox/openbox.c:193
 msgid "X server does not support locale."
 msgstr "X sunucusu dil ayarlarını desteklemiyor."
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
 msgstr "X sunucu için dil ayarları değiştiricisi ayarlanamadı."
 
-#: openbox/openbox.c:263
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Geçerli yapılandırma dosyası bulunamadı, bazı basit öntanımlı ayarlar "
 "kullanılıyor"
 
-#: openbox/openbox.c:297
+#: openbox/openbox.c:286
 msgid "Unable to load a theme."
 msgstr "Tema yüklenemedi."
 
-#: openbox/openbox.c:377
+#: openbox/openbox.c:370
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -279,30 +284,26 @@ msgstr ""
 "sözdizimi hatası bulundu. Daha fazla bilgi için stdout çıktısına bakınız. "
 "Son hata \"%s\" dosyası içerisindeki %d satırında %s hata iletisi ile görüldü"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:372
 msgid "Openbox Syntax Error"
 msgstr "Openbox Sözdizimi Hatası"
 
-#: openbox/openbox.c:379
-msgid "Close"
-msgstr "Kapat"
-
-#: openbox/openbox.c:448
+#: openbox/openbox.c:438
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 "Yeniden başlatmadaki \"%s\": %s çalıştırılabilir dosyalarının başlatılması "
 "başarısız oldu"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:517 openbox/openbox.c:519
 msgid "Copyright (c)"
 msgstr "Telif Hakkı (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:528
 msgid "Syntax: openbox [options]\n"
 msgstr "Sözdizimi: openbox [seçenekler]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:529
 msgid ""
 "\n"
 "Options:\n"
@@ -310,32 +311,32 @@ msgstr ""
 "\n"
 "Seçenekler:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:530
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Yardımı görüntüle ve çık\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:531
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Sürüm bilgisini görüntüle ve çık\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:532
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Güncel pencere yöneticisini değiştir\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:536
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 "  --config-file FILE  Kullanılacak yapılandırma dosyasının yolunu belirtir\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:537
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr ""
 "  --sm-disable        Oturum yöneticisiyle olan bağlanıyı etkisiz kıl\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:538
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -343,19 +344,19 @@ msgstr ""
 "\n"
 "İletiler çalışan bir Openbox örneğine aktarılıyor:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:539
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Openbox yapılandırmasını yeniden yükle\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:540
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Openbox'ı yeniden başlat\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:541
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Openbox'tan çık\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -363,9 +364,13 @@ msgstr ""
 "\n"
 "Hata ayıklama seçenekleri:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:543
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Eş zamanlı kipte çalış\n"
+
+#: openbox/openbox.c:544
+msgid "  --startup CMD       Run CMD after starting\n"
+msgstr ""
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -377,10 +382,14 @@ msgstr ""
 "  --debug-focus       Özelleşmiş durum için hata ayıklama çıktısını göster\n"
 
 #: openbox/openbox.c:547
+msgid "  --debug-session     Display debugging output for session management\n"
+msgstr ""
+
+#: openbox/openbox.c:548
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Görüntü gerçek olmayan ekranlara bölünür\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:549
 #, c-format
 msgid ""
 "\n"
@@ -389,26 +398,27 @@ msgstr ""
 "\n"
 "Lütfen hataları %s adresine bildiriniz\n"
 
-#: openbox/openbox.c:617
-msgid "--config-file requires an argument\n"
-msgstr "--config-file dosyası bir değişkene ihtiyaç duyuyor\n"
+#: openbox/openbox.c:632 openbox/openbox.c:666
+#, c-format
+msgid "%s requires an argument\n"
+msgstr "%s dosyası bir değişkene ihtiyaç duyuyor\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:709
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "\"%s\" geçersiz komut satırı değişkeni\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "%d ekranınz zaten bir pencere yöneticixi çalışıyor"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Seçilen %d ekranında pencere yöneticisi bulunamadı"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:150
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "%d ekranındaki pencere yöneticisinden çıkılamıyor"
@@ -417,7 +427,7 @@ msgstr "%d ekranındaki pencere yöneticisinden çıkılamıyor"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, fuzzy, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -432,31 +442,12 @@ msgstr[1] ""
 "Openbox %d masaüstleri için yapılandırılmıştır fakat güncel oturum %d dir. "
 "Openbox yapılandırmasının üzerien yazılıyor."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "%i masaüstü"
 
-#: openbox/session.c:104
-#, c-format
-msgid "Unable to make directory \"%s\": %s"
-msgstr "\"%s\": %s dizini oluşturulamadı"
-
-#: openbox/session.c:466
-#, c-format
-msgid "Unable to save the session to \"%s\": %s"
-msgstr "\"%s\": %s oturumu kaydedilemedi"
-
-#: openbox/session.c:605
-#, c-format
-msgid "Error while saving the session to \"%s\": %s"
-msgstr "Oturum \"%s\": %s'e kaydedilirken hata"
-
-#: openbox/session.c:842
-msgid "Not connected to a session manager"
-msgstr "Oturum yöneticisine bağlı değil"
-
-#: openbox/startupnotify.c:243
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s"
 msgstr "%s çalışıyor"
@@ -481,11 +472,32 @@ msgstr "Tuş bağında \"%s\" geçersiz tuş adı"
 msgid "Requested key \"%s\" does not exist on the display"
 msgstr "İstenilen \"%s\" tuşu görüntüde yok"
 
-#: openbox/xerror.c:40
-#, c-format
-msgid "X Error: %s"
-msgstr "%s X Hatası"
-
-#: openbox/prompt.c:200
+#: openbox/prompt.c:153
 msgid "OK"
 msgstr "Tamam"
+
+#, fuzzy
+#~ msgid "Openbox"
+#~ msgstr "Openbox'tan Çık"
+
+#~ msgid "--config-file requires an argument\n"
+#~ msgstr "--config-file dosyası bir değişkene ihtiyaç duyuyor\n"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "Openbox oturum yönetim desteği olmaksızın yapılandırıldığı için "
+#~ "SessionLogout eylemi geçerli değildir."
+
+#~ msgid "Unable to save the session to \"%s\": %s"
+#~ msgstr "\"%s\": %s oturumu kaydedilemedi"
+
+#~ msgid "Error while saving the session to \"%s\": %s"
+#~ msgstr "Oturum \"%s\": %s'e kaydedilirken hata"
+
+#~ msgid "Not connected to a session manager"
+#~ msgstr "Oturum yöneticisine bağlı değil"
+
+#~ msgid "X Error: %s"
+#~ msgstr "%s X Hatası"

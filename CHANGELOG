@@ -1,4 +1,61 @@
-3.5.0-rc1:
+3.5.0:
+  * New alt-tab dialog shows windows in a vertical list.
+  * Improved Xinerama support.
+  * Allow icons in menus.
+  * Theme options for prompt dialogs (osd.button.unpressed.*,
+    osd.button.pressed.*, osd.button.focused.*)
+  * Addresses bug #4877, #4596, #4617, #4752, #4663, #4662, #4586, #2319,
+    #4341, #4519, #4543, #4503, #4355, #4072, #3702, #4284
+  * Lots of additional bug fixes and performance improvements.
+
+3.4.11.2:
+  * Updated Estonian and Portuguese translations.
+  * Fix a rare crash involving moving fullscreen windows to different monitors
+  * Fix a more common crash involving pressing right in a menu
+
+3.4.11.1:
+  * Updated Polish translation.
+  * Fixed bug #4519 (Incorrect focus in reused windows).
+  * Lower the default submenu open/hide delay from 200ms to 100ms.
+  * Fix some more problems with gnome integration.
+  * Update Clearlooks theme.
+  * Some other small fixes.
+
+3.4.11:
+  * Update Hungarian, Japanese, and Latvian translations.
+  * Make xdg-autostart use the OPENBOX environment by default, so you can use
+    OnlyShowIn=OPENBOX in an autostart .desktop and it will work as expected.
+  * Don't close the menu when you hold control and execute something.
+  * Fix bug #4503 (Adjust who shows up in the Alt-Tab list using SKIP_TASKBAR).
+  * Fix flickering window when moving maximized window between monitors of
+    different sizes.
+  * Fix bug #4355 (Allow multiple escaped _'s in a menu label and allow
+    a menu shortcut to come after an escaped _).
+  * Remember the maximized state of a window when it goes fullscreen, and
+    restore it when leaving fullscreen state.
+  * Fix bug #4072 (Openbox is stopped by terminal applications writing to
+    stdout).
+  * Fix bug #4492 (Mistake in openbox-gnome-session check while setting up).
+  * Fix obxprop to make --root and --id work correctly.
+  * Add _OB_APP_ROLE/CLASS/NAME/TYPE properties (replaces _OB_ROLE/CLASS/NAME).
+  * Make the focus cycling popup dynamic when windows appear/disappear.
+  * Fix bug #4411 (Crash when window appears during focus cycling).
+  * Allow the user to specify which properties should be shown by obxprop.
+  * Fix tilde expansion in the Execute action
+  * Make Home and End keys move to the top/bottom of the active menu.
+  * Use the submenuShowDelay when navigating menus with the keyboard.
+
+3.4.10:
+  * Improve keyboard navigation in Openbox menus.
+  * Add a --root option and a manpage for obxprop.
+  * Use a negative value for submenuShowDelay and submenuHideDelay to cause
+    an infinite delay.  This means you have to click to show a submenu, rather
+    than just hover over it.
+  * Improved code for submenu show/hide delay.  Added the submenuHideDelay
+    config file option, under the "menu" section.
+  * Fixed bug #4464 (Typo in openbox-gnome-session script).
+  * Fixed bug #4436 (Focusing a window used to stop focus cycling).
+  * Renamed obprop to obxprop due to collision with Open Babel (See bug #4419).
 
 3.4.9:
   * Allow focus to move while inside an Openbox menu, or during an interactive

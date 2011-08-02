@@ -326,6 +326,8 @@ static void parse_menu(xmlNodePtr node, gpointer data)
     ObMenuParseState *state = data;
     gchar *name = NULL, *title = NULL, *script = NULL;
     ObMenu *menu;
+    ObMenuEntry *e;
+    gchar *icon;
 
     if (!obt_xml_attr_string(node, "id", &name))
         goto parse_menu_fail;
@@ -349,8 +351,20 @@ static void parse_menu(xmlNodePtr node, gpointer data)
         }
     }
 
-    if (state->parent)
-        menu_add_submenu(state->parent, -1, name);
+    if (state->parent) {
+        e = menu_add_submenu(state->parent, -1, name);
+
+        if (config_menu_show_icons &&
+            obt_xml_attr_string(node, "icon", &icon))
+        {
+            e->data.submenu.icon = RrImageNewFromName(ob_rr_icons, icon);
+
+            if (e->data.submenu.icon)
+                e->data.submenu.icon_alpha = 0xff;
+
+            g_free(icon);
+        }
+    }
 
 parse_menu_fail:
     g_free(name);
@@ -534,6 +548,7 @@ void menu_entry_unref(ObMenuEntry *self)
             }
             break;
         case OB_MENU_ENTRY_TYPE_SUBMENU:
+            RrImageUnref(self->data.submenu.icon);
             g_free(self->data.submenu.name);
             break;
         case OB_MENU_ENTRY_TYPE_SEPARATOR:

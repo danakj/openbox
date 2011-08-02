@@ -7,84 +7,74 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2011-08-01 18:20+0200\n"
 "PO-Revision-Date: 2008-05-04 21:16+0200\n"
 "Last-Translator: Vytautas <vytautas1987@yahoo.com>\n"
 "Language-Team: Lithuanian <lt@li.ourg>\n"
+"Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: openbox/actions.c:149
+#: openbox/actions.c:198
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Neteisingo veiksmo \"%s\" pareikalauta. Toks veiksmas neegzistuoja."
 
-#: openbox/actions/execute.c:128
+#: openbox/actions/execute.c:147
 msgid "No"
 msgstr "Ne"
 
-#: openbox/actions/execute.c:129
+#: openbox/actions/execute.c:148
 msgid "Yes"
 msgstr "Taip"
 
-#: openbox/actions/execute.c:133
+#: openbox/actions/execute.c:152
 msgid "Execute"
 msgstr "Vygdyti"
 
-#: openbox/actions/execute.c:142
+#: openbox/actions/execute.c:161
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nepavyko išversti \"%s\" iš utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:69 openbox/client.c:3550
 msgid "Cancel"
 msgstr "Atšaukti"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:70
 msgid "Exit"
 msgstr "Išeiti"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Ar tikrai norite išjungti Openbox?"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Išjungti Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
-"valdymo palaikymo"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Išsiregistruoti"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
 msgstr "Ar tikrai norite išsiregistruoti?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:75
+msgid "Log Out"
+msgstr "Išsiregistruoti"
+
+#: openbox/actions/exit.c:78
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Ar tikrai norite išjungti Openbox?"
+
+#: openbox/actions/exit.c:79
+msgid "Exit Openbox"
+msgstr "Išjungti Openbox"
+
+#: openbox/client.c:2037
 msgid "Unnamed Window"
 msgstr "Bevardis Langas"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2051 openbox/client.c:2082
 msgid "Killing..."
 msgstr "Naikinama..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2053 openbox/client.c:2084
 msgid "Not Responding"
 msgstr "Neatsako"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3539
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -93,149 +83,164 @@ msgstr ""
 "Langas \"%s\" neatsako.  Ar nori jį priverstinai išjungti nusiūsdamas %s "
 "signalą?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3541
 msgid "End Process"
 msgstr "Baigti procesą"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3545
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Langas \"%s\" neatsako. Ar nori jį atjungti nuo X serverio?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3547
 msgid "Disconnect"
 msgstr "Atsijungti"
 
-#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
+#: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
 msgstr "Eiti ten..."
 
-#: openbox/client_list_combined_menu.c:94
+#: openbox/client_list_combined_menu.c:100
 msgid "Manage desktops"
 msgstr "Valdyti darbastalius"
 
-#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
+#: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
 msgstr "_Pridėti darbastalį"
 
-#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
 msgstr "P_ašalinti paskutinį darbastalį"
 
-#: openbox/client_list_combined_menu.c:149
+#: openbox/client_list_combined_menu.c:157
 msgid "Windows"
 msgstr "Langai"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:214
 msgid "Desktops"
 msgstr "Darbastaliai"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:259
 msgid "All desktops"
 msgstr "Visi darbastaliai"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Layer"
 msgstr "_Sluoksnis"
 
-#: openbox/client_menu.c:375
+#: openbox/client_menu.c:376
 msgid "Always on _top"
 msgstr "Visada _viršuje"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:377
 msgid "_Normal"
 msgstr "_Normalus"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:378
 msgid "Always on _bottom"
 msgstr "Visada _apačioje"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:380
 msgid "_Send to desktop"
 msgstr "Siūsti į _darbastalį"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:384
 msgid "Client menu"
 msgstr "Kliento menu"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:394
 msgid "R_estore"
 msgstr "_Atstatyti"
 
-#: openbox/client_menu.c:397
+#: openbox/client_menu.c:398
 msgid "_Move"
 msgstr "_Judinti"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:400
 msgid "Resi_ze"
 msgstr "_Pakeisti dydį"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:402
 msgid "Ico_nify"
 msgstr "_Mažinti"
 
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:406
 msgid "Ma_ximize"
 msgstr "D_idinti"
 
-#: openbox/client_menu.c:409
+#: openbox/client_menu.c:410
 msgid "_Roll up/down"
 msgstr "Apvers_ti aukštyn/žemyn"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "Ne/D_ekoruoti"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "_Uždaryti"
 
-#: openbox/config.c:781
-#, c-format
-msgid "Invalid button \"%s\" specified in config file"
-msgstr "Neteisingas mygtuskas \"%s\" nurodytas nustatymų byloje"
-
-#: openbox/keyboard.c:157
-msgid "Conflict with key binding in config file"
-msgstr "Konfliktas tarp mygtukų nustatymų byloje"
-
-#: openbox/menu.c:102 openbox/menu.c:110
-#, c-format
-msgid "Unable to find a valid menu file \"%s\""
-msgstr "Nerasta gera menu byla \"%s\""
-
-#: openbox/menu.c:170
-#, c-format
-msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Nepavyko pipe-menu komandos vygdyti \"%s\": %s"
-
-#: openbox/menu.c:184
-#, c-format
-msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Neteisinga išvestis iš pipe-menu \"%s\""
-
-#: openbox/menu.c:197
-#, c-format
-msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Bandoma įeiti į menu \"%s\", bet jis neegzistuoja"
-
-#: openbox/menu.c:367 openbox/menu.c:368
-msgid "More..."
-msgstr "Dar..."
-
-#: openbox/mouse.c:373
-#, c-format
-msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Neteisingas mygtukas \"%s\" pelės nustatymuose"
-
-#: openbox/mouse.c:379
+#: openbox/config.c:503
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Neteisingas kontekstas \"%s\" pelės nustatymuose"
 
-#: openbox/openbox.c:133
+#: openbox/config.c:857
+#, c-format
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Neteisingas mygtuskas \"%s\" nurodytas nustatymų byloje"
+
+#: openbox/config.c:882
+msgid ""
+"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"will not be loaded."
+msgstr ""
+
+#: openbox/debug.c:55
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr "Negalima padaryti direktorijos '%s': %s"
+
+#: openbox/debug.c:138 openbox/openbox.c:372
+msgid "Close"
+msgstr "Uždaryti"
+
+#: openbox/keyboard.c:161
+msgid "Conflict with key binding in config file"
+msgstr "Konfliktas tarp mygtukų nustatymų byloje"
+
+#: openbox/menu.c:94 openbox/menu.c:106
+#, c-format
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Nerasta gera menu byla \"%s\""
+
+#: openbox/menu.c:158
+#, c-format
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Nepavyko pipe-menu komandos vygdyti \"%s\": %s"
+
+#: openbox/menu.c:172
+#, c-format
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Neteisinga išvestis iš pipe-menu \"%s\""
+
+#: openbox/menu.c:185
+#, c-format
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Bandoma įeiti į menu \"%s\", bet jis neegzistuoja"
+
+#: openbox/menu.c:400 openbox/menu.c:401
+msgid "More..."
+msgstr "Dar..."
+
+#: openbox/mouse.c:376
+#, c-format
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Neteisingas mygtukas \"%s\" pelės nustatymuose"
+
+#: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "Negalima patekti į home direktoriją \"%s\": %s"
@@ -244,28 +249,28 @@ msgstr "Negalima patekti į home direktoriją \"%s\": %s"
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Nepavyko atidaryti ekrano pagal DISPLAY aplinkos kintamąjį."
 
-#: openbox/openbox.c:183
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "Nepavyko inicijuoti obrender bibliotekos."
 
-#: openbox/openbox.c:194
+#: openbox/openbox.c:193
 msgid "X server does not support locale."
 msgstr "X serveris nepalaiko lokalės."
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Negalima nustatyti lokalės keitinių X serveriui."
 
-#: openbox/openbox.c:263
+#: openbox/openbox.c:253
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
 "Nepavyksta rasti geros nustatymų bylos, naudojami standartiniai nustatymai"
 
-#: openbox/openbox.c:297
+#: openbox/openbox.c:286
 msgid "Unable to load a theme."
 msgstr "Nepavyksta įjunggti temos."
 
-#: openbox/openbox.c:377
+#: openbox/openbox.c:370
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -276,28 +281,24 @@ msgstr ""
 "daugiau informacijos.  Paskutinė klaida byloje \"%s\" eilutėje %d, su "
 "pranešimu: %s"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:372
 msgid "Openbox Syntax Error"
 msgstr "Openbox Sintaksės Klaida"
 
-#: openbox/openbox.c:379
-msgid "Close"
-msgstr "Uždaryti"
-
-#: openbox/openbox.c:448
+#: openbox/openbox.c:438
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "Restartui nepavyko įjungti \"%s\": %s"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:517 openbox/openbox.c:519
 msgid "Copyright (c)"
 msgstr "Copyright (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:528
 msgid "Syntax: openbox [options]\n"
 msgstr "Sintaksė: openbox [nustatymai]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:529
 msgid ""
 "\n"
 "Options:\n"
@@ -305,30 +306,30 @@ msgstr ""
 "\n"
 "Nustatymai:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:530
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Parodyti tai ir išeiti\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:531
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Parodyti versiją ir išeiti\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:532
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Pakeisti jau veikiantį VM\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:536
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file FILE  Nurodyti kur yra nustatymų byla\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:537
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Atsijungti nuo sesijos tvarkyklės\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:538
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -336,19 +337,19 @@ msgstr ""
 "\n"
 "Perduodamos žinutės į veikiantį Openbox:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:539
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Perkrauti Openbox nustatymus\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:540
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Perkrauti Openbox\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:541
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Išeiti iš Openbox\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -356,9 +357,13 @@ msgstr ""
 "\n"
 "Klaidų šalinimo nustatymai:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:543
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Paleisti synchronous mode\n"
+
+#: openbox/openbox.c:544
+msgid "  --startup CMD       Run CMD after starting\n"
+msgstr ""
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -369,10 +374,14 @@ msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Rodyti debugging output dėl focus handling\n"
 
 #: openbox/openbox.c:547
+msgid "  --debug-session     Display debugging output for session management\n"
+msgstr "  --debug-session     Rodyti debugging output dėl session management\n"
+
+#: openbox/openbox.c:548
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr "  --debug-xinerama    Skirstyt ekraną į netikrus xinerama ekranus\n"
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:549
 #, c-format
 msgid ""
 "\n"
@@ -381,26 +390,27 @@ msgstr ""
 "\n"
 "Praneškite apie vabaliukus %s\n"
 
-#: openbox/openbox.c:617
-msgid "--config-file requires an argument\n"
-msgstr "--config-file reikalauja argumento\n"
+#: openbox/openbox.c:632 openbox/openbox.c:666
+#, c-format
+msgid "%s requires an argument\n"
+msgstr "%s reikalauja argumento\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:709
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Blogas komandinės eilutės argumentas \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "WM jau veikia ekrane %d"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Nepavyksta gauti langų tvarkyklės pasirinkimo ekrane %d"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:150
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "WM ekrane %d neišsijungia"
@@ -409,7 +419,7 @@ msgstr "WM ekrane %d neišsijungia"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:418
 #, fuzzy, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -424,31 +434,12 @@ msgstr[1] ""
 "Openbox yra suderintas %d darbastaliams, bet dabartinė sesija turi %d.  Mes "
 "naudosime kitą, ne Openbox, konfigūraciją."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1205
 #, c-format
 msgid "desktop %i"
 msgstr "darbastalis %i"
 
-#: openbox/session.c:104
-#, c-format
-msgid "Unable to make directory \"%s\": %s"
-msgstr "Negalima padaryti direktorijos \"%s\": %s"
-
-#: openbox/session.c:466
-#, c-format
-msgid "Unable to save the session to \"%s\": %s"
-msgstr "Negalima išsaugoti sesijos į \"%s\": %s"
-
-#: openbox/session.c:605
-#, c-format
-msgid "Error while saving the session to \"%s\": %s"
-msgstr "Klaida bandant išsaugot sesiją į \"%s\": %s"
-
-#: openbox/session.c:842
-msgid "Not connected to a session manager"
-msgstr "Neprisijungta prie sesijų sesijos tvarkyklė"
-
-#: openbox/startupnotify.c:243
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s"
 msgstr "Veikia %s"
@@ -474,11 +465,32 @@ msgstr "Neteisingas klavišo vardas \"%s\" klavišų priskyrimuose"
 msgid "Requested key \"%s\" does not exist on the display"
 msgstr "Norimas klavišas \"%s\" neegzistuoja ekrane"
 
-#: openbox/xerror.c:40
-#, c-format
-msgid "X Error: %s"
-msgstr "X Klaida: %s"
-
-#: openbox/prompt.c:200
+#: openbox/prompt.c:153
 msgid "OK"
 msgstr "OK"
+
+#, fuzzy
+#~ msgid "Openbox"
+#~ msgstr "Išjungti Openbox"
+
+#~ msgid "--config-file requires an argument\n"
+#~ msgstr "--config-file reikalauja argumento\n"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout action negalimas, nes Openbox buvo pastatytas be sesijos "
+#~ "valdymo palaikymo"
+
+#~ msgid "Unable to save the session to \"%s\": %s"
+#~ msgstr "Negalima išsaugoti sesijos į \"%s\": %s"
+
+#~ msgid "Error while saving the session to \"%s\": %s"
+#~ msgstr "Klaida bandant išsaugot sesiją į \"%s\": %s"
+
+#~ msgid "Not connected to a session manager"
+#~ msgstr "Neprisijungta prie sesijų sesijos tvarkyklė"
+
+#~ msgid "X Error: %s"
+#~ msgstr "X Klaida: %s"

@@ -170,6 +170,8 @@ openbox_openbox_CPPFLAGS = \
 	-DCONFIGDIR=\"$(configdir)\" \
 	-DG_LOG_DOMAIN=\"Openbox\"
 openbox_openbox_LDADD = \
+	$(XINERAMA_LIBS) \
+	$(XRANDR_LIBS) \
 	$(SM_LIBS) \
 	$(GLIB_LIBS) \
 	$(X_LIBS) \
@@ -323,9 +325,11 @@ tools_obxprop_obxprop_SOURCES = \
 ## gdm-control ##
 
 tools_gdm_control_gdm_control_CPPFLAGS = \
+	$(XAUTH_CFLAGS) \
 	$(X_CFLAGS) \
 	$(GLIB_CFLAGS)
 tools_gdm_control_gdm_control_LDADD = \
+	$(XAUTH_LIBS) \
 	$(X_LIBS) \
 	$(GLIB_LIBS)
 tools_gdm_control_gdm_control_SOURCES = \

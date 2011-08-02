@@ -181,7 +181,8 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
     self->text = createWindow(self->window, 0, NULL);
     g_hash_table_insert(menu_frame_map, &self->window, self);
     g_hash_table_insert(menu_frame_map, &self->text, self);
-    if (entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+    if ((entry->type == OB_MENU_ENTRY_TYPE_NORMAL) ||
+        (entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)) {
         self->icon = createWindow(self->window, 0, NULL);
         g_hash_table_insert(menu_frame_map, &self->icon, self);
     }
@@ -209,7 +210,8 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
         XDestroyWindow(obt_display, self->window);
         g_hash_table_remove(menu_frame_map, &self->text);
         g_hash_table_remove(menu_frame_map, &self->window);
-        if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) {
+        if ((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) ||
+            (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)) {
             XDestroyWindow(obt_display, self->icon);
             g_hash_table_remove(menu_frame_map, &self->icon);
         }
@@ -324,11 +326,18 @@ void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
                                gint *dx, gint *dy)
 {
     const Rect *a = NULL;
-    gint pos, half;
+    Rect search = self->area;
+    gint pos, half, monitor;
 
     *dx = *dy = 0;
+    RECT_SET_POINT(search, x, y);
 
-    a = screen_physical_area_monitor(screen_find_monitor_point(x, y));
+    if (self->parent)
+        monitor = self->parent->monitor;
+    else
+        monitor = screen_find_monitor(&search);
+
+    a = screen_physical_area_monitor(monitor);
 
     half = g_list_length(self->entries) / 2;
     pos = g_list_index(self->entries, self->selected);
@@ -515,7 +524,8 @@ static void menu_entry_frame_render(ObMenuEntryFrame *self)
         g_assert_not_reached();
     }
 
-    if (self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL &&
+    if (((self->entry->type == OB_MENU_ENTRY_TYPE_NORMAL) ||
+         (self->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU)) &&
         self->entry->data.normal.icon)
     {
         RrAppearance *clear;

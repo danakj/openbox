@@ -13,9 +13,9 @@ void action_fullscreen_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_fullscreen(data->client, !data->client->fullscreen);
+        client_fullscreen(data->target, !data->target->fullscreen);
         action_client_move(data, FALSE);
     }
     return FALSE;

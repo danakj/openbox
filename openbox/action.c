@@ -292,12 +292,12 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
             action_interactive_cancel_act();
         run_i = TRUE;
         if (i_run != this_run && act->i_pre)
-            run_i = act->i_pre(data->state, act->options);
+            run_i = act->i_pre(data->mod_state, act->options);
     }
 
     run = TRUE;
     if (run_i) {
-        run = action_interactive_begin_act(act, data->state);
+        run = action_interactive_begin_act(act, data->mod_state);
         ran_interactive = TRUE;
     }
 
@@ -312,7 +312,7 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
             if (action_is_interactive(act))
                 action_interactive_end_act();
             /* XXX else if (client_set_contains(focus_client)) */
-            else if (data->client && data->client == focus_client)
+            else if (data->target && data->target == focus_client)
                 event_update_user_time();
         }
     }
@@ -393,11 +393,9 @@ void action_client_move(const ObActionListRun *data, gboolean start)
     if (start)
         ignore_start = event_start_ignore_all_enters();
     else if (config_focus_follow &&
-             data->context != OB_FRAME_CONTEXT_CLIENT)
+             data->pointer_context != OB_FRAME_CONTEXT_CLIENT)
     {
-        if (data->uact == OB_USER_ACTION_MOUSE_PRESS) {
-            struct _ObClient *c;
-
+        if (data->user_act == OB_USER_ACTION_MOUSE_PRESS) {
             /* usually this is sorta redundant, but with a press action
                that moves windows our from under the cursor, the enter
                event will come as a GrabNotify which is ignored, so this
@@ -408,21 +406,22 @@ void action_client_move(const ObActionListRun *data, gboolean start)
                should be ignored
             */
             if (!grab_on_pointer()) {
-                if ((c = client_under_pointer()) && c != data->client) {
+                struct _ObClient *under = client_under_pointer();
+                if (under && under != data->pointer_over) {
                     ob_debug_type(OB_DEBUG_FOCUS,
                                   "Generating fake enter because we did a "
                                   "mouse-event action");
-                    event_enter_client(c);
+                    event_enter_client(under);
                 }
-                else if (!c && c != data->client) {
+                else if (!under && under != data->pointer_over) {
                     ob_debug_type(OB_DEBUG_FOCUS,
                                   "Generating fake leave because we did a "
                                   "mouse-event action");
-                    event_enter_client(data->client);
+                    event_enter_client(data->target);
                 }
             }
         }
-        else if (!data->button && !config_focus_under_mouse)
+        else if (!data->pointer_button && !config_focus_under_mouse)
             event_end_ignore_all_enters(ignore_start);
     }
 }

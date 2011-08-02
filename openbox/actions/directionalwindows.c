@@ -150,7 +150,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
     Options *o = options;
 
     if (!o->interactive)
-        end_cycle(FALSE, data->state, o);
+        end_cycle(FALSE, data->mod_state, o);
     else {
         struct _ObClient *ft;
 

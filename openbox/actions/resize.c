@@ -68,16 +68,16 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
-        ObClient *c = data->client;
+    if (data->target) {
+        ObClient *c = data->target;
         guint32 corner;
 
-        if (!data->button)
+        if (!data->pointer_button)
             corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
         else if (o->corner_specified)
             corner = o->corner; /* it was specified in the binding */
         else
-            corner = pick_corner(data->x, data->y,
+            corner = pick_corner(data->pointer_x, data->pointer_y,
                                  c->frame->area.x, c->frame->area.y,
                                  /* use the client size because the frame
                                     can be differently sized (shaded
@@ -88,7 +88,8 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
                                  c->area.height + c->frame->size.top +
                                  c->frame->size.bottom, c->shaded);
 
-        moveresize_start(c, data->x, data->y, data->button, corner);
+        moveresize_start(c, data->pointer_x, data->pointer_y,
+                         data->pointer_button, corner);
     }
 
     return FALSE;

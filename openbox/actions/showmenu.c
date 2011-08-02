@@ -44,8 +44,9 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
     Options *o = options;
 
     /* you cannot call ShowMenu from inside a menu */
-    if (data->uact != OB_USER_ACTION_MENU_SELECTION && o->name)
-        menu_show(o->name, data->x, data->y, data->button != 0, data->client);
+    if (data->user_act != OB_USER_ACTION_MENU_SELECTION && o->name)
+        menu_show(o->name, data->pointer_x, data->pointer_y,
+                  data->pointer_button != 0, data->target);
 
     return FALSE;
 }

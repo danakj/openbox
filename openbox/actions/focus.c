@@ -48,25 +48,26 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
+    if (data->target) {
 /*
         ob_debug("button %d focusable %d context %d %d %d\n",
                  data->button, client_mouse_focusable(data->client),
                  data->context,
                  OB_FRAME_CONTEXT_CLIENT, OB_FRAME_CONTEXT_FRAME);
 */
-        if (data->button == 0 || client_mouse_focusable(data->client) ||
-            (data->context != OB_FRAME_CONTEXT_CLIENT &&
-             data->context != OB_FRAME_CONTEXT_FRAME))
+        if (data->pointer_button == 0 ||
+            client_mouse_focusable(data->target) ||
+            (data->pointer_context != OB_FRAME_CONTEXT_CLIENT &&
+             data->pointer_context != OB_FRAME_CONTEXT_FRAME))
         {
             if (o->stop_int)
                 action_interactive_cancel_act();
 
             action_client_move(data, TRUE);
-            client_activate(data->client, TRUE, o->here, FALSE, FALSE, TRUE);
+            client_activate(data->target, TRUE, o->here, FALSE, FALSE, TRUE);
             action_client_move(data, FALSE);
         }
-    } else if (data->context == OB_FRAME_CONTEXT_DESKTOP) {
+    } else if (data->pointer_context == OB_FRAME_CONTEXT_DESKTOP) {
         if (o->stop_int)
             action_interactive_cancel_act();
 

@@ -13,7 +13,7 @@ void action_unfocus_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client && data->client == focus_client)
+    if (data->target && data->target == focus_client)
         focus_fallback(FALSE, FALSE, TRUE, FALSE);
     return FALSE;
 }

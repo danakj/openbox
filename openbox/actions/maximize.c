@@ -61,9 +61,9 @@ static void free_func(gpointer o)
 static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_maximize(data->client, TRUE, o->dir);
+        client_maximize(data->target, TRUE, o->dir);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -73,9 +73,9 @@ static gboolean run_func_on(const ObActionListRun *data, gpointer options)
 static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_maximize(data->client, FALSE, o->dir);
+        client_maximize(data->target, FALSE, o->dir);
         action_client_move(data, FALSE);
     }
     return FALSE;
@@ -85,14 +85,14 @@ static gboolean run_func_off(const ObActionListRun *data, gpointer options)
 static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
-    if (data->client) {
+    if (data->target) {
         gboolean toggle;
         action_client_move(data, TRUE);
-        toggle = ((o->dir == HORZ && !data->client->max_horz) ||
-                  (o->dir == VERT && !data->client->max_vert) ||
+        toggle = ((o->dir == HORZ && !data->target->max_horz) ||
+                  (o->dir == VERT && !data->target->max_vert) ||
                   (o->dir == BOTH &&
-                   !(data->client->max_horz && data->client->max_vert)));
-        client_maximize(data->client, toggle, o->dir);
+                   !(data->target->max_horz && data->target->max_vert)));
+        client_maximize(data->target, toggle, o->dir);
         action_client_move(data, FALSE);
     }
     return FALSE;

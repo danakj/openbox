@@ -13,9 +13,9 @@ void action_iconify_startup(void)
 /* Always return FALSE because its not interactive */
 static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
-    if (data->client) {
+    if (data->target) {
         action_client_move(data, TRUE);
-        client_iconify(data->client, TRUE, TRUE, FALSE);
+        client_iconify(data->target, TRUE, TRUE, FALSE);
         action_client_move(data, FALSE);
     }
 

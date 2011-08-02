@@ -60,8 +60,8 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
-        ObClient *c = data->client;
+    if (data->target) {
+        ObClient *c = data->target;
         gint x, y, ow, xoff, nw, oh, yoff, nh, lw, lh;
         gint left = o->left, right = o->right, top = o->top, bottom = o->bottom;
 

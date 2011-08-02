@@ -89,13 +89,13 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
+    if (data->target) {
         Rect *area, *carea;
         ObClient *c;
         guint mon, cmon;
         gint x, y, lw, lh, w, h;
 
-        c = data->client;
+        c = data->target;
         mon = o->monitor;
         cmon = client_monitor(c);
         switch (mon) {

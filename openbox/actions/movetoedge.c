@@ -59,13 +59,13 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
+    if (data->target) {
         gint x, y;
 
-        client_find_move_directional(data->client, o->dir, &x, &y);
-        if (x != data->client->area.x || y != data->client->area.y) {
+        client_find_move_directional(data->target, o->dir, &x, &y);
+        if (x != data->target->area.x || y != data->target->area.y) {
             action_client_move(data, TRUE);
-            client_move(data->client, x, y);
+            client_move(data->target, x, y);
             action_client_move(data, FALSE);
         }
     }

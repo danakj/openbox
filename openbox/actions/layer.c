@@ -74,8 +74,8 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 
-    if (data->client) {
-        ObClient *c = data->client;
+    if (data->target) {
+        ObClient *c = data->target;
 
         action_client_move(data, TRUE);
 

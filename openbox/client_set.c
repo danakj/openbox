@@ -163,6 +163,12 @@ static gboolean foreach_reduce(gpointer k, gpointer v, gpointer u)
     return d->f(c, d->data);
 }
 
+static gboolean func_invert(struct _ObClient *c, gpointer data)
+{
+    struct ObClientSetForeachReduce *d = data;
+    return !d->f(c, d->data);
+}
+
 ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
                                gpointer data)
 {
@@ -170,6 +176,22 @@ ObClientSet* client_set_reduce(ObClientSet *set, ObClientSetReduceFunc f,
 
     g_return_val_if_fail(set != NULL, NULL);
     g_return_val_if_fail(f != NULL, NULL);
+
+    if (set->all) {
+        struct ObClientSetForeachReduce *d;
+
+        /* use set expansion on an empty set rather than building a full set
+           and then removing stuff.  but we're given a reduce function.
+           so when reduce says TRUE, we want to add (expand) it.
+           we use func_invert() to do this.
+        */
+        set->all = FALSE; /* make it empty */
+        d.f = f;
+        d.data = data;
+        return client_set_expand(set, func_invert, &d);
+    }
+
+    if (!set->h) return set; /* already empty */
 
     d.f = f;
     d.data = data;
@@ -185,10 +207,14 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
                                gpointer data)
 {
     GList *it;
+    gint avail;
 
     g_return_val_if_fail(set != NULL, NULL);
     g_return_val_if_fail(f != NULL, NULL);
 
+    if (set->all) return set; /* already full */
+
+    avail = 0;
     for (it = client_list; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         if (!set->h || !g_hash_table_lookup(set->h, &c->window))
@@ -197,6 +223,12 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
                     set->h = g_hash_table_new(g_int_hash, g_int_equal);
                 g_hash_table_insert(set->h, &c->window, c);
             }
+        ++avail;
+    }
+    if (g_hash_table_size(set->h) == avail) {
+        g_hash_table_destroy(set->h);
+        set->h = NULL;
+        set->all = TRUE;
     }
     return set;
 }

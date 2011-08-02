@@ -30,7 +30,7 @@ ObClientSet* client_set_empty(void);
 /*! Returns a new set of clients with a single client in it.
   The client is the currently targeted window. */
 ObClientSet* client_set_single(void);
-/*! Returns a new set of clients with all possible client in it.*/
+/*! Returns a new set of clients with all possible clients in it. */
 ObClientSet* client_set_all(void);
 
 void client_set_destroy(ObClientSet *set);

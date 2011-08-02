@@ -75,11 +75,12 @@ void prompt_startup(gboolean reconfig)
 
 void prompt_shutdown(gboolean reconfig)
 {
-    GList *it;
+    GList *it, *next;
 
     if (!reconfig) {
-        for (it = prompt_list; it; it = g_list_next(it)) {
+        for (it = prompt_list; it; it = next) {
             ObPrompt *p = it->data;
+            next = it->next;
             if (p->cleanup) p->cleanup(p, p->data);
         }
 

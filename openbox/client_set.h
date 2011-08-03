@@ -89,3 +89,12 @@ void client_set_foreach(const ObClientSet *set, ObClientSetForeachFunc func,
   @data to the function along with the client. */
 void client_set_run(const ObClientSet *set, const struct _ObActionListRun *run,
                     ObClientSetRunFunc func, gpointer data);
+
+/*! Returns the size of the set.
+  In the special case where the set contains all windows, it returns
+  (unsigned)-1.  Otherwise it returns the number of windows in the set.
+*/
+guint client_set_size(const ObClientSet *set);
+
+/*! Returns a list of all clients in the set. */
+GList *client_set_get_all(const ObClientSet *set);

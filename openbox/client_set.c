@@ -88,7 +88,7 @@ static void foreach_clone(gpointer k, gpointer v, gpointer u)
     g_hash_table_insert(seth, &c->window, c);
 }
 
-ObClientSet* client_set_clone(ObClientSet *a)
+ObClientSet* client_set_clone(const ObClientSet *a)
 {
     ObClientSet *set;
 
@@ -306,21 +306,84 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
     return set;
 }
 
-gboolean client_set_is_empty(ObClientSet *set)
+gboolean client_set_is_empty(const ObClientSet *set)
 {
     if (set->all) return client_list == NULL;
     else return set->h == NULL;
 }
 
-gboolean client_set_test_boolean(ObClientSet *set)
+gboolean client_set_test_boolean(const ObClientSet *set)
 {
     if (set->all) return TRUE;
     else return set->h != NULL;
 }
 
-gboolean client_set_contains(ObClientSet *set, struct _ObClient *c)
+gboolean client_set_contains(const ObClientSet *set, struct _ObClient *c)
 {
     if (set->all) return TRUE;
     if (!set->h) return FALSE;
     return g_hash_table_lookup(set->h, &c->window) != NULL;
+}
+
+typedef struct {
+    union {
+        ObClientSetForeachFunc foreach;
+        ObClientSetRunFunc run;
+    } func;
+    const struct _ObActionListRun *run;
+    gpointer data;
+    gboolean running;
+} ObClientSetForeachData;
+
+void foreach_func(gpointer k, gpointer v, gpointer u)
+{
+    const ObClientSetForeachData *const d = u;
+    if (!d->runnig) return;
+    d->runnig = d->func.foreach((ObClient*)v, d->data);
+}
+
+void client_set_foreach(const ObClientSet *set, ObClientSetForeachFunc func,
+                        gpointer data)
+{
+    g_return_if_fail(set != NULL);
+
+    if (set->all) {
+        GList *it;
+        for (it = client_list; it; it = g_list_next(it))
+            func(it->data, data);
+    }
+    else if (set->h) {
+        ObClientSetForeachData d;
+        d.func.foreach = func;
+        d.data = data;
+        d.running = TRUE;
+        g_hash_table_foreach(set->h, foreach_func, &d);
+    }
+}
+
+void run_func(gpointer k, gpointer v, gpointer u)
+{
+    const ObClientSetForeachData *const d = u;
+    if (!d->running) return;
+    d->running = d->func.run((ObClient*)v, d->run, d->data);
+}
+
+void client_set_run(const ObClientSet *set, const struct _ObActionListRun *run,
+                    ObClientSetRunFunc func, gpointer data)
+{
+    g_return_if_fail(set != NULL);
+
+    if (set->all) {
+        GList *it;
+        for (it = client_list; it; it = g_list_next(it))
+            func(run, it->data, data);
+    }
+    else if (set->h) {
+        ObClientSetForeachData d;
+        d.func.run = func;
+        d.data = data;
+        d.run = run;
+        d.running = FALSE;
+        g_hash_table_foreach(set->h, run_func, &d);
+    }
 }

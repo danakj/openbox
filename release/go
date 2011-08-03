@@ -28,6 +28,11 @@ echo -n "ok? (y/n) "
 read a
 test "$a" = "y" || error "aborted"
 
+#### TEST english po VERSIONS ####
+
+BAD_PO="$(grep Project-Id-Version po/en*.po|grep -v "openbox $VERSION\\\\n")"
+test -z "$BAD_PO" || error "wrong version in po files" "$BAD_PO"
+
 #### TEST COMPILATION ####
 
 # check that it builds

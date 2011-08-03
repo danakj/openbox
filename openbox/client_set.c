@@ -320,6 +320,7 @@ gboolean client_set_test_boolean(const ObClientSet *set)
 
 gboolean client_set_contains(const ObClientSet *set, struct _ObClient *c)
 {
+    if (!c) return FALSE;
     if (set->all) return TRUE;
     if (!set->h) return FALSE;
     return g_hash_table_lookup(set->h, &c->window) != NULL;
@@ -337,9 +338,9 @@ typedef struct {
 
 void foreach_func(gpointer k, gpointer v, gpointer u)
 {
-    const ObClientSetForeachData *const d = u;
-    if (!d->runnig) return;
-    d->runnig = d->func.foreach((ObClient*)v, d->data);
+    ObClientSetForeachData *const d = u;
+    if (!d->running) return;
+    d->running = d->func.foreach((ObClient*)v, d->data);
 }
 
 void client_set_foreach(const ObClientSet *set, ObClientSetForeachFunc func,
@@ -363,7 +364,7 @@ void client_set_foreach(const ObClientSet *set, ObClientSetForeachFunc func,
 
 void run_func(gpointer k, gpointer v, gpointer u)
 {
-    const ObClientSetForeachData *const d = u;
+    ObClientSetForeachData *const d = u;
     if (!d->running) return;
     d->running = d->func.run((ObClient*)v, d->run, d->data);
 }
@@ -376,14 +377,34 @@ void client_set_run(const ObClientSet *set, const struct _ObActionListRun *run,
     if (set->all) {
         GList *it;
         for (it = client_list; it; it = g_list_next(it))
-            func(run, it->data, data);
+            func(it->data, run, data);
     }
     else if (set->h) {
         ObClientSetForeachData d;
         d.func.run = func;
         d.data = data;
         d.run = run;
-        d.running = FALSE;
+        d.running = TRUE;
         g_hash_table_foreach(set->h, run_func, &d);
     }
+}
+
+guint client_set_size(const ObClientSet *set)
+{
+    if (set->all)
+        return (unsigned)-1;
+    else if (!set->h)
+        return 0;
+    else
+        return g_hash_table_size(set->h);
+}
+
+GList *client_set_get_all(const ObClientSet *set)
+{
+    if (set->all)
+        return g_list_copy(client_list);
+    else if (!set->h)
+        return NULL;
+    else
+        return g_hash_table_get_values(set->h);
 }

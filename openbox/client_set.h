@@ -19,11 +19,16 @@
 #include <glib.h>
 
 struct _ObClient;
+struct _ObActionListRun;
 
 typedef struct _ObClientSet ObClientSet;
 
 typedef gboolean (*ObClientSetReduceFunc)(struct _ObClient *c, gpointer data);
 typedef gboolean (*ObClientSetExpandFunc)(struct _ObClient *c, gpointer data);
+typedef gboolean (*ObClientSetForeachFunc)(struct _ObClient *c, gpointer data);
+typedef gboolean (*ObClientSetRunFunc)(struct _ObClient *c,
+                                       const struct _ObActionListRun *run,
+                                       gpointer data);
 
 /*! Returns a new set of clients without anything in it. */
 ObClientSet* client_set_empty(void);
@@ -33,7 +38,7 @@ ObClientSet* client_set_single(struct _ObClient *c);
 ObClientSet* client_set_all(void);
 
 /*! Returns an identical set to @a. */
-ObClientSet* client_set_clone(ObClientSet *a);
+ObClientSet* client_set_clone(const ObClientSet *a);
 
 void client_set_destroy(ObClientSet *set);
 
@@ -65,12 +70,22 @@ ObClientSet* client_set_expand(ObClientSet *set, ObClientSetExpandFunc f,
                                gpointer data);
 
 /*! Returns TRUE if there is nothing in the set. */
-gboolean client_set_is_empty(ObClientSet *set);
+gboolean client_set_is_empty(const ObClientSet *set);
 
 /*! Returns TRUE if there is someting in the set, or if it is the special
   "ALL" set, which contains all clients.  Even when there are no clients
   present, this set returns TRUE. */
-gboolean client_set_test_boolean(ObClientSet *set);
+gboolean client_set_test_boolean(const ObClientSet *set);
 
 /*! Returns TRUE if @set contains @c. */
-gboolean client_set_contains(ObClientSet *set, struct _ObClient *c);
+gboolean client_set_contains(const ObClientSet *set, struct _ObClient *c);
+
+/*! Runs the given funcion on each client in the @set, passing the given
+  @data to the function along with the client. */
+void client_set_foreach(const ObClientSet *set, ObClientSetForeachFunc func,
+                        gpointer data);
+
+/*! Runs the given funcion on each client in the @set, passing the given
+  @data to the function along with the client. */
+void client_set_run(const ObClientSet *set, const struct _ObActionListRun *run,
+                    ObClientSetRunFunc func, gpointer data);

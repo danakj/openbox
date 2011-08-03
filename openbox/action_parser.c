@@ -174,7 +174,7 @@ ObActionList* parse_list(ObActionParser *p, GTokenType end, gboolean *e)
         else if (t == ';') {
             g_scanner_get_next_token(p->scan); /* separator */
         }
-        else if (t == G_TOKEN_IDENTIFIER) {
+        else if (t == G_TOKEN_IDENTIFIER || t == '[' || t == '{') {
             ObActionList *next;
 
             /* parse the next action and stick it on the end of the list */

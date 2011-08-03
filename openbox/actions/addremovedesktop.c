@@ -1,6 +1,7 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
+#include "openbox/client_set.h"
 #include "openbox/screen.h"
 #include <glib.h>
 
@@ -13,7 +14,8 @@ static gpointer setup_func(GHashTable *config);
 static gpointer setup_add_func(GHashTable *config);
 static gpointer setup_remove_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_addremovedesktop_startup(void)
 {
@@ -62,7 +64,8 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
 

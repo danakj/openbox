@@ -3,6 +3,7 @@
 #include "openbox/action_value.h"
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/frame.h"
 #include "obt/prop.h"
 
@@ -13,7 +14,8 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
                            gboolean shaded);
@@ -64,34 +66,39 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
+    GList *list;
+    struct _ObClient *c;
+    guint32 corner;
 
-    if (data->target) {
-        ObClient *c = data->target;
-        guint32 corner;
+    /* only works on a single client */
+    if (client_set_size(set) != 1) return FALSE;
 
-        if (!data->pointer_button)
-            corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
-        else if (o->corner_specified)
-            corner = o->corner; /* it was specified in the binding */
-        else
-            corner = pick_corner(data->pointer_x, data->pointer_y,
-                                 c->frame->area.x, c->frame->area.y,
-                                 /* use the client size because the frame
-                                    can be differently sized (shaded
-                                    windows) and we want this based on the
-                                    clients size */
-                                 c->area.width + c->frame->size.left +
-                                 c->frame->size.right,
-                                 c->area.height + c->frame->size.top +
-                                 c->frame->size.bottom, c->shaded);
+    list = client_set_get_all(set);
+    c = list->data;
+    g_list_free(list);
 
-        moveresize_start(c, data->pointer_x, data->pointer_y,
-                         data->pointer_button, corner);
-    }
+    if (!data->pointer_button)
+        corner = OBT_PROP_ATOM(NET_WM_MOVERESIZE_SIZE_KEYBOARD);
+    else if (o->corner_specified)
+        corner = o->corner; /* it was specified in the binding */
+    else
+        corner = pick_corner(data->pointer_x, data->pointer_y,
+                             c->frame->area.x, c->frame->area.y,
+                             /* use the client size because the frame
+                                can be differently sized (shaded
+                                windows) and we want this based on the
+                                clients size */
+                             c->area.width + c->frame->size.left +
+                             c->frame->size.right,
+                             c->area.height + c->frame->size.top +
+                             c->frame->size.bottom, c->shaded);
 
+    moveresize_start(c, data->pointer_x, data->pointer_y,
+                     data->pointer_button, corner);
     return FALSE;
 }
 

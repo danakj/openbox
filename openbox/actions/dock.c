@@ -1,11 +1,14 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
 #include "openbox/dock.h"
 
-static gboolean raise_func(const ObActionListRun *data, gpointer options);
-static gboolean lower_func(const ObActionListRun *data, gpointer options);
+static gboolean raise_func(const ObClientSet *set,
+                           const ObActionListRun *data, gpointer options);
+static gboolean lower_func(const ObClientSet *set,
+                           const ObActionListRun *data, gpointer options);
 
 void action_dock_startup(void)
 {
@@ -16,7 +19,8 @@ void action_dock_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean raise_func(const ObActionListRun *data, gpointer options)
+static gboolean raise_func(const ObClientSet *set,
+                           const ObActionListRun *data, gpointer options)
 {
     action_client_move(data, TRUE);
     dock_raise_dock();
@@ -26,7 +30,8 @@ static gboolean raise_func(const ObActionListRun *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean lower_func(const ObActionListRun *data, gpointer options)
+static gboolean lower_func(const ObClientSet *set,
+                           const ObActionListRun *data, gpointer options)
 {
     action_client_move(data, TRUE);
     dock_lower_dock();

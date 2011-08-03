@@ -3,6 +3,7 @@
 #include "openbox/action_list_run.h"
 #include "openbox/action_parser.h"
 #include "openbox/action_value.h"
+#include "openbox/client_set.h"
 #include "openbox/event.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
@@ -33,7 +34,8 @@ static gpointer setup_cycle_func(GHashTable *config,
                                  ObActionIPostFunc *post);
 static gpointer setup_target_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
                              ObtIC *ic,
@@ -145,9 +147,12 @@ static void free_func(gpointer options)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
+
+    if (client_set_is_empty(set)) return FALSE;
 
     if (!o->interactive)
         end_cycle(FALSE, data->mod_state, o);
@@ -155,6 +160,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
         struct _ObClient *ft;
 
         ft = focus_directional_cycle(o->direction,
+                                     set,
                                      o->dock_windows,
                                      o->desktop_windows,
                                      TRUE,
@@ -223,6 +229,7 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
     struct _ObClient *ft;
 
     ft = focus_directional_cycle(o->direction,
+                                 NULL,
                                  o->dock_windows,
                                  o->desktop_windows,
                                  o->interactive,

@@ -20,6 +20,7 @@
 #include "focus_cycle.h"
 #include "focus_cycle_indicator.h"
 #include "client.h"
+#include "client_set.h"
 #include "frame.h"
 #include "focus.h"
 #include "screen.h"
@@ -36,16 +37,16 @@ typedef enum {
 } ObCycleType;
 
 ObClient       *focus_cycle_target = NULL;
+ObClientSet    *focus_cycle_set = NULL;
 static ObCycleType focus_cycle_type = OB_CYCLE_NONE;
 static gboolean focus_cycle_linear;
 static gboolean focus_cycle_iconic_windows;
-static gboolean focus_cycle_all_desktops;
-static gboolean focus_cycle_nonhilite_windows;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
 
 static ObClient *focus_find_directional(ObClient *c,
                                         ObDirection dir,
+                                        const ObClientSet *set,
                                         gboolean dock_windows,
                                         gboolean desktop_windows);
 
@@ -66,7 +67,8 @@ void focus_cycle_addremove(ObClient *c, gboolean redraw)
 
     if (focus_cycle_type == OB_CYCLE_DIRECTIONAL) {
         if (c && focus_cycle_target == c) {
-            focus_directional_cycle(0, TRUE, TRUE, TRUE, TRUE,
+            /* cancel it */
+            focus_directional_cycle(0, NULL, TRUE, TRUE, TRUE, TRUE,
                                     TRUE, TRUE, TRUE);
         }
     }
@@ -87,19 +89,19 @@ void focus_cycle_addremove(ObClient *c, gboolean redraw)
 void focus_cycle_reorder()
 {
     if (focus_cycle_type == OB_CYCLE_NORMAL) {
-        focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_target,
+        focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_set,
+                                                       focus_cycle_target,
                                                        TRUE,
                                                        focus_cycle_linear);
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
-            focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+            focus_cycle(NULL, TRUE, TRUE, TRUE, TRUE,
                         TRUE, TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
                         TRUE, TRUE);
     }
 }
 
-ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
-                      gboolean nonhilite_windows,
+ObClient* focus_cycle(const ObClientSet *set, gboolean forward,
                       gboolean dock_windows, gboolean desktop_windows,
                       gboolean linear, gboolean interactive,
                       gboolean showbar, ObFocusCyclePopupMode mode,
@@ -129,10 +131,9 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     }
 
     if (focus_cycle_target == NULL) {
+        focus_cycle_set = client_set_clone(set);
         focus_cycle_linear = linear;
         focus_cycle_iconic_windows = TRUE;
-        focus_cycle_all_desktops = all_desktops;
-        focus_cycle_nonhilite_windows = nonhilite_windows;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
         start = it = g_list_find(list, focus_client);
@@ -160,7 +161,8 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                     focus_cycle_draw_indicator(showbar ? ft : NULL);
                 }
                 /* same arguments as focus_target_valid */
-                focus_cycle_popup_show(ft, mode, focus_cycle_linear);
+                focus_cycle_popup_show(focus_cycle_set, ft, mode,
+                                       focus_cycle_linear);
                 return focus_cycle_target;
             } else if (ft != focus_cycle_target) {
                 focus_cycle_target = ft;
@@ -175,6 +177,8 @@ done_cycle:
     if (done && !cancel) ret = focus_cycle_target;
 
     focus_cycle_target = NULL;
+    client_set_destroy(focus_cycle_set);
+    focus_cycle_set = NULL;
     focus_cycle_type = OB_CYCLE_NONE;
     g_list_free(order);
     order = NULL;
@@ -189,6 +193,7 @@ done_cycle:
 
 /* this be mostly ripped from fvwm */
 static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
+                                        const ObClientSet *set,
                                         gboolean dock_windows,
                                         gboolean desktop_windows)
 {
@@ -282,7 +287,8 @@ static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
     return best_client;
 }
 
-ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
+ObClient* focus_directional_cycle(ObDirection dir, const ObClientSet *set,
+                                  gboolean dock_windows,
                                   gboolean desktop_windows,
                                   gboolean interactive,
                                   gboolean showbar, gboolean dialog,
@@ -302,10 +308,9 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         goto done_cycle;
 
     if (focus_cycle_target == NULL) {
+        focus_cycle_set = client_set_clone(set);
         focus_cycle_linear = FALSE;
         focus_cycle_iconic_windows = FALSE;
-        focus_cycle_all_desktops = FALSE;
-        focus_cycle_nonhilite_windows = TRUE;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
     }
@@ -313,10 +318,11 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!first) first = focus_client;
 
     if (focus_cycle_target)
-        ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
+        ft = focus_find_directional(focus_cycle_target, dir, set, dock_windows,
                                     desktop_windows);
     else if (first)
-        ft = focus_find_directional(first, dir, dock_windows, desktop_windows);
+        ft = focus_find_directional(first, dir, set, dock_windows,
+                                    desktop_windows);
     else {
         GList *it;
 
@@ -344,6 +350,8 @@ done_cycle:
 
     first = NULL;
     focus_cycle_target = NULL;
+    client_set_destroy(focus_cycle_set);
+    focus_cycle_set = NULL;
     focus_cycle_type = OB_CYCLE_NONE;
 
     focus_cycle_draw_indicator(NULL);
@@ -354,11 +362,13 @@ done_cycle:
 
 gboolean focus_cycle_valid(struct _ObClient *client)
 {
-    return focus_valid_target(client, screen_desktop, TRUE,
-                              focus_cycle_iconic_windows,
-                              focus_cycle_all_desktops,
-                              focus_cycle_nonhilite_windows,
-                              focus_cycle_dock_windows,
-                              focus_cycle_desktop_windows,
-                              FALSE);
+    return
+        client_set_contains(focus_cycle_set, client) &&
+        focus_valid_target(client, screen_desktop, TRUE,
+                           focus_cycle_iconic_windows,
+                           TRUE, /* all desktops */
+                           TRUE, /* non-hilite windows */
+                           focus_cycle_dock_windows,
+                           focus_cycle_desktop_windows,
+                           FALSE);
 }

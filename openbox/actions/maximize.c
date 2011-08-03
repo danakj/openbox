@@ -2,6 +2,7 @@
 #include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 
 /* These match the values for client_maximize */
 typedef enum {
@@ -16,9 +17,12 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func_on(const ObActionListRun *data, gpointer options);
-static gboolean run_func_off(const ObActionListRun *data, gpointer options);
-static gboolean run_func_toggle(const ObActionListRun *data, gpointer options);
+static gboolean run_func_on(const ObClientSet *set,
+                            const ObActionListRun *data, gpointer options);
+static gboolean run_func_off(const ObClientSet *set,
+                             const ObActionListRun *data, gpointer options);
+static gboolean run_func_toggle(const ObClientSet *set,
+                                const ObActionListRun *data, gpointer options);
 
 void action_maximize_startup(void)
 {
@@ -57,8 +61,8 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func_on(const ObActionListRun *data, gpointer options)
+static gboolean each_on(ObClient *c, const ObActionListRun *data,
+                        gpointer options)
 {
     Options *o = options;
     if (data->target) {
@@ -66,11 +70,23 @@ static gboolean run_func_on(const ObActionListRun *data, gpointer options)
         client_maximize(data->target, TRUE, o->dir);
         action_client_move(data, FALSE);
     }
-    return FALSE;
+    return TRUE;
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_off(const ObActionListRun *data, gpointer options)
+static gboolean run_func_on(const ObClientSet *set,
+                            const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
+        action_client_move(data, TRUE);
+        client_set_run(set, data, each_on, options);
+        action_client_move(data, FALSE);
+    }
+    return FALSE;
+}
+
+static gboolean each_off(ObClient *c, const ObActionListRun *data,
+                         gpointer options)
 {
     Options *o = options;
     if (data->target) {
@@ -78,21 +94,41 @@ static gboolean run_func_off(const ObActionListRun *data, gpointer options)
         client_maximize(data->target, FALSE, o->dir);
         action_client_move(data, FALSE);
     }
-    return FALSE;
+    return TRUE;
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_toggle(const ObActionListRun *data, gpointer options)
+static gboolean run_func_off(const ObClientSet *set,
+                             const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
+        action_client_move(data, TRUE);
+        client_set_run(set, data, each_off, options);
+        action_client_move(data, FALSE);
+    }
+    return FALSE;
+}
+
+static gboolean each_toggle(ObClient *c, const ObActionListRun *data,
+                            gpointer options)
 {
     Options *o = options;
-    if (data->target) {
-        gboolean toggle;
+    gboolean toggle;
+    toggle = ((o->dir == HORZ && !data->target->max_horz) ||
+              (o->dir == VERT && !data->target->max_vert) ||
+              (o->dir == BOTH &&
+               !(data->target->max_horz && data->target->max_vert)));
+    client_maximize(data->target, toggle, o->dir);
+    return TRUE;
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean run_func_toggle(const ObClientSet *set,
+                                const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
         action_client_move(data, TRUE);
-        toggle = ((o->dir == HORZ && !data->target->max_horz) ||
-                  (o->dir == VERT && !data->target->max_vert) ||
-                  (o->dir == BOTH &&
-                   !(data->target->max_horz && data->target->max_vert)));
-        client_maximize(data->target, toggle, o->dir);
+        client_set_run(set, data, each_toggle, options);
         action_client_move(data, FALSE);
     }
     return FALSE;

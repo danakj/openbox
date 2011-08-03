@@ -1,11 +1,12 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
-#include "openbox/event.h"
-#include "openbox/startupnotify.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
+#include "openbox/event.h"
 #include "openbox/prompt.h"
 #include "openbox/screen.h"
+#include "openbox/startupnotify.h"
 #include "obt/paths.h"
 #include "gettext.h"
 
@@ -20,12 +21,16 @@ typedef struct {
     gchar   *sn_icon;
     gchar   *sn_wmclass;
     gchar   *prompt;
+
+    /* for the prompt callback */
     ObActionListRun *data;
+    ObClientSet *set;
 } Options;
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 static void shutdown_func(void);
 static void client_dest(ObClient *client, gpointer data);
 
@@ -99,12 +104,14 @@ static void free_func(gpointer options)
         g_free(o->sn_icon);
         g_free(o->sn_wmclass);
         g_free(o->prompt);
+        if (o->set) client_set_destroy(o->set);
         if (o->data) g_slice_free(ObActionListRun, o->data);
         g_slice_free(Options, o);
     }
 }
 
-static Options* dup_options(Options *in, const ObActionListRun *data)
+static Options* dup_options(Options *in, const ObClientSet *set,
+                            const ObActionListRun *data)
 {
     Options *o = g_slice_new(Options);
     o->cmd = g_strdup(in->cmd);
@@ -113,50 +120,19 @@ static Options* dup_options(Options *in, const ObActionListRun *data)
     o->sn_icon = g_strdup(in->sn_icon);
     o->sn_wmclass = g_strdup(in->sn_wmclass);
     o->prompt = NULL;
+    o->set = client_set_clone(set);
     o->data = g_slice_new(ObActionListRun);
     memcpy(o->data, data, sizeof(ObActionListRun));
     return o;
 }
 
-static gboolean prompt_cb(ObPrompt *p, gint result, gpointer options)
+static gboolean do_execute_each(ObClient *client,
+                                const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
-    if (result)
-        run_func(o->data, o);
-    return TRUE; /* call the cleanup func */
-}
-
-static void prompt_cleanup(ObPrompt *p, gpointer options)
-{
-    prompt_unref(p);
-    free_func(options);
-}
-
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
-{
     GError *e;
     gchar **argv = NULL;
     gchar *cmd;
-    Options *o = options;
-
-    if (!o->cmd) return FALSE;
-
-    if (o->prompt) {
-        ObPrompt *p;
-        Options *ocp;
-        ObPromptAnswer answers[] = {
-            { _("No"), 0 },
-            { _("Yes"), 1 }
-        };
-
-        ocp = dup_options(options, data);
-        p = prompt_new(o->prompt, _("Execute"), answers, 2, 0, 0,
-                       prompt_cb, prompt_cleanup, ocp);
-        prompt_show(p, NULL, FALSE);
-
-        return FALSE;
-    }
 
     cmd = g_filename_from_utf8(o->cmd, -1, NULL, NULL, NULL);
     if (!cmd) {
@@ -164,7 +140,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
         return FALSE;
     }
 
-    if (data->target) {
+    if (client) {
         gchar *c, *before, *expand;
 
         /* replace occurrences of $pid and $wid */
@@ -186,7 +162,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
                 expand = g_strdup_printf("%s%s%u",
                                          (expand ? expand : ""),
                                          before,
-                                         data->target->pid);
+                                         client->pid);
                 g_free(tmp);
 
                 before = c + 4; /* 4 = strlen("$pid") */
@@ -204,7 +180,7 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
                 expand = g_strdup_printf("%s%s%lu",
                                          (expand ? expand : ""),
                                          before,
-                                         data->target->window);
+                                         client->window);
                 g_free(tmp);
 
                 before = c + 4; /* 4 = strlen("$wid") */
@@ -271,5 +247,57 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
 
     g_free(cmd);
 
+    return TRUE;
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean do_execute(const ObClientSet *set,
+                           const ObActionListRun *data, gpointer options)
+{
+    if (client_set_is_empty(set))
+        do_execute_each(NULL, data, options);
+    else
+        client_set_run(set, data, do_execute_each, options);
     return FALSE;
+}
+
+static gboolean prompt_cb(ObPrompt *p, gint result, gpointer options)
+{
+    Options *o = options;
+    if (result)
+        run_func(o->set, o->data, o);
+    return TRUE; /* call the cleanup func */
+}
+
+static void prompt_cleanup(ObPrompt *p, gpointer options)
+{
+    prompt_unref(p);
+    free_func(options);
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    Options *o = options;
+
+    if (!o->cmd) return FALSE;
+
+    if (o->prompt) {
+        ObPrompt *p;
+        Options *ocp;
+        ObPromptAnswer answers[] = {
+            { _("No"), 0 },
+            { _("Yes"), 1 }
+        };
+
+        ocp = dup_options(options, set, data);
+        p = prompt_new(o->prompt, _("Execute"), answers, 2, 0, 0,
+                       prompt_cb, prompt_cleanup, ocp);
+        prompt_show(p, NULL, FALSE);
+
+        return FALSE;
+    }
+
+    return do_execute(set, data, options);
 }

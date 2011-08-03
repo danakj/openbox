@@ -280,6 +280,9 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
        If the action is doing something to the currently focused window,
          then we want to update its user_time to indicate it was used by a
          human now.
+         - However, we only do this for non-interactive actions, as we expect
+           them to do their "thing" on every window in the set.  Interactive
+           actions generally let you choose one from a set to do stuff to.
     */
 
     run_i = FALSE;
@@ -304,15 +307,13 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
     if (run) {
         gboolean end;
 
-        /* XXX pass the set here */
-        end = !act->def->run(data, act->options);
+        end = !act->def->run(set, data, act->options);
         g_assert(end || action_is_interactive(act));
 
         if (end) {
             if (action_is_interactive(act))
                 action_interactive_end_act();
-            /* XXX else if (client_set_contains(focus_client)) */
-            else if (data->target && data->target == focus_client)
+            else if (client_set_contains(set, focus_client))
                 event_update_user_time();
         }
     }

@@ -1,8 +1,10 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 #include "openbox/focus.h"
 
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_unfocus_startup(void)
 {
@@ -11,9 +13,10 @@ void action_unfocus_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
-    if (data->target && data->target == focus_client)
+    if (focus_client && client_set_contains(set, focus_client))
         focus_fallback(FALSE, FALSE, TRUE, FALSE);
     return FALSE;
 }

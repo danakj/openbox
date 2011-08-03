@@ -3,6 +3,7 @@
 #include "openbox/action_list_run.h"
 #include "openbox/action_parser.h"
 #include "openbox/action_value.h"
+#include "openbox/client_set.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
 #include "openbox/event.h"
@@ -15,8 +16,6 @@ typedef struct {
     gboolean linear;
     gboolean dock_windows;
     gboolean desktop_windows;
-    gboolean only_hilite_windows;
-    gboolean all_desktops;
     gboolean forward;
     gboolean bar;
     gboolean raise;
@@ -45,7 +44,8 @@ static gpointer setup_backward_func(GHashTable *config,
                                     ObActionICancelFunc *c,
                                     ObActionIPostFunc *post);
 static void     free_func(gpointer options);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
                              ObtIC *ic,
@@ -95,15 +95,9 @@ static gpointer setup_func(GHashTable *config,
     v = g_hash_table_lookup(config, "panels");
     if (v && action_value_is_string(v))
         o->dock_windows = action_value_bool(v);
-    v = g_hash_table_lookup(config, "hilite");
-    if (v && action_value_is_string(v))
-        o->only_hilite_windows = action_value_bool(v);
     v = g_hash_table_lookup(config, "desktop");
     if (v && action_value_is_string(v))
         o->desktop_windows = action_value_bool(v);
-    v = g_hash_table_lookup(config, "allDesktops");
-    if (v && action_value_is_string(v))
-        o->all_desktops = action_value_bool(v);
 
     v = g_hash_table_lookup(config, "finalactions");
     if (v && action_value_is_action_list(v)) {
@@ -155,14 +149,16 @@ static void free_func(gpointer options)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     struct _ObClient *ft;
 
-    ft = focus_cycle(o->forward,
-                     o->all_desktops,
-                     !o->only_hilite_windows,
+    if (client_set_is_empty(set)) return FALSE;
+
+    ft = focus_cycle(set,
+                     o->forward,
                      o->dock_windows,
                      o->desktop_windows,
                      o->linear,
@@ -233,9 +229,8 @@ static void i_post_func(gpointer options)
     Options *o = options;
     struct _ObClient *ft;
 
-    ft = focus_cycle(o->forward,
-                     o->all_desktops,
-                     !o->only_hilite_windows,
+    ft = focus_cycle(NULL,
+                     o->forward,
                      o->dock_windows,
                      o->desktop_windows,
                      o->linear,

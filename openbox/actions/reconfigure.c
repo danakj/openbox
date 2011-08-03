@@ -1,8 +1,10 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 #include "openbox/openbox.h"
 
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_reconfigure_startup(void)
 {
@@ -11,7 +13,8 @@ void action_reconfigure_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     ob_reconfigure();
 

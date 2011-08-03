@@ -35,13 +35,15 @@ void focus_cycle_startup(gboolean reconfig);
 void focus_cycle_shutdown(gboolean reconfig);
 
 /*! Cycle focus amongst windows. */
-struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
-                              gboolean nonhilite_windows,
+struct _ObClient* focus_cycle(const struct _ObClientSet *set,
+                              gboolean forward,
                               gboolean dock_windows, gboolean desktop_windows,
                               gboolean linear, gboolean interactive,
                               gboolean showbar, ObFocusCyclePopupMode mode,
                               gboolean done, gboolean cancel);
+
 struct _ObClient* focus_directional_cycle(ObDirection dir,
+                                          const struct _ObClientSet *set,
                                           gboolean dock_windows,
                                           gboolean desktop_windows,
                                           gboolean interactive,

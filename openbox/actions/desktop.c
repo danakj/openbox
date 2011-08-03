@@ -3,6 +3,7 @@
 #include "openbox/action_value.h"
 #include "openbox/screen.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/openbox.h"
 #include "obt/keyboard.h"
 
@@ -29,6 +30,10 @@ typedef struct {
     gboolean send;
     gboolean follow;
     gboolean interactive;
+
+    /* for the foreach function */
+    guint d;
+    GSList *moved;
 } Options;
 
 static gpointer setup_go_func(GHashTable *config,
@@ -42,7 +47,8 @@ static gpointer setup_send_func(GHashTable *config,
                                 ObActionICancelFunc *cancel,
                                 ObActionIPostFunc *post);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 static gboolean i_pre_func(guint state, gpointer options);
 static gboolean i_input_func(guint initial_state,
@@ -179,7 +185,19 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_send(ObClient *c, const ObActionListRun *data,
+                          gpointer options)
+{
+    Options *o = options;
+    if (client_normal(c)) {
+        client_set_desktop(c, o->d, o->follow, FALSE);
+        o->moved = g_slist_prepend(o->moved, c);
+    }
+    return TRUE;
+}
+
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     guint d;
@@ -202,22 +220,28 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
         g_assert_not_reached();
     }
 
-    if (d < screen_num_desktops &&
-        (d != screen_desktop ||
-         (data->target && data->target->desktop != screen_desktop))) {
-        gboolean go = TRUE;
+    if (d < screen_num_desktops) {        
+        gboolean go;
+
+        go = TRUE;
+        o->d = d;
+        o->moved = NULL;
 
         action_client_move(data, TRUE);
-        if (o->send && data->target && client_normal(data->target)) {
-            client_set_desktop(data->target, d, o->follow, FALSE);
+        if (o->send) {
+            client_set_run(set, data, each_send, o);
             go = o->follow;
         }
 
         if (go) {
-            screen_set_desktop(d, TRUE);
-            if (data->target)
-                client_bring_helper_windows(data->target);
+            GSList *it;
+
+            if (d != screen_desktop)
+                screen_set_desktop(d, TRUE);
+            for (it = o->moved; it; it = g_slist_next(it))
+                client_bring_helper_windows(it->data);
         }
+        g_slist_free(o->moved);
 
         action_client_move(data, FALSE);
     }

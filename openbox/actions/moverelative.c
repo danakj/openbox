@@ -2,6 +2,7 @@
 #include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
 #include "openbox/config.h"
@@ -15,7 +16,8 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_moverelative_startup(void)
 {
@@ -45,38 +47,41 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_run(ObClient *c, const ObActionListRun *data,
+                         gpointer options)
 {
     Options *o = options;
+    gint x, y, lw, lh, w, h;
 
-    if (data->target) {
-        ObClient *c;
-        gint x, y, lw, lh, w, h;
+    x = o->x;
+    y = o->y;
+    if (o->x_denom || o->y_denom) {
+        const Rect *carea;
 
-        c = data->target;
-        x = o->x;
-        y = o->y;
-        if (o->x_denom || o->y_denom) {
-            const Rect *carea;
+        carea = screen_area(c->desktop, client_monitor(c), NULL);
+        if (o->x_denom)
+            x = (x * carea->width) / o->x_denom;
+        if (o->y_denom)
+            y = (y * carea->height) / o->y_denom;
+    }
+    x = c->area.x + x;
+    y = c->area.y + y;
+    w = c->area.width;
+    h = c->area.height;
+    client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
+    client_find_onscreen(c, &x, &y, w, h, FALSE);
+    client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
+    return TRUE;
+}
 
-            carea = screen_area(c->desktop, client_monitor(c), NULL);
-            if (o->x_denom)
-                x = (x * carea->width) / o->x_denom;
-            if (o->y_denom)
-                y = (y * carea->height) / o->y_denom;
-        }
-        x = c->area.x + x;
-        y = c->area.y + y;
-        w = c->area.width;
-        h = c->area.height;
-        client_try_configure(c, &x, &y, &w, &h, &lw, &lh, TRUE);
-        client_find_onscreen(c, &x, &y, w, h, FALSE);
-
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
         action_client_move(data, TRUE);
-        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
+        client_set_run(set, data, each_run, options);
         action_client_move(data, FALSE);
     }
-
     return FALSE;
 }

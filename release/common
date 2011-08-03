@@ -15,6 +15,7 @@ clean() {
 
 error() {
   echo "error: $1"
+  test -n "$2" && echo "$2"
   clean
   exit 1
 }
@@ -39,9 +40,10 @@ test $? = 0 || error "git-checkout failed"
 
 # get last release
 if test -z "$LAST"; then
-    LAST=$(git describe --match 'release-*' $REV)
-    test $? == 0 || \
+    LAST=$(git describe --match 'release-*' --abbrev=0 $REV)
+    test $? = 0 || \
 	error "unable to find last release"
+    echo "Using previous release as $LAST"
 fi
 
 H="$(head -1 CHANGELOG|cut -d: -f 1)"

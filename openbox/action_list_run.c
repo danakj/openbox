@@ -41,7 +41,6 @@ gboolean action_list_run(ObActionList *acts,
 {
     ObActionListRun action_data;
 
-    g_return_val_if_fail(acts != NULL, FALSE);
     if (acts == NULL) return FALSE;
 
     /* Don't save the initial mod state when running things from the menu */

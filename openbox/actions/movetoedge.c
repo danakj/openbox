@@ -3,6 +3,7 @@
 #include "openbox/action_value.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/frame.h"
 #include "openbox/geom.h"
 #include <glib.h>
@@ -13,7 +14,8 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_movetoedge_startup(void)
 {
@@ -54,21 +56,26 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_run(ObClient *c, const ObActionListRun *data,
+                         gpointer options)
 {
     Options *o = options;
+    gint x, y;
 
-    if (data->target) {
-        gint x, y;
+    client_find_move_directional(c, o->dir, &x, &y);
+    if (x != c->area.x || y != c->area.y)
+        client_move(c, x, y);
+    return TRUE;
+}
 
-        client_find_move_directional(data->target, o->dir, &x, &y);
-        if (x != data->target->area.x || y != data->target->area.y) {
-            action_client_move(data, TRUE);
-            client_move(data->target, x, y);
-            action_client_move(data, FALSE);
-        }
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
+        action_client_move(data, TRUE);
+        client_set_run(set, data, each_run, options);
+        action_client_move(data, FALSE);
     }
-
     return FALSE;
 }

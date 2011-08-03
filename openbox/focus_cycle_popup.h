@@ -21,6 +21,7 @@
 #define __focus_cycle_popup_h
 
 struct _ObClient;
+struct _ObClientSet;
 
 #include <glib.h>
 
@@ -33,8 +34,9 @@ typedef enum {
 void focus_cycle_popup_startup(gboolean reconfig);
 void focus_cycle_popup_shutdown(gboolean reconfig);
 
-void focus_cycle_popup_show(struct _ObClient *c, ObFocusCyclePopupMode mode,
-                            gboolean linear);
+void focus_cycle_popup_show(const struct _ObClientSet *set,
+                            struct _ObClient *c,
+                            ObFocusCyclePopupMode mode, gboolean linear);
 void focus_cycle_popup_hide(void);
 
 void focus_cycle_popup_single_show(struct _ObClient *c);
@@ -46,7 +48,8 @@ gboolean focus_cycle_popup_is_showing(struct _ObClient *c);
     the target given to the function is no longer valid, this will return
     a different target that is valid, and which should be considered the
     current focus cycling target. */
-struct _ObClient *focus_cycle_popup_refresh(struct _ObClient *target,
+struct _ObClient *focus_cycle_popup_refresh(const struct _ObClientSet *set,
+                                            struct _ObClient *target,
                                             gboolean redraw,
                                             gboolean linear);
 

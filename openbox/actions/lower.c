@@ -1,9 +1,11 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
+#include "openbox/client_set.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
 
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_lower_startup(void)
 {
@@ -11,12 +13,20 @@ void action_lower_startup(void)
                     NULL, NULL, run_func);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_run(struct _ObClient *c, const ObActionListRun *data,
+                         gpointer options)
 {
-    if (data->target) {
+    stacking_lower(CLIENT_AS_WINDOW(c));
+    return TRUE;
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
         action_client_move(data, TRUE);
-        stacking_lower(CLIENT_AS_WINDOW(data->target));
+        client_set_run(set, data, each_run, options);
         action_client_move(data, FALSE);
     }
 

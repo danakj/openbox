@@ -3,6 +3,7 @@
 #include "openbox/action_value.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/frame.h"
 #include "openbox/screen.h"
 #include <glib.h>
@@ -15,7 +16,8 @@ typedef struct {
 static gpointer setup_func(GHashTable *config);
 static gpointer setup_shrink_func(GHashTable *config);
 static void free_func(gpointer o);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_growtoedge_startup(void)
 {
@@ -81,9 +83,7 @@ static gboolean do_grow(const ObActionListRun *data, gint x, gint y, gint w, gin
         realw != data->target->area.width ||
         realh != data->target->area.height)
     {
-        action_client_move(data, TRUE);
         client_move_resize(data->target, x, y, realw, realh);
-        action_client_move(data, FALSE);
         return TRUE;
     }
     return FALSE;
@@ -94,28 +94,27 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_run(ObClient *c,
+                         const ObActionListRun *data, gpointer options)
 {
     Options *o = options;
     gint x, y, w, h;
     ObDirection opp;
     gint half;
 
-    if (!data->target ||
+    if (!c ||
         /* don't allow vertical resize if shaded */
         ((o->dir == OB_DIRECTION_NORTH || o->dir == OB_DIRECTION_SOUTH) &&
-         data->target->shaded))
+         c->shaded))
     {
-        return FALSE;
+        return TRUE;
     }
 
     if (!o->shrink) {
         /* try grow */
-        client_find_resize_directional(data->target, o->dir, TRUE,
-                                       &x, &y, &w, &h);
+        client_find_resize_directional(c, o->dir, TRUE, &x, &y, &w, &h);
         if (do_grow(data, x, y, w, h))
-            return FALSE;
+            return TRUE;
     }
 
     /* we couldn't grow, so try shrink! */
@@ -123,37 +122,48 @@ static gboolean run_func(const ObActionListRun *data, gpointer options)
            (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :
             (o->dir == OB_DIRECTION_EAST ? OB_DIRECTION_WEST :
              OB_DIRECTION_EAST)));
-    client_find_resize_directional(data->target, opp, FALSE,
-                                   &x, &y, &w, &h);
+    client_find_resize_directional(c, opp, FALSE, &x, &y, &w, &h);
     switch (opp) {
     case OB_DIRECTION_NORTH:
-        half = data->target->area.y + data->target->area.height / 2;
+        half = c->area.y + c->area.height / 2;
         if (y > half) {
             h += y - half;
             y = half;
         }
         break;
     case OB_DIRECTION_SOUTH:
-        half = data->target->area.height / 2;
+        half = c->area.height / 2;
         if (h < half)
             h = half;
         break;
     case OB_DIRECTION_WEST:
-        half = data->target->area.x + data->target->area.width / 2;
+        half = c->area.x + c->area.width / 2;
         if (x > half) {
             w += x - half;
             x = half;
         }
         break;
     case OB_DIRECTION_EAST:
-        half = data->target->area.width / 2;
+        half = c->area.width / 2;
         if (w < half)
             w = half;
         break;
     default: g_assert_not_reached();
     }
     if (do_grow(data, x, y, w, h))
-        return FALSE;
+        return TRUE;
 
+    return TRUE;
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
+        action_client_move(data, TRUE);
+        client_set_run(set, data, each_run, options);
+        action_client_move(data, FALSE);
+    }
     return FALSE;
 }

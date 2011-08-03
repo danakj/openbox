@@ -33,7 +33,8 @@ typedef struct _ObAction             ObAction;
 typedef struct _ObActionData         ObActionData;
 
 typedef void     (*ObActionDataFreeFunc)(gpointer options);
-typedef gboolean (*ObActionRunFunc)(const struct _ObActionListRun *data,
+typedef gboolean (*ObActionRunFunc)(const struct _ObClientSet *set,
+                                    const struct _ObActionListRun *data,
                                     gpointer options);
 typedef gpointer (*ObActionDataSetupFunc)(GHashTable *config);
 typedef void     (*ObActionShutdownFunc)(void);

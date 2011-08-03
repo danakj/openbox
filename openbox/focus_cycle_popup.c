@@ -21,6 +21,7 @@
 #include "focus_cycle.h"
 #include "popup.h"
 #include "client.h"
+#include "client_set.h"
 #include "screen.h"
 #include "focus.h"
 #include "openbox.h"
@@ -101,6 +102,7 @@ static ObIconPopup *single_popup;
 
 static gchar   *popup_get_name (ObClient *c);
 static gboolean popup_setup    (ObFocusCyclePopup *p,
+                                const ObClientSet *set,
                                 gboolean create_targets,
                                 gboolean refresh_targets,
                                 gboolean linear);
@@ -250,8 +252,9 @@ static void popup_target_free(ObFocusCyclePopupTarget *t)
     g_slice_free(ObFocusCyclePopupTarget, t);
 }
 
-static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
-                            gboolean refresh_targets, gboolean linear)
+static gboolean popup_setup(ObFocusCyclePopup *p, const ObClientSet *set,
+                            gboolean create_targets, gboolean refresh_targets,
+                            gboolean linear)
 {
     gint maxwidth, n;
     GList *it;
@@ -286,7 +289,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
     {
         ObClient *ft = it->data;
 
-        if (focus_cycle_valid(ft)) {
+        if (client_set_contains(set, ft) && focus_cycle_valid(ft)) {
             GList *rit;
 
             /* reuse the target if possible during refresh */
@@ -704,8 +707,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
     XFlush(obt_display);
 }
 
-void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
-                            gboolean linear)
+void focus_cycle_popup_show(const ObClientSet *set, ObClient *c,
+                            ObFocusCyclePopupMode mode, gboolean linear)
 {
     g_assert(c != NULL);
 
@@ -716,7 +719,7 @@ void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped) {
-        popup_setup(&popup, TRUE, FALSE, linear);
+        popup_setup(&popup, set, TRUE, FALSE, linear);
         /* this is fixed once the dialog is shown */
         popup.mode = mode;
     }
@@ -822,7 +825,8 @@ static ObClient* popup_revert(ObClient *target)
     return NULL;
 }
 
-ObClient* focus_cycle_popup_refresh(ObClient *target,
+ObClient* focus_cycle_popup_refresh(const ObClientSet *set,
+                                    ObClient *target,
                                     gboolean redraw,
                                     gboolean linear)
 {
@@ -831,7 +835,7 @@ ObClient* focus_cycle_popup_refresh(ObClient *target,
     if (!focus_cycle_valid(target))
         target = popup_revert(target);
 
-    redraw = popup_setup(&popup, TRUE, TRUE, linear) && redraw;
+    redraw = popup_setup(&popup, set, TRUE, TRUE, linear) && redraw;
 
     if (!target && popup.targets)
         target = ((ObFocusCyclePopupTarget*)popup.targets->data)->client;

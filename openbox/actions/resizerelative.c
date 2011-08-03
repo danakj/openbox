@@ -2,6 +2,7 @@
 #include "openbox/action_list_run.h"
 #include "openbox/action_value.h"
 #include "openbox/client.h"
+#include "openbox/client_set.h"
 #include "openbox/screen.h"
 #include "openbox/frame.h"
 #include "openbox/config.h"
@@ -19,7 +20,8 @@ typedef struct {
 
 static gpointer setup_func(GHashTable *config);
 static void     free_func(gpointer options);
-static gboolean run_func(const ObActionListRun *data, gpointer options);
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options);
 
 void action_resizerelative_startup(void)
 {
@@ -55,47 +57,53 @@ static void free_func(gpointer o)
     g_slice_free(Options, o);
 }
 
-/* Always return FALSE because its not interactive */
-static gboolean run_func(const ObActionListRun *data, gpointer options)
+static gboolean each_run(ObClient *c, const ObActionListRun *data,
+                         gpointer options)
 {
     Options *o = options;
+    gint x, y, ow, xoff, nw, oh, yoff, nh, lw, lh;
+    gint left = o->left, right = o->right, top = o->top, bottom = o->bottom;
 
-    if (data->target) {
-        ObClient *c = data->target;
-        gint x, y, ow, xoff, nw, oh, yoff, nh, lw, lh;
-        gint left = o->left, right = o->right, top = o->top, bottom = o->bottom;
+    if (o->left_denom)
+        left = left * c->area.width / o->left_denom;
+    if (o->right_denom)
+        right = right * c->area.width / o->right_denom;
+    if (o->top_denom)
+        top = top * c->area.height / o->top_denom;
+    if (o->bottom_denom)
+        bottom = bottom * c->area.height / o->bottom_denom;
 
-        if (o->left_denom)
-            left = left * c->area.width / o->left_denom;
-        if (o->right_denom)
-            right = right * c->area.width / o->right_denom;
-        if (o->top_denom)
-            top = top * c->area.height / o->top_denom;
-        if (o->bottom_denom)
-            bottom = bottom * c->area.height / o->bottom_denom;
+    // When resizing, if the resize has a non-zero value then make sure it
+    // is at least as big as the size increment so the window does actually
+    // resize.
+    x = c->area.x;
+    y = c->area.y;
+    ow = c->area.width;
+    xoff = -MAX(left, (left ? c->size_inc.width : 0));
+    nw = ow + MAX(right + left, (right + left ? c->size_inc.width : 0));
+    oh = c->area.height;
+    yoff = -MAX(top, (top ? c->size_inc.height : 0));
+    nh = oh + MAX(bottom + top, (bottom + top ? c->size_inc.height : 0));
 
-        // When resizing, if the resize has a non-zero value then make sure it
-        // is at least as big as the size increment so the window does actually
-        // resize.
-        x = c->area.x;
-        y = c->area.y;
-        ow = c->area.width;
-        xoff = -MAX(left, (left ? c->size_inc.width : 0));
-        nw = ow + MAX(right + left, (right + left ? c->size_inc.width : 0));
-        oh = c->area.height;
-        yoff = -MAX(top, (top ? c->size_inc.height : 0));
-        nh = oh + MAX(bottom + top, (bottom + top ? c->size_inc.height : 0));
+    client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
+    xoff = xoff == 0 ? 0 :
+        (xoff < 0 ? MAX(xoff, ow-nw) : MIN(xoff, ow-nw));
+    yoff = yoff == 0 ? 0 :
+        (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
 
-        client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
-        xoff = xoff == 0 ? 0 :
-            (xoff < 0 ? MAX(xoff, ow-nw) : MIN(xoff, ow-nw));
-        yoff = yoff == 0 ? 0 :
-            (yoff < 0 ? MAX(yoff, oh-nh) : MIN(yoff, oh-nh));
+    client_move_resize(c, x + xoff, y + yoff, nw, nh);
 
+    return TRUE;
+}
+
+/* Always return FALSE because its not interactive */
+static gboolean run_func(const ObClientSet *set,
+                         const ObActionListRun *data, gpointer options)
+{
+    if (!client_set_is_empty(set)) {
         action_client_move(data, TRUE);
-        client_move_resize(c, x + xoff, y + yoff, nw, nh);
+        client_set_run(set, data, each_run, options);
         action_client_move(data, FALSE);
     }
-
     return FALSE;
 }

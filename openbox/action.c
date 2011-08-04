@@ -288,14 +288,16 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
     run_i = FALSE;
     if (action_is_interactive(act)) {
         ObActionRunFunc this_run = act->def->run;
-        ObActionRunFunc i_run = (current_i_act ?
-                                 current_i_act->def->run : NULL);
+        ObActionRunFunc current_i_run = (current_i_act ?
+                                         current_i_act->def->run : NULL);
 
-        if (i_run && i_run != this_run)
-            action_interactive_cancel_act();
-        run_i = TRUE;
-        if (i_run != this_run && act->i_pre)
-            run_i = act->i_pre(data->mod_state, act->options);
+        if (current_i_run != this_run) {
+            if (current_i_run)
+                action_interactive_cancel_act();
+            run_i = TRUE;
+            if (act->i_pre)
+                run_i = act->i_pre(data->mod_state, act->options);
+        }
     }
 
     run = TRUE;

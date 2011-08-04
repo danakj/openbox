@@ -1070,7 +1070,7 @@ void config_startup(ObtXmlInst *i)
     obt_xml_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 8;
-    config_mouse_dclicktime = 200;
+    config_mouse_dclicktime = 500;
     config_mouse_screenedgetime = 400;
     config_mouse_screenedgewarp = FALSE;
 

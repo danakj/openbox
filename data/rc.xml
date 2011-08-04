@@ -313,7 +313,7 @@
 <mouse>
   <dragThreshold>1</dragThreshold>
   <!-- number of pixels the mouse must move before a drag begins -->
-  <doubleClickTime>200</doubleClickTime>
+  <doubleClickTime>500</doubleClickTime>
   <!-- in milliseconds (1000 = 1 second) -->
   <screenEdgeWarpTime>400</screenEdgeWarpTime>
   <!-- Time before changing desktops when the pointer touches the edge of the

@@ -211,7 +211,7 @@ gboolean mouse_event(ObClient *client, XEvent *e)
     static Time ltime;
     static guint button = 0, state = 0, lbutton = 0;
     static Window lwindow = None;
-    static gint px, py, pwx = -1, pwy = -1;
+    static gint px, py, pwx = -1, pwy = -1, lx = -10, ly = -10;
     gboolean used = FALSE;
 
     ObFrameContext context;
@@ -290,18 +290,24 @@ gboolean mouse_event(ObClient *client, XEvent *e)
                 if (e->xbutton.x >= (signed)-b &&
                     e->xbutton.y >= (signed)-b &&
                     e->xbutton.x < (signed)(w+b) &&
-                    e->xbutton.y < (signed)(h+b)) {
+                    e->xbutton.y < (signed)(h+b))
+                {
                     click = TRUE;
                     /* double clicks happen if there were 2 in a row! */
                     if (lbutton == button &&
                         lwindow == e->xbutton.window &&
                         e->xbutton.time - config_mouse_dclicktime <=
-                        ltime) {
+                        ltime &&
+                        ABS(e->xbutton.x - lx) < 8 &&
+                        ABS(e->xbutton.y - ly) < 8)
+                    {
                         dclick = TRUE;
                         lbutton = 0;
                     } else {
                         lbutton = button;
                         lwindow = e->xbutton.window;
+                        lx = e->xbutton.x;
+                        ly = e->xbutton.y;
                     }
                 } else {
                     lbutton = 0;

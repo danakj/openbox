@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/screen.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
@@ -73,7 +73,7 @@ static gpointer setup_func(GHashTable *config,
                            ObActionICancelFunc *cancel,
                            ObActionIPostFunc *post)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -84,8 +84,8 @@ static gpointer setup_func(GHashTable *config,
     o->u.rel.wrap = TRUE;
 
     v = g_hash_table_lookup(config, "to");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (!g_ascii_strcasecmp(s, "last"))
             o->type = LAST;
         else if (!g_ascii_strcasecmp(s, "current"))
@@ -127,8 +127,8 @@ static gpointer setup_func(GHashTable *config,
     }
 
     v = g_hash_table_lookup(config, "wrap");
-    if (v && action_value_is_string(v))
-        o->u.rel.wrap = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->u.rel.wrap = config_value_bool(v);
 
     return o;
 }
@@ -159,7 +159,7 @@ static gpointer setup_send_func(GHashTable *config,
                                 ObActionICancelFunc *cancel,
                                 ObActionIPostFunc *post)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = setup_func(config, pre, input, cancel, post);
@@ -167,8 +167,8 @@ static gpointer setup_send_func(GHashTable *config,
     o->follow = TRUE;
 
     v = g_hash_table_lookup(config, "follow");
-    if (v && action_value_is_string(v))
-        o->follow = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->follow = config_value_bool(v);
 
     if (o->type == RELATIVE && o->follow) {
         o->interactive = TRUE;

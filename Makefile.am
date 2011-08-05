@@ -243,8 +243,6 @@ openbox_openbox_SOURCES = \
 	openbox/action_list_run.h \
 	openbox/action_parser.c \
 	openbox/action_parser.h \
-	openbox/action_value.c \
-	openbox/action_value.h \
 	openbox/client.c \
 	openbox/client.h \
 	openbox/client_list_menu.c \
@@ -257,6 +255,8 @@ openbox_openbox_SOURCES = \
 	openbox/client_set.h \
 	openbox/config.c \
 	openbox/config.h \
+	openbox/config_value.c \
+	openbox/config_value.h \
 	openbox/debug.c \
 	openbox/debug.h \
 	openbox/dock.c \

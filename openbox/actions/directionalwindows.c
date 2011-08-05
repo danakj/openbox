@@ -2,7 +2,7 @@
 #include "openbox/action_list.h"
 #include "openbox/action_list_run.h"
 #include "openbox/action_parser.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/event.h"
 #include "openbox/stacking.h"
@@ -55,7 +55,7 @@ void action_directionalwindows_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -63,23 +63,23 @@ static gpointer setup_func(GHashTable *config)
     o->bar = TRUE;
 
     v = g_hash_table_lookup(config, "dialog");
-    if (v && action_value_is_string(v))
-        o->dialog = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->dialog = config_value_bool(v);
     v = g_hash_table_lookup(config, "bar");
-    if (v && action_value_is_string(v))
-        o->bar = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->bar = config_value_bool(v);
     v = g_hash_table_lookup(config, "raise");
-    if (v && action_value_is_string(v))
-        o->raise = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->raise = config_value_bool(v);
     v = g_hash_table_lookup(config, "panels");
-    if (v && action_value_is_string(v))
-        o->dock_windows = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->dock_windows = config_value_bool(v);
     v = g_hash_table_lookup(config, "desktop");
-    if (v && action_value_is_string(v))
-        o->desktop_windows = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->desktop_windows = config_value_bool(v);
     v = g_hash_table_lookup(config, "direction");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->direction = OB_DIRECTION_NORTH;
@@ -103,8 +103,8 @@ static gpointer setup_func(GHashTable *config)
     }
 
     v = g_hash_table_lookup(config, "finalactions");
-    if (v && action_value_is_action_list(v)) {
-        o->actions = action_value_action_list(v);
+    if (v && config_value_is_action_list(v)) {
+        o->actions = config_value_action_list(v);
         action_list_ref(o->actions);
     }
     else {

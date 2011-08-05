@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/openbox.h"
 #include "openbox/prompt.h"
@@ -24,15 +24,15 @@ void action_exit_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->prompt = TRUE;
 
     v = g_hash_table_lookup(config, "prompt");
-    if (v && action_value_is_string(v))
-        o->prompt = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->prompt = config_value_bool(v);
 
     return o;
 }

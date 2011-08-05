@@ -19,7 +19,7 @@
 #include <glib.h>
 
 struct _ObActionListRun;
-struct _ObActionValue;
+struct _ObConfigValue;
 struct _ObClient;
 struct _ObClientSet;
 
@@ -28,7 +28,7 @@ typedef struct _ObActionFilterFuncs ObActionFilterFuncs;
 typedef enum _ObActionFilterDefault ObActionFilterDefault;
 
 typedef gpointer (*ObActionFilterSetupFunc)(gboolean invert,
-                                            struct _ObActionValue *v);
+                                            struct _ObConfigValue *v);
 typedef void (*ObActionFilterDestroyFunc)(gpointer data);
 typedef struct _ObClientSet* (*ObActionFilterFunc)(
     gboolean invert, const struct _ObActionListRun *run, gpointer data);
@@ -52,7 +52,7 @@ gboolean action_filter_register(const gchar *name,
                                 ObActionFilterDestroyFunc destroy,
                                 ObActionFilterFunc set);
 
-ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v);
+ObActionFilter* action_filter_new(const gchar *key, struct _ObConfigValue *v);
 void action_filter_ref(ObActionFilter *f);
 void action_filter_unref(ObActionFilter *f);
 

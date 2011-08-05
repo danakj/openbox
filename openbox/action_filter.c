@@ -94,7 +94,7 @@ static void action_filter_unregister(ObActionFilterDefinition *def)
     }
 }
 
-ObActionFilter* action_filter_new(const gchar *key, struct _ObActionValue *v)
+ObActionFilter* action_filter_new(const gchar *key, struct _ObConfigValue *v)
 {
     ObActionFilterDefinition *def;
     ObActionFilter *filter;

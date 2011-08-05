@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/screen.h"
 #include <glib.h>
@@ -27,14 +27,14 @@ void action_addremovedesktop_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "where");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (!g_ascii_strcasecmp(s, "last"))
             o->current = FALSE;
         else if (!g_ascii_strcasecmp(s, "current"))

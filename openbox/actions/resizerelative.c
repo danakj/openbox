@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
 #include "openbox/screen.h"
@@ -31,23 +31,23 @@ void action_resizerelative_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "left");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->left, &o->left_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->left, &o->left_denom);
     v = g_hash_table_lookup(config, "right");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->right, &o->right_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->right, &o->right_denom);
     v = g_hash_table_lookup(config, "top");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->top, &o->top_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->top, &o->top_denom);
     v = g_hash_table_lookup(config, "bottom");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->bottom, &o->bottom_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->bottom, &o->bottom_denom);
 
     return o;
 }

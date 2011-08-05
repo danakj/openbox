@@ -20,7 +20,7 @@
 #include "action.h"
 #include "action_filter.h"
 #include "action_list.h"
-#include "action_value.h"
+#include "config_value.h"
 #include "gettext.h"
 
 #ifdef HAVE_STRING_H
@@ -29,7 +29,6 @@
 
 struct _ObActionList;
 struct _ObActionListTest;
-struct _ObActionValue;
 
 #define SKIP " \t"
 #define IDENTIFIER_FIRST G_CSET_a_2_z G_CSET_A_2_Z G_CSET_DIGITS "-_"
@@ -42,7 +41,7 @@ struct _ObActionList* parse_list(ObActionParser *p,
 struct _ObActionList* parse_action(ObActionParser *p, gboolean *e);
 struct _ObActionList* parse_filter(ObActionParser *p, gboolean *e);
 struct _ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e);
-struct _ObActionValue* parse_value(ObActionParser *p,
+struct _ObConfigValue* parse_value(ObActionParser *p,
                                    gboolean allow_actions,
                                    gboolean *e);
 gchar* parse_string(ObActionParser *p, guchar end, gboolean *e);
@@ -219,7 +218,7 @@ ObActionList* parse_action(ObActionParser *p, gboolean *e)
     /* read the action's name */
     name = g_strdup(p->scan->value.v_string);
     config = g_hash_table_new_full(g_str_hash, g_str_equal, g_free,
-                                   (GDestroyNotify)action_value_unref);
+                                   (GDestroyNotify)config_value_unref);
 
     /* read the action's options key:value pairs */
     t = g_scanner_peek_next_token(p->scan);
@@ -232,7 +231,7 @@ ObActionList* parse_action(ObActionParser *p, gboolean *e)
         }
         else {
             gchar *key;
-            ObActionValue *value;
+            ObConfigValue *value;
 
             g_scanner_get_next_token(p->scan); /* eat the key */
             t = g_scanner_peek_next_token(p->scan); /* check for ':' */
@@ -314,7 +313,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
 {
     GTokenType t;
     gchar *key;
-    ObActionValue *value;
+    ObConfigValue *value;
     gboolean and;
     ObActionFilter *filter;
     ObActionListTest *next;
@@ -343,7 +342,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
     /* don't allow any errors (but value can be null if not present) */
     if (*e) {
         g_free(key);
-        action_value_unref(value);
+        config_value_unref(value);
         return NULL;
     }
 
@@ -356,7 +355,7 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
     }
 
     g_free(key);
-    action_value_unref(value);
+    config_value_unref(value);
     if (!filter)
         return NULL;
 
@@ -392,25 +391,25 @@ ObActionListTest* parse_filter_test(ObActionParser *p, gboolean *e)
     }
 }
 
-ObActionValue* parse_value(ObActionParser *p,
+ObConfigValue* parse_value(ObActionParser *p,
                            gboolean allow_actions,
                            gboolean *e)
 {
     GTokenType t;
-    ObActionValue *v;
+    ObConfigValue *v;
 
     v = NULL;
     t = g_scanner_get_next_token(p->scan);
     if (t == G_TOKEN_IDENTIFIER) {
-        v = action_value_new_string(p->scan->value.v_string);
+        v = config_value_new_string(p->scan->value.v_string);
     }
     else if (t == '"')
-        v = action_value_new_string(parse_string(p, '"', e));
+        v = config_value_new_string(parse_string(p, '"', e));
     else if (t == '(')
-        v = action_value_new_string(parse_string(p, ')', e));
+        v = config_value_new_string(parse_string(p, ')', e));
     else if (t == '{' && allow_actions) {
         ObActionList *l = parse_list(p, '}', e);
-        if (l) v = action_value_new_action_list(l);
+        if (l) v = config_value_new_action_list(l);
     }
     else
         parse_error(p, G_TOKEN_NONE, _("Expected an option value"), e);

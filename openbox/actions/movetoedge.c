@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/misc.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
@@ -25,15 +25,15 @@ void action_movetoedge_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
 
     v = g_hash_table_lookup(config, "direction");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (!g_ascii_strcasecmp(s, "north") ||
             !g_ascii_strcasecmp(s, "up"))
             o->dir = OB_DIRECTION_NORTH;

@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/openbox.h"
 #include "obt/paths.h"
@@ -22,14 +22,14 @@ void action_restart_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "command");
-    if (v && action_value_is_string(v))
-        o->cmd = obt_paths_expand_tilde(action_value_string(v));
+    if (v && config_value_is_string(v))
+        o->cmd = obt_paths_expand_tilde(config_value_string(v));
     return o;
 }
 

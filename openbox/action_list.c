@@ -19,7 +19,6 @@
 #include "action_list.h"
 #include "action.h"
 #include "action_filter.h"
-#include "action_value.h"
 
 #include <glib.h>
 

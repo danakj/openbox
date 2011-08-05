@@ -112,6 +112,11 @@ void obt_xml_register(ObtXmlInst *i, const gchar *tag,
     g_hash_table_insert(i->callbacks, c->tag, c);
 }
 
+void obt_xml_unregister(ObtXmlInst *i, const gchar *tag)
+{
+    g_hash_table_remove(i->callbacks, tag);
+}
+
 static gboolean load_file(ObtXmlInst *i,
                           const gchar *domain,
                           const gchar *filename,

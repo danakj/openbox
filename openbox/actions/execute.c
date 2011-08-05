@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
 #include "openbox/event.h"
@@ -58,31 +58,31 @@ static void client_dest(ObClient *client, gpointer data)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "command");
-    if (v && action_value_is_string(v))
-        o->cmd = obt_paths_expand_tilde(action_value_string(v));
+    if (v && config_value_is_string(v))
+        o->cmd = obt_paths_expand_tilde(config_value_string(v));
 
     v = g_hash_table_lookup(config, "prompt");
-    if (v && action_value_is_string(v))
-        o->prompt = g_strdup(action_value_string(v));
+    if (v && config_value_is_string(v))
+        o->prompt = g_strdup(config_value_string(v));
 
     v = g_hash_table_lookup(config, "startupnotify");
-    if (v && action_value_is_string(v) && action_value_bool(v)) {
+    if (v && config_value_is_string(v) && config_value_bool(v)) {
         o->sn = TRUE;
         v = g_hash_table_lookup(config, "name");
-        if (v && action_value_is_string(v))
-            o->sn_name = g_strdup(action_value_string(v));
+        if (v && config_value_is_string(v))
+            o->sn_name = g_strdup(config_value_string(v));
         v = g_hash_table_lookup(config, "icon");
-        if (v && action_value_is_string(v))
-            o->sn_icon = g_strdup(action_value_string(v));
+        if (v && config_value_is_string(v))
+            o->sn_icon = g_strdup(config_value_string(v));
         v = g_hash_table_lookup(config, "wmclass");
-        if (v && action_value_is_string(v))
-            o->sn_wmclass = g_strdup(action_value_string(v));
+        if (v && config_value_is_string(v))
+            o->sn_wmclass = g_strdup(config_value_string(v));
     }
     return o;
 }

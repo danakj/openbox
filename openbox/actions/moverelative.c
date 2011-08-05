@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
 #include "openbox/screen.h"
@@ -27,17 +27,17 @@ void action_moverelative_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "x");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->x, &o->x_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->x, &o->x_denom);
     v = g_hash_table_lookup(config, "y");
-    if (v && action_value_is_string(v))
-        action_value_fraction(v, &o->y, &o->y_denom);
+    if (v && config_value_is_string(v))
+        config_value_fraction(v, &o->y, &o->y_denom);
 
     return o;
 }

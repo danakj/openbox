@@ -2,7 +2,7 @@
 #include "openbox/action_list.h"
 #include "openbox/action_list_run.h"
 #include "openbox/action_parser.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/stacking.h"
 #include "openbox/window.h"
@@ -68,7 +68,7 @@ static gpointer setup_func(GHashTable *config,
                            ObActionICancelFunc *cancel,
                            ObActionIPostFunc *post)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -76,32 +76,32 @@ static gpointer setup_func(GHashTable *config,
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
 
     v = g_hash_table_lookup(config, "linear");
-    if (v && action_value_is_string(v))
-        o->linear = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->linear = config_value_bool(v);
     v = g_hash_table_lookup(config, "dialog");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (g_strcasecmp(s, "none") == 0)
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
         else if (g_strcasecmp(s, "icons") == 0)
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }
     v = g_hash_table_lookup(config, "bar");
-    if (v && action_value_is_string(v))
-        o->bar = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->bar = config_value_bool(v);
     v = g_hash_table_lookup(config, "raise");
-    if (v && action_value_is_string(v))
-        o->raise = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->raise = config_value_bool(v);
     v = g_hash_table_lookup(config, "panels");
-    if (v && action_value_is_string(v))
-        o->dock_windows = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->dock_windows = config_value_bool(v);
     v = g_hash_table_lookup(config, "desktop");
-    if (v && action_value_is_string(v))
-        o->desktop_windows = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->desktop_windows = config_value_bool(v);
 
     v = g_hash_table_lookup(config, "finalactions");
-    if (v && action_value_is_action_list(v)) {
-        o->actions = action_value_action_list(v);
+    if (v && config_value_is_action_list(v)) {
+        o->actions = config_value_action_list(v);
         action_list_ref(o->actions);
     }
     else {

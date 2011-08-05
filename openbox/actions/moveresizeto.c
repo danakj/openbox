@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
 #include "openbox/screen.h"
@@ -37,7 +37,7 @@ void action_moveresizeto_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
@@ -48,24 +48,24 @@ static gpointer setup_func(GHashTable *config)
     o->monitor = CURRENT_MONITOR;
 
     v = g_hash_table_lookup(config, "x");
-    if (v && action_value_is_string(v))
-        action_value_gravity_coord(v, &o->x);
+    if (v && config_value_is_string(v))
+        config_value_gravity_coord(v, &o->x);
     v = g_hash_table_lookup(config, "y");
-    if (v && action_value_is_string(v))
-        action_value_gravity_coord(v, &o->y);
+    if (v && config_value_is_string(v))
+        config_value_gravity_coord(v, &o->y);
 
     v = g_hash_table_lookup(config, "width");
-    if (v && action_value_is_string(v))
-        if (g_ascii_strcasecmp(action_value_string(v), "current") != 0)
-            action_value_fraction(v, &o->w, &o->w_denom);
+    if (v && config_value_is_string(v))
+        if (g_ascii_strcasecmp(config_value_string(v), "current") != 0)
+            config_value_fraction(v, &o->w, &o->w_denom);
     v = g_hash_table_lookup(config, "height");
-    if (v && action_value_is_string(v))
-        if (g_ascii_strcasecmp(action_value_string(v), "current") != 0)
-            action_value_fraction(v, &o->h, &o->h_denom);
+    if (v && config_value_is_string(v))
+        if (g_ascii_strcasecmp(config_value_string(v), "current") != 0)
+            config_value_fraction(v, &o->h, &o->h_denom);
 
     v = g_hash_table_lookup(config, "monitor");
-    if (v && action_value_is_string(v)) {
-        const gchar *s = action_value_string(v);
+    if (v && config_value_is_string(v)) {
+        const gchar *s = config_value_string(v);
         if (g_ascii_strcasecmp(s, "current") != 0) {
             if (!g_ascii_strcasecmp(s, "all"))
                 o->monitor = ALL_MONITORS;
@@ -74,7 +74,7 @@ static gpointer setup_func(GHashTable *config)
             else if(!g_ascii_strcasecmp(s, "prev"))
                 o->monitor = PREV_MONITOR;
             else
-                o->monitor = action_value_int(v) - 1;
+                o->monitor = config_value_int(v) - 1;
         }
     }
 

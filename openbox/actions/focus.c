@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/event.h"
 #include "openbox/client.h"
 #include "openbox/client_set.h"
@@ -25,18 +25,18 @@ void action_focus_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
     o->stop_int = TRUE;
 
     v = g_hash_table_lookup(config, "here");
-    if (v && action_value_is_string(v))
-        o->here = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->here = config_value_bool(v);
     v = g_hash_table_lookup(config, "stopInteractive");
-    if (v && action_value_is_string(v))
-        o->stop_int = action_value_bool(v);
+    if (v && config_value_is_string(v))
+        o->stop_int = config_value_bool(v);
     return o;
 }
 

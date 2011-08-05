@@ -1,6 +1,6 @@
 #include "openbox/action.h"
 #include "openbox/action_list_run.h"
-#include "openbox/action_value.h"
+#include "openbox/config_value.h"
 #include "openbox/client_set.h"
 #include "openbox/menu.h"
 #include <glib.h>
@@ -22,14 +22,14 @@ void action_showmenu_startup(void)
 
 static gpointer setup_func(GHashTable *config)
 {
-    ObActionValue *v;
+    ObConfigValue *v;
     Options *o;
 
     o = g_slice_new0(Options);
 
     v = g_hash_table_lookup(config, "menu");
-    if (v && action_value_is_string(v))
-        o->name = g_strdup(action_value_string(v));
+    if (v && config_value_is_string(v))
+        o->name = g_strdup(config_value_string(v));
     return o;
 }
 

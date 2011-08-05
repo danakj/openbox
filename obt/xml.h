@@ -62,6 +62,7 @@ void obt_xml_close(ObtXmlInst *inst);
 
 void obt_xml_register(ObtXmlInst *inst, const gchar *tag,
                       ObtXmlCallback func, gpointer data);
+void obt_xml_unregister(ObtXmlInst *inst, const gchar *tag);
 void obt_xml_tree(ObtXmlInst *i, xmlNodePtr node);
 void obt_xml_tree_from_root(ObtXmlInst *i);
 

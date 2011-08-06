@@ -260,6 +260,8 @@ openbox_openbox_SOURCES = \
 	openbox/client_set.h \
 	openbox/config.c \
 	openbox/config.h \
+	openbox/config_parser.c \
+	openbox/config_parser.h \
 	openbox/config_value.c \
 	openbox/config_value.h \
 	openbox/debug.c \

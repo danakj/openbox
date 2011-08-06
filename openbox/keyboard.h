@@ -26,10 +26,17 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
+typedef struct _ObKeyboardKey ObKeyboardKey;
+
 struct _ObClient;
 struct _ObActionList;
 
 extern KeyBindingTree *keyboard_firstnode;
+
+struct _ObKeyboardKey {
+    guint keycode;
+    guint modifiers;
+};
 
 void keyboard_startup(gboolean reconfig);
 void keyboard_shutdown(gboolean reconfig);

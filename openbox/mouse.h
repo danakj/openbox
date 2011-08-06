@@ -24,7 +24,14 @@
 
 #include <X11/Xlib.h>
 
+typedef struct _ObMouseButton ObMouseButton;
+
 struct _ObActionList;
+
+struct _ObMouseButton {
+    guint button;
+    guint modifiers;
+};
 
 void mouse_startup(gboolean reconfig);
 void mouse_shutdown(gboolean reconfig);

@@ -83,11 +83,9 @@ ObOrientation   config_dock_orient;
 gboolean        config_dock_hide;
 guint           config_dock_hide_delay;
 guint           config_dock_show_delay;
-guint           config_dock_app_move_button;
-guint           config_dock_app_move_modifiers;
+ObMouseButton   config_dock_app_move_button;
 
-guint config_keyboard_reset_keycode;
-guint config_keyboard_reset_state;
+ObKeyboardKey config_keyboard_reset_key;
 
 gint     config_mouse_threshold;
 gint     config_mouse_dclicktime;
@@ -430,8 +428,8 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
     if ((n = obt_xml_find_sibling(node->children, "chainQuitKey"))) {
         key = obt_xml_node_string(n);
-        translate_key(key, &config_keyboard_reset_state,
-                      &config_keyboard_reset_keycode);
+        translate_key(key, &config_keyboard_reset_key.modifiers,
+                      &config_keyboard_reset_key.keycode);
         g_free(key);
     }
 
@@ -857,8 +855,8 @@ static void parse_dock(xmlNodePtr node, gpointer d)
         gchar *str = obt_xml_node_string(n);
         guint b, s;
         if (translate_button(str, &s, &b)) {
-            config_dock_app_move_button = b;
-            config_dock_app_move_modifiers = s;
+            config_dock_app_move_button.button = b;
+            config_dock_app_move_button.modifiers = s;
         } else {
             g_message(_("Invalid button \"%s\" specified in config file"), str);
         }
@@ -1079,13 +1077,13 @@ void config_startup(ObtXmlInst *i)
     config_dock_hide = FALSE;
     config_dock_hide_delay = 300;
     config_dock_show_delay = 300;
-    config_dock_app_move_button = 2; /* middle */
-    config_dock_app_move_modifiers = 0;
+    config_dock_app_move_button.button = 2; /* middle */
+    config_dock_app_move_button.modifiers = 0;
 
     obt_xml_register(i, "dock", parse_dock, NULL);
 
-    translate_key("C-g", &config_keyboard_reset_state,
-                  &config_keyboard_reset_keycode);
+    translate_key("C-g", &config_keyboard_reset_key.modifiers,
+                  &config_keyboard_reset_key.keycode);
 
     bind_default_keyboard();
 

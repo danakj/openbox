@@ -59,8 +59,8 @@ static void grab_keys(gboolean grab)
             p = p->next_sibling;
         }
         if (curpos)
-            grab_key(config_keyboard_reset_keycode,
-                     config_keyboard_reset_state,
+            grab_key(config_keyboard_reset_key.keycode,
+                     config_keyboard_reset_key.modifiers,
                      obt_root(ob_screen), GrabModeAsync);
     }
 }
@@ -235,8 +235,8 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
 
     mods = obt_keyboard_only_modmasks(e->xkey.state);
 
-    if (e->xkey.keycode == config_keyboard_reset_keycode &&
-        mods == config_keyboard_reset_state)
+    if (e->xkey.keycode == config_keyboard_reset_key.keycode &&
+        mods == config_keyboard_reset_key.modifiers)
     {
         if (chain_timer) g_source_remove(chain_timer);
         keyboard_reset_chains(-1);

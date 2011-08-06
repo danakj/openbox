@@ -41,14 +41,14 @@ StrutPartial dock_strut;
 static void dock_app_grab_button(ObDockApp *app, gboolean grab)
 {
     if (grab) {
-        grab_button_full(config_dock_app_move_button,
-                         config_dock_app_move_modifiers, app->icon_win,
+        grab_button_full(config_dock_app_move_button.button,
+                         config_dock_app_move_button.modifiers, app->icon_win,
                          ButtonPressMask | ButtonReleaseMask |
                          ButtonMotionMask,
                          GrabModeAsync, OB_CURSOR_MOVE);
     } else {
-        ungrab_button(config_dock_app_move_button,
-                      config_dock_app_move_modifiers, app->icon_win);
+        ungrab_button(config_dock_app_move_button.button,
+                      config_dock_app_move_button.modifiers, app->icon_win);
     }
 }
 

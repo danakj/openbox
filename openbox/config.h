@@ -25,6 +25,8 @@
 #include "place.h"
 #include "client.h"
 #include "geom.h"
+#include "keyboard.h"
+#include "mouse.h"
 #include "moveresize.h"
 #include "obrender/render.h"
 #include "obt/xml.h"
@@ -129,9 +131,7 @@ extern guint config_dock_hide_delay;
 /*! The number of milliseconds to wait before showing the dock */
 extern guint config_dock_show_delay;
 /*! The mouse button to be used to move dock apps */
-extern guint config_dock_app_move_button;
-/*! The modifiers to be used with the button to move dock apps */
-extern guint config_dock_app_move_modifiers;
+extern ObMouseButton config_dock_app_move_button;
 
 /*! The name of the theme */
 extern gchar *config_theme;
@@ -167,10 +167,8 @@ extern GSList *config_desktops_names;
 /*! Amount of time to show the desktop switch dialog */
 extern guint config_desktop_popup_time;
 
-/*! The keycode of the key combo which resets the keybaord chains */
-extern guint config_keyboard_reset_keycode;
-/*! The modifiers of the key combo which resets the keybaord chains */
-extern guint config_keyboard_reset_state;
+/*! The key combo which resets the keybaord chains */
+extern ObKeyboardKey config_keyboard_reset_key;
 
 /*! Number of pixels a drag must go before being considered a drag */
 extern gint config_mouse_threshold;

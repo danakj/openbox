@@ -18,6 +18,7 @@
 */
 
 #include "config.h"
+#include "config_value.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "action.h"
@@ -156,33 +157,6 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     }
 }
 
-void config_parse_relative_number(gchar *s, gint *num, gint *denom)
-{
-    *num = strtol(s, &s, 10);
-
-    if (*s == '%') {
-        *denom = 100;
-    } else if (*s == '/') {
-        *denom = atoi(s+1);
-    }
-}
-
-void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
-{
-    gchar *s = obt_xml_node_string(node);
-    if (!g_ascii_strcasecmp(s, "center"))
-        c->center = TRUE;
-    else {
-        gchar *ps = s;
-        if (s[0] == '-')
-            c->opposite = TRUE;
-        if (s[0] == '-' || s[0] == '+')
-            ps++;
-        config_parse_relative_number(ps, &c->pos, &c->denom);
-    }
-    g_free(s);
-}
-
 /*
   <applications>
     <application name="aterm">
@@ -281,13 +255,19 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             if ((n = obt_xml_find_sibling(app->children, "position"))) {
                 if ((c = obt_xml_find_sibling(n->children, "x")))
                     if (!obt_xml_node_contains(c, "default")) {
-                        config_parse_gravity_coord(c, &settings->position.x);
+                        ObConfigValue *v = config_value_new_string(
+                            obt_xml_node_string(node));
+                        config_value_gravity_coord(v, &settings->position.x);
+                        config_value_unref(v);
                         x_pos_given = TRUE;
                     }
 
                 if (x_pos_given && (c = obt_xml_find_sibling(n->children, "y")))
                     if (!obt_xml_node_contains(c, "default")) {
-                        config_parse_gravity_coord(c, &settings->position.y);
+                        ObConfigValue *v = config_value_new_string(
+                            obt_xml_node_string(node));
+                        config_value_gravity_coord(v, &settings->position.y);
+                        config_value_unref(v);
                         settings->pos_given = TRUE;
                     }
 
@@ -786,12 +766,20 @@ static void parse_resize(xmlNodePtr node, gpointer d)
             if ((n = obt_xml_find_sibling(node, "popupFixedPosition"))) {
                 xmlNodePtr n2;
 
-                if ((n2 = obt_xml_find_sibling(n->children, "x")))
-                    config_parse_gravity_coord(n2,
+                if ((n2 = obt_xml_find_sibling(n->children, "x"))) {
+                    ObConfigValue *v = config_value_new_string(
+                        obt_xml_node_string(n2));
+                    config_value_gravity_coord(v,
                                                &config_resize_popup_fixed.x);
-                if ((n2 = obt_xml_find_sibling(n->children, "y")))
-                    config_parse_gravity_coord(n2,
+                    config_value_unref(v);
+                }
+                if ((n2 = obt_xml_find_sibling(n->children, "y"))) {
+                    ObConfigValue *v = config_value_new_string(
+                        obt_xml_node_string(n2));
+                    config_value_gravity_coord(v,
                                                &config_resize_popup_fixed.y);
+                    config_value_unref(v);
+                }
 
                 config_resize_popup_fixed.x.pos =
                     MAX(config_resize_popup_fixed.x.pos, 0);

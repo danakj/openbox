@@ -87,40 +87,40 @@ gboolean config_value_is_action_list(const ObConfigValue *v)
 
 void config_value_copy_ptr(ObConfigValue *v,
                            ObConfigValueDataType type,
-                           ObConfigValueDataPtr *p,
+                           ObConfigValueDataPtr p,
                            const ObConfigValueEnum e[])
 {
     switch (type) {
     case OB_CONFIG_VALUE_STRING:
-        *p->string = config_value_string(v);
+        *p.string = config_value_string(v);
         break;
     case OB_CONFIG_VALUE_BOOLEAN:
-        *p->boolean = config_value_bool(v);
+        *p.boolean = config_value_bool(v);
         break;
     case OB_CONFIG_VALUE_INTEGER:
-        *p->integer = config_value_int(v);
+        *p.integer = config_value_int(v);
         break;
     case OB_CONFIG_VALUE_ENUM:
-        *p->enumeration = config_value_enum(v, e);
+        *p.enumeration = config_value_enum(v, e);
         break;
     case OB_CONFIG_VALUE_FRACTION: {
         gint n, d;
         config_value_fraction(v, &n, &d);
-        p->fraction->numer = n;
-        p->fraction->denom = d;
+        p.fraction->numer = n;
+        p.fraction->denom = d;
         break;
     }
     case OB_CONFIG_VALUE_GRAVITY_COORD: {
         GravityCoord c;
         config_value_gravity_coord(v, &c);
-        *p->coord = c;
+        *p.coord = c;
         break;
     }
     case OB_CONFIG_VALUE_LIST:
-        *p->list = config_value_list(v);
+        *p.list = config_value_list(v);
         break;
     case OB_CONFIG_VALUE_ACTIONLIST:
-        *p->actions = config_value_action_list(v);
+        *p.actions = config_value_action_list(v);
         break;
     case NUM_OB_CONFIG_VALUE_TYPES:
     default:

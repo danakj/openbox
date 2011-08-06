@@ -117,6 +117,19 @@ void obt_xml_unregister(ObtXmlInst *i, const gchar *tag)
     g_hash_table_remove(i->callbacks, tag);
 }
 
+void obt_xml_new_file(ObtXmlInst *i,
+                      const gchar *root_node)
+{
+    xmlNodePtr old;
+
+    g_assert(i->doc == NULL); /* another doc isn't open already? */
+
+    i->doc = xmlNewDoc((xmlChar*)"1.0");
+    i->root = xmlNewDocRawNode(i->doc, NULL, (xmlChar*)root_node, NULL);
+    old = xmlDocSetRootElement(i->doc, i->root);
+    if (old) xmlFreeNode(old);
+}
+
 static gboolean load_file(ObtXmlInst *i,
                           const gchar *domain,
                           const gchar *filename,
@@ -366,7 +379,7 @@ gboolean obt_xml_node_contains(xmlNodePtr node, const gchar *val)
     return r;
 }
 
-xmlNodePtr obt_xml_find_node(xmlNodePtr node, const gchar *tag)
+xmlNodePtr obt_xml_find_sibling(xmlNodePtr node, const gchar *tag)
 {
     while (node) {
         if (!xmlStrcmp(node->name, (const xmlChar*) tag))
@@ -438,4 +451,71 @@ gboolean obt_xml_attr_contains(xmlNodePtr node, const gchar *name,
     }
     xmlFree(c);
     return r;
+}
+
+xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
+                                 const gchar *default_value)
+{
+    xmlNodePtr n, c;
+    gchar **nodes;
+    gchar **it, **next;
+
+    g_return_val_if_fail(subtree != NULL, NULL);
+
+    n = subtree;
+
+    nodes = g_strsplit(path, "/", 0);
+    for (it = nodes; *it; it = next) {
+        gchar **attrs;
+        gboolean ok = FALSE;
+
+        attrs = g_strsplit(*it, ":", 0);
+        next = it + 1;
+
+        /* match attributes */
+        c = obt_xml_find_sibling(n->children, attrs[0]);
+        while (c && !ok) {
+            gint i;
+
+            ok = TRUE;
+            for (i = 1; attrs[i]; ++i) {
+                gchar **eq = g_strsplit(attrs[i], "=", 2);
+                if (eq[1] && !obt_xml_attr_contains(c, eq[0], eq[1]))
+                    ok = FALSE;
+                g_strfreev(eq);
+            }
+            if (!ok)
+                c = obt_xml_find_sibling(c->next, attrs[0]);
+        }
+
+        if (!c) {
+            gint i;
+
+            c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0],
+                                *next ? NULL : (xmlChar*)default_value);
+
+            for (i = 1; attrs[i]; ++i) {
+                gchar **eq = g_strsplit(attrs[i], "=", 2);
+                if (eq[1])
+                    xmlNewProp(c, (xmlChar*)eq[0], (xmlChar*)eq[1]);
+                g_strfreev(eq);
+            }
+        }
+        n = c;
+
+        g_strfreev(attrs);
+    }
+
+    g_strfreev(nodes);
+
+    return n;
+}
+
+void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path)
+{
+    xmlNodePtr n;
+
+    n = obt_xml_path_get_node(subtree, path, NULL);
+    xmlUnlinkNode(n);
+    xmlFreeNode(n);
 }

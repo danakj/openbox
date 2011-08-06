@@ -32,6 +32,9 @@ ObtXmlInst* obt_xml_instance_new(void);
 void obt_xml_instance_ref(ObtXmlInst *inst);
 void obt_xml_instance_unref(ObtXmlInst *inst);
 
+void obt_xml_new_file(ObtXmlInst *inst,
+                      const gchar *root_node);
+
 gboolean obt_xml_load_file(ObtXmlInst *inst,
                            const gchar *path,
                            const gchar *root_node);
@@ -69,7 +72,7 @@ void obt_xml_tree_from_root(ObtXmlInst *i);
 
 /* helpers */
 
-xmlNodePtr obt_xml_find_node   (xmlNodePtr node, const gchar *name);
+xmlNodePtr obt_xml_find_sibling(xmlNodePtr node, const gchar *name);
 
 gboolean obt_xml_node_contains (xmlNodePtr node, const gchar *val);
 gchar   *obt_xml_node_string   (xmlNodePtr node);
@@ -84,6 +87,33 @@ gboolean obt_xml_attr_int      (xmlNodePtr node, const gchar *name,
                                 gint *value);
 gboolean obt_xml_attr_bool     (xmlNodePtr node, const gchar *name,
                                 gboolean *value);
+
+/* path based operations */
+
+/*! Returns the node in the given @subtree, at the given @path.  If the node is
+  not found, it is created, along with any parents.
+
+  The path has a structure follows.
+  - <name> - specifies a child of the current position in the subtree
+  - :foo=bar - specifies an attribute and its value.  this can be appended to
+    a <name> or to another attribute
+  - / - specifies to move one level deeper in the tree
+
+  An example:
+  - theme/font:place=ActiveWindow/size refers to the size node at this
+    position:
+    - <theme><font place="ActiveWindow"><size /></font></theme>
+
+  @subtree The root of the search.
+  @path A string specifying the search path.
+  @default_value If the node is not found, it is created with this value
+    contained within.
+*/
+xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
+                                 const gchar *default_value);
+/*! Removes a specified node from the tree. */
+void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path);
+
 
 G_END_DECLS
 

@@ -215,7 +215,7 @@ void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 */
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
-    xmlNodePtr app = obt_xml_find_node(node->children, "application");
+    xmlNodePtr app = obt_xml_find_sibling(node->children, "application");
     gchar *name = NULL, *class = NULL, *role = NULL, *title = NULL,
         *type_str = NULL;
     gboolean name_set, class_set, type_set, role_set, title_set;
@@ -272,29 +272,29 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             if (type_set)
                 settings->type = type;
 
-            if ((n = obt_xml_find_node(app->children, "decor")))
+            if ((n = obt_xml_find_sibling(app->children, "decor")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->decor = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "shade")))
+            if ((n = obt_xml_find_sibling(app->children, "shade")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->shade = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "position"))) {
-                if ((c = obt_xml_find_node(n->children, "x")))
+            if ((n = obt_xml_find_sibling(app->children, "position"))) {
+                if ((c = obt_xml_find_sibling(n->children, "x")))
                     if (!obt_xml_node_contains(c, "default")) {
                         config_parse_gravity_coord(c, &settings->position.x);
                         x_pos_given = TRUE;
                     }
 
-                if (x_pos_given && (c = obt_xml_find_node(n->children, "y")))
+                if (x_pos_given && (c = obt_xml_find_sibling(n->children, "y")))
                     if (!obt_xml_node_contains(c, "default")) {
                         config_parse_gravity_coord(c, &settings->position.y);
                         settings->pos_given = TRUE;
                     }
 
                 /* monitor can be set without setting x or y */
-                if ((c = obt_xml_find_node(n->children, "monitor")))
+                if ((c = obt_xml_find_sibling(n->children, "monitor")))
                     if (!obt_xml_node_contains(c, "default")) {
                         gchar *s = obt_xml_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))
@@ -314,11 +314,11 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 obt_xml_attr_bool(n, "force", &settings->pos_force);
             }
 
-            if ((n = obt_xml_find_node(app->children, "focus")))
+            if ((n = obt_xml_find_sibling(app->children, "focus")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->focus = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "desktop"))) {
+            if ((n = obt_xml_find_sibling(app->children, "desktop"))) {
                 if (!obt_xml_node_contains(n, "default")) {
                     gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "all"))
@@ -332,7 +332,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 }
             }
 
-            if ((n = obt_xml_find_node(app->children, "layer")))
+            if ((n = obt_xml_find_sibling(app->children, "layer")))
                 if (!obt_xml_node_contains(n, "default")) {
                     gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "above"))
@@ -344,23 +344,23 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     g_free(s);
                 }
 
-            if ((n = obt_xml_find_node(app->children, "iconic")))
+            if ((n = obt_xml_find_sibling(app->children, "iconic")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->iconic = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "skip_pager")))
+            if ((n = obt_xml_find_sibling(app->children, "skip_pager")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->skip_pager = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "skip_taskbar")))
+            if ((n = obt_xml_find_sibling(app->children, "skip_taskbar")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->skip_taskbar = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "fullscreen")))
+            if ((n = obt_xml_find_sibling(app->children, "fullscreen")))
                 if (!obt_xml_node_contains(n, "default"))
                     settings->fullscreen = obt_xml_node_bool(n);
 
-            if ((n = obt_xml_find_node(app->children, "maximized")))
+            if ((n = obt_xml_find_sibling(app->children, "maximized")))
                 if (!obt_xml_node_contains(n, "default")) {
                     gchar *s = obt_xml_node_string(n);
                     if (!g_ascii_strcasecmp(s, "horizontal")) {
@@ -385,7 +385,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
             name = class = role = title = type_str = NULL;
         }
 
-        app = obt_xml_find_node(app->next, "application");
+        app = obt_xml_find_sibling(app->next, "application");
     }
 }
 
@@ -414,13 +414,13 @@ static void parse_key(xmlNodePtr node, GList *keylist)
     for (key = keys; *key; ++key) {
         keylist = g_list_append(keylist, *key);
 
-        if ((n = obt_xml_find_node(node->children, "keybind"))) {
+        if ((n = obt_xml_find_sibling(node->children, "keybind"))) {
             while (n) {
                 parse_key(n, keylist);
-                n = obt_xml_find_node(n->next, "keybind");
+                n = obt_xml_find_sibling(n->next, "keybind");
             }
         }
-        else if ((n = obt_xml_find_node(node->children, "action"))) {
+        else if ((n = obt_xml_find_sibling(node->children, "action"))) {
             while (n) {
                 ObActionParser *p;
                 ObActionList *actions;
@@ -436,7 +436,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
                     keyboard_bind(keylist, actions);
 
                 action_list_unref(actions);
-                n = obt_xml_find_node(n->next, "action");
+                n = obt_xml_find_sibling(n->next, "action");
             }
         }
 
@@ -457,17 +457,17 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
     keyboard_unbind_all();
 
-    if ((n = obt_xml_find_node(node->children, "chainQuitKey"))) {
+    if ((n = obt_xml_find_sibling(node->children, "chainQuitKey"))) {
         key = obt_xml_node_string(n);
         translate_key(key, &config_keyboard_reset_state,
                       &config_keyboard_reset_keycode);
         g_free(key);
     }
 
-    if ((n = obt_xml_find_node(node->children, "keybind")))
+    if ((n = obt_xml_find_sibling(node->children, "keybind")))
         while (n) {
             parse_key(n, NULL);
-            n = obt_xml_find_node(n->next, "keybind");
+            n = obt_xml_find_sibling(n->next, "keybind");
         }
 }
 
@@ -492,21 +492,21 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "dragThreshold")))
+    if ((n = obt_xml_find_sibling(node, "dragThreshold")))
         config_mouse_threshold = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "doubleClickTime")))
+    if ((n = obt_xml_find_sibling(node, "doubleClickTime")))
         config_mouse_dclicktime = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "screenEdgeWarpTime"))) {
+    if ((n = obt_xml_find_sibling(node, "screenEdgeWarpTime"))) {
         config_mouse_screenedgetime = obt_xml_node_int(n);
         /* minimum value of 25 for this property, when it is 1 and you hit the
            edge it basically never stops */
         if (config_mouse_screenedgetime && config_mouse_screenedgetime < 25)
             config_mouse_screenedgetime = 25;
     }
-    if ((n = obt_xml_find_node(node, "screenEdgeWarpMouse")))
+    if ((n = obt_xml_find_sibling(node, "screenEdgeWarpMouse")))
         config_mouse_screenedgewarp = obt_xml_node_bool(n);
 
-    n = obt_xml_find_node(node, "context");
+    n = obt_xml_find_sibling(node, "context");
     while (n) {
         gchar *modcxstr;
         ObFrameContext cx;
@@ -527,7 +527,7 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                 continue;
             }
 
-            nbut = obt_xml_find_node(n->children, "mousebind");
+            nbut = obt_xml_find_sibling(n->children, "mousebind");
             while (nbut) {
                 if (!obt_xml_attr_string(nbut, "button", &buttonstr))
                     goto next_nbut;
@@ -544,7 +544,7 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                 else
                     goto next_nbut;
 
-                nact = obt_xml_find_node(nbut->children, "action");
+                nact = obt_xml_find_sibling(nbut->children, "action");
                 while (nact) {
                     ObActionList *actions;
                     ObActionParser *p;
@@ -554,20 +554,20 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                     p = action_parser_new();
                     if ((actions = action_parser_read_string(p, (gchar*)c)))
                         mouse_bind(buttonstr, cx, mact, actions);
-                    nact = obt_xml_find_node(nact->next, "action");
+                    nact = obt_xml_find_sibling(nact->next, "action");
                     action_list_unref(actions);
                     xmlFree(c);
                     action_parser_unref(p);
                 }
             g_free(buttonstr);
             next_nbut:
-            nbut = obt_xml_find_node(nbut->next, "mousebind");
+            nbut = obt_xml_find_sibling(nbut->next, "mousebind");
             }
         }
         g_free(modcxstr);
         g_free(cxstr);
     next_n:
-        n = obt_xml_find_node(n->next, "context");
+        n = obt_xml_find_sibling(n->next, "context");
     }
 }
 
@@ -577,19 +577,19 @@ static void parse_focus(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "focusNew")))
+    if ((n = obt_xml_find_sibling(node, "focusNew")))
         config_focus_new = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "followMouse")))
+    if ((n = obt_xml_find_sibling(node, "followMouse")))
         config_focus_follow = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "focusDelay")))
+    if ((n = obt_xml_find_sibling(node, "focusDelay")))
         config_focus_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "raiseOnFocus")))
+    if ((n = obt_xml_find_sibling(node, "raiseOnFocus")))
         config_focus_raise = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "focusLast")))
+    if ((n = obt_xml_find_sibling(node, "focusLast")))
         config_focus_last = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "underMouse")))
+    if ((n = obt_xml_find_sibling(node, "underMouse")))
         config_focus_under_mouse = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "unfocusOnLeave")))
+    if ((n = obt_xml_find_sibling(node, "unfocusOnLeave")))
         config_unfocus_leave = obt_xml_node_bool(n);
 }
 
@@ -599,12 +599,12 @@ static void parse_placement(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "policy")))
+    if ((n = obt_xml_find_sibling(node, "policy")))
         if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
-    if ((n = obt_xml_find_node(node, "center")))
+    if ((n = obt_xml_find_sibling(node, "center")))
         config_place_center = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "monitor"))) {
+    if ((n = obt_xml_find_sibling(node, "monitor"))) {
         if (obt_xml_node_contains(n, "active"))
             config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
         else if (obt_xml_node_contains(n, "mouse"))
@@ -612,7 +612,7 @@ static void parse_placement(xmlNodePtr node, gpointer d)
         else if (obt_xml_node_contains(n, "any"))
             config_place_monitor = OB_PLACE_MONITOR_ANY;
     }
-    if ((n = obt_xml_find_node(node, "primaryMonitor"))) {
+    if ((n = obt_xml_find_sibling(node, "primaryMonitor"))) {
         config_primary_monitor_index = obt_xml_node_int(n);
         if (!config_primary_monitor_index) {
             if (obt_xml_node_contains(n, "mouse"))
@@ -627,13 +627,13 @@ static void parse_margins(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "top")))
+    if ((n = obt_xml_find_sibling(node, "top")))
         config_margins.top = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_node(node, "left")))
+    if ((n = obt_xml_find_sibling(node, "left")))
         config_margins.left = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_node(node, "right")))
+    if ((n = obt_xml_find_sibling(node, "right")))
         config_margins.right = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_node(node, "bottom")))
+    if ((n = obt_xml_find_sibling(node, "bottom")))
         config_margins.bottom = MAX(0, obt_xml_node_int(n));
 }
 
@@ -643,7 +643,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "name"))) {
+    if ((n = obt_xml_find_sibling(node, "name"))) {
         gchar *c;
 
         g_free(config_theme);
@@ -651,7 +651,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         config_theme = obt_paths_expand_tilde(c);
         g_free(c);
     }
-    if ((n = obt_xml_find_node(node, "titleLayout"))) {
+    if ((n = obt_xml_find_sibling(node, "titleLayout"))) {
         gchar *c, *d;
 
         g_free(config_title_layout);
@@ -662,11 +662,11 @@ static void parse_theme(xmlNodePtr node, gpointer d)
             for (d = c+1; *d != '\0'; ++d)
                 if (*c == *d) *d = ' ';
     }
-    if ((n = obt_xml_find_node(node, "keepBorder")))
+    if ((n = obt_xml_find_sibling(node, "keepBorder")))
         config_theme_keepborder = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "animateIconify")))
+    if ((n = obt_xml_find_sibling(node, "animateIconify")))
         config_animate_iconify = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "windowListIconSize"))) {
+    if ((n = obt_xml_find_sibling(node, "windowListIconSize"))) {
         config_theme_window_list_icon_size = obt_xml_node_int(n);
         if (config_theme_window_list_icon_size < 16)
             config_theme_window_list_icon_size = 16;
@@ -674,7 +674,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
             config_theme_window_list_icon_size = 96;
     }
 
-    n = obt_xml_find_node(node, "font");
+    n = obt_xml_find_sibling(node, "font");
     while (n) {
         xmlNodePtr   fnode;
         RrFont     **font;
@@ -700,21 +700,21 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         else
             goto next_font;
 
-        if ((fnode = obt_xml_find_node(n->children, "name"))) {
+        if ((fnode = obt_xml_find_sibling(n->children, "name"))) {
             g_free(name);
             name = obt_xml_node_string(fnode);
         }
-        if ((fnode = obt_xml_find_node(n->children, "size"))) {
+        if ((fnode = obt_xml_find_sibling(n->children, "size"))) {
             int s = obt_xml_node_int(fnode);
             if (s > 0) size = s;
         }
-        if ((fnode = obt_xml_find_node(n->children, "weight"))) {
+        if ((fnode = obt_xml_find_sibling(n->children, "weight"))) {
             gchar *w = obt_xml_node_string(fnode);
             if (!g_ascii_strcasecmp(w, "Bold"))
                 weight = RR_FONTWEIGHT_BOLD;
             g_free(w);
         }
-        if ((fnode = obt_xml_find_node(n->children, "slant"))) {
+        if ((fnode = obt_xml_find_sibling(n->children, "slant"))) {
             gchar *s = obt_xml_node_string(fnode);
             if (!g_ascii_strcasecmp(s, "Italic"))
                 slant = RR_FONTSLANT_ITALIC;
@@ -726,7 +726,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
         g_free(name);
     next_font:
-        n = obt_xml_find_node(n->next, "font");
+        n = obt_xml_find_sibling(n->next, "font");
     }
 }
 
@@ -736,17 +736,17 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "number"))) {
+    if ((n = obt_xml_find_sibling(node, "number"))) {
         gint d = obt_xml_node_int(n);
         if (d > 0)
             config_desktops_num = (unsigned) d;
     }
-    if ((n = obt_xml_find_node(node, "firstdesk"))) {
+    if ((n = obt_xml_find_sibling(node, "firstdesk"))) {
         gint d = obt_xml_node_int(n);
         if (d > 0)
             config_screen_firstdesk = (unsigned) d;
     }
-    if ((n = obt_xml_find_node(node, "names"))) {
+    if ((n = obt_xml_find_sibling(node, "names"))) {
         GSList *it;
         xmlNodePtr nname;
 
@@ -755,15 +755,15 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
         g_slist_free(config_desktops_names);
         config_desktops_names = NULL;
 
-        nname = obt_xml_find_node(n->children, "name");
+        nname = obt_xml_find_sibling(n->children, "name");
         while (nname) {
             config_desktops_names =
                 g_slist_append(config_desktops_names,
                                obt_xml_node_string(nname));
-            nname = obt_xml_find_node(nname->next, "name");
+            nname = obt_xml_find_sibling(nname->next, "name");
         }
     }
-    if ((n = obt_xml_find_node(node, "popupTime")))
+    if ((n = obt_xml_find_sibling(node, "popupTime")))
         config_desktop_popup_time = obt_xml_node_int(n);
 }
 
@@ -773,9 +773,9 @@ static void parse_resize(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "drawContents")))
+    if ((n = obt_xml_find_sibling(node, "drawContents")))
         config_resize_redraw = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "popupShow"))) {
+    if ((n = obt_xml_find_sibling(node, "popupShow"))) {
         config_resize_popup_show = obt_xml_node_int(n);
         if (obt_xml_node_contains(n, "Always"))
             config_resize_popup_show = 2;
@@ -784,7 +784,7 @@ static void parse_resize(xmlNodePtr node, gpointer d)
         else if (obt_xml_node_contains(n, "Nonpixel"))
             config_resize_popup_show = 1;
     }
-    if ((n = obt_xml_find_node(node, "popupPosition"))) {
+    if ((n = obt_xml_find_sibling(node, "popupPosition"))) {
         if (obt_xml_node_contains(n, "Top"))
             config_resize_popup_pos = OB_RESIZE_POS_TOP;
         else if (obt_xml_node_contains(n, "Center"))
@@ -792,13 +792,13 @@ static void parse_resize(xmlNodePtr node, gpointer d)
         else if (obt_xml_node_contains(n, "Fixed")) {
             config_resize_popup_pos = OB_RESIZE_POS_FIXED;
 
-            if ((n = obt_xml_find_node(node, "popupFixedPosition"))) {
+            if ((n = obt_xml_find_sibling(node, "popupFixedPosition"))) {
                 xmlNodePtr n2;
 
-                if ((n2 = obt_xml_find_node(n->children, "x")))
+                if ((n2 = obt_xml_find_sibling(n->children, "x")))
                     config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.x);
-                if ((n2 = obt_xml_find_node(n->children, "y")))
+                if ((n2 = obt_xml_find_sibling(n->children, "y")))
                     config_parse_gravity_coord(n2,
                                                &config_resize_popup_fixed.y);
 
@@ -817,7 +817,7 @@ static void parse_dock(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "position"))) {
+    if ((n = obt_xml_find_sibling(node, "position"))) {
         if (obt_xml_node_contains(n, "TopLeft"))
             config_dock_floating = FALSE,
             config_dock_pos = OB_DIRECTION_NORTHWEST;
@@ -846,15 +846,15 @@ static void parse_dock(xmlNodePtr node, gpointer d)
             config_dock_floating = TRUE;
     }
     if (config_dock_floating) {
-        if ((n = obt_xml_find_node(node, "floatingX")))
+        if ((n = obt_xml_find_sibling(node, "floatingX")))
             config_dock_x = obt_xml_node_int(n);
-        if ((n = obt_xml_find_node(node, "floatingY")))
+        if ((n = obt_xml_find_sibling(node, "floatingY")))
             config_dock_y = obt_xml_node_int(n);
     } else {
-        if ((n = obt_xml_find_node(node, "noStrut")))
+        if ((n = obt_xml_find_sibling(node, "noStrut")))
             config_dock_nostrut = obt_xml_node_bool(n);
     }
-    if ((n = obt_xml_find_node(node, "stacking"))) {
+    if ((n = obt_xml_find_sibling(node, "stacking"))) {
         if (obt_xml_node_contains(n, "normal"))
             config_dock_layer = OB_STACKING_LAYER_NORMAL;
         else if (obt_xml_node_contains(n, "below"))
@@ -862,19 +862,19 @@ static void parse_dock(xmlNodePtr node, gpointer d)
         else if (obt_xml_node_contains(n, "above"))
             config_dock_layer = OB_STACKING_LAYER_ABOVE;
     }
-    if ((n = obt_xml_find_node(node, "direction"))) {
+    if ((n = obt_xml_find_sibling(node, "direction"))) {
         if (obt_xml_node_contains(n, "horizontal"))
             config_dock_orient = OB_ORIENTATION_HORZ;
         else if (obt_xml_node_contains(n, "vertical"))
             config_dock_orient = OB_ORIENTATION_VERT;
     }
-    if ((n = obt_xml_find_node(node, "autoHide")))
+    if ((n = obt_xml_find_sibling(node, "autoHide")))
         config_dock_hide = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "hideDelay")))
+    if ((n = obt_xml_find_sibling(node, "hideDelay")))
         config_dock_hide_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "showDelay")))
+    if ((n = obt_xml_find_sibling(node, "showDelay")))
         config_dock_show_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "moveButton"))) {
+    if ((n = obt_xml_find_sibling(node, "moveButton"))) {
         gchar *str = obt_xml_node_string(n);
         guint b, s;
         if (translate_button(str, &s, &b)) {
@@ -892,17 +892,17 @@ static void parse_menu(xmlNodePtr node, gpointer d)
     xmlNodePtr n;
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "hideDelay")))
+    if ((n = obt_xml_find_sibling(node, "hideDelay")))
         config_menu_hide_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "middle")))
+    if ((n = obt_xml_find_sibling(node, "middle")))
         config_menu_middle = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "submenuShowDelay")))
+    if ((n = obt_xml_find_sibling(node, "submenuShowDelay")))
         config_submenu_show_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "submenuHideDelay")))
+    if ((n = obt_xml_find_sibling(node, "submenuHideDelay")))
         config_submenu_hide_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "manageDesktops")))
+    if ((n = obt_xml_find_sibling(node, "manageDesktops")))
         config_menu_manage_desktops = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_node(node, "showIcons"))) {
+    if ((n = obt_xml_find_sibling(node, "showIcons"))) {
         config_menu_show_icons = obt_xml_node_bool(n);
 #ifndef USE_IMLIB2
         if (config_menu_show_icons)
@@ -910,7 +910,7 @@ static void parse_menu(xmlNodePtr node, gpointer d)
 #endif
     }
 
-    while ((node = obt_xml_find_node(node, "file"))) {
+    while ((node = obt_xml_find_sibling(node, "file"))) {
             gchar *c = obt_xml_node_string(node);
             config_menu_files = g_slist_append(config_menu_files,
                                                obt_paths_expand_tilde(c));
@@ -924,9 +924,9 @@ static void parse_resistance(xmlNodePtr node, gpointer d)
     xmlNodePtr n;
 
     node = node->children;
-    if ((n = obt_xml_find_node(node, "strength")))
+    if ((n = obt_xml_find_sibling(node, "strength")))
         config_resist_win = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "screen_edge_strength")))
+    if ((n = obt_xml_find_sibling(node, "screen_edge_strength")))
         config_resist_edge = obt_xml_node_int(n);
 }
 

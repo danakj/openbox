@@ -84,7 +84,7 @@ gboolean config_value_is_action_list(const ObConfigValue *v);
   pointing to. */
 void config_value_copy_ptr(ObConfigValue *v,
                            ObConfigValueDataType type,
-                           ObConfigValueDataPtr *p,
+                           ObConfigValueDataPtr p,
                            const ObConfigValueEnum e[]);
 
 /* These ones are valid on a string value */

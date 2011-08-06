@@ -287,7 +287,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
             ObActionList *acts = NULL;
             ObActionParser *p;
 
-            c = obt_xml_find_node(node->children, "action");
+            c = obt_xml_find_sibling(node->children, "action");
             p = action_parser_new();
             while (c) {
                 ObActionList *al;
@@ -297,7 +297,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
                 xmlFree(cc);
                 acts = action_list_concat(acts, al);
 
-                c = obt_xml_find_node(c->next, "action");
+                c = obt_xml_find_sibling(c->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, acts, TRUE);
             action_list_unref(acts);

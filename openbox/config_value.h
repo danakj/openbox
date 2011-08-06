@@ -16,8 +16,6 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#include "geom.h"
-
 #include <glib.h>
 
 struct _GravityCoord;
@@ -38,7 +36,10 @@ typedef enum {
     OB_CONFIG_VALUE_INTEGER,
     OB_CONFIG_VALUE_FRACTION,
     OB_CONFIG_VALUE_GRAVITY_COORD,
+    OB_CONFIG_VALUE_KEY,
+    OB_CONFIG_VALUE_BUTTON,
     OB_CONFIG_VALUE_STRING_LIST,
+    OB_CONFIG_VALUE_LIST,
     OB_CONFIG_VALUE_ACTIONLIST,
     NUM_OB_CONFIG_VALUE_TYPES
 } ObConfigValueDataType;
@@ -55,6 +56,8 @@ typedef union _ObConfigValueDataPtr {
         guint denom;
     } *fraction;
     struct _GravityCoord *coord;
+    struct _ObKeyboardKey *key;
+    struct _ObMouseButton *button;
     const gchar *const**list;
     struct _ObActionList **actions;
 } ObConfigValueDataPtr;
@@ -83,20 +86,25 @@ gboolean config_value_is_action_list(const ObConfigValue *v);
 
 /*! Copies the data inside @v to the destination that the pointer @p is
   pointing to. */
-void config_value_copy_ptr(ObConfigValue *v,
-                           ObConfigValueDataType type,
-                           ObConfigValueDataPtr p,
-                           const ObConfigValueEnum e[]);
+gboolean config_value_copy_ptr(ObConfigValue *v,
+                               ObConfigValueDataType type,
+                               ObConfigValueDataPtr p,
+                               const ObConfigValueEnum e[]);
 
 /* These ones are valid on a string value */
 
 const gchar* config_value_string(ObConfigValue *v);
 gboolean config_value_bool(ObConfigValue *v);
 guint config_value_int(ObConfigValue *v);
-/*! returns (guint)-1 if an error */
-guint config_value_enum(ObConfigValue *v, const ObConfigValueEnum e[]);
+/*! returns FALSE if the value isn't in the enumeration */
+gboolean config_value_enum(ObConfigValue *v, const ObConfigValueEnum e[],
+                           guint *out);
 void config_value_fraction(ObConfigValue *v, gint *numer, gint *denom);
 void config_value_gravity_coord(ObConfigValue *v, struct _GravityCoord *c);
+/*! returns FALSE if the key string isn't valid */
+gboolean config_value_key(ObConfigValue *v, struct _ObKeyboardKey *k);
+/*! returns FALSE if the button string isn't valid */
+gboolean config_value_button(ObConfigValue *v, struct _ObMouseButton *b);
 
 /* These ones are valid on a string list value */
 

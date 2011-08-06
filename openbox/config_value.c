@@ -19,6 +19,9 @@
 #include "config_value.h"
 #include "action_list.h"
 #include "geom.h"
+#include "keyboard.h"
+#include "mouse.h"
+#include "translate.h"
 
 #include "stdlib.h"
 
@@ -81,11 +84,13 @@ gboolean config_value_is_action_list(const ObConfigValue *v)
 
 /**************************** pointer functions ****************************/
 
-void config_value_copy_ptr(ObConfigValue *v,
-                           ObConfigValueDataType type,
-                           ObConfigValueDataPtr p,
-                           const ObConfigValueEnum e[])
+gboolean config_value_copy_ptr(ObConfigValue *v,
+                               ObConfigValueDataType type,
+                               ObConfigValueDataPtr p,
+                               const ObConfigValueEnum e[])
 {
+    gboolean ok = TRUE;
+
     switch (type) {
     case OB_CONFIG_VALUE_STRING:
         *p.string = config_value_string(v);
@@ -97,7 +102,7 @@ void config_value_copy_ptr(ObConfigValue *v,
         *p.integer = config_value_int(v);
         break;
     case OB_CONFIG_VALUE_ENUM:
-        *p.enumeration = config_value_enum(v, e);
+        ok = config_value_enum(v, e, p.enumeration);
         break;
     case OB_CONFIG_VALUE_FRACTION: {
         gint n, d;
@@ -107,11 +112,15 @@ void config_value_copy_ptr(ObConfigValue *v,
         break;
     }
     case OB_CONFIG_VALUE_GRAVITY_COORD: {
-        GravityCoord c;
-        config_value_gravity_coord(v, &c);
-        *p.coord = c;
+        config_value_gravity_coord(v, p.coord);
         break;
     }
+    case OB_CONFIG_VALUE_KEY:
+        ok = config_value_key(v, p.key);
+        break;
+    case OB_CONFIG_VALUE_BUTTON:
+        ok = config_value_button(v, p.button);
+        break;
     case OB_CONFIG_VALUE_STRING_LIST: {
         *p.list = config_value_string_list(v);
         break;
@@ -120,9 +129,9 @@ void config_value_copy_ptr(ObConfigValue *v,
         *p.actions = config_value_action_list(v);
         break;
     case NUM_OB_CONFIG_VALUE_TYPES:
-    default:
         g_assert_not_reached();
     }
+    return ok;
 }
 
 
@@ -149,18 +158,21 @@ guint config_value_int(ObConfigValue *v)
     s = v->v.string;
     return strtol(s, &s, 10);
 }
-guint config_value_enum(ObConfigValue *v, const ObConfigValueEnum choices[])
+gboolean config_value_enum(ObConfigValue *v, const ObConfigValueEnum choices[],
+                           guint *out)
 {
     const ObConfigValueEnum *e;
 
-    g_return_val_if_fail(v != NULL, (guint)-1);
-    g_return_val_if_fail(config_value_is_string(v), (guint)-1);
-    g_return_val_if_fail(choices != NULL, (guint)-1);
+    g_return_val_if_fail(v != NULL, FALSE);
+    g_return_val_if_fail(config_value_is_string(v), FALSE);
+    g_return_val_if_fail(choices != NULL, FALSE);
 
     for (e = choices; e->name; ++e)
-        if (g_strcasecmp(v->v.string, e->name) == 0)
-            return e->value;
-    return (guint)-1;
+        if (g_strcasecmp(v->v.string, e->name) == 0) {
+            *out = e->value;
+            return TRUE;
+        }
+    return FALSE;
 }
 void config_value_fraction(ObConfigValue *v, gint *numer, gint *denom)
 {
@@ -207,6 +219,24 @@ void config_value_gravity_coord(ObConfigValue *v, GravityCoord *c)
         else if (*s == '/')
             c->denom = atoi(s+1);
     }
+}
+gboolean config_value_key(ObConfigValue *v, struct _ObKeyboardKey *k)
+{
+    k->modifiers = 0;
+    k->keycode = 0;
+
+    g_return_val_if_fail(v != NULL, FALSE);
+    g_return_val_if_fail(config_value_is_string(v), FALSE);
+    return translate_key(v->v.string, &k->modifiers, &k->keycode);
+}
+gboolean config_value_button(ObConfigValue *v, struct _ObMouseButton *b)
+{
+    b->modifiers = 0;
+    b->button = 0;
+
+    g_return_val_if_fail(v != NULL, FALSE);
+    g_return_val_if_fail(config_value_is_string(v), FALSE);
+    return translate_button(v->v.string, &b->modifiers, &b->button);
 }
 const gchar *const* config_value_string_list(ObConfigValue *v)
 {

@@ -303,14 +303,18 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("window.active.label.text.color", theme->title_focused_color,
                RrColorNew(inst, 0x0, 0x0, 0x0));
 
-    READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color,
-               RrColorCopy(theme->title_unfocused_color));
-
     READ_COLOR_("osd.active.label.text.color",
                 "osd.label.text.color",
                 theme->osd_text_active_color, RrColorCopy(theme->title_focused_color));
 
+    READ_COLOR("window.inactive.label.text.color", theme->title_unfocused_color,
+               RrColorCopy(theme->title_unfocused_color));
+
     READ_COLOR("osd.inactive.label.text.color", theme->osd_text_inactive_color,
+               RrColorNew(inst, 0xff, 0xff, 0xff));
+
+    READ_COLOR("window.inactive.label.text.color",
+               theme->title_unfocused_color,
                RrColorNew(inst, 0xff, 0xff, 0xff));
 
     READ_COLOR("window.active.button.unpressed.image.color",
@@ -982,7 +986,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->a_focused_label->texture[0].data.text.shadow_offset_y;
         if (theme->title_focused_shadow_color)
             theme->osd_text_active_shadow_color =
-                RrColorCopy(theme->title_focused_shadow_color);
+                RrColorNew(inst,
+                           theme->title_focused_shadow_color->r,
+                           theme->title_focused_shadow_color->g,
+                           theme->title_focused_shadow_color->b);
         else
             theme->osd_text_active_shadow_color = RrColorNew(inst, 0, 0, 0);
         theme->osd_text_active_shadow_alpha =
@@ -1106,7 +1113,10 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->a_unfocused_label->texture[0].data.text.shadow_offset_y;
         if (theme->title_unfocused_shadow_color)
             theme->osd_text_inactive_shadow_color =
-                RrColorCopy(theme->title_unfocused_shadow_color);
+                RrColorNew(inst,
+                           theme->title_unfocused_shadow_color->r,
+                           theme->title_unfocused_shadow_color->g,
+                           theme->title_unfocused_shadow_color->b);
         else
             theme->osd_text_inactive_shadow_color = RrColorNew(inst, 0, 0, 0);
         theme->osd_text_inactive_shadow_alpha =

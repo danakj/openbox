@@ -25,11 +25,9 @@ void ob_debug_startup(void);
 void ob_debug_shutdown(void);
 
 void ob_debug(const gchar *a, ...);
-void ag_debug(const gchar *a, ...);
 
 typedef enum {
     OB_DEBUG_NORMAL,
-    OB_DEBUG_AG,
     OB_DEBUG_FOCUS,
     OB_DEBUG_APP_BUGS,
     OB_DEBUG_SM,

@@ -2627,7 +2627,6 @@ void client_calc_layer(ObClient *self)
 
 gboolean client_should_show(ObClient *self)
 {
-    ag_debug("should i show on desktop %d? (really %d)", screen_desktop, self->desktop);
     if (self->iconic)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop)

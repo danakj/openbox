@@ -147,13 +147,12 @@ static inline void log_argv(ObDebugType type,
     gchar *message;
 
     g_assert(type < OB_DEBUG_TYPE_NUM);
-    if (!enabled_types[type] && type != OB_DEBUG_AG) return;
+    if (!enabled_types[type]) return;
 
     switch (type) {
     case OB_DEBUG_FOCUS:    prefix = "(FOCUS) ";           break;
     case OB_DEBUG_APP_BUGS: prefix = "(APPLICATION BUG) "; break;
     case OB_DEBUG_SM:       prefix = "(SESSION) ";         break;
-    case OB_DEBUG_AG:       prefix = "(ANDREW) ";          break;
     default:                prefix = NULL;                 break;
     }
 
@@ -174,15 +173,6 @@ void ob_debug(const gchar *a, ...)
 
     va_start(vl, a);
     log_argv(OB_DEBUG_NORMAL, a, vl);
-    va_end(vl);
-}
-
-void ag_debug(const gchar *a, ...)
-{
-    va_list vl;
-
-    va_start(vl, a);
-    log_argv(OB_DEBUG_AG, a, vl);
     va_end(vl);
 }
 

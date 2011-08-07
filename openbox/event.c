@@ -1847,7 +1847,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (sym == XK_Left || sym == XK_h) {
+            else if (sym == XK_Left) {
                 /* Left goes to the parent menu */
                 if (frame->parent) {
                     /* remove focus from the child */
@@ -1859,8 +1859,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (sym == XK_Right || sym == XK_Return 
-                     || sym == XK_KP_Enter || sym == XK_l)
+            else if (sym == XK_Right || sym == XK_Return || sym == XK_KP_Enter)
             {
                 /* Right and enter goes to the selected submenu.
                    Enter executes instead if it's not on a submenu. */
@@ -1881,12 +1880,12 @@ static gboolean event_handle_menu_input(XEvent *ev)
                 ret = TRUE;
             }
 
-            else if (sym == XK_Up || sym == XK_k) {
+            else if (sym == XK_Up) {
                 menu_frame_select_previous(frame);
                 ret = TRUE;
             }
 
-            else if (sym == XK_Down || sym == XK_j) {
+            else if (sym == XK_Down) {
                 menu_frame_select_next(frame);
                 ret = TRUE;
             }

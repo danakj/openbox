@@ -40,12 +40,16 @@
   <!-- with Smart placement on a multi-monitor system, try to place new windows
        on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
        the active window is, 'Primary' - only on the primary monitor -->
+  <primaryMonitorType>Fixed</primaryMonitorType>
+  <!-- The monitor where Openbox should place popup dialogs such as the
+       focus cycling popup, or the desktop switch popup.  It can be one of the
+       following: 'Fixed' - use the monitor in the primaryMonitor tag
+                  'Mouse' - where the mouse is, or
+                  'Active' - where the active window is -->
   <primaryMonitor>1</primaryMonitor>
   <!-- The monitor where Openbox should place popup dialogs such as the
-       focus cycling popup, or the desktop switch popup.  It can be an index
-       from 1, specifying a particular monitor.  Or it can be one of the
-       following: 'Mouse' - where the mouse is, or
-                  'Active' - where the active window is -->
+       focus cycling popup, or the desktop switch popup.  It is an index
+       from 1, specifying a particular monitor. -->
 </placement>
 
 <theme>

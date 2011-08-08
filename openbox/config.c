@@ -540,34 +540,6 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_placement(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "policy")))
-        if (obt_xml_node_contains(n, "UnderMouse"))
-            config_place_policy = OB_PLACE_POLICY_MOUSE;
-    if ((n = obt_xml_find_sibling(node, "center")))
-        config_place_center = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "monitor"))) {
-        if (obt_xml_node_contains(n, "active"))
-            config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
-        else if (obt_xml_node_contains(n, "mouse"))
-            config_place_monitor = OB_PLACE_MONITOR_MOUSE;
-        else if (obt_xml_node_contains(n, "any"))
-            config_place_monitor = OB_PLACE_MONITOR_ANY;
-    }
-    if ((n = obt_xml_find_sibling(node, "primaryMonitor"))) {
-        config_primary_monitor_index = obt_xml_node_int(n);
-        if (!config_primary_monitor_index) {
-            if (obt_xml_node_contains(n, "mouse"))
-                config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
-        }
-    }
-}
-
 static void parse_margins(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
@@ -992,6 +964,7 @@ static void bind_default_mouse(void)
 #define BOOL config_parser_bool
 #define INT config_parser_int
 #define STRING config_parser_string
+#define ENUM config_parser_enum
 
 void config_startup(ObConfigParser *p, ObtXmlInst *i)
 {
@@ -1003,14 +976,34 @@ void config_startup(ObConfigParser *p, ObtXmlInst *i)
     BOOL(p, "focus/underMouse", "no", &config_focus_under_mouse);
     BOOL(p, "focus/unfocusOnLeave", "no", &config_unfocus_leave);
 
-    config_place_policy = OB_PLACE_POLICY_SMART;
-    config_place_center = TRUE;
-    config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
-
-    config_primary_monitor_index = 1;
-    config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
-
-    obt_xml_register(i, "placement", parse_placement, NULL);
+    {
+        static ObConfigValueEnum policies[] = {
+            {"smart", OB_PLACE_POLICY_SMART},
+            {"undermouse", OB_PLACE_POLICY_MOUSE},
+            {0, 0}};
+        ENUM(p, "placement/policy", "smart", &config_place_policy, policies);
+    }
+    BOOL(p, "placement/center", "true", &config_place_center);
+    {
+        static ObConfigValueEnum monitors[] = {
+            {"any", OB_PLACE_MONITOR_ANY},
+            {"active", OB_PLACE_MONITOR_ACTIVE},
+            {"mouse", OB_PLACE_MONITOR_MOUSE},
+            {"primary", OB_PLACE_MONITOR_PRIMARY},
+            {0, 0}};
+        ENUM(p, "placement/monitor", "primary", &config_place_monitor,
+             monitors);
+    }
+    INT(p, "placement/primaryMonitor", "1",
+        &config_primary_monitor_index);
+    {
+        static ObConfigValueEnum primaries[] = {
+            {"active", OB_PLACE_MONITOR_ACTIVE},
+            {"mouse", OB_PLACE_MONITOR_MOUSE},
+            {"fixed", 0}};
+        ENUM(p, "placement/primaryMonitorType", "fixed",
+             &config_primary_monitor, primaries);
+    }
 
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 

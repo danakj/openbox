@@ -533,22 +533,6 @@ static void parse_context(xmlNodePtr n, gpointer d)
     g_free(cxstr);
 }
 
-static void parse_margins(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "top")))
-        config_margins.top = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_sibling(node, "left")))
-        config_margins.left = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_sibling(node, "right")))
-        config_margins.right = MAX(0, obt_xml_node_int(n));
-    if ((n = obt_xml_find_sibling(node, "bottom")))
-        config_margins.bottom = MAX(0, obt_xml_node_int(n));
-}
-
 static void parse_theme(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
@@ -1043,9 +1027,12 @@ void config_load_config(void)
         config_primary_monitor_index = obt_xml_node_int(e);
     }
 
+    n = obt_xml_path_get_node(root, "margins", "");
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-    obt_xml_register(config_inst, "margins", parse_margins, NULL);
+    config_margins.top = MAX(0, obt_xml_path_int(n, "top", "0"));
+    config_margins.left = MAX(0, obt_xml_path_int(n, "left", "0"));
+    config_margins.right = MAX(0, obt_xml_path_int(n, "right", "0"));
+    config_margins.bottom = MAX(0, obt_xml_path_int(n, "bottom", "0"));
 
     config_theme = NULL;
 
@@ -1170,6 +1157,11 @@ void config_save_config(void)
         obt_xml_path_set_string(n, "primaryMonitor", e);
     }
 
+    n = obt_xml_path_get_node(root, "margins", "");
+    obt_xml_path_set_int(n, "top", config_margins.top);
+    obt_xml_path_set_int(n, "left", config_margins.left);
+    obt_xml_path_set_int(n, "right", config_margins.right);
+    obt_xml_path_set_int(n, "bottom", config_margins.bottom);
 
     if (!obt_xml_save_cache_file(config_inst, "openbox", "config", TRUE))
         g_warning("Unable to save configuration in XDG cache directory.");

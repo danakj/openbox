@@ -429,6 +429,23 @@ xmlNodePtr obt_xml_find_sibling(xmlNodePtr node, const gchar *tag)
     return NULL;
 }
 
+void obt_xml_node_set_string(xmlNodePtr node, const gchar *s)
+{
+    xmlNodeSetContent(node, (const xmlChar*)s);
+}
+
+void obt_xml_node_set_int(xmlNodePtr node, gint i)
+{
+    gchar *s = g_strdup_printf("%d", i);
+    obt_xml_node_set_string(node, s);
+    g_free(s);
+}
+
+void obt_xml_node_set_bool(xmlNodePtr node, gboolean b)
+{
+    obt_xml_node_set_string(node, b ? "yes" : "no");
+}
+
 gboolean obt_xml_attr_bool(xmlNodePtr node, const gchar *name,
                            gboolean *value)
 {
@@ -655,3 +672,23 @@ gboolean obt_xml_path_bool(xmlNodePtr subtree, const gchar *path,
     return n ? obt_xml_node_bool(n) : FALSE;
 }
 
+void obt_xml_path_set_string(xmlNodePtr subtree, const gchar *path,
+                             const gchar *value)
+{
+    xmlNodePtr n = obt_xml_path_get_node(subtree, path, "");
+    obt_xml_node_set_string(n, value);
+}
+
+void obt_xml_path_set_int(xmlNodePtr subtree, const gchar *path,
+                          gint value)
+{
+    xmlNodePtr n = obt_xml_path_get_node(subtree, path, "");
+    obt_xml_node_set_int(n, value);
+}
+
+void obt_xml_path_set_bool(xmlNodePtr subtree, const gchar *path,
+                           gboolean value)
+{
+    xmlNodePtr n = obt_xml_path_get_node(subtree, path, "");
+    obt_xml_node_set_bool(n, value);
+}

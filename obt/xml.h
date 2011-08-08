@@ -38,6 +38,10 @@ void obt_xml_new_file(ObtXmlInst *inst,
 gboolean obt_xml_load_file(ObtXmlInst *inst,
                            const gchar *path,
                            const gchar *root_node);
+gboolean obt_xml_load_cache_file(ObtXmlInst *inst,
+                                 const gchar *domain,
+                                 const gchar *filename,
+                                 const gchar *root_node);
 gboolean obt_xml_load_config_file(ObtXmlInst *inst,
                                   const gchar *domain,
                                   const gchar *filename,

@@ -79,53 +79,6 @@ gboolean config_value_is_action_list(const ObConfigValue *v)
     return v->type == OB_CV_ACTION_LIST;
 }
 
-/**************************** pointer functions ****************************/
-
-void config_value_copy_ptr(ObConfigValue *v,
-                           ObConfigValueDataType type,
-                           ObConfigValueDataPtr p,
-                           const ObConfigValueEnum e[])
-{
-    switch (type) {
-    case OB_CONFIG_VALUE_STRING:
-        *p.string = config_value_string(v);
-        break;
-    case OB_CONFIG_VALUE_BOOLEAN:
-        *p.boolean = config_value_bool(v);
-        break;
-    case OB_CONFIG_VALUE_INTEGER:
-        *p.integer = config_value_int(v);
-        break;
-    case OB_CONFIG_VALUE_ENUM:
-        *p.enumeration = config_value_enum(v, e);
-        break;
-    case OB_CONFIG_VALUE_FRACTION: {
-        gint n, d;
-        config_value_fraction(v, &n, &d);
-        p.fraction->numer = n;
-        p.fraction->denom = d;
-        break;
-    }
-    case OB_CONFIG_VALUE_GRAVITY_COORD: {
-        GravityCoord c;
-        config_value_gravity_coord(v, &c);
-        *p.coord = c;
-        break;
-    }
-    case OB_CONFIG_VALUE_STRING_LIST: {
-        *p.list = config_value_string_list(v);
-        break;
-    }
-    case OB_CONFIG_VALUE_ACTIONLIST:
-        *p.actions = config_value_action_list(v);
-        break;
-    case NUM_OB_CONFIG_VALUE_TYPES:
-    default:
-        g_assert_not_reached();
-    }
-}
-
-
 /***************************** getter functions ****************************/
 
 const gchar* config_value_string(ObConfigValue *v)
@@ -148,19 +101,6 @@ guint config_value_int(ObConfigValue *v)
     g_return_val_if_fail(config_value_is_string(v), FALSE);
     s = v->v.string;
     return strtol(s, &s, 10);
-}
-guint config_value_enum(ObConfigValue *v, const ObConfigValueEnum choices[])
-{
-    const ObConfigValueEnum *e;
-
-    g_return_val_if_fail(v != NULL, (guint)-1);
-    g_return_val_if_fail(config_value_is_string(v), (guint)-1);
-    g_return_val_if_fail(choices != NULL, (guint)-1);
-
-    for (e = choices; e->name; ++e)
-        if (g_strcasecmp(v->v.string, e->name) == 0)
-            return e->value;
-    return (guint)-1;
 }
 void config_value_fraction(ObConfigValue *v, gint *numer, gint *denom)
 {

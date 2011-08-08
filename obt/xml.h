@@ -87,6 +87,10 @@ gchar   *obt_xml_node_string   (xmlNodePtr node);
 gint     obt_xml_node_int      (xmlNodePtr node);
 gboolean obt_xml_node_bool     (xmlNodePtr node);
 
+void obt_xml_node_set_string(xmlNodePtr node, const gchar *s);
+void obt_xml_node_set_int(xmlNodePtr node, gint i);
+void obt_xml_node_set_bool(xmlNodePtr node, gboolean b);
+
 gboolean obt_xml_attr_contains (xmlNodePtr node, const gchar *name,
                                 const gchar *val);
 gboolean obt_xml_attr_string   (xmlNodePtr node, const gchar *name,
@@ -135,6 +139,12 @@ int obt_xml_path_int(xmlNodePtr subtree, const gchar *path,
 gboolean obt_xml_path_bool(xmlNodePtr subtree, const gchar *path,
                            const gchar *default_value);
 
+void obt_xml_path_set_string(xmlNodePtr subtree, const gchar *path,
+                             const gchar *value);
+void obt_xml_path_set_int(xmlNodePtr subtree, const gchar *path,
+                          gint value);
+void obt_xml_path_set_bool(xmlNodePtr subtree, const gchar *path,
+                           gboolean value);
 
 G_END_DECLS
 

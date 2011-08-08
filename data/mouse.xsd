@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?> <!-- -*- nxml -*- -->
+
+<!-- XML Schema for the Openbox window manager configuration file -->
+
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN"
+				"http://www.w3.org/2001/XMLSchema.dtd" [
+<!ATTLIST schema xmlns:ob CDATA #IMPLIED>
+<!ENTITY % p "xsd:">
+<!ENTITY % s ":xsd">
+]>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openbox.org/4.0/rc"
+    xmlns:ob="http://openbox.org/4.0/rc"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+    <!--
+         root node
+      -->
+    <xsd:element name="mouse">
+        <xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element maxOccurs="unbounded" name="context" type="ob:context"/>
+	  </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="context">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" name="mousebind" type="ob:mousebind"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="ob:contextname" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="mousebind">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" name="action" type="xsd:string"/>
+        </xsd:sequence>
+        <xsd:attribute name="action" type="ob:mouseaction" use="required"/>
+        <xsd:attribute name="button" type="ob:button" use="required"/>
+    </xsd:complexType>
+    <xsd:simpleType name="mouseaction">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Click"/>
+            <xsd:enumeration value="DoubleClick"/>
+            <xsd:enumeration value="Drag"/>
+            <xsd:enumeration value="Press"/>
+            <xsd:enumeration value="Release"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="button">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(([ACMSW]|Mod[1-5])-){,5}(Left|Middle|Right|Up|Down|Button[0-9]+)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="contextname">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Desktop"/>
+            <xsd:enumeration value="Root"/>
+            <xsd:enumeration value="Client"/>
+            <xsd:enumeration value="Titlebar"/>
+            <xsd:enumeration value="Frame"/>
+            <xsd:enumeration value="TLCorner"/>
+            <xsd:enumeration value="TRCorner"/>
+            <xsd:enumeration value="BLCorner"/>
+            <xsd:enumeration value="BRCorner"/>
+            <xsd:enumeration value="Top"/>
+            <xsd:enumeration value="Left"/>
+            <xsd:enumeration value="Right"/>
+            <xsd:enumeration value="Bottom"/>
+            <xsd:enumeration value="Maximize"/>
+            <xsd:enumeration value="AllDesktops"/>
+            <xsd:enumeration value="Shade"/>
+            <xsd:enumeration value="Iconify"/>
+            <xsd:enumeration value="Icon"/>
+            <xsd:enumeration value="Close"/>
+            <xsd:enumeration value="MoveResize"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

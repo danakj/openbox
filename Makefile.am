@@ -492,8 +492,10 @@ dist_pixmap_DATA = \
 	data/openbox.png
 
 dist_rc_DATA = \
-	data/rc.xml \
-	data/menu.xml
+	data/keys \
+	data/mouse \
+	data/applications \
+	data/menu
 
 edit = $(SED) \
 	-e 's!@version\@!$(VERSION)!' \
@@ -539,8 +541,6 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_noinst_DATA = \
-	data/rc.xsd \
-	data/menu.xsd \
 	data/autostart/autostart.in \
 	data/autostart/openbox-autostart.in \
 	data/xsession/openbox.desktop.in \
@@ -587,7 +587,9 @@ dist_doc_DATA = \
 	AUTHORS \
 	CHANGELOG \
 	COPYING \
-	data/rc.xsd \
+	data/keys.xsd \
+	data/mouse.xsd \
+	data/applications.xsd \
 	data/menu.xsd \
 	doc/rc-mouse-focus.xml
 

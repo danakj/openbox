@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?> <!-- -*- nxml -*- -->
+
+<!-- XML Schema for the Openbox window manager configuration file -->
+
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN"
+				"http://www.w3.org/2001/XMLSchema.dtd" [
+<!ATTLIST schema xmlns:ob CDATA #IMPLIED>
+<!ENTITY % p "xsd:">
+<!ENTITY % s ":xsd">
+]>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openbox.org/4.0/rc"
+    xmlns:ob="http://openbox.org/4.0/rc"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+    <!--
+         root node
+      -->
+    <xsd:element name="keys">
+        <xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
+	  </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="keybind">
+        <xsd:choice>
+            <xsd:element maxOccurs="unbounded" name="action" type="xsd:string"/>
+            <xsd:element maxOccurs="unbounded" name="keybind" type="ob:keybind"/>
+        </xsd:choice>
+        <xsd:attribute name="chroot" type="ob:bool"/>
+        <xsd:attribute name="key" type="ob:keyname" use="required"/>
+    </xsd:complexType>
+</xsd:schema>

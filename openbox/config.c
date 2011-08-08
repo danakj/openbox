@@ -370,7 +370,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
 */
 
-static void parse_key(xmlNodePtr node, GList *keylist)
+static void parse_keybind(xmlNodePtr node, GList *keylist)
 {
     gchar *keystring, **keys, **key;
     xmlNodePtr n;
@@ -387,7 +387,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
 
         if ((n = obt_xml_find_sibling(node->children, "keybind"))) {
             while (n) {
-                parse_key(n, keylist);
+                parse_keybind(n, keylist);
                 n = obt_xml_find_sibling(n->next, "keybind");
             }
         }
@@ -426,20 +426,12 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
     xmlNodePtr n;
     gchar *key;
 
-    keyboard_unbind_all();
-
     if ((n = obt_xml_find_sibling(node->children, "chainQuitKey"))) {
         key = obt_xml_node_string(n);
         translate_key(key, &config_keyboard_reset_state,
                       &config_keyboard_reset_keycode);
         g_free(key);
     }
-
-    if ((n = obt_xml_find_sibling(node->children, "keybind")))
-        while (n) {
-            parse_key(n, NULL);
-            n = obt_xml_find_sibling(n->next, "keybind");
-        }
 }
 
 /*
@@ -454,10 +446,7 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
 static void parse_mouse(xmlNodePtr node, gpointer d)
 {
-    xmlNodePtr n, nbut, nact;
-    gchar *buttonstr;
-    gchar *cxstr;
-    ObMouseAction mact;
+    xmlNodePtr n;
 
     mouse_unbind_all();
 
@@ -476,70 +465,72 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
     }
     if ((n = obt_xml_find_sibling(node, "screenEdgeWarpMouse")))
         config_mouse_screenedgewarp = obt_xml_node_bool(n);
+}
 
-    n = obt_xml_find_sibling(node, "context");
-    while (n) {
-        gchar *modcxstr;
-        ObFrameContext cx;
+static void parse_context(xmlNodePtr n, gpointer d)
+{
+    xmlNodePtr nbut, nact;
+    gchar *buttonstr;
+    gchar *cxstr;
+    ObMouseAction mact;
+    gchar *modcxstr;
+    ObFrameContext cx;
 
-        if (!obt_xml_attr_string(n, "name", &cxstr))
-            goto next_n;
+    if (!obt_xml_attr_string(n, "name", &cxstr))
+        return;
 
-        modcxstr = g_strdup(cxstr); /* make a copy to mutilate */
-        while (frame_next_context_from_string(modcxstr, &cx)) {
-            if (!cx) {
-                gchar *s = strchr(modcxstr, ' ');
-                if (s) {
-                    *s = '\0';
-                    g_message(_("Invalid context \"%s\" in mouse binding"),
-                              modcxstr);
-                    *s = ' ';
-                }
-                continue;
+    modcxstr = g_strdup(cxstr); /* make a copy to mutilate */
+    while (frame_next_context_from_string(modcxstr, &cx)) {
+        if (!cx) {
+            gchar *s = strchr(modcxstr, ' ');
+            if (s) {
+                *s = '\0';
+                g_message(_("Invalid context \"%s\" in mouse binding"),
+                          modcxstr);
+                *s = ' ';
             }
-
-            nbut = obt_xml_find_sibling(n->children, "mousebind");
-            while (nbut) {
-                if (!obt_xml_attr_string(nbut, "button", &buttonstr))
-                    goto next_nbut;
-                if (obt_xml_attr_contains(nbut, "action", "press"))
-                    mact = OB_MOUSE_ACTION_PRESS;
-                else if (obt_xml_attr_contains(nbut, "action", "release"))
-                    mact = OB_MOUSE_ACTION_RELEASE;
-                else if (obt_xml_attr_contains(nbut, "action", "click"))
-                    mact = OB_MOUSE_ACTION_CLICK;
-                else if (obt_xml_attr_contains(nbut, "action","doubleclick"))
-                    mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
-                else if (obt_xml_attr_contains(nbut, "action", "drag"))
-                    mact = OB_MOUSE_ACTION_MOTION;
-                else
-                    goto next_nbut;
-
-                nact = obt_xml_find_sibling(nbut->children, "action");
-                while (nact) {
-                    ObActionList *actions;
-                    ObActionParser *p;
-                    xmlChar *c;
-
-                    c = xmlNodeGetContent(nact);
-                    p = action_parser_new();
-                    if ((actions = action_parser_read_string(p, (gchar*)c)))
-                        mouse_bind(buttonstr, cx, mact, actions);
-                    nact = obt_xml_find_sibling(nact->next, "action");
-                    action_list_unref(actions);
-                    xmlFree(c);
-                    action_parser_unref(p);
-                }
-            g_free(buttonstr);
-            next_nbut:
-            nbut = obt_xml_find_sibling(nbut->next, "mousebind");
-            }
+            continue;
         }
-        g_free(modcxstr);
-        g_free(cxstr);
-    next_n:
-        n = obt_xml_find_sibling(n->next, "context");
+
+        nbut = obt_xml_find_sibling(n->children, "mousebind");
+        while (nbut) {
+            if (!obt_xml_attr_string(nbut, "button", &buttonstr))
+                goto next_nbut;
+            if (obt_xml_attr_contains(nbut, "action", "press"))
+                mact = OB_MOUSE_ACTION_PRESS;
+            else if (obt_xml_attr_contains(nbut, "action", "release"))
+                mact = OB_MOUSE_ACTION_RELEASE;
+            else if (obt_xml_attr_contains(nbut, "action", "click"))
+                mact = OB_MOUSE_ACTION_CLICK;
+            else if (obt_xml_attr_contains(nbut, "action","doubleclick"))
+                mact = OB_MOUSE_ACTION_DOUBLE_CLICK;
+            else if (obt_xml_attr_contains(nbut, "action", "drag"))
+                mact = OB_MOUSE_ACTION_MOTION;
+            else
+                goto next_nbut;
+
+            nact = obt_xml_find_sibling(nbut->children, "action");
+            while (nact) {
+                ObActionList *actions;
+                ObActionParser *p;
+                xmlChar *c;
+
+                c = xmlNodeGetContent(nact);
+                p = action_parser_new();
+                if ((actions = action_parser_read_string(p, (gchar*)c)))
+                    mouse_bind(buttonstr, cx, mact, actions);
+                nact = obt_xml_find_sibling(nact->next, "action");
+                action_list_unref(actions);
+                xmlFree(c);
+                action_parser_unref(p);
+            }
+            g_free(buttonstr);
+        next_nbut:
+            nbut = obt_xml_find_sibling(nbut->next, "mousebind");
+        }
     }
+    g_free(modcxstr);
+    g_free(cxstr);
 }
 
 static void parse_focus(xmlNodePtr node, gpointer d)
@@ -919,9 +910,6 @@ static void bind_default_keyboard(void)
 {
     ObDefKeyBind *it;
     ObDefKeyBind binds[] = {
-        { "Left",
-          "Execute startupnotify:yes name:Konqueror              \\\n"
-          "  command:(kfmclient openProfile filemanagement)" },
         { "A-Tab", "NextWindow" },
         { "S-A-Tab", "PreviousWindow" },
         { "A-F4", "Close" },
@@ -1013,8 +1001,37 @@ static void bind_default_mouse(void)
     action_parser_unref(p);
 }
 
-void config_startup(ObtXmlInst *i)
+void config_startup()
 {
+}
+
+enum ObConfigType {
+    CONFIG_FILE,
+    CACHE_FILE
+};
+
+static gboolean load_file(ObtXmlInst *i, enum ObConfigType type,
+                          const gchar *domain, const gchar *file)
+{
+    gboolean load = FALSE;
+
+    switch (type) {
+    case CONFIG_FILE:
+        load = obt_xml_load_config_file(i, domain, file, file);
+        break;
+    case CACHE_FILE:
+        load = obt_xml_load_cache_file(i, domain, file, file);
+        break;
+    }
+
+    return load;
+}
+
+gboolean config_load_config(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
     config_focus_new = TRUE;
     config_focus_follow = FALSE;
     config_focus_delay = 0;
@@ -1087,16 +1104,12 @@ void config_startup(ObtXmlInst *i)
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
 
-    bind_default_keyboard();
-
     obt_xml_register(i, "keyboard", parse_keyboard, NULL);
 
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 200;
     config_mouse_screenedgetime = 400;
     config_mouse_screenedgewarp = FALSE;
-
-    bind_default_mouse();
 
     obt_xml_register(i, "mouse", parse_mouse, NULL);
 
@@ -1115,9 +1128,70 @@ void config_startup(ObtXmlInst *i)
 
     obt_xml_register(i, "menu", parse_menu, NULL);
 
-    config_per_app_settings = NULL;
+    ok = load_file(i, CACHE_FILE, "openbox", "config");
+    if (ok) {
+        obt_xml_tree_from_root(i);
+        obt_xml_close(i);
+    }
+    obt_xml_instance_unref(i);
+    return ok;
+}
 
+gboolean config_load_keys(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    ok = load_file(i, CONFIG_FILE, "openbox", "keys");
+    if (!ok)
+        bind_default_keyboard();
+    else {
+        xmlNodePtr n, r;
+
+        r = obt_xml_root(i);
+        if ((n = obt_xml_find_sibling(r->children, "keybind")))
+            while (n) {
+                parse_keybind(n, NULL);
+                n = obt_xml_find_sibling(n->next, "keybind");
+            }
+    }
+    obt_xml_instance_unref(i);
+    return ok;
+}
+
+gboolean config_load_mouse(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    obt_xml_register(i, "context", parse_context, NULL);
+
+    ok = load_file(i, CONFIG_FILE, "openbox", "mouse");
+    if (!ok)
+        bind_default_mouse();
+    else {
+        obt_xml_tree_from_root(i);
+        obt_xml_close(i);
+    }
+    obt_xml_instance_unref(i);
+    return ok;
+}
+
+gboolean config_load_windows(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    config_per_app_settings = NULL;
     obt_xml_register(i, "applications", parse_per_app_settings, NULL);
+
+    ok = load_file(i, CONFIG_FILE, "openbox", "applications");
+    if (ok) {
+        obt_xml_tree_from_root(i);
+        obt_xml_close(i);
+    }
+    obt_xml_instance_unref(i);
+    return ok;
 }
 
 void config_shutdown(void)

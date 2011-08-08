@@ -105,7 +105,6 @@ static Cursor    cursors[OB_NUM_CURSORS];
 static gint      exitcode = 0;
 static guint     remote_control = 0;
 static gboolean  being_replaced = FALSE;
-static gchar    *config_file = NULL;
 static gchar    *startup_cmd = NULL;
 
 static void signal_handler(gint signal, gpointer data);
@@ -229,45 +228,22 @@ gint main(gint argc, gchar **argv)
 
             if (reconfigure) obt_keyboard_reload();
 
+            config_startup();
+
             {
-                ObtXmlInst *i;
-
-                /* startup the parsing so everything can register sections
-                   of the rc */
-                i = obt_xml_instance_new();
-
                 /* register all the available actions and filters */
                 action_startup(reconfigure);
                 action_filter_startup(reconfigure);
-                /* start up config which sets up with the parser */
-                config_startup(i);
 
-                /* parse/load user options */
-                if ((config_file &&
-                     obt_xml_load_file(i, config_file, "openbox_config")) ||
-                    obt_xml_load_config_file(i, "openbox", "rc",
-                                             "openbox_config"))
-                {
-                    obt_xml_tree_from_root(i);
-                    obt_xml_close(i);
-                }
-                else {
-                    g_message(_("Unable to find a valid config file, using some simple defaults"));
-                    config_file = NULL;
-                }
-
-                if (config_file) {
-                    gchar *p = g_filename_to_utf8(config_file, -1,
-                                                  NULL, NULL, NULL);
-                    if (p)
-                        OBT_PROP_SETS(obt_root(ob_screen), OB_CONFIG_FILE, p);
-                    g_free(p);
-                }
-                else
-                    OBT_PROP_ERASE(obt_root(ob_screen), OB_CONFIG_FILE);
-
-                /* we're done with parsing now, kill it */
-                obt_xml_instance_unref(i);
+                /* set up the various file loaders */
+                config_load_config();
+                if (!config_load_keys())
+                    g_message(_("Unable to find a valid \"%s\" file, using some simple defaults"), "keys");
+                if (!config_load_mouse())
+                    g_message(_("Unable to find a valid \"%s\" file, using some simple defaults"), "mouse");
+                if (!config_load_windows())
+                    g_message(_("No \"%s\" file found, not using any rules"),
+                              "windows");
             }
 
             /* load the theme specified in the rc file */
@@ -533,10 +509,6 @@ static void print_help(void)
     g_print(_("  --help              Display this help and exit\n"));
     g_print(_("  --version           Display the version and exit\n"));
     g_print(_("  --replace           Replace the currently running window manager\n"));
-    /* TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
-       aligned still, if you have to, make a new line with \n and 22 spaces. It's
-       fine to leave it as FILE though. */
-    g_print(_("  --config-file FILE  Specify the path to the config file to use\n"));
     g_print(_("  --sm-disable        Disable connection to the session manager\n"));
     g_print(_("\nPassing messages to a running Openbox instance:\n"));
     g_print(_("  --reconfigure       Reload Openbox's configuration\n"));
@@ -663,17 +635,6 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--exit")) {
             remote_control = 3;
-        }
-        else if (!strcmp(argv[i], "--config-file")) {
-            if (i == *argc - 1) /* no args left */
-                g_printerr(_("%s requires an argument\n"), "--config-file");
-            else {
-                /* this will be in the current locale encoding, which is
-                   what we want */
-                config_file = argv[i+1];
-                ++i; /* skip the argument */
-                ob_debug("--config-file %s", config_file);
-            }
         }
         else if (!strcmp(argv[i], "--sm-save-file")) {
             if (i == *argc - 1) /* no args left */

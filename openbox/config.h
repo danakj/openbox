@@ -206,8 +206,13 @@ extern GSList *config_menu_files;
 /*! Per app settings */
 extern GSList *config_per_app_settings;
 
-void config_startup(ObtXmlInst *i);
+void config_startup(void);
 void config_shutdown(void);
+
+gboolean config_load_config(void);
+gboolean config_load_keys(void);
+gboolean config_load_mouse(void);
+gboolean config_load_windows(void);
 
 /*! Create an ObAppSettings structure with the default values */
 ObAppSettings* config_create_app_settings(void);

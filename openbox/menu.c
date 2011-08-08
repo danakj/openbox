@@ -101,14 +101,14 @@ void menu_startup(gboolean reconfig)
     if (!loaded) {
         if (obt_xml_load_config_file(menu_parse_inst,
                                      "openbox",
-                                     "menu.xml",
+                                     "menu",
                                      "openbox_menu"))
         {
             obt_xml_tree_from_root(menu_parse_inst);
             obt_xml_close(menu_parse_inst);
         } else
             g_message(_("Unable to find a valid menu file \"%s\""),
-                      "menu.xml");
+                      "menu");
     }
 
     g_assert(menu_parse_state.parent == NULL);

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?> <!-- -*- nxml -*- -->
+
+<!-- XML Schema for the Openbox window manager configuration file -->
+
+<!DOCTYPE schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN"
+				"http://www.w3.org/2001/XMLSchema.dtd" [
+<!ATTLIST schema xmlns:ob CDATA #IMPLIED>
+<!ENTITY % p "xsd:">
+<!ENTITY % s ":xsd">
+]>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://openbox.org/4.0/rc"
+    xmlns:ob="http://openbox.org/4.0/rc"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+    <!--
+         root node
+      -->
+    <xsd:element name="applications">
+        <xsd:complexType>
+	  <xsd:sequence>
+	    <xsd:element maxOccurs="unbounded" name="application" type="ob:application"/>
+	  </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="application">
+        <xsd:all>
+            <xsd:element minOccurs="0" name="decor" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="shade" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="position" type="ob:window_position"/>
+            <xsd:element minOccurs="0" name="focus" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="desktop" type="xsd:integer"/>
+            <xsd:element minOccurs="0" name="layer" type="ob:layer"/>
+            <xsd:element minOccurs="0" name="iconic" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="skip_pager" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="fullscreen" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="maximized" type="ob:maximization"/>
+        </xsd:all>
+        <!-- at least one of these must be present -->
+        <xsd:attribute name="role" type="xsd:string"/>
+        <xsd:attribute name="title" type="xsd:string"/>
+        <xsd:attribute name="type" type="ob:clienttype"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="class" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:simpleType name="bool">
+        <!-- this is copied to maximization.  Keep that in sync. -->
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="yes"/>
+            <xsd:enumeration value="no"/>
+            <xsd:enumeration value="true"/>
+            <xsd:enumeration value="false"/>
+            <xsd:enumeration value="on"/>
+            <xsd:enumeration value="off"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="window_position">
+        <xsd:all>
+            <xsd:element name="x" type="ob:center_or_int"/>
+            <xsd:element name="y" type="ob:center_or_int"/>
+            <xsd:element minOccurs="0" name="monitor" type="ob:mouse_or_int"/>    
+            <xsd:element minOccurs="0" name="head" type="xsd:string"/>
+        </xsd:all>
+        <xsd:attribute name="force" type="ob:bool"/>
+    </xsd:complexType>
+    <xsd:simpleType name="layer">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[Aa][Bb][Oo][Vv][Ee]"/>
+            <xsd:pattern value="[Nn][Oo][Rr][Mm][Aa][Ll]"/>
+            <xsd:pattern value="[Bb][Ee][Ll][Oo][Ww]"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="maximization">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Horizontal"/>
+            <xsd:enumeration value="Vertical"/>
+            <!-- this is a copy of ob:bool.  Keep it in sync. -->
+            <xsd:enumeration value="yes"/>
+            <xsd:enumeration value="no"/>
+            <xsd:enumeration value="true"/>
+            <xsd:enumeration value="false"/>
+            <xsd:enumeration value="on"/>
+            <xsd:enumeration value="off"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="clienttype">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="desktop"/>
+            <xsd:enumeration value="dock"/>
+            <xsd:enumeration value="toolbar"/>
+            <xsd:enumeration value="menu"/>
+            <xsd:enumeration value="splash"/>
+            <xsd:enumeration value="utility"/>
+            <xsd:enumeration value="dialog"/>
+            <xsd:enumeration value="normal"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

@@ -125,9 +125,9 @@ static ObConfigParserEntity* add(ObConfigParser *p,
     ObConfigParserEntity *e;
 
     g_return_val_if_fail(def != NULL, NULL);
-    g_return_val_if_fail(g_hash_table_lookup(p->entities, name) != NULL, NULL);
+    g_return_val_if_fail(g_hash_table_lookup(p->entities, name) == NULL, NULL);
 
-    e = g_slice_new(ObConfigParserEntity);
+    e = g_slice_new0(ObConfigParserEntity);
     e->name = g_strdup(name);
     e->cb = FALSE;
     e->u.v.value = def;
@@ -251,9 +251,9 @@ void config_parser_callback(ObConfigParser *p, const gchar *name,
 {
     ObConfigParserEntity *e;
 
-    g_return_if_fail(g_hash_table_lookup(p->entities, name) != NULL);
+    g_return_if_fail(g_hash_table_lookup(p->entities, name) == NULL);
 
-    e = g_slice_new(ObConfigParserEntity);
+    e = g_slice_new0(ObConfigParserEntity);
     e->name = g_strdup(name);
     e->cb = TRUE;
     e->u.cb.func = cb;

@@ -38,13 +38,13 @@ typedef enum {
     OB_CONFIG_VALUE_INTEGER,
     OB_CONFIG_VALUE_FRACTION,
     OB_CONFIG_VALUE_GRAVITY_COORD,
-    OB_CONFIG_VALUE_LIST,
+    OB_CONFIG_VALUE_STRING_LIST,
     OB_CONFIG_VALUE_ACTIONLIST,
     NUM_OB_CONFIG_VALUE_TYPES
 } ObConfigValueDataType;
 
 /*! This holds a pointer to one of the possible types in ObConfigValueType. */
-typedef union {
+typedef union _ObConfigValueDataPtr {
     const gpointer *pointer; /*!< Generic pointer */
     const gchar **string;
     gboolean *boolean;
@@ -54,8 +54,8 @@ typedef union {
         guint numer;
         guint denom;
     } *fraction;
-    GravityCoord *coord;
-    const GList **list; /*!< A list of ObConfigValue objects */
+    struct _GravityCoord *coord;
+    const gchar *const**list;
     struct _ObActionList **actions;
 } ObConfigValueDataPtr;
 
@@ -70,14 +70,15 @@ ObConfigValue* config_value_new_string_steal(gchar *s);
 
 /*! Creates a config value which holds a list of other values
   This function copies the list and adds a refcount to the values within. */
-ObConfigValue* config_value_new_list(GList *list);
+ObConfigValue* config_value_new_string_list(gchar **list);
 /*! Creates a config value which holds a list of other values.
   This function steals ownership the list and the values within. */
-ObConfigValue* config_value_new_list_steal(GList *list);
+ObConfigValue* config_value_new_string_list_steal(gchar **list);
+
 ObConfigValue* config_value_new_action_list(struct _ObActionList *al);
 
 gboolean config_value_is_string(const ObConfigValue *v);
-gboolean config_value_is_list(const ObConfigValue *v);
+gboolean config_value_is_string_list(const ObConfigValue *v);
 gboolean config_value_is_action_list(const ObConfigValue *v);
 
 /*! Copies the data inside @v to the destination that the pointer @p is
@@ -97,9 +98,9 @@ guint config_value_enum(ObConfigValue *v, const ObConfigValueEnum e[]);
 void config_value_fraction(ObConfigValue *v, gint *numer, gint *denom);
 void config_value_gravity_coord(ObConfigValue *v, struct _GravityCoord *c);
 
-/* These ones are valid on a list value */
+/* These ones are valid on a string list value */
 
-GList* config_value_list(ObConfigValue *v);
+gchar const*const* config_value_string_list(ObConfigValue *v);
 
 /* These ones are value on a action list value */
 

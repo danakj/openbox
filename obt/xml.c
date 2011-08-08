@@ -203,6 +203,26 @@ gboolean obt_xml_load_file(ObtXmlInst *i,
     return r;
 }
 
+gboolean obt_xml_load_cache_file(ObtXmlInst *i,
+                                 const gchar *domain,
+                                 const gchar *filename,
+                                 const gchar *root_node)
+{
+    GSList *paths = NULL;
+    gboolean r;
+
+    paths = g_slist_append(paths,
+                           g_strdup(obt_paths_cache_home(i->xdg_paths)));
+
+    r = load_file(i, domain, filename, root_node, paths);
+
+    while (paths) {
+        g_free(paths->data);
+        paths = g_slist_delete_link(paths, paths);
+    }
+    return r;
+}
+
 gboolean obt_xml_load_config_file(ObtXmlInst *i,
                                   const gchar *domain,
                                   const gchar *filename,

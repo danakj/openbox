@@ -362,6 +362,8 @@ gint main(gint argc, gchar **argv)
                 xmlprompt = NULL;
             }
 
+            config_save_config();
+
             if (!reconfigure)
                 window_unmanage_all();
 

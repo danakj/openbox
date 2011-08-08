@@ -209,7 +209,9 @@ extern GSList *config_per_app_settings;
 void config_startup(void);
 void config_shutdown(void);
 
-gboolean config_load_config(void);
+void config_load_config(void);
+void config_save_config(void);
+
 gboolean config_load_keys(void);
 gboolean config_load_mouse(void);
 gboolean config_load_windows(void);

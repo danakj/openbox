@@ -533,56 +533,6 @@ static void parse_context(xmlNodePtr n, gpointer d)
     g_free(cxstr);
 }
 
-static void parse_focus(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "focusNew")))
-        config_focus_new = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "followMouse")))
-        config_focus_follow = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "focusDelay")))
-        config_focus_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_sibling(node, "raiseOnFocus")))
-        config_focus_raise = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "focusLast")))
-        config_focus_last = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "underMouse")))
-        config_focus_under_mouse = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "unfocusOnLeave")))
-        config_unfocus_leave = obt_xml_node_bool(n);
-}
-
-static void parse_placement(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "policy")))
-        if (obt_xml_node_contains(n, "UnderMouse"))
-            config_place_policy = OB_PLACE_POLICY_MOUSE;
-    if ((n = obt_xml_find_sibling(node, "center")))
-        config_place_center = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "monitor"))) {
-        if (obt_xml_node_contains(n, "active"))
-            config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
-        else if (obt_xml_node_contains(n, "mouse"))
-            config_place_monitor = OB_PLACE_MONITOR_MOUSE;
-        else if (obt_xml_node_contains(n, "any"))
-            config_place_monitor = OB_PLACE_MONITOR_ANY;
-    }
-    if ((n = obt_xml_find_sibling(node, "primaryMonitor"))) {
-        config_primary_monitor_index = obt_xml_node_int(n);
-        if (!config_primary_monitor_index) {
-            if (obt_xml_node_contains(n, "mouse"))
-                config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
-        }
-    }
-}
-
 static void parse_margins(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
@@ -1001,197 +951,10 @@ static void bind_default_mouse(void)
     action_parser_unref(p);
 }
 
+static ObtXmlInst *config_inst = NULL;
+
 void config_startup()
 {
-}
-
-enum ObConfigType {
-    CONFIG_FILE,
-    CACHE_FILE
-};
-
-static gboolean load_file(ObtXmlInst *i, enum ObConfigType type,
-                          const gchar *domain, const gchar *file)
-{
-    gboolean load = FALSE;
-
-    switch (type) {
-    case CONFIG_FILE:
-        load = obt_xml_load_config_file(i, domain, file, file);
-        break;
-    case CACHE_FILE:
-        load = obt_xml_load_cache_file(i, domain, file, file);
-        break;
-    }
-
-    return load;
-}
-
-gboolean config_load_config(void)
-{
-    ObtXmlInst *i = obt_xml_instance_new();
-    gboolean ok;
-
-    config_focus_new = TRUE;
-    config_focus_follow = FALSE;
-    config_focus_delay = 0;
-    config_focus_raise = FALSE;
-    config_focus_last = TRUE;
-    config_focus_under_mouse = FALSE;
-    config_unfocus_leave = FALSE;
-
-    obt_xml_register(i, "focus", parse_focus, NULL);
-
-    config_place_policy = OB_PLACE_POLICY_SMART;
-    config_place_center = TRUE;
-    config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
-
-    config_primary_monitor_index = 1;
-    config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
-
-    obt_xml_register(i, "placement", parse_placement, NULL);
-
-    STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
-    obt_xml_register(i, "margins", parse_margins, NULL);
-
-    config_theme = NULL;
-
-    config_animate_iconify = TRUE;
-    config_title_layout = g_strdup("NLIMC");
-    config_theme_keepborder = TRUE;
-    config_theme_window_list_icon_size = 36;
-
-    config_font_activewindow = NULL;
-    config_font_inactivewindow = NULL;
-    config_font_menuitem = NULL;
-    config_font_menutitle = NULL;
-    config_font_activeosd = NULL;
-    config_font_inactiveosd = NULL;
-
-    obt_xml_register(i, "theme", parse_theme, NULL);
-
-    config_desktops_num = 4;
-    config_screen_firstdesk = 1;
-    config_desktops_names = NULL;
-    config_desktop_popup_time = 875;
-
-    obt_xml_register(i, "desktops", parse_desktops, NULL);
-
-    config_resize_redraw = TRUE;
-    config_resize_popup_show = 1; /* nonpixel increments */
-    config_resize_popup_pos = OB_RESIZE_POS_CENTER;
-    GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);
-    GRAVITY_COORD_SET(config_resize_popup_fixed.y, 0, FALSE, FALSE);
-
-    obt_xml_register(i, "resize", parse_resize, NULL);
-
-    config_dock_layer = OB_STACKING_LAYER_ABOVE;
-    config_dock_pos = OB_DIRECTION_NORTHEAST;
-    config_dock_floating = FALSE;
-    config_dock_nostrut = FALSE;
-    config_dock_x = 0;
-    config_dock_y = 0;
-    config_dock_orient = OB_ORIENTATION_VERT;
-    config_dock_hide = FALSE;
-    config_dock_hide_delay = 300;
-    config_dock_show_delay = 300;
-    config_dock_app_move_button = 2; /* middle */
-    config_dock_app_move_modifiers = 0;
-
-    obt_xml_register(i, "dock", parse_dock, NULL);
-
-    translate_key("C-g", &config_keyboard_reset_state,
-                  &config_keyboard_reset_keycode);
-
-    obt_xml_register(i, "keyboard", parse_keyboard, NULL);
-
-    config_mouse_threshold = 8;
-    config_mouse_dclicktime = 200;
-    config_mouse_screenedgetime = 400;
-    config_mouse_screenedgewarp = FALSE;
-
-    obt_xml_register(i, "mouse", parse_mouse, NULL);
-
-    config_resist_win = 10;
-    config_resist_edge = 20;
-
-    obt_xml_register(i, "resistance", parse_resistance, NULL);
-
-    config_menu_hide_delay = 250;
-    config_menu_middle = FALSE;
-    config_submenu_show_delay = 100;
-    config_submenu_hide_delay = 400;
-    config_menu_manage_desktops = TRUE;
-    config_menu_files = NULL;
-    config_menu_show_icons = TRUE;
-
-    obt_xml_register(i, "menu", parse_menu, NULL);
-
-    ok = load_file(i, CACHE_FILE, "openbox", "config");
-    if (ok) {
-        obt_xml_tree_from_root(i);
-        obt_xml_close(i);
-    }
-    obt_xml_instance_unref(i);
-    return ok;
-}
-
-gboolean config_load_keys(void)
-{
-    ObtXmlInst *i = obt_xml_instance_new();
-    gboolean ok;
-
-    ok = load_file(i, CONFIG_FILE, "openbox", "keys");
-    if (!ok)
-        bind_default_keyboard();
-    else {
-        xmlNodePtr n, r;
-
-        r = obt_xml_root(i);
-        if ((n = obt_xml_find_sibling(r->children, "keybind")))
-            while (n) {
-                parse_keybind(n, NULL);
-                n = obt_xml_find_sibling(n->next, "keybind");
-            }
-    }
-    obt_xml_instance_unref(i);
-    return ok;
-}
-
-gboolean config_load_mouse(void)
-{
-    ObtXmlInst *i = obt_xml_instance_new();
-    gboolean ok;
-
-    obt_xml_register(i, "context", parse_context, NULL);
-
-    ok = load_file(i, CONFIG_FILE, "openbox", "mouse");
-    if (!ok)
-        bind_default_mouse();
-    else {
-        obt_xml_tree_from_root(i);
-        obt_xml_close(i);
-    }
-    obt_xml_instance_unref(i);
-    return ok;
-}
-
-gboolean config_load_windows(void)
-{
-    ObtXmlInst *i = obt_xml_instance_new();
-    gboolean ok;
-
-    config_per_app_settings = NULL;
-    obt_xml_register(i, "applications", parse_per_app_settings, NULL);
-
-    ok = load_file(i, CONFIG_FILE, "openbox", "applications");
-    if (ok) {
-        obt_xml_tree_from_root(i);
-        obt_xml_close(i);
-    }
-    obt_xml_instance_unref(i);
-    return ok;
 }
 
 void config_shutdown(void)
@@ -1226,4 +989,248 @@ void config_shutdown(void)
         g_slice_free(ObAppSettings, it->data);
     }
     g_slist_free(config_per_app_settings);
+}
+
+void config_load_config(void)
+{
+    xmlNodePtr n, root, e;
+    gboolean ok;
+
+    config_inst = obt_xml_instance_new();
+    ok = obt_xml_load_cache_file(config_inst, "openbox", "config", "config");
+    root = obt_xml_root(config_inst);
+
+    n = obt_xml_path_get_node(root, "focus", "");
+    config_focus_new = obt_xml_path_bool(n, "focusNew", "yes");
+    config_focus_follow = obt_xml_path_bool(n, "followMouse", "no");
+    config_focus_delay = obt_xml_path_int(n, "focusDelay", "0");
+    config_focus_raise = obt_xml_path_bool(n, "raiseOnFocus", "no");
+    config_focus_last = obt_xml_path_bool(n, "focusLast", "yes");
+    config_focus_under_mouse = obt_xml_path_bool(n, "underMouse", "no");
+    config_unfocus_leave = obt_xml_path_bool(n, "unfocusOnLeave", "no");
+
+    n = obt_xml_path_get_node(root, "placement", "");
+    e = obt_xml_path_get_node(n, "policy", "smart");
+    if (obt_xml_node_contains(e, "smart"))
+        config_place_policy = OB_PLACE_POLICY_SMART;
+    else if (obt_xml_node_contains(e, "undermouse"))
+        config_place_policy = OB_PLACE_POLICY_MOUSE;
+    else
+        config_place_policy = OB_PLACE_POLICY_SMART;
+    config_place_center = obt_xml_path_bool(n, "center", "true");
+    e = obt_xml_path_get_node(n, "monitor", "primary");
+    if (obt_xml_node_contains(e, "primary"))
+        config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
+    else if (obt_xml_node_contains(e, "active"))
+        config_place_monitor = OB_PLACE_MONITOR_ACTIVE;
+    else if (obt_xml_node_contains(e, "mouse"))
+        config_place_monitor = OB_PLACE_MONITOR_MOUSE;
+    else if (obt_xml_node_contains(e, "any"))
+        config_place_monitor = OB_PLACE_MONITOR_ANY;
+    else
+        config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
+    e = obt_xml_path_get_node(n, "primaryMonitor", "1");
+    if (obt_xml_node_contains(e, "active")) {
+        config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
+        config_primary_monitor_index = 1;
+    }
+    else if (obt_xml_node_contains(e, "mouse")) {
+        config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
+        config_primary_monitor_index = 1;
+    }
+    else {
+        config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
+        config_primary_monitor_index = obt_xml_node_int(e);
+    }
+
+    STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+    obt_xml_register(config_inst, "margins", parse_margins, NULL);
+
+    config_theme = NULL;
+
+    config_animate_iconify = TRUE;
+    config_title_layout = g_strdup("NLIMC");
+    config_theme_keepborder = TRUE;
+    config_theme_window_list_icon_size = 36;
+
+    config_font_activewindow = NULL;
+    config_font_inactivewindow = NULL;
+    config_font_menuitem = NULL;
+    config_font_menutitle = NULL;
+    config_font_activeosd = NULL;
+    config_font_inactiveosd = NULL;
+
+    obt_xml_register(config_inst, "theme", parse_theme, NULL);
+
+    config_desktops_num = 4;
+    config_screen_firstdesk = 1;
+    config_desktops_names = NULL;
+    config_desktop_popup_time = 875;
+
+    obt_xml_register(config_inst, "desktops", parse_desktops, NULL);
+
+    config_resize_redraw = TRUE;
+    config_resize_popup_show = 1; /* nonpixel increments */
+    config_resize_popup_pos = OB_RESIZE_POS_CENTER;
+    GRAVITY_COORD_SET(config_resize_popup_fixed.x, 0, FALSE, FALSE);
+    GRAVITY_COORD_SET(config_resize_popup_fixed.y, 0, FALSE, FALSE);
+
+    obt_xml_register(config_inst, "resize", parse_resize, NULL);
+
+    config_dock_layer = OB_STACKING_LAYER_ABOVE;
+    config_dock_pos = OB_DIRECTION_NORTHEAST;
+    config_dock_floating = FALSE;
+    config_dock_nostrut = FALSE;
+    config_dock_x = 0;
+    config_dock_y = 0;
+    config_dock_orient = OB_ORIENTATION_VERT;
+    config_dock_hide = FALSE;
+    config_dock_hide_delay = 300;
+    config_dock_show_delay = 300;
+    config_dock_app_move_button = 2; /* middle */
+    config_dock_app_move_modifiers = 0;
+
+    obt_xml_register(config_inst, "dock", parse_dock, NULL);
+
+    translate_key("C-g", &config_keyboard_reset_state,
+                  &config_keyboard_reset_keycode);
+
+    obt_xml_register(config_inst, "keyboard", parse_keyboard, NULL);
+
+    config_mouse_threshold = 8;
+    config_mouse_dclicktime = 200;
+    config_mouse_screenedgetime = 400;
+    config_mouse_screenedgewarp = FALSE;
+
+    obt_xml_register(config_inst, "mouse", parse_mouse, NULL);
+
+    config_resist_win = 10;
+    config_resist_edge = 20;
+
+    obt_xml_register(config_inst, "resistance", parse_resistance, NULL);
+
+    config_menu_hide_delay = 250;
+    config_menu_middle = FALSE;
+    config_submenu_show_delay = 100;
+    config_submenu_hide_delay = 400;
+    config_menu_manage_desktops = TRUE;
+    config_menu_files = NULL;
+    config_menu_show_icons = TRUE;
+
+    obt_xml_register(config_inst, "menu", parse_menu, NULL);
+
+
+    if (ok) {
+        obt_xml_tree_from_root(config_inst);
+        obt_xml_close(config_inst);
+    }
+}
+
+void config_save_config(void)
+{
+    xmlNodePtr n, root;
+    const gchar *e;
+
+    root = obt_xml_root(config_inst);
+
+    n = obt_xml_path_get_node(root, "focus", "");
+    obt_xml_path_set_bool(n, "focusNew", config_focus_new);
+    obt_xml_path_set_bool(n, "followMouse", config_focus_follow);
+    obt_xml_path_set_int(n, "focusDelay", config_focus_delay);
+    obt_xml_path_set_bool(n, "raiseOnFocus", config_focus_raise);
+    obt_xml_path_set_bool(n, "focusLast", config_focus_last);
+    obt_xml_path_set_bool(n, "underMouse", config_focus_under_mouse);
+    obt_xml_path_set_bool(n, "unfocusOnLeave", config_unfocus_leave);
+
+    n = obt_xml_path_get_node(root, "placement", "");
+    switch (config_place_policy) {
+    case OB_PLACE_POLICY_SMART: e = "smart"; break;
+    case OB_PLACE_POLICY_MOUSE: e = "mouse"; break;
+    }
+    obt_xml_path_set_string(n, "policy", e);
+    obt_xml_path_set_bool(n, "center", config_place_center);
+    switch (config_place_monitor) {
+    case OB_PLACE_MONITOR_PRIMARY: e = "primary"; break;
+    case OB_PLACE_MONITOR_ACTIVE: e = "active"; break;
+    case OB_PLACE_MONITOR_MOUSE: e = "mouse"; break;
+    case OB_PLACE_MONITOR_ANY: e = "any"; break;
+    }
+    obt_xml_path_set_string(n, "monitor", e);
+    if (config_primary_monitor_index)
+        obt_xml_path_set_int(
+            n, "primaryMonitor", config_primary_monitor_index);
+    else {
+        switch (config_primary_monitor) {
+        case OB_PLACE_MONITOR_ACTIVE: e = "active"; break;
+        case OB_PLACE_MONITOR_MOUSE: e = "mouse"; break;
+        case OB_PLACE_MONITOR_PRIMARY: 
+        case OB_PLACE_MONITOR_ANY: g_assert_not_reached();
+        }
+        obt_xml_path_set_string(n, "primaryMonitor", e);
+    }
+
+
+    if (!obt_xml_save_cache_file(config_inst, "openbox", "config", TRUE))
+        g_warning("Unable to save configuration in XDG cache directory.");
+    obt_xml_instance_unref(config_inst);
+    config_inst = NULL;
+}
+
+gboolean config_load_keys(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    ok = obt_xml_load_config_file(i, "openbox", "keys", "keys");
+    if (!ok)
+        bind_default_keyboard();
+    else {
+        xmlNodePtr n, r;
+
+        r = obt_xml_root(i);
+        if ((n = obt_xml_find_sibling(r->children, "keybind")))
+            while (n) {
+                parse_keybind(n, NULL);
+                n = obt_xml_find_sibling(n->next, "keybind");
+            }
+    }
+    obt_xml_instance_unref(i);
+    return ok;
+}
+
+gboolean config_load_mouse(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    obt_xml_register(i, "context", parse_context, NULL);
+
+    ok = obt_xml_load_config_file(i, "openbox", "mouse", "mouse");
+    if (!ok)
+        bind_default_mouse();
+    else {
+        obt_xml_tree_from_root(i);
+        obt_xml_close(i);
+    }
+    obt_xml_instance_unref(i);
+    return ok;
+}
+
+gboolean config_load_windows(void)
+{
+    ObtXmlInst *i = obt_xml_instance_new();
+    gboolean ok;
+
+    config_per_app_settings = NULL;
+    obt_xml_register(i, "applications", parse_per_app_settings, NULL);
+
+    ok = obt_xml_load_config_file(
+        i, "openbox", "applications", "applications");
+    if (ok) {
+        obt_xml_tree_from_root(i);
+        obt_xml_close(i);
+    }
+    obt_xml_instance_unref(i);
+    return ok;
 }

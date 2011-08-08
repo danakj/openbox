@@ -67,6 +67,8 @@ void screen_resize(void);
 
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);
+/*! Store the current desktop (and update _NET_CURRENT_DESKTOP) */
+gboolean screen_store_desktop(guint num);
 /*! Change the current desktop */
 void screen_set_desktop(guint num, gboolean dofocus);
 /*! Add a new desktop either at the end or inserted at the current desktop */

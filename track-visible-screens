@@ -79,24 +79,28 @@ do_output(visibles, currentdesk, names, deskcnt)
 
 when_output = set(['_NET_CURRENT_DESKTOP', '_NET_VISIBLE_DESKTOPS',
                   '_NET_DESKTOP_NAMES', '_NET_NUMBER_DESKTOPS'])
-while True:
-    event.read(c, block=True)
-    for e in event.queue():
-        if not isinstance(e, xcb.xproto.PropertyNotifyEvent):
-            continue
 
-        aname = util.get_atom_name(c, e.atom)
-        if aname == '_NET_CURRENT_DESKTOP':
-            currentdesk = ewmh.get_current_desktop(c, root).reply()
-        elif aname == '_NET_VISIBLE_DESKTOPS':
-            visibles = ewmh.get_visible_desktops(c, root).reply()
-        elif aname == '_NET_DESKTOP_NAMES':
-            names = ewmh.get_desktop_names(c, root).reply()
-        elif aname == '_NET_NUMBER_OF_DESKTOPS':
-            deskcnt = ewmh.get_number_of_desktops(c, root).reply()
+try:
+    while True:
+        event.read(c, block=True)
+        for e in event.queue():
+            if not isinstance(e, xcb.xproto.PropertyNotifyEvent):
+                continue
 
-        if aname in when_output:
-            do_output(visibles, currentdesk, names, deskcnt)
+            aname = util.get_atom_name(c, e.atom)
+            if aname == '_NET_CURRENT_DESKTOP':
+                currentdesk = ewmh.get_current_desktop(c, root).reply()
+            elif aname == '_NET_VISIBLE_DESKTOPS':
+                visibles = ewmh.get_visible_desktops(c, root).reply()
+            elif aname == '_NET_DESKTOP_NAMES':
+                names = ewmh.get_desktop_names(c, root).reply()
+            elif aname == '_NET_NUMBER_OF_DESKTOPS':
+                deskcnt = ewmh.get_number_of_desktops(c, root).reply()
 
-    c.flush()
+            if aname in when_output:
+                do_output(visibles, currentdesk, names, deskcnt)
+
+        c.flush()
+except IOError:
+    print >> sys.stderr, "X connection lost!"
 

@@ -633,6 +633,16 @@ static void screen_set_visible_desktops(void)
                     visible_desktops, size);
 }
 
+gboolean screen_store_desktop(guint num)
+{
+    if (screen_desktop == num) return FALSE;
+
+    screen_desktop = num;
+    OBT_PROP_SET32(obt_root(ob_screen), NET_CURRENT_DESKTOP, CARDINAL, num);
+
+    return TRUE;
+}
+
 void screen_set_desktop(guint num, gboolean dofocus)
 {
     GList *it;
@@ -651,11 +661,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
              g_slist_index(screen_visible_desktops, screen_desktop) > -1);
 
     previous = screen_desktop;
-    screen_desktop = num;
 
-    if (previous == num) return;
-
-    OBT_PROP_SET32(obt_root(ob_screen), NET_CURRENT_DESKTOP, CARDINAL, num);
+    if (!screen_store_desktop(num)) return;
 
     /* This whole thing decides when/how to save the screen_last_desktop so
        that it can be restored later if you want */
@@ -731,8 +738,8 @@ void screen_set_desktop(guint num, gboolean dofocus)
         /* screen_hide_desktop_popup(); */
         client_focus(focus_order_find_first(screen_desktop));
 
-        if (ob_state() == OB_STATE_RUNNING)
-            screen_show_desktop_popup(screen_desktop, FALSE);
+        /* if (ob_state() == OB_STATE_RUNNING) */
+            /* screen_show_desktop_popup(screen_desktop, FALSE); */
     }
     else {
         gint cur_monitor;
@@ -1011,8 +1018,6 @@ void screen_show_desktop_popup(guint d, gboolean perm)
 
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
-
-    ag_debug("showing desktop popup for %d", d);
 
     /* a = screen_physical_area_primary(FALSE); */
     a = screen_physical_area_monitor(screen_desktop_monitor());

@@ -3940,6 +3940,9 @@ gboolean client_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
+    if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop)
+        screen_store_desktop(self->desktop);
+
     if (!client_can_focus(self)) {
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Client %s can't be focused", self->title);

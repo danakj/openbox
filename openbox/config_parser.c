@@ -151,7 +151,7 @@ void config_parser_bool(ObConfigParser *p,
 }
 
 void config_parser_int(ObConfigParser *p,
-                       const gchar *name, const gchar *def, gint *v)
+                       const gchar *name, const gchar *def, guint *v)
 {
     ObConfigValue *cv = config_value_new_string(def);
     add(p, name, cv, OB_CONFIG_VALUE_INTEGER, (ObConfigValueDataPtr)v);
@@ -337,15 +337,6 @@ void config_parser_options(void)
     if (!obt_xml_load_file(i, fpath, "openbox_config"))
         obt_xml_new_file(i, "openbox_config");
     root = obt_xml_root(i);
-
-    n = obt_xml_tree_get_node("focus");
-    config_focus_new = read_bool(n, "focusnew", TRUE);
-    config_focus_follow = read_bool(n, "followmouse", FALSE);
-    config_focus_delay = read_int(n, "focusdelay", 0);
-    config_focus_raise = read_bool(n, "raiseonfocus", FALSE);
-    config_focus_last = read_bool(n, "focuslast", TRUE);
-    config_focus_under_mouse = read_bool(n, "undermouse", FALSE);
-    config_unfocus_leave = read_bool(n, "unfocusonleave", FALSE);
 
     n = obt_xml_tree_get_node("placement");
     config_place_policy = read_enum(

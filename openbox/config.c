@@ -18,7 +18,7 @@
 */
 
 #include "config.h"
-#include "config_value.h"
+#include "config_parser.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "action.h"
@@ -540,28 +540,6 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_focus(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "focusNew")))
-        config_focus_new = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "followMouse")))
-        config_focus_follow = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "focusDelay")))
-        config_focus_delay = obt_xml_node_int(n);
-    if ((n = obt_xml_find_sibling(node, "raiseOnFocus")))
-        config_focus_raise = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "focusLast")))
-        config_focus_last = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "underMouse")))
-        config_focus_under_mouse = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "unfocusOnLeave")))
-        config_unfocus_leave = obt_xml_node_bool(n);
-}
-
 static void parse_placement(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
@@ -1011,17 +989,19 @@ static void bind_default_mouse(void)
     action_parser_unref(p);
 }
 
-void config_startup(ObtXmlInst *i)
-{
-    config_focus_new = TRUE;
-    config_focus_follow = FALSE;
-    config_focus_delay = 0;
-    config_focus_raise = FALSE;
-    config_focus_last = TRUE;
-    config_focus_under_mouse = FALSE;
-    config_unfocus_leave = FALSE;
+#define BOOL config_parser_bool
+#define INT config_parser_int
+#define STRING config_parser_string
 
-    obt_xml_register(i, "focus", parse_focus, NULL);
+void config_startup(ObConfigParser *p, ObtXmlInst *i)
+{
+    BOOL(p, "focus/focusNew", "yes", &config_focus_new);
+    BOOL(p, "focus/followMouse", "no", &config_focus_follow);
+    INT(p, "focus/focusDelay", "0", &config_focus_delay);
+    BOOL(p, "focus/raiseOnFocus", "no", &config_focus_raise);
+    BOOL(p, "focus/focusLast", "yes", &config_focus_last);
+    BOOL(p, "focus/underMouse", "no", &config_focus_under_mouse);
+    BOOL(p, "focus/unfocusOnLeave", "no", &config_unfocus_leave);
 
     config_place_policy = OB_PLACE_POLICY_SMART;
     config_place_center = TRUE;

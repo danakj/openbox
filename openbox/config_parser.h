@@ -35,7 +35,7 @@ void config_parser_unref(ObConfigParser *p);
 void config_parser_bool(ObConfigParser *p,
                         const gchar *name, const gchar *def, gboolean *v);
 void config_parser_int(ObConfigParser *p,
-                       const gchar *name, const gchar *def, gint *v);
+                       const gchar *name, const gchar *def, guint *v);
 void config_parser_string(ObConfigParser *p,
                           const gchar *name, const gchar *def,
                           const gchar **v);

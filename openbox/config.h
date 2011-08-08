@@ -33,6 +33,8 @@
 
 #include <glib.h>
 
+struct _ObConfigParser;
+
 typedef struct _ObAppSettings ObAppSettings;
 
 struct _ObAppSettings
@@ -204,7 +206,7 @@ extern GSList *config_menu_files;
 /*! Per app settings */
 extern GSList *config_per_app_settings;
 
-void config_startup(ObtXmlInst *i);
+void config_startup(struct _ObConfigParser *p, ObtXmlInst *i);
 void config_shutdown(void);
 
 /*! Create an ObAppSettings structure with the default values */

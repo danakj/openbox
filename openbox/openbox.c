@@ -41,6 +41,7 @@
 #include "grab.h"
 #include "group.h"
 #include "config.h"
+#include "config_parser.h"
 #include "ping.h"
 #include "prompt.h"
 #include "gettext.h"
@@ -230,17 +231,19 @@ gint main(gint argc, gchar **argv)
             if (reconfigure) obt_keyboard_reload();
 
             {
+                ObConfigParser *p;
                 ObtXmlInst *i;
 
                 /* startup the parsing so everything can register sections
                    of the rc */
+                p = config_parser_new();
                 i = obt_xml_instance_new();
 
                 /* register all the available actions and filters */
                 action_startup(reconfigure);
                 action_filter_startup(reconfigure);
                 /* start up config which sets up with the parser */
-                config_startup(i);
+                config_startup(p, i);
 
                 /* parse/load user options */
                 if ((config_file &&
@@ -248,6 +251,7 @@ gint main(gint argc, gchar **argv)
                     obt_xml_load_config_file(i, "openbox", "rc",
                                              "openbox_config"))
                 {
+                    config_parser_read(p, i);
                     obt_xml_tree_from_root(i);
                     obt_xml_close(i);
                 }
@@ -268,6 +272,7 @@ gint main(gint argc, gchar **argv)
 
                 /* we're done with parsing now, kill it */
                 obt_xml_instance_unref(i);
+                config_parser_unref(p);
             }
 
             /* load the theme specified in the rc file */

@@ -453,6 +453,52 @@ gboolean obt_xml_attr_contains(xmlNodePtr node, const gchar *name,
     return r;
 }
 
+/*! Finds a sibling which matches a name and attributes.
+  @first The first sibling in the list.
+  @attrs NULL-terminated array of strings.  The first string is the name of
+    the node.  The remaining values are key,value pairs for attributes the
+    node should have.
+*/
+static xmlNodePtr find_sibling(xmlNodePtr first, gchar **attrs)
+{
+    xmlNodePtr c;
+    gboolean ok;
+
+    ok = FALSE;
+    c = obt_xml_find_sibling(first, attrs[0]);
+    while (c && !ok) {
+        gint i;
+
+        ok = TRUE;
+        for (i = 1; attrs[i]; ++i) {
+            gchar **eq = g_strsplit(attrs[i], "=", 2);
+            if (eq[1] && !obt_xml_attr_contains(c, eq[0], eq[1]))
+                ok = FALSE;
+            g_strfreev(eq);
+        }
+        if (!ok)
+            c = obt_xml_find_sibling(c->next, attrs[0]);
+    }
+    return ok ? c : NULL;
+}
+
+static xmlNodePtr create_child(xmlNodePtr parent, gchar *const*attrs,
+                               const gchar *value)
+{
+    xmlNodePtr c;
+    gint i;
+
+    c = xmlNewTextChild(parent, NULL, (xmlChar*)attrs[0], (xmlChar*)value);
+
+    for (i = 1; attrs[i]; ++i) {
+        gchar **eq = g_strsplit(attrs[i], "=", 2);
+        if (eq[1])
+            xmlNewProp(c, (xmlChar*)eq[0], (xmlChar*)eq[1]);
+        g_strfreev(eq);
+    }
+    return c;
+}
+
 xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
                                  const gchar *default_value)
 {
@@ -467,44 +513,18 @@ xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
     nodes = g_strsplit(path, "/", 0);
     for (it = nodes; *it; it = next) {
         gchar **attrs;
-        gboolean ok = FALSE;
 
         attrs = g_strsplit(*it, ":", 0);
         next = it + 1;
 
         /* match attributes */
-        c = obt_xml_find_sibling(n->children, attrs[0]);
-        while (c && !ok) {
-            gint i;
-
-            ok = TRUE;
-            for (i = 1; attrs[i]; ++i) {
-                gchar **eq = g_strsplit(attrs[i], "=", 2);
-                if (eq[1] && !obt_xml_attr_contains(c, eq[0], eq[1]))
-                    ok = FALSE;
-                g_strfreev(eq);
-            }
-            if (!ok)
-                c = obt_xml_find_sibling(c->next, attrs[0]);
-        }
+        c = find_sibling(n->children, attrs);
 
         if (!c) {
-            gint i;
-
             if (*next)
-                c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0], NULL);
+                c = create_child(n, attrs, NULL);
             else if (default_value)
-                c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0],
-                                    (xmlChar*)default_value);
-
-            if (c) {
-                for (i = 1; attrs[i]; ++i) {
-                    gchar **eq = g_strsplit(attrs[i], "=", 2);
-                    if (eq[1])
-                        xmlNewProp(c, (xmlChar*)eq[0], (xmlChar*)eq[1]);
-                    g_strfreev(eq);
-                }
-            }
+                c = create_child(n, attrs, default_value);
         }
         n = c;
 
@@ -515,6 +535,49 @@ xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
 
     return n;
 }
+
+GList* obt_xml_path_get_list(xmlNodePtr subtree, const gchar *path)
+{
+    xmlNodePtr n, c;
+    gchar **nodes;
+    gchar **it, **next;
+    GList *list;
+
+    g_return_val_if_fail(subtree != NULL, NULL);
+
+    n = subtree;
+    list = NULL;
+
+    nodes = g_strsplit(path, "/", 0);
+    if (nodes[0]) {
+        gchar **attrs;
+
+        for (it = nodes, next = it + 1; *next; it = next) {
+            attrs = g_strsplit(*it, ":", 0);
+            next = it + 1;
+
+            /* match attributes */
+            c = find_sibling(n->children, attrs);
+            if (!c) c = create_child(n, attrs, NULL);
+            n = c;
+
+            g_strfreev(attrs);
+        }
+
+        attrs = g_strsplit(*next, ":", 0);
+        c = n->children;
+        while (c && (c = find_sibling(c, attrs))) {
+            list = g_list_append(list, c);
+            c = c->next;
+        }
+        g_strfreev(attrs);
+    }
+
+    g_strfreev(nodes);
+
+    return list;
+}
+
 
 void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path)
 {

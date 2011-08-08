@@ -111,6 +111,12 @@ gboolean obt_xml_attr_bool     (xmlNodePtr node, const gchar *name,
 */
 xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
                                  const gchar *default_value);
+/*! Similar to obt_xml_path_get_node(), but returns a list of nodes that
+  match the given path.
+  Given xml as <a><b>1</b><b>2</b><b>3</b></a>, the path "a/b" would return
+  the list of all nodes named b.
+*/
+GList* obt_xml_path_get_list(xmlNodePtr subtree, const gchar *path);
 /*! Removes a specified node from the tree. */
 void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path);
 

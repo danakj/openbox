@@ -24,12 +24,21 @@
 
 typedef struct {
     gchar *name;
-    ObConfigValue *def;
-    ObConfigValue *value;
-    ObConfigValueDataType type;
-    ObConfigValueDataPtr data;
-    const ObConfigValueEnum *enum_choices;
-    gchar* (*string_modify_func)(const gchar *s);
+    gboolean cb;
+    union _ObConfigParserEntityUnion {
+        struct _ObConfigParserEntityCallback {
+            ObConfigParserFunc func;
+            gpointer data;
+        } cb;
+        struct _ObConfigParserEntityValue {
+            ObConfigValue *def;
+            ObConfigValue *value;
+            ObConfigValueDataType type;
+            ObConfigValueDataPtr data;
+            const ObConfigValueEnum *enum_choices;
+            gchar* (*string_modify_func)(const gchar *s);
+        } v;
+    } u;
 } ObConfigParserEntity;
 
 struct _ObConfigParser {
@@ -40,9 +49,12 @@ struct _ObConfigParser {
 static void entity_free(ObConfigParserEntity *e)
 {
     g_free(e->name);
-    config_value_unref(e->def);
-    config_value_unref(e->value);
-    e->data.pointer = NULL; /* if it was holding a pointer, then NULL it */
+    if (!e->cb) {
+        config_value_unref(e->u.v.def);
+        config_value_unref(e->u.v.value);
+        /* if it was holding a pointer, then NULL it */
+        e->u.v.data.pointer = NULL;
+    }
     g_slice_free(ObConfigParserEntity, e);
 }
 
@@ -72,28 +84,35 @@ static void copy_value(ObConfigParserEntity *e)
 {
     gboolean b;
 
-    if (e->string_modify_func && config_value_is_string(e->value)) {
-        gchar *s = e->string_modify_func(config_value_string(e->value));
+    g_return_if_fail(e->cb == FALSE);
+
+    if (e->u.v.string_modify_func &&
+        config_value_is_string(e->u.v.value))
+    {
+        gchar *s = e->u.v.string_modify_func(
+            config_value_string(e->u.v.value));
         if (s) {
-            config_value_unref(e->value);
-            e->value = config_value_new_string_steal(s);
+            config_value_unref(e->u.v.value);
+            e->u.v.value = config_value_new_string_steal(s);
         }
     }
 
-    switch (e->type) {
+    switch (e->u.v.type) {
     case OB_CONFIG_VALUE_ENUM:
-        b = config_value_copy_ptr(e->value, e->type, e->data, e->enum_choices);
+        b = config_value_copy_ptr(e->u.v.value, e->u.v.type,
+                                  e->u.v.data, e->u.v.enum_choices);
         break;
     default:
-        b = config_value_copy_ptr(e->value, e->type, e->data, NULL);
+        b = config_value_copy_ptr(e->u.v.value, e->u.v.type,
+                                  e->u.v.data, NULL);
         break;
     }
 
     /* replace the bad value with the default (if it's not the default) */
-    if (!b && e->value != e->def) {
-        config_value_unref(e->value);
-        e->value = e->def;
-        config_value_ref(e->value);
+    if (!b && e->u.v.value != e->u.v.def) {
+        config_value_unref(e->u.v.value);
+        e->u.v.value = e->u.v.def;
+        config_value_ref(e->u.v.value);
         copy_value(e);
     }
 }
@@ -110,12 +129,13 @@ static ObConfigParserEntity* add(ObConfigParser *p,
 
     e = g_slice_new(ObConfigParserEntity);
     e->name = g_strdup(name);
-    e->value = def;
-    e->def = def;
+    e->cb = FALSE;
+    e->u.v.value = def;
+    e->u.v.def = def;
     config_value_ref(def);
     config_value_ref(def);
-    e->type = type;
-    e->data = v;
+    e->u.v.type = type;
+    e->u.v.data = v;
     g_hash_table_replace(p->entities, e->name, e);
 
     copy_value(e);
@@ -156,7 +176,7 @@ void config_parser_enum(ObConfigParser *p,
     cv = config_value_new_string(def);
     e = add(p, name, cv, OB_CONFIG_VALUE_ENUM, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
-    e->enum_choices = choices;
+    e->u.v.enum_choices = choices;
 }
 
 void config_parser_string_list(ObConfigParser *p,
@@ -194,7 +214,7 @@ void config_parser_string_uniq(ObConfigParser *p,
     cv = config_value_new_string(def);
     e = add(p, name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
-    e->string_modify_func = modify_uniq;
+    e->u.v.string_modify_func = modify_uniq;
 }
 
 gchar *modify_path(const gchar *s)
@@ -212,7 +232,7 @@ void config_parser_string_path(ObConfigParser *p,
     cv = config_value_new_string(def);
     e = add(p, name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
-    e->string_modify_func = modify_path;
+    e->u.v.string_modify_func = modify_path;
 }
 void config_parser_key(ObConfigParser *p,
                        const gchar *name, const gchar *def,
@@ -226,21 +246,47 @@ void config_parser_key(ObConfigParser *p,
     config_value_unref(cv);
 }
 
+void config_parser_callback(ObConfigParser *p, const gchar *name,
+                            ObConfigParserFunc cb, gpointer data)
+{
+    ObConfigParserEntity *e;
+
+    g_return_if_fail(g_hash_table_lookup(p->entities, name) != NULL);
+
+    e = g_slice_new(ObConfigParserEntity);
+    e->name = g_strdup(name);
+    e->cb = TRUE;
+    e->u.cb.func = cb;
+    e->u.cb.data = data;
+    g_hash_table_replace(p->entities, e->name, e);
+}
+
+
 static void foreach_read(gpointer k, gpointer v, gpointer u)
 {
     ObtXmlInst *i = u;
     ObConfigParserEntity *e = v;
     xmlNodePtr root, n;
 
-    if (config_value_is_string(e->def)) {
-        root = obt_xml_root(i);
-        n = obt_xml_path_get_node(root, e->name, config_value_string(e->def));
+    root = obt_xml_root(i);
 
-        config_value_unref(e->value);
-        e->value = config_value_new_string_steal(obt_xml_node_string(n));
+    if (e->cb) {
+        n = obt_xml_path_get_node(root, e->name, NULL);
+        e->u.cb.func(n, e->u.cb.data);
+        return;
+    }
+
+    g_return_if_fail(e->cb == FALSE);
+
+    if (config_value_is_string(e->u.v.def)) {
+        n = obt_xml_path_get_node(root, e->name,
+                                  config_value_string(e->u.v.def));
+
+        config_value_unref(e->u.v.value);
+        e->u.v.value = config_value_new_string_steal(obt_xml_node_string(n));
         copy_value(e);
     }
-    else if (config_value_is_string_list(e->def)) {
+    else if (config_value_is_string_list(e->u.v.def)) {
         GList *list;
 
         root = obt_xml_root(i);
@@ -258,11 +304,11 @@ static void foreach_read(gpointer k, gpointer v, gpointer u)
             }
             *c = NULL;
 
-            config_value_unref(e->value);
-            e->value = config_value_new_string_list_steal(out);
+            config_value_unref(e->u.v.value);
+            e->u.v.value = config_value_new_string_list_steal(out);
         }
     }
-    else if (config_value_is_action_list(e->def))
+    else if (config_value_is_action_list(e->u.v.def))
         g_error("Unable to read action lists from config file");
     else
         g_assert_not_reached();

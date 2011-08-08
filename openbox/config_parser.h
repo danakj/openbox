@@ -23,6 +23,8 @@
 
 typedef struct _ObConfigParser ObConfigParser;
 
+typedef void (*ObConfigParserFunc)(xmlNodePtr node, gpointer d);
+
 ObConfigParser *config_parser_new(void);
 
 void config_parser_ref(ObConfigParser *p);
@@ -54,6 +56,9 @@ void config_parser_string_path(ObConfigParser *p,
 void config_parser_key(ObConfigParser *p,
                        const gchar *name, const gchar *def,
                        const gchar **v);
+
+void config_parser_callback(ObConfigParser *p, const gchar *name,
+                            ObConfigParserFunc cb, gpointer data);
 
 
 void config_parser_read(ObConfigParser *p, ObtXmlInst *i);

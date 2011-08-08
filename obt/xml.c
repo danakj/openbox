@@ -325,6 +325,26 @@ gboolean obt_xml_save_file(ObtXmlInst *inst,
     return xmlSaveFormatFile(path, inst->doc, pretty) != -1;
 }
 
+gboolean obt_xml_save_cache_file(ObtXmlInst *inst,
+                                 const gchar *domain,
+                                 const gchar *filename,
+                                 gboolean pretty)
+{
+    gchar *dpath, *fpath;
+    gboolean ok;
+
+    dpath = g_build_filename(obt_paths_cache_home(inst->xdg_paths),
+                             domain, NULL);
+    fpath = g_build_filename(dpath, filename, NULL);
+
+    ok = obt_paths_mkdir_path(dpath, 0700);
+    ok = ok && obt_xml_save_file(inst, fpath, pretty);
+
+    g_free(fpath);
+    g_free(dpath);
+    return ok;
+}
+
 void obt_xml_close(ObtXmlInst *i)
 {
     if (i && i->doc) {
@@ -607,3 +627,31 @@ void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path)
     xmlUnlinkNode(n);
     xmlFreeNode(n);
 }
+
+gchar* obt_xml_path_string(xmlNodePtr subtree, const gchar *path,
+                          const gchar *default_value)
+{
+    xmlNodePtr n;
+
+    n = obt_xml_path_get_node(subtree, path, default_value);
+    return n ? obt_xml_node_string(n) : NULL;
+}
+
+int obt_xml_path_int(xmlNodePtr subtree, const gchar *path,
+                     const gchar *default_value)
+{
+    xmlNodePtr n;
+
+    n = obt_xml_path_get_node(subtree, path, default_value);
+    return n ? obt_xml_node_int(n) : 0;
+}
+
+gboolean obt_xml_path_bool(xmlNodePtr subtree, const gchar *path,
+                           const gchar *default_value)
+{
+    xmlNodePtr n;
+
+    n = obt_xml_path_get_node(subtree, path, default_value);
+    return n ? obt_xml_node_bool(n) : FALSE;
+}
+

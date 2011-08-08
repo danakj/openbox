@@ -61,6 +61,10 @@ gboolean obt_xml_load_mem(ObtXmlInst *inst,
 gboolean obt_xml_save_file(ObtXmlInst *inst,
                            const gchar *path,
                            gboolean pretty);
+gboolean obt_xml_save_cache_file(ObtXmlInst *inst,
+                                 const gchar *domain,
+                                 const gchar *filename,
+                                 gboolean pretty);
 
 xmlDocPtr obt_xml_doc(ObtXmlInst *inst);
 xmlNodePtr obt_xml_root(ObtXmlInst *inst);
@@ -123,6 +127,13 @@ xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
 GList* obt_xml_path_get_list(xmlNodePtr subtree, const gchar *path);
 /*! Removes a specified node from the tree. */
 void obt_xml_path_delete_node(xmlNodePtr subtree, const gchar *path);
+
+gchar* obt_xml_path_string(xmlNodePtr subtree, const gchar *path,
+                          const gchar *default_value);
+int obt_xml_path_int(xmlNodePtr subtree, const gchar *path,
+                     const gchar *default_value);
+gboolean obt_xml_path_bool(xmlNodePtr subtree, const gchar *path,
+                           const gchar *default_value);
 
 
 G_END_DECLS

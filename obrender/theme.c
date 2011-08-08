@@ -310,8 +310,9 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                 "osd.label.text.color",
                 theme->osd_text_active_color, RrColorCopy(theme->title_focused_color));
 
-    READ_COLOR("osd.inactive.label.text.color", theme->osd_text_inactive_color,
-               RrColorNew(inst, 0xff, 0xff, 0xff));
+    READ_COLOR_("osd.inactive.label.text.color",
+                "osd.label.text.color",
+                theme->osd_text_inactive_color, RrColorCopy(theme->title_unfocused_color));
 
     READ_COLOR("window.active.button.unpressed.image.color",
                theme->titlebut_focused_unpressed_color,

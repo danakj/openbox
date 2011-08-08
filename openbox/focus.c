@@ -135,7 +135,9 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            2. it is a valid auto-focus target
            3. it is not shaded
         */
-        if ((allow_omnipresent || c->desktop == screen_desktop) &&
+        /* if ((allow_omnipresent || c->desktop == screen_desktop) && */
+        if ((allow_omnipresent || 
+             screen_desktop_is_visible(c->desktop, FALSE)) &&
             focus_valid_target(c, screen_desktop,
                                TRUE, FALSE, FALSE, TRUE, FALSE, FALSE,
                                FALSE) &&
@@ -270,6 +272,7 @@ ObClient *focus_order_find_first(guint desktop)
     GList *it;
     for (it = focus_order; it; it = g_list_next(it)) {
         ObClient *c = it->data;
+        /* if (screen_desktop_is_visible(c->desktop, TRUE)) */
         if (c->desktop == desktop || c->desktop == DESKTOP_ALL)
             return c;
     }
@@ -324,8 +327,9 @@ gboolean focus_valid_target(ObClient *ft,
 
        do this check first because it will usually filter out the most
        windows */
-    ok = (all_desktops || ft->desktop == desktop ||
-          ft->desktop == DESKTOP_ALL);
+    /* ok = (all_desktops || ft->desktop == desktop || */
+          /* ft->desktop == DESKTOP_ALL); */
+    ok = all_desktops || screen_desktop_is_visible(ft->desktop, TRUE);
 
     /* if we only include hilited windows, check if the window is */
     ok = ok && (nonhilite_windows || ft->demands_attention);

@@ -781,8 +781,9 @@ static gboolean client_can_steal_focus(ObClient *self,
        focus, unless it was launched after we changed desktops and the request
        came from the user
      */
-    if (!(self->desktop == screen_desktop ||
-          self->desktop == DESKTOP_ALL) &&
+    /* if (!(self->desktop == screen_desktop || */
+          /* self->desktop == DESKTOP_ALL) && */
+    if (!screen_desktop_is_visible(self->desktop, TRUE) &&
         (!allow_other_desktop ||
          (request_from_user && screen_desktop_user_time &&
           !event_time_after(launch_time, screen_desktop_user_time))))
@@ -1277,7 +1278,18 @@ static void client_get_desktop(ObClient *self)
         }
         /* defaults to the current desktop */
         else {
-            self->desktop = screen_desktop;
+            Rect client_area;
+            guint cur_mon;
+
+            RECT_SET(client_area, &self->area.x, &self->area.y, 
+                     self->area.width, self->area.height);
+            cur_mon = screen_find_monitor(&client_area);
+
+            ag_debug("on monitor %d", cur_mon);
+            ag_debug("which has desktop %d",
+                     *g_slist_nth(screen_visible_desktops, cur_mon));
+
+            self->desktop = g_slist_nth_data(screen_visible_desktops, cur_mon);
             ob_debug("client desktop set to the current desktop: %d",
                      self->desktop);
         }
@@ -2401,8 +2413,9 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic ||
-        (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop))
+    if (self->shaded || self->iconic || 
+        !screen_desktop_is_visible(self->desktop, TRUE))
+        /* (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop)) */
     {
         self->wmstate = IconicState;
     } else
@@ -2546,8 +2559,9 @@ static ObStackingLayer calc_layer(ObClient *self)
              /* you are fullscreen while you or your children are focused.. */
              (client_focused(self) || client_search_focus_tree(self) ||
               /* you can be fullscreen if you're on another desktop */
-              (self->desktop != screen_desktop &&
-               self->desktop != DESKTOP_ALL) ||
+              !screen_desktop_is_visible(self->desktop, TRUE) ||
+              /* (self->desktop != screen_desktop && */
+               /* self->desktop != DESKTOP_ALL) || */
               /* and you can also be fullscreen if the focused client is on
                  another monitor, or nothing else is focused */
               (!focus_client ||
@@ -2627,13 +2641,20 @@ void client_calc_layer(ObClient *self)
 
 gboolean client_should_show(ObClient *self)
 {
-    ag_debug("should i show on desktop %d? (really %d)", screen_desktop, self->desktop);
+    GSList *sit;
+    
     if (self->iconic)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop)
         return FALSE;
-    if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
+    if (screen_desktop_is_visible(self->desktop, TRUE))
         return TRUE;
+    /* if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL) */
+        /* return TRUE; */
+/*  */
+    /* for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit)) */
+        /* if (self->desktop == sit->data) */
+            /* return TRUE; */
 
     return FALSE;
 }
@@ -3305,8 +3326,9 @@ static void client_iconify_recursive(ObClient *self,
         } else {
             self->iconic = iconic;
 
-            if (curdesk && self->desktop != screen_desktop &&
-                self->desktop != DESKTOP_ALL)
+            /* if (curdesk && self->desktop != screen_desktop && */
+                /* self->desktop != DESKTOP_ALL) */
+            if (curdesk && !screen_desktop_is_visible(self->desktop, TRUE))
                 client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
             /* this puts it after the current focused window, this will
@@ -3410,6 +3432,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     if (max) {
         /* make sure the window is on some monitor */
         client_find_onscreen(self, &x, &y, w, h, FALSE);
+
     }
 
     client_change_state(self); /* change the state hints on the client */
@@ -3605,8 +3628,9 @@ void client_hilite(ObClient *self, gboolean hilite)
 
             /* if the window is on another desktop then raise it and make it
                the most recently used window */
-            if (self->desktop != screen_desktop &&
-                self->desktop != DESKTOP_ALL)
+            /* if (self->desktop != screen_desktop && */
+                /* self->desktop != DESKTOP_ALL) */
+            if (!screen_desktop_is_visible(self->desktop, TRUE))
             {
                 stacking_raise(CLIENT_AS_WINDOW(self));
                 focus_order_to_top(self);
@@ -3906,6 +3930,7 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    if (self == NULL) return FALSE;
     if (!client_validate(self)) return FALSE;
 
     /* we might not focus this window, so if we have modal children which would
@@ -3967,14 +3992,17 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
         screen_show_desktop(FALSE, self);
     if (self->iconic)
         client_iconify(self, FALSE, here, FALSE);
-    if (self->desktop != DESKTOP_ALL &&
+    /* if (self->desktop != DESKTOP_ALL && */
+        /* self->desktop != screen_desktop) */
+    if (!screen_desktop_is_visible(self->desktop, TRUE) ||
         self->desktop != screen_desktop)
     {
         if (here)
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else
             screen_set_desktop(self->desktop, FALSE);
-    } else if (!self->frame->visible)
+    } 
+    else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess
            with it */
         return;
@@ -4013,7 +4041,8 @@ static void client_bring_windows_recursive(ObClient *self,
 
     if (((helpers && client_helper(self)) ||
          (modals && self->modal)) &&
-        ((self->desktop != desktop && self->desktop != DESKTOP_ALL) ||
+        /* ((self->desktop != desktop && self->desktop != DESKTOP_ALL) || */
+        (!screen_desktop_is_visible(self->desktop, TRUE) ||
          (iconic && self->iconic)))
     {
         if (iconic && self->iconic)
@@ -4513,8 +4542,9 @@ ObClient* client_under_pointer(void)
                     /* check the desktop, this is done during desktop
                        switching and windows are shown/hidden status is not
                        reliable */
-                    (c->desktop == screen_desktop ||
-                     c->desktop == DESKTOP_ALL) &&
+                    /* (c->desktop == screen_desktop || */
+                     /* c->desktop == DESKTOP_ALL) && */
+                    screen_desktop_is_visible(c->desktop, TRUE) &&
                     /* ignore all animating windows */
                     !frame_iconify_animating(c->frame) &&
                     RECT_CONTAINS(c->frame->area, x, y))

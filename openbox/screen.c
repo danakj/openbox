@@ -60,6 +60,7 @@ static void     screen_fallback_focus(void);
 guint           screen_num_desktops;
 guint           screen_num_monitors;
 guint           screen_desktop;
+GSList         *screen_visible_desktops = NULL;
 guint           screen_last_desktop;
 gboolean        screen_showing_desktop;
 ObDesktopLayout screen_desktop_layout;
@@ -82,6 +83,9 @@ static GSList *struts_bottom = NULL;
 static ObPagerPopup *desktop_popup;
 static guint         desktop_popup_timer = 0;
 static gboolean      desktop_popup_perm;
+
+static void get_xinerama_screens(Rect **xin_areas, guint *nxin);
+static void screen_set_visible_desktops(void);
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -219,6 +223,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(NET_SUPPORTING_WM_CHECK);
     supported[i++] = OBT_PROP_ATOM(NET_WM_FULL_PLACEMENT);
     supported[i++] = OBT_PROP_ATOM(NET_CURRENT_DESKTOP);
+    supported[i++] = OBT_PROP_ATOM(NET_VISIBLE_DESKTOPS);
     supported[i++] = OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS);
     supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_GEOMETRY);
     supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_VIEWPORT);
@@ -357,6 +362,7 @@ void screen_startup(gboolean reconfig)
 {
     gchar **names = NULL;
     guint32 d;
+    guint i;
     gboolean namesexist = FALSE;
 
     desktop_popup = pager_popup_new();
@@ -425,6 +431,11 @@ void screen_startup(gboolean reconfig)
         screen_set_num_desktops(session_num_desktops);
     else
         screen_set_num_desktops(config_desktops_num);
+
+    get_xinerama_screens(&monitor_area, &screen_num_monitors);
+    ag_debug("setting the first %d desktops as visible", screen_num_monitors);
+    for (i = 0; i < screen_num_monitors; i++)
+        screen_visible_desktops = g_slist_append(screen_visible_desktops, i);
 
     screen_desktop = screen_num_desktops;  /* something invalid */
     /* start on the current desktop when a wm was already running */
@@ -607,13 +618,37 @@ static gboolean last_desktop_func(gpointer data)
     return FALSE; /* don't repeat */
 }
 
+static void screen_set_visible_desktops(void)
+{
+    gulong *visible_desktops, *desk_it;
+    guint size = g_slist_length(screen_visible_desktops);
+    GSList *sit;
+
+    visible_desktops = g_new(gulong, size);
+    desk_it = visible_desktops;
+    for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit), ++desk_it)
+        *desk_it = sit->data;
+
+    OBT_PROP_SETA32(obt_root(ob_screen), NET_VISIBLE_DESKTOPS, CARDINAL, 
+                    visible_desktops, size);
+}
+
 void screen_set_desktop(guint num, gboolean dofocus)
 {
     GList *it;
+    GSList *sit;
     guint previous;
     gulong ignore_start;
 
+    ag_debug("number of desktops %d; switching to %d", 
+             screen_num_desktops, num);
+    ag_debug("current desktop %d", screen_desktop);
+    ag_debug("index in visible list %d",
+             g_slist_index(screen_visible_desktops, screen_desktop));
+
     g_assert(num < screen_num_desktops);
+    g_assert(screen_desktop == screen_num_desktops || 
+             g_slist_index(screen_visible_desktops, screen_desktop) > -1);
 
     previous = screen_desktop;
     screen_desktop = num;
@@ -692,53 +727,74 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
     ob_debug("Moving to desktop %d", num+1);
 
-    if (ob_state() == OB_STATE_RUNNING)
-        screen_show_desktop_popup(screen_desktop, FALSE);
+    if (screen_desktop_is_visible(screen_desktop, FALSE)) {
+        /* screen_hide_desktop_popup(); */
+        client_focus(focus_order_find_first(screen_desktop));
 
-    /* ignore enter events caused by the move */
-    ignore_start = event_start_ignore_all_enters();
-
-    if (moveresize_client)
-        client_set_desktop(moveresize_client, num, TRUE, FALSE);
-
-    /* show windows before hiding the rest to lessen the enter/leave events */
-
-    /* show windows from top to bottom */
-    for (it = stacking_list; it; it = g_list_next(it)) {
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *c = it->data;
-            client_show(c);
-        }
+        if (ob_state() == OB_STATE_RUNNING)
+            screen_show_desktop_popup(screen_desktop, FALSE);
     }
+    else {
+        gint cur_monitor;
 
-    if (dofocus) screen_fallback_focus();
+        if ((cur_monitor = g_slist_index(screen_visible_desktops, 
+                                         previous)) > -1) {
+            ag_debug("changing monitor %d desktop from %d to %d",
+                     cur_monitor, previous, screen_desktop);
+            g_slist_nth(screen_visible_desktops, 
+                        cur_monitor)->data = screen_desktop;
+        }
 
-    /* hide windows from bottom to top */
-    for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
-        if (WINDOW_IS_CLIENT(it->data)) {
-            ObClient *c = it->data;
-            if (client_hide(c)) {
-                if (c == focus_client) {
-                    /* c was focused and we didn't do fallback clearly so make
-                       sure openbox doesnt still consider the window focused.
-                       this happens when using NextWindow with allDesktops,
-                       since it doesnt want to move focus on desktop change,
-                       but the focus is not going to stay with the current
-                       window, which has now disappeared.
-                       only do this if the client was actually hidden,
-                       otherwise it can keep focus. */
-                    focus_set_client(NULL);
+        if (ob_state() == OB_STATE_RUNNING)
+            screen_show_desktop_popup(screen_desktop, FALSE);
+
+        /* ignore enter events caused by the move */
+        ignore_start = event_start_ignore_all_enters();
+
+        if (moveresize_client)
+            client_set_desktop(moveresize_client, num, TRUE, FALSE);
+
+        /* show windows before hiding the rest to lessen the enter/leave events */
+
+        /* show windows from top to bottom */
+        for (it = stacking_list; it; it = g_list_next(it)) {
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = it->data;
+                client_show(c);
+            }
+        }
+
+        if (dofocus) screen_fallback_focus();
+
+        /* hide windows from bottom to top */
+        for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = it->data;
+                if (client_hide(c)) {
+                    if (c == focus_client) {
+                        /* c was focused and we didn't do fallback clearly so make
+                           sure openbox doesnt still consider the window focused.
+                           this happens when using NextWindow with allDesktops,
+                           since it doesnt want to move focus on desktop change,
+                           but the focus is not going to stay with the current
+                           window, which has now disappeared.
+                           only do this if the client was actually hidden,
+                           otherwise it can keep focus. */
+                        focus_set_client(NULL);
+                    }
                 }
             }
         }
+
+        focus_cycle_addremove(NULL, TRUE);
+
+        event_end_ignore_all_enters(ignore_start);
+
+        if (event_source_time() != CurrentTime)
+            screen_desktop_user_time = event_source_time();
     }
 
-    focus_cycle_addremove(NULL, TRUE);
-
-    event_end_ignore_all_enters(ignore_start);
-
-    if (event_source_time() != CurrentTime)
-        screen_desktop_user_time = event_source_time();
+    screen_set_visible_desktops();
 }
 
 void screen_add_desktop(gboolean current)
@@ -944,6 +1000,11 @@ static gboolean hide_desktop_popup_func(gpointer data)
     return FALSE; /* don't repeat */
 }
 
+gint screen_desktop_monitor()
+{
+    return g_slist_index(screen_visible_desktops, screen_desktop);
+}
+
 void screen_show_desktop_popup(guint d, gboolean perm)
 {
     const Rect *a;
@@ -951,7 +1012,10 @@ void screen_show_desktop_popup(guint d, gboolean perm)
     /* 0 means don't show the popup */
     if (!config_desktop_popup_time) return;
 
-    a = screen_physical_area_primary(FALSE);
+    ag_debug("showing desktop popup for %d", d);
+
+    /* a = screen_physical_area_primary(FALSE); */
+    a = screen_physical_area_monitor(screen_desktop_monitor());
     pager_popup_position(desktop_popup, CenterGravity,
                          a->x + a->width / 2, a->y + a->height / 2);
     pager_popup_icon_size_multiplier(desktop_popup,
@@ -1374,11 +1438,28 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
     RECT_SET((*xin_areas)[*nxin], l, t, r - l + 1, b - t + 1);
 }
 
+gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent)
+{
+    GSList *sit;
+
+    if (omnipresent && desktop == DESKTOP_ALL)
+        return TRUE;
+
+    for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit))
+        if (desktop == sit->data) {
+            /* ag_debug("%d is visible", desktop); */
+            return TRUE;
+        }
+
+    return FALSE;
+}
+
 void screen_update_areas(void)
 {
-    guint i;
+    guint i, old_num_monitors;
     gulong *dims;
     GList *it, *onscreen;
+    GSList *sit;
 
     /* collect the clients that are on screen */
     onscreen = NULL;
@@ -1387,8 +1468,18 @@ void screen_update_areas(void)
             onscreen = g_list_prepend(onscreen, it->data);
     }
 
+    old_num_monitors = screen_num_monitors;
     g_free(monitor_area);
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
+
+    g_assert(screen_num_desktops >= screen_num_monitors);
+
+    if (old_num_monitors != screen_num_monitors)
+        ag_debug("there were %d monitors; now there are %d",
+                 old_num_monitors, screen_num_monitors);
+
+    for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit))
+        ag_debug("available desktop: %d", *sit);
 
     /* set up the user-specified margins */
     config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);
@@ -1756,9 +1847,15 @@ gboolean screen_pointer_pos(gint *x, gint *y)
 
 gboolean screen_compare_desktops(guint a, guint b)
 {
-    if (a == DESKTOP_ALL)
-        a = screen_desktop;
-    if (b == DESKTOP_ALL)
-        b = screen_desktop;
-    return a == b;
+    /* if (a == DESKTOP_ALL) */
+        /* a = screen_desktop; */
+    /* if (b == DESKTOP_ALL) */
+        /* b = screen_desktop; */
+    /* return a == b; */
+
+    if (screen_desktop_is_visible(a, TRUE) &&
+        screen_desktop_is_visible(b, TRUE))
+        return TRUE;
+    else
+        return FALSE;
 }

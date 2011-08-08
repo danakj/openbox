@@ -32,6 +32,8 @@ extern guint screen_num_desktops;
 extern guint screen_num_monitors;
 /*! The current desktop */
 extern guint screen_desktop;
+/*! All visible desktops */
+extern GSList *screen_visible_desktops;
 /*! The desktop which was last visible */
 extern guint screen_last_desktop;
 /*! Are we in showing-desktop mode? */
@@ -102,6 +104,7 @@ void screen_update_desktop_names(void);
   it handles the root colormap. */
 void screen_install_colormap(struct _ObClient *client, gboolean install);
 
+gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent);
 void screen_update_areas(void);
 
 const Rect* screen_physical_area_all_monitors(void);

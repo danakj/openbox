@@ -73,9 +73,9 @@ static void parse_error(const gchar *m, const ObtDDParse *const parse,
                         gboolean *error)
 {
     if (!parse->filename)
-        g_warning("%s at line %lu of input", m, parse->lineno);
+        g_debug("%s at line %lu of input", m, parse->lineno);
     else
-        g_warning("%s at line %lu of file %s",
+        g_debug("%s at line %lu of file %s",
                   m, parse->lineno, parse->filename);
     if (error) *error = TRUE;
 }

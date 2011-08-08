@@ -491,14 +491,19 @@ xmlNodePtr obt_xml_path_get_node(xmlNodePtr subtree, const gchar *path,
         if (!c) {
             gint i;
 
-            c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0],
-                                *next ? NULL : (xmlChar*)default_value);
+            if (*next)
+                c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0], NULL);
+            else if (default_value)
+                c = xmlNewTextChild(n, NULL, (xmlChar*)attrs[0],
+                                    (xmlChar*)default_value);
 
-            for (i = 1; attrs[i]; ++i) {
-                gchar **eq = g_strsplit(attrs[i], "=", 2);
-                if (eq[1])
-                    xmlNewProp(c, (xmlChar*)eq[0], (xmlChar*)eq[1]);
-                g_strfreev(eq);
+            if (c) {
+                for (i = 1; attrs[i]; ++i) {
+                    gchar **eq = g_strsplit(attrs[i], "=", 2);
+                    if (eq[1])
+                        xmlNewProp(c, (xmlChar*)eq[0], (xmlChar*)eq[1]);
+                    g_strfreev(eq);
+                }
             }
         }
         n = c;

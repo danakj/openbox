@@ -31,7 +31,7 @@ struct _ObConfigValue {
     } type;
     union {
         gchar *string;
-        GList *list;
+        gchar **list;
         ObActionList *actions;
     } v;
 };
@@ -48,13 +48,9 @@ void config_value_unref(ObConfigValue *v)
         case OB_CV_STRING:
             g_free(v->v.string);
             break;
-        case OB_CV_LIST: {
-            GList *it;
-            for (it = v->v.list; it; it = g_list_next(it))
-                config_value_unref(it->data);
-            g_list_free(v->v.list);
+        case OB_CV_LIST:
+            g_strfreev(v->v.list);
             break;
-        }
         case OB_CV_ACTION_LIST:
             action_list_unref(v->v.actions);
             break;
@@ -71,7 +67,7 @@ gboolean config_value_is_string(const ObConfigValue *v)
     return v->type == OB_CV_STRING;
 }
 
-gboolean config_value_is_list(const ObConfigValue *v)
+gboolean config_value_is_string_list(const ObConfigValue *v)
 {
     g_return_val_if_fail(v != NULL, FALSE);
     return v->type == OB_CV_LIST;
@@ -116,9 +112,10 @@ void config_value_copy_ptr(ObConfigValue *v,
         *p.coord = c;
         break;
     }
-    case OB_CONFIG_VALUE_LIST:
-        *p.list = config_value_list(v);
+    case OB_CONFIG_VALUE_STRING_LIST: {
+        *p.list = config_value_string_list(v);
         break;
+    }
     case OB_CONFIG_VALUE_ACTIONLIST:
         *p.actions = config_value_action_list(v);
         break;
@@ -211,11 +208,11 @@ void config_value_gravity_coord(ObConfigValue *v, GravityCoord *c)
             c->denom = atoi(s+1);
     }
 }
-GList* config_value_list(ObConfigValue *v)
+const gchar *const* config_value_string_list(ObConfigValue *v)
 {
     g_return_val_if_fail(v != NULL, NULL);
-    g_return_val_if_fail(config_value_is_list(v), NULL);
-    return v->v.list;
+    g_return_val_if_fail(config_value_is_string_list(v), NULL);
+    return (const gchar**)v->v.list;
 }
 ObActionList* config_value_action_list(ObConfigValue *v)
 {
@@ -243,17 +240,12 @@ ObConfigValue* config_value_new_string_steal(gchar *s)
     return v;
 }
 
-ObConfigValue* config_value_new_list(GList *list)
+ObConfigValue* config_value_new_string_list(gchar **list)
 {
-    GList *c = g_list_copy(list);
-    GList *it;
-
-    for (it = c; it; it = g_list_next(it))
-        config_value_ref(it->data);
-    return config_value_new_list_steal(c);
+    return config_value_new_string_list_steal(g_strdupv(list));
 }
 
-ObConfigValue* config_value_new_list_steal(GList *list)
+ObConfigValue* config_value_new_string_list_steal(gchar **list)
 {
     ObConfigValue *v = g_slice_new(ObConfigValue);
     v->ref = 1;

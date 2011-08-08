@@ -32,7 +32,10 @@ typedef struct {
     gchar* (*string_modify_func)(const gchar *s);
 } ObConfigParserEntity;
 
-static GHashTable *entities;
+struct _ObConfigParser {
+    guint ref;
+    GHashTable *entities;
+};
 
 static void entity_free(ObConfigParserEntity *e)
 {
@@ -43,20 +46,26 @@ static void entity_free(ObConfigParserEntity *e)
     g_slice_free(ObConfigParserEntity, e);
 }
 
-void config_parser_startup(gboolean reconfig)
+ObConfigParser *config_parser_new(void)
 {
-    if (reconfig) return;
-
-    entities = g_hash_table_new_full(
+    ObConfigParser *p = g_slice_new(ObConfigParser);
+    p->ref = 1;
+    p->entities = g_hash_table_new_full(
         g_str_hash, g_str_equal, NULL, (GDestroyNotify)entity_free);
+    return p;
 }
 
-void config_parser_shutdown(gboolean reconfig)
+void config_parser_ref(ObConfigParser *p)
 {
-    if (reconfig) return;
+    ++p->ref;
+}
 
-    g_hash_table_unref(entities);
-    entities = NULL;
+void config_parser_unref(ObConfigParser *p)
+{
+    if (p && --p->ref < 1) {
+        g_hash_table_unref(p->entities);
+        g_slice_free(ObConfigParser, p);
+    }
 }
 
 static void copy_value(ObConfigParserEntity *e)
@@ -89,14 +98,15 @@ static void copy_value(ObConfigParserEntity *e)
     }
 }
 
-static ObConfigParserEntity* add(const gchar *name, ObConfigValue *def,
+static ObConfigParserEntity* add(ObConfigParser *p,
+                                 const gchar *name, ObConfigValue *def,
                                  ObConfigValueDataType type,
                                  ObConfigValueDataPtr v)
 {
     ObConfigParserEntity *e;
 
     g_return_val_if_fail(def != NULL, NULL);
-    g_return_val_if_fail(g_hash_table_lookup(entities, name) != NULL, NULL);
+    g_return_val_if_fail(g_hash_table_lookup(p->entities, name) != NULL, NULL);
 
     e = g_slice_new(ObConfigParserEntity);
     e->name = g_strdup(name);
@@ -106,49 +116,55 @@ static ObConfigParserEntity* add(const gchar *name, ObConfigValue *def,
     config_value_ref(def);
     e->type = type;
     e->data = v;
-    g_hash_table_replace(entities, e->name, e);
+    g_hash_table_replace(p->entities, e->name, e);
 
     copy_value(e);
     return e;
 }
 
-void config_parser_bool(const gchar *name, const gchar *def, gboolean *v)
+void config_parser_bool(ObConfigParser *p,
+                        const gchar *name, const gchar *def, gboolean *v)
 {
     ObConfigValue *cv = config_value_new_string(def);
-    add(name, cv, OB_CONFIG_VALUE_BOOLEAN, (ObConfigValueDataPtr)v);
+    add(p, name, cv, OB_CONFIG_VALUE_BOOLEAN, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
 }
 
-void config_parser_int(const gchar *name, const gchar *def, gint *v)
+void config_parser_int(ObConfigParser *p,
+                       const gchar *name, const gchar *def, gint *v)
 {
     ObConfigValue *cv = config_value_new_string(def);
-    add(name, cv, OB_CONFIG_VALUE_INTEGER, (ObConfigValueDataPtr)v);
+    add(p, name, cv, OB_CONFIG_VALUE_INTEGER, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
 }
 
-void config_parser_string(const gchar *name, const gchar *def, const gchar **v)
+void config_parser_string(ObConfigParser *p,
+                          const gchar *name, const gchar *def, const gchar **v)
 {
     ObConfigValue *cv = config_value_new_string(def);
-    add(name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
+    add(p, name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
 }
 
-void config_parser_enum(const gchar *name, const gchar *def, guint *v,
+void config_parser_enum(ObConfigParser *p,
+                        const gchar *name, const gchar *def, guint *v,
                         const ObConfigValueEnum choices[])
 {
     ObConfigValue *cv;
     ObConfigParserEntity *e;
 
     cv = config_value_new_string(def);
-    e = add(name, cv, OB_CONFIG_VALUE_ENUM, (ObConfigValueDataPtr)v);
+    e = add(p, name, cv, OB_CONFIG_VALUE_ENUM, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
     e->enum_choices = choices;
 }
 
-void config_parser_list(const gchar *name, GList *def, const GList **v)
+void config_parser_string_list(ObConfigParser *p,
+                               const gchar *name, gchar **def,
+                               const gchar *const**v)
 {
-    ObConfigValue *cv = config_value_new_list(def);
-    add(name, cv, OB_CONFIG_VALUE_LIST, (ObConfigValueDataPtr)v);
+    ObConfigValue *cv = config_value_new_string_list(def);
+    add(p, name, cv, OB_CONFIG_VALUE_STRING_LIST, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
 }
 
@@ -168,14 +184,15 @@ gchar *modify_uniq(const gchar *s)
     return str;
 }
 
-void config_parser_string_uniq(const gchar *name, const gchar *def,
+void config_parser_string_uniq(ObConfigParser *p,
+                               const gchar *name, const gchar *def,
                                const gchar **v)
 {
     ObConfigValue *cv;
     ObConfigParserEntity *e;
 
     cv = config_value_new_string(def);
-    e = add(name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
+    e = add(p, name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
     e->string_modify_func = modify_uniq;
 }
@@ -185,26 +202,75 @@ gchar *modify_path(const gchar *s)
     return obt_paths_expand_tilde(s);
 }
 
-void config_parser_string_path(const gchar *name, const gchar *def,
+void config_parser_string_path(ObConfigParser *p,
+                               const gchar *name, const gchar *def,
                                const gchar **v)
 {
     ObConfigValue *cv;
     ObConfigParserEntity *e;
 
     cv = config_value_new_string(def);
-    e = add(name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
+    e = add(p, name, cv, OB_CONFIG_VALUE_STRING, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
     e->string_modify_func = modify_path;
 }
-void config_parser_key(const gchar *name, const gchar *def,
+void config_parser_key(ObConfigParser *p,
+                       const gchar *name, const gchar *def,
                        const gchar **v)
 {
     ObConfigValue *cv;
     ObConfigParserEntity *e;
 
     cv = config_value_new_string(def);
-    e = add(name, cv, OB_CONFIG_VALUE_KEY, (ObConfigValueDataPtr)v);
+    e = add(p, name, cv, OB_CONFIG_VALUE_KEY, (ObConfigValueDataPtr)v);
     config_value_unref(cv);
+}
+
+static void foreach_read(gpointer k, gpointer v, gpointer u)
+{
+    ObtXmlInst *i = u;
+    ObConfigParserEntity *e = v;
+    xmlNodePtr root, n;
+
+    if (config_value_is_string(e->def)) {
+        root = obt_xml_root(i);
+        n = obt_xml_path_get_node(root, e->name, config_value_string(e->def));
+
+        config_value_unref(e->value);
+        e->value = config_value_new_string_steal(obt_xml_node_string(n));
+        copy_value(e);
+    }
+    else if (config_value_is_string_list(e->def)) {
+        GList *list;
+
+        root = obt_xml_root(i);
+        list = obt_xml_path_get_list(root, e->name);
+
+        if (list) {
+            GList *it;
+            gchar **out, **c;
+
+            c = out = g_new(gchar*, g_list_length(list) + 1);
+            for (it = list; it; it = g_list_next(it)) {
+                n = it->data;
+                *c = obt_xml_node_string(v);
+                ++c;
+            }
+            *c = NULL;
+
+            config_value_unref(e->value);
+            e->value = config_value_new_string_list_steal(out);
+        }
+    }
+    else if (config_value_is_action_list(e->def))
+        g_error("Unable to read action lists from config file");
+    else
+        g_assert_not_reached();
+}
+
+void config_parser_read(ObConfigParser *p, ObtXmlInst *i)
+{
+    g_hash_table_foreach(p->entities, foreach_read, i);
 }
 
 

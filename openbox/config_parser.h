@@ -21,23 +21,39 @@
 
 #include <glib.h>
 
-void config_parser_startup(gboolean reconfig);
-void config_parser_shutdown(gboolean reconfig);
+typedef struct _ObConfigParser ObConfigParser;
+
+ObConfigParser *config_parser_new(void);
+
+void config_parser_ref(ObConfigParser *p);
+void config_parser_unref(ObConfigParser *p);
 
 /*! Register the configuration option @name, with the default value @def.
   The value of the option will be stored in @v. */
-void config_parser_bool(const gchar *name, const gchar *def, gboolean *v);
-void config_parser_int(const gchar *name, const gchar *def, gint *v);
-void config_parser_string(const gchar *name, const gchar *def,
+void config_parser_bool(ObConfigParser *p,
+                        const gchar *name, const gchar *def, gboolean *v);
+void config_parser_int(ObConfigParser *p,
+                       const gchar *name, const gchar *def, gint *v);
+void config_parser_string(ObConfigParser *p,
+                          const gchar *name, const gchar *def,
                           const gchar **v);
-void config_parser_enum(const gchar *name, const gchar *def, guint *v,
+void config_parser_enum(ObConfigParser *p,
+                        const gchar *name, const gchar *def, guint *v,
                         const ObConfigValueEnum choices[]);
-void config_parser_list(const gchar *name, GList *def, const GList **v);
+void config_parser_string_list(ObConfigParser *p,
+                               const gchar *name, gchar **def,
+                               const gchar *const**v);
 
 
-void config_parser_string_uniq(const gchar *name, const gchar *def,
+void config_parser_string_uniq(ObConfigParser *p,
+                               const gchar *name, const gchar *def,
                                const gchar **v);
-void config_parser_string_path(const gchar *name, const gchar *def,
+void config_parser_string_path(ObConfigParser *p,
+                               const gchar *name, const gchar *def,
                                const gchar **v);
-void config_parser_key(const gchar *name, const gchar *def,
+void config_parser_key(ObConfigParser *p,
+                       const gchar *name, const gchar *def,
                        const gchar **v);
+
+
+void config_parser_read(ObConfigParser *p, ObtXmlInst *i);

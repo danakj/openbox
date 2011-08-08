@@ -106,3 +106,5 @@ obt/tests/bstest
 obt/tests/ddtest
 obt/tests/linktest
 obt/tests/watchtest
+tags
+*swp

@@ -101,6 +101,6 @@ try:
                 do_output(visibles, currentdesk, names, deskcnt)
 
         c.flush()
-except IOError:
+except IOError, xcb.Exception:
     print >> sys.stderr, "X connection lost!"
 

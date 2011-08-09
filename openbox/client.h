@@ -741,6 +741,8 @@ void client_set_layer(ObClient *self, gint layer);
 
 guint client_monitor(ObClient *self);
 
+gboolean client_set_monitor(ObClient *self, guint monitor);
+
 ObClient* client_under_pointer(void);
 
 gboolean client_has_group_siblings(ObClient *self);

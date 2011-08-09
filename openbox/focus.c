@@ -329,7 +329,9 @@ gboolean focus_valid_target(ObClient *ft,
        windows */
     /* ok = (all_desktops || ft->desktop == desktop || */
           /* ft->desktop == DESKTOP_ALL); */
-    ok = all_desktops || screen_desktop_is_visible(ft->desktop, TRUE);
+    ok = all_desktops || 
+         screen_desktop_is_visible(ft->desktop, TRUE) ||
+         ft->desktop == desktop;
 
     /* if we only include hilited windows, check if the window is */
     ok = ok && (nonhilite_windows || ft->demands_attention);

@@ -151,6 +151,20 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
     guint i;
     ObClient *p;
     GSList *it;
+    gint cur_mon;
+
+    ag_debug("PICKING HEAD...");
+
+    if((cur_mon = g_slist_index(screen_visible_desktops, c->desktop)) > -1) {
+        ag_debug("\tpicked %d monitor because of desktop %d",
+                 cur_mon, c->desktop);
+        area = screen_area(c->desktop, cur_mon, NULL);
+
+        return area;
+    }
+
+    ag_debug("\tusing original picking algorithm because"
+             " desktop %d is hidden...", c->desktop);
 
     choice = g_new(ObPlaceHead, screen_num_monitors);
     for (i = 0; i < screen_num_monitors; ++i) {
@@ -530,6 +544,54 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     }
 
     return FALSE;
+}
+
+gboolean place_client_onscreen(ObClient *client, guint new_mon,
+                               gint *x, gint *y, gint *width, gint *height)
+{
+    guint last_mon;
+    float xrat, yrat;
+    Rect *last_area, *new_area;
+
+    last_mon = client_monitor(client);
+    if (new_mon == last_mon) {
+        ag_debug("Skip set monitor for %s", client->title);
+        return FALSE;
+    }
+
+    last_area = screen_area(client->desktop, last_mon, NULL);
+    new_area = screen_area(client->desktop, new_mon, NULL);
+
+    ag_debug("Moving client %s from %d monitor to %d monitor",
+             client->title, last_mon, new_mon);
+    ag_debug("\tClient geometry (%d, %d) %dx%d", 
+             client->frame->area.x, client->frame->area.y,
+             client->frame->area.width, client->frame->area.height);
+    ag_debug("\told monitor: (%d, %d) %dx%d",
+             last_area->x, last_area->y, last_area->width, last_area->height);
+    ag_debug("\tnew monitor: (%d, %d) %dx%d",
+             new_area->x, new_area->y, new_area->width, new_area->height);
+
+    xrat = (float)new_area->width / (float)last_area->width;
+    yrat = (float)new_area->height / (float)last_area->height;
+
+    ag_debug("\tx ratio %.4f", xrat);
+    ag_debug("\ty ratio %.4f", yrat);
+
+    *x = new_area->x + (client->frame->area.x - last_area->x) * xrat;
+    *y = new_area->y + (client->frame->area.y - last_area->y) * yrat;
+    *width = client->frame->area.width * xrat;
+    *height = client->frame->area.height * yrat;
+
+    ag_debug("\tnew x %d", *x);
+    ag_debug("\tnew y %d", *y);
+    ag_debug("\tnew width %d", *width);
+    ag_debug("\tnew height %d", *height);
+
+    g_slice_free(Rect, last_area);
+    g_slice_free(Rect, new_area);
+
+    return TRUE;
 }
 
 /*! Return TRUE if openbox chose the position for the window, and FALSE if

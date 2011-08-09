@@ -340,14 +340,28 @@ void client_manage(Window window, ObPrompt *prompt)
             !client_is_oldfullscreen(self, &place))
         {
             Rect *r;
+            gint cur_mon;
 
-            r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
+            if ((cur_mon = g_slist_index(screen_visible_desktops,
+                                         self->desktop)) > -1)
+                r = screen_area(self->desktop, cur_mon, NULL);
+            else
+                r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
+
             if (r->x || r->y) {
                 place.x = r->x;
                 place.y = r->y;
                 ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
             }
             g_slice_free(Rect, r);
+        }
+
+        else if (!obplaced) {
+            gint cur_mon;
+            if ((cur_mon = g_slist_index(screen_visible_desktops,
+                                         self->desktop)) > -1)
+                place_client_onscreen(self, cur_mon, &place.x, &place.y,
+                                      &place.width, &place.height);
         }
 
         /* make sure the window is visible. */
@@ -1278,18 +1292,8 @@ static void client_get_desktop(ObClient *self)
         }
         /* defaults to the current desktop */
         else {
-            Rect client_area;
-            guint cur_mon;
+            self->desktop = screen_desktop;
 
-            RECT_SET(client_area, &self->area.x, &self->area.y, 
-                     self->area.width, self->area.height);
-            cur_mon = screen_find_monitor(&client_area);
-
-            ag_debug("on monitor %d", cur_mon);
-            ag_debug("which has desktop %d",
-                     *g_slist_nth(screen_visible_desktops, cur_mon));
-
-            self->desktop = g_slist_nth_data(screen_visible_desktops, cur_mon);
             ob_debug("client desktop set to the current desktop: %d",
                      self->desktop);
         }
@@ -2662,11 +2666,16 @@ gboolean client_should_show(ObClient *self)
 gboolean client_show(ObClient *self)
 {
     gboolean show = FALSE;
+    gint cur_mon;
 
     if (client_should_show(self)) {
         /* replay pending pointer event before showing the window, in case it
            should be going to something under the window */
         mouse_replay_pointer();
+
+        if ((cur_mon = g_slist_index(screen_visible_desktops,
+                                     self->desktop)) > -1)
+            client_set_monitor(self, cur_mon);
 
         frame_show(self->frame);
         show = TRUE;
@@ -4117,6 +4126,17 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 guint client_monitor(ObClient *self)
 {
     return screen_find_monitor(&self->frame->area);
+}
+
+gboolean client_set_monitor(ObClient *self, guint new_mon)
+{
+    guint x, y, w, h;
+    if(place_client_onscreen(self, new_mon, &x, &y, &w, &h)) {
+        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 ObClient *client_direct_parent(ObClient *self)

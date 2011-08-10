@@ -224,7 +224,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(NET_SUPPORTING_WM_CHECK);
     supported[i++] = OBT_PROP_ATOM(NET_WM_FULL_PLACEMENT);
     supported[i++] = OBT_PROP_ATOM(NET_CURRENT_DESKTOP);
-    supported[i++] = OBT_PROP_ATOM(NET_VISIBLE_DESKTOPS);
+    supported[i++] = OBT_PROP_ATOM(NET_VISIBLE_DESKTOPS); /* non-standard */
     supported[i++] = OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS);
     supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_GEOMETRY);
     supported[i++] = OBT_PROP_ATOM(NET_DESKTOP_VIEWPORT);
@@ -288,6 +288,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(NET_REQUEST_FRAME_EXTENTS);
     supported[i++] = OBT_PROP_ATOM(NET_RESTACK_WINDOW);
     supported[i++] = OBT_PROP_ATOM(NET_STARTUP_ID);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY); /* non-standard */
 #ifdef SYNC
     supported[i++] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST);
     supported[i++] = OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER);

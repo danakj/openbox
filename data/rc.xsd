@@ -62,6 +62,7 @@
             <xsd:element minOccurs="0" name="focusDelay" type="xsd:integer"/>
             <xsd:element minOccurs="0" name="raiseOnFocus" type="ob:bool"/>
             <xsd:element minOccurs="0" name="unfocusOnLeave" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="inactiveOpacity" type="xsd:integer" />
         </xsd:all>
     </xsd:complexType>
     <xsd:complexType name="placement">

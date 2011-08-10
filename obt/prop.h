@@ -113,7 +113,7 @@ typedef enum {
     OBT_PROP_NET_DESKTOP_GEOMETRY,
     OBT_PROP_NET_DESKTOP_VIEWPORT,
     OBT_PROP_NET_CURRENT_DESKTOP,
-    OBT_PROP_NET_VISIBLE_DESKTOPS,
+    OBT_PROP_NET_VISIBLE_DESKTOPS, /* non-standard */
     OBT_PROP_NET_DESKTOP_NAMES,
     OBT_PROP_NET_ACTIVE_WINDOW,
 /*    Atom net_restack_window;*/
@@ -152,6 +152,7 @@ typedef enum {
     OBT_PROP_NET_WM_USER_TIME,
 /*  OBT_PROP_NET_WM_USER_TIME_WINDOW, */
     OBT_PROP_NET_FRAME_EXTENTS,
+    OBT_PROP_NET_WM_WINDOW_OPACITY, /* non-standard */
 
     /* application protocols */
     OBT_PROP_NET_WM_PING,

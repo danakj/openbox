@@ -77,6 +77,8 @@ extern gboolean config_focus_under_mouse;
 /*! Remove focus from windows when the mouse leaves them
  */
 extern gboolean config_unfocus_leave;
+/*! Set the opacity level of an unfocused window */
+extern guint    config_inactive_opacity;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;

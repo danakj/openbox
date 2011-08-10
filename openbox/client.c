@@ -356,7 +356,7 @@ void client_manage(Window window, ObPrompt *prompt)
             g_slice_free(Rect, r);
         }
 
-        else if (!obplaced) {
+        else if (!obplaced && client_normal(self)) {
             gint cur_mon;
             if ((cur_mon = g_slist_index(screen_visible_desktops,
                                          self->desktop)) > -1)
@@ -3229,13 +3229,16 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     */
     if (self->managed) {
         guint oldm, newm, newdesk;
-        oldm = screen_find_monitor(&oldframe);
-        newm = screen_find_monitor(&self->frame->area);
 
-        if (oldm != newm) {
-            newdesk = g_slist_nth(screen_visible_desktops, newm)->data;
-            client_set_desktop(self, newdesk, TRUE, TRUE);
-            screen_store_desktop(newdesk);
+        if(client_normal(self)) {
+            oldm = screen_find_monitor(&oldframe);
+            newm = screen_find_monitor(&self->frame->area);
+
+            if (oldm != newm) {
+                newdesk = g_slist_nth(screen_visible_desktops, newm)->data;
+                client_set_desktop(self, newdesk, TRUE, TRUE);
+                screen_store_desktop(newdesk);
+            }
         }
         
         if (oldm != newm || 

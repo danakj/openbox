@@ -153,7 +153,7 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
     GSList *it;
     gint cur_mon;
 
-    ag_debug("PICKING HEAD...");
+    ag_debug("PICKING HEAD FOR %s...", c->title);
 
     if((cur_mon = g_slist_index(screen_visible_desktops, c->desktop)) > -1) {
         ag_debug("\tpicked %d monitor because of desktop %d",
@@ -608,6 +608,9 @@ gboolean place_client_onscreen(ObClient *client, guint new_mon,
                                gint *x, gint *y, gint *width, gint *height)
 {
     Rect *client_area;
+
+    if (!client_normal(client))
+        return FALSE;
 
     client_area = g_slice_new(Rect);
     RECT_SET(*client_area, client->frame->area.x, client->frame->area.y,

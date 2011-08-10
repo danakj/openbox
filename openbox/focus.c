@@ -135,9 +135,10 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            2. it is a valid auto-focus target
            3. it is not shaded
         */
-        /* if ((allow_omnipresent || c->desktop == screen_desktop) && */
-        if ((allow_omnipresent || 
-             screen_desktop_is_visible(c->desktop, FALSE)) &&
+        /* if ((allow_omnipresent ||  */
+             /* screen_desktop_is_visible(c->desktop, FALSE)) && */
+        if (((allow_omnipresent && c->desktop == DESKTOP_ALL) || 
+             c->desktop == screen_desktop) &&
             focus_valid_target(c, screen_desktop,
                                TRUE, FALSE, FALSE, TRUE, FALSE, FALSE,
                                FALSE) &&
@@ -160,7 +161,8 @@ static ObClient* focus_fallback_target(gboolean allow_refocus,
            a splashscreen or a desktop window (save the desktop as a
            backup fallback though)
         */
-        if (focus_valid_target(c, screen_desktop,
+        if (c->desktop == screen_desktop &&
+            focus_valid_target(c, screen_desktop,
                                TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE) &&
             (allow_refocus || client_focus_target(c) != old) &&
             client_focus(c))
@@ -273,7 +275,8 @@ ObClient *focus_order_find_first(guint desktop)
     for (it = focus_order; it; it = g_list_next(it)) {
         ObClient *c = it->data;
         /* if (screen_desktop_is_visible(c->desktop, TRUE)) */
-        if (c->desktop == desktop || c->desktop == DESKTOP_ALL)
+        if (client_normal(c) &&
+            (c->desktop == desktop || c->desktop == DESKTOP_ALL))
             return c;
     }
     return NULL;

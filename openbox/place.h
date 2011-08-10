@@ -39,6 +39,8 @@ typedef enum
     OB_PLACE_MONITOR_PRIMARY
 } ObPlaceMonitor;
 
+gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width, 
+                        gint *height);
 gboolean place_client_onscreen(struct _ObClient *client, guint new_mon,
                                gint *x, gint *y, gint *width, gint *height);
 gboolean place_client(struct _ObClient *client, gboolean foreground,

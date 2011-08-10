@@ -86,6 +86,7 @@ static gboolean      desktop_popup_perm;
 
 static void get_xinerama_screens(Rect **xin_areas, guint *nxin);
 static void screen_set_visible_desktops(void);
+static void screen_correct_clients(void);
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -735,11 +736,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ob_debug("Moving to desktop %d", num+1);
 
     if (screen_desktop_is_visible(screen_desktop, FALSE)) {
-        /* screen_hide_desktop_popup(); */
-        client_focus(focus_order_find_first(screen_desktop));
-
-        /* if (ob_state() == OB_STATE_RUNNING) */
-            /* screen_show_desktop_popup(screen_desktop, FALSE); */
+        screen_hide_desktop_popup();
+        if(!client_focus(focus_order_find_first(screen_desktop)))
+            focus_nothing();
     }
     else {
         gint cur_monitor;
@@ -1459,6 +1458,25 @@ gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent)
     return FALSE;
 }
 
+static void screen_correct_clients(void)
+{
+    GList *it;
+
+    /* Some clients may be physically on a screen that no longer
+     * maps to the desktop they are on. Correct that.
+     */
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = it->data;
+            guint cmon, desk_mon;
+
+            desk_mon = g_slist_index(screen_visible_desktops, 
+                                     c->desktop);
+            if ((cmon = client_monitor(c)) != desk_mon)
+                client_set_monitor(c, desk_mon);
+        }
+}
+
 void screen_update_areas(void)
 {
     guint i, old_num_monitors;
@@ -1479,12 +1497,50 @@ void screen_update_areas(void)
 
     g_assert(screen_num_desktops >= screen_num_monitors);
 
-    if (old_num_monitors != screen_num_monitors)
+    if (old_num_monitors && old_num_monitors != screen_num_monitors) {
+        GSList *new_visible;
+
         ag_debug("there were %d monitors; now there are %d",
                  old_num_monitors, screen_num_monitors);
 
-    for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit))
-        ag_debug("available desktop: %d", *sit);
+        /* Rebuild the visible desktop list.
+         * Always start with the current desktop and add on from there.
+         */
+        if (screen_num_monitors < old_num_monitors) {
+            GSList *svd, *sit;
+
+            ag_debug("removing the last %d monitors", 
+                     old_num_monitors - screen_num_monitors);
+
+            svd = screen_visible_desktops;
+            while (g_slist_length(svd) > screen_num_monitors)
+                for (sit = svd; sit; sit = g_slist_next(sit))
+                    if (sit->data != screen_desktop) {
+                        svd = g_slist_delete_link(svd, sit);
+                        break;
+                    }
+            screen_visible_desktops = svd;
+        }
+
+        else { /* screen_num_monitors > old_num_monitors */
+            guint d;
+
+            ag_debug("adding the next %d monitors",
+                     screen_num_monitors - old_num_monitors);
+
+            for (i = old_num_monitors; i < screen_num_monitors; i++)
+                for (d = 0; d < screen_num_desktops; d++)
+                    if (g_slist_index(screen_visible_desktops, d) == -1) {
+                        screen_visible_desktops = g_slist_append(
+                                                    screen_visible_desktops,
+                                                    d);
+                        break;
+                    }
+        }
+
+        screen_set_visible_desktops();
+        screen_correct_clients();
+    }
 
     /* set up the user-specified margins */
     config_margins.top_start = RECT_LEFT(monitor_area[screen_num_monitors]);
@@ -1613,6 +1669,18 @@ Rect* screen_area_all_monitors(guint desktop)
 #define STRUT_BOTTOM_IGNORE(s, us, search) \
     (head == SCREEN_AREA_ALL_MONITORS && us && \
      RECT_BOTTOM(monitor_area[i]) - s->bottom < RECT_BOTTOM(*search))
+
+Rect* screen_monitor_area(guint head)
+{
+    Rect *a;
+
+    g_assert(head < screen_num_monitors);
+
+    a = g_slice_new(Rect);
+    RECT_SET(*a, monitor_area[head].x, monitor_area[head].y,
+             monitor_area[head].width, monitor_area[head].height);
+    return a;
+}
 
 Rect* screen_area(guint desktop, guint head, Rect *search)
 {

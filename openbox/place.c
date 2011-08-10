@@ -546,27 +546,36 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     return FALSE;
 }
 
-gboolean place_client_onscreen(ObClient *client, guint new_mon,
-                               gint *x, gint *y, gint *width, gint *height)
+/* Make the following function a special case of something more general.
+ * We need to be able to abstract the origin of where the client *is*.
+ * i.e., when a client is unmaximized we need to determine where it needs to
+ * go. Particularly, before it is actually moved. So we need a "here's where
+ * the client wants to go, is that right for the monitor i gave you? if not,
+ * adjust it please."
+ */
+gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width,
+                        gint *height)
 {
     guint last_mon;
+    guint last_desk, new_desk;
     float xrat, yrat;
-    Rect *last_area, *new_area;
+    Rect *last_area, *new_area, *cur_area;
 
-    last_mon = client_monitor(client);
+    cur_area = g_slice_new(Rect);
+    RECT_SET(*cur_area, *x, *y, *width, *height);
+
+    last_mon = screen_find_monitor(cur_area);
     if (new_mon == last_mon) {
-        ag_debug("Skip set monitor for %s", client->title);
+        g_slice_free(Rect, cur_area);
         return FALSE;
     }
 
-    last_area = screen_area(client->desktop, last_mon, NULL);
-    new_area = screen_area(client->desktop, new_mon, NULL);
+    last_desk = g_slist_nth(screen_visible_desktops, last_mon)->data;
+    new_desk = g_slist_nth(screen_visible_desktops, new_mon)->data;
 
-    ag_debug("Moving client %s from %d monitor to %d monitor",
-             client->title, last_mon, new_mon);
-    ag_debug("\tClient geometry (%d, %d) %dx%d", 
-             client->frame->area.x, client->frame->area.y,
-             client->frame->area.width, client->frame->area.height);
+    last_area = screen_area(last_desk, last_mon, NULL);
+    new_area = screen_area(new_desk, new_mon, NULL);
+
     ag_debug("\told monitor: (%d, %d) %dx%d",
              last_area->x, last_area->y, last_area->width, last_area->height);
     ag_debug("\tnew monitor: (%d, %d) %dx%d",
@@ -578,18 +587,55 @@ gboolean place_client_onscreen(ObClient *client, guint new_mon,
     ag_debug("\tx ratio %.4f", xrat);
     ag_debug("\ty ratio %.4f", yrat);
 
-    *x = new_area->x + (client->frame->area.x - last_area->x) * xrat;
-    *y = new_area->y + (client->frame->area.y - last_area->y) * yrat;
-    *width = client->frame->area.width * xrat;
-    *height = client->frame->area.height * yrat;
+    *x = new_area->x + (*x - last_area->x) * xrat;
+    *y = new_area->y + (*y - last_area->y) * yrat;
+    *width *= xrat;
+    *height *= yrat;
 
     ag_debug("\tnew x %d", *x);
     ag_debug("\tnew y %d", *y);
     ag_debug("\tnew width %d", *width);
     ag_debug("\tnew height %d", *height);
 
+    g_slice_free(Rect, cur_area);
     g_slice_free(Rect, last_area);
     g_slice_free(Rect, new_area);
+
+    return TRUE;
+}
+
+gboolean place_client_onscreen(ObClient *client, guint new_mon,
+                               gint *x, gint *y, gint *width, gint *height)
+{
+    Rect *client_area;
+
+    client_area = g_slice_new(Rect);
+    RECT_SET(*client_area, client->frame->area.x, client->frame->area.y,
+             client->frame->area.width, client->frame->area.height);
+
+    ag_debug("Move client %s from %d monitor to %d monitor?",
+             client->title, client_monitor(client), new_mon);
+    ag_debug("\tOriginal client geometry (%d, %d) %dx%d",
+             client_area->x, client_area->y,
+             client_area->width, client_area->height);
+
+    if (!place_onscreen(new_mon, &client_area->x, &client_area->y,
+                        &client_area->width, &client_area->height)) {
+        ag_debug("Skip set monitor for %s", client->title);
+        g_slice_free(Rect, client_area);
+        return FALSE;
+    }
+
+    ag_debug("\tNew client geometry (%d, %d) %dx%d",
+             client_area->x, client_area->y,
+             client_area->width, client_area->height);
+
+    *x = client_area->x;
+    *y = client_area->y;
+    *width = client_area->width;
+    *height = client_area->height;
+
+    g_slice_free(Rect, client_area);
 
     return TRUE;
 }

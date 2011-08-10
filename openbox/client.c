@@ -2668,14 +2668,13 @@ gboolean client_show(ObClient *self)
     gboolean show = FALSE;
     gint cur_mon;
 
+    if ((cur_mon = g_slist_index(screen_visible_desktops, self->desktop)) > -1)
+        client_set_monitor(self, cur_mon);
+
     if (client_should_show(self)) {
         /* replay pending pointer event before showing the window, in case it
            should be going to something under the window */
         mouse_replay_pointer();
-
-        if ((cur_mon = g_slist_index(screen_visible_desktops,
-                                     self->desktop)) > -1)
-            client_set_monitor(self, cur_mon);
 
         frame_show(self->frame);
         show = TRUE;
@@ -2686,6 +2685,7 @@ gboolean client_show(ObClient *self)
         */
         client_change_wm_state(self);
     }
+
     return show;
 }
 
@@ -3220,16 +3220,28 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        also if it changed to/from oldschool fullscreen then its layer may
        change
 
+       AG: With multihead, moving between monitors means changing desktops.
+           So we need to update the client desktop and store the new current
+           desktop.
+
        watch out tho, don't try change stacking stuff if the window is no
        longer being managed !
     */
-    if (self->managed &&
-        (screen_find_monitor(&self->frame->area) !=
-         screen_find_monitor(&oldframe) ||
-         (final && (client_is_oldfullscreen(self, &oldclient) !=
-                    client_is_oldfullscreen(self, &self->area)))))
-    {
-        client_calc_layer(self);
+    if (self->managed) {
+        guint oldm, newm, newdesk;
+        oldm = screen_find_monitor(&oldframe);
+        newm = screen_find_monitor(&self->frame->area);
+
+        if (oldm != newm) {
+            newdesk = g_slist_nth(screen_visible_desktops, newm)->data;
+            client_set_desktop(self, newdesk, TRUE, TRUE);
+            screen_store_desktop(newdesk);
+        }
+        
+        if (oldm != newm || 
+            (final && (client_is_oldfullscreen(self, &oldclient) !=
+                       client_is_oldfullscreen(self, &self->area))))
+            client_calc_layer(self);
     }
 }
 
@@ -3430,6 +3442,27 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
             RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
                      self->pre_max_area.width, 0);
+        }
+
+        {
+            Rect *area;
+            guint desk_mon;
+
+            area = g_slice_new(Rect);
+            RECT_SET(*area, x, y, w, h);
+            desk_mon = g_slist_index(screen_visible_desktops, self->desktop);
+
+            ag_debug("unmaximizing window %s", self->title);
+            ag_debug("\tit wants to go to monitor %d",
+                     screen_find_monitor(area));
+            ag_debug("\tbut it should be on monitor %d", desk_mon);
+            ag_debug("\tmoreover, it claims it's on %d",
+                     client_monitor(self));
+
+            if (screen_find_monitor(area) != desk_mon)
+                place_onscreen(desk_mon, &x, &y, &w, &h);
+
+            g_slice_free(Rect, area);
         }
     }
 
@@ -4006,13 +4039,15 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
         client_iconify(self, FALSE, here, FALSE);
     /* if (self->desktop != DESKTOP_ALL && */
         /* self->desktop != screen_desktop) */
-    if (!screen_desktop_is_visible(self->desktop, TRUE) ||
-        self->desktop != screen_desktop)
+    if (self->desktop != DESKTOP_ALL &&
+        (!screen_desktop_is_visible(self->desktop, TRUE) ||
+         self->desktop != screen_desktop))
     {
         if (here)
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
-        else
+        else {
             screen_set_desktop(self->desktop, FALSE);
+        }
     } 
     else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess

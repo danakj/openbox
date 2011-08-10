@@ -140,6 +140,8 @@ const Rect* screen_physical_area_primary(gboolean fixed);
 #define SCREEN_AREA_ALL_MONITORS ((unsigned)-1)
 #define SCREEN_AREA_ONE_MONITOR  ((unsigned)-2)
 
+Rect* screen_monitor_area(guint head);
+
 /*! @param head is the number of the head or one of SCREEN_AREA_ALL_MONITORS,
            SCREEN_AREA_ONE_MONITOR
     @param search NULL or the whole monitor(s)

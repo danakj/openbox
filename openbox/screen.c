@@ -435,7 +435,7 @@ void screen_startup(gboolean reconfig)
         screen_set_num_desktops(config_desktops_num);
 
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
-    ob_debug(OB_DEBUG_MULTIHEAD, "setting the first %d desktops as visible", 
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "setting the first %d desktops as visible", 
              screen_num_monitors);
     for (i = 0; i < screen_num_monitors; i++)
         screen_visible_desktops = g_slist_append(screen_visible_desktops, i);
@@ -446,13 +446,13 @@ void screen_startup(gboolean reconfig)
                        NET_CURRENT_DESKTOP, CARDINAL, &d) &&
         d < screen_num_desktops)
     {
-        screen_set_desktop(d, FALSE);
+        screen_set_desktop(d, FALSE, FALSE);
     } else if (session_desktop >= 0)
         screen_set_desktop(MIN((guint)session_desktop,
-                               screen_num_desktops), FALSE);
+                               screen_num_desktops), FALSE, FALSE);
     else
         screen_set_desktop(MIN(config_screen_firstdesk,
-                               screen_num_desktops) - 1, FALSE);
+                               screen_num_desktops) - 1, FALSE, FALSE);
     screen_last_desktop = screen_desktop;
 
     /* don't start in showing-desktop mode */
@@ -570,7 +570,7 @@ void screen_set_num_desktops(guint num)
 
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
-        screen_set_desktop(num - 1, TRUE);
+        screen_set_desktop(num - 1, TRUE, FALSE);
 }
 
 static void screen_fallback_focus(void)
@@ -646,17 +646,17 @@ gboolean screen_store_desktop(guint num)
     return TRUE;
 }
 
-void screen_set_desktop(guint num, gboolean dofocus)
+void screen_set_desktop(guint num, gboolean dofocus, gboolean force_no_greedy)
 {
     GList *it;
     GSList *sit;
     guint previous;
     gulong ignore_start;
 
-    ob_debug(OB_DEBUG_MULTIHEAD, "number of desktops %d; switching to %d", 
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "number of desktops %d; switching to %d", 
              screen_num_desktops, num);
-    ob_debug(OB_DEBUG_MULTIHEAD, "current desktop %d", screen_desktop);
-    ob_debug(OB_DEBUG_MULTIHEAD, "index in visible list %d",
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "current desktop %d", screen_desktop);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "index in visible list %d",
              g_slist_index(screen_visible_desktops, screen_desktop));
 
     g_assert(num < screen_num_desktops);
@@ -738,7 +738,39 @@ void screen_set_desktop(guint num, gboolean dofocus)
     ob_debug("Moving to desktop %d", num+1);
 
     if (screen_desktop_is_visible(screen_desktop, FALSE)) {
+        guint curmon, nextmon;
+
         screen_hide_desktop_popup();
+
+        curmon = g_slist_index(screen_visible_desktops, previous);
+        nextmon = g_slist_index(screen_visible_desktops, screen_desktop);
+
+        if (!force_no_greedy && 
+              (config_desktop_greedy && curmon >= 0 &&
+               curmon < screen_num_monitors && curmon != nextmon)) {
+                        
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "greedy desktop switch");
+            ob_debug_type(OB_DEBUG_MULTIHEAD, 
+                          "changing monitor %d desktop from %d to %d", curmon, 
+                          previous, screen_desktop);
+            ob_debug_type(OB_DEBUG_MULTIHEAD, 
+                          "changing monitor %d desktop from %d to %d", nextmon, 
+                          screen_desktop, previous);
+
+            g_slist_nth(screen_visible_desktops, curmon)->data = screen_desktop;
+            g_slist_nth(screen_visible_desktops, nextmon)->data = previous;
+
+            for (it = stacking_list; it; it = g_list_next(it))
+                if (WINDOW_IS_CLIENT(it->data)) {
+                    ObClient *c = it->data;
+                    if (c->desktop == screen_desktop)
+                        client_set_monitor(c, curmon, TRUE);
+                    else if (c->desktop == previous)
+                        client_set_monitor(c, nextmon, TRUE);
+                }
+
+        }
+
         if(!client_focus(focus_order_find_first(screen_desktop)))
             focus_nothing();
     }
@@ -747,7 +779,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
         if ((cur_monitor = g_slist_index(screen_visible_desktops, 
                                          previous)) > -1) {
-            ob_debug(OB_DEBUG_MULTIHEAD, 
+            ob_debug_type(OB_DEBUG_MULTIHEAD, 
                      "changing monitor %d desktop from %d to %d", cur_monitor, 
                      previous, screen_desktop);
             g_slist_nth(screen_visible_desktops, 
@@ -1454,7 +1486,7 @@ gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent)
 
     for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit))
         if (desktop == sit->data) {
-            /* ob_debug(OB_DEBUG_MULTIHEAD, "%d is visible", desktop); */
+            /* ob_debug_type(OB_DEBUG_MULTIHEAD, "%d is visible", desktop); */
             return TRUE;
         }
 
@@ -1476,7 +1508,7 @@ static void screen_correct_clients(void)
             desk_mon = g_slist_index(screen_visible_desktops, 
                                      c->desktop);
             if ((cmon = client_monitor(c)) != desk_mon)
-                client_set_monitor(c, desk_mon);
+                client_set_monitor(c, desk_mon, FALSE);
         }
 }
 
@@ -1503,7 +1535,7 @@ void screen_update_areas(void)
     if (old_num_monitors && old_num_monitors != screen_num_monitors) {
         GSList *new_visible;
 
-        ob_debug(OB_DEBUG_MULTIHEAD, "there were %d monitors; now there are %d",
+        ob_debug_type(OB_DEBUG_MULTIHEAD, "there were %d monitors; now there are %d",
                  old_num_monitors, screen_num_monitors);
 
         /* Rebuild the visible desktop list.
@@ -1512,7 +1544,7 @@ void screen_update_areas(void)
         if (screen_num_monitors < old_num_monitors) {
             GSList *svd, *sit;
 
-            ob_debug(OB_DEBUG_MULTIHEAD, "removing the last %d monitors", 
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "removing the last %d monitors", 
                      old_num_monitors - screen_num_monitors);
 
             svd = screen_visible_desktops;
@@ -1528,7 +1560,7 @@ void screen_update_areas(void)
         else { /* screen_num_monitors > old_num_monitors */
             guint d;
 
-            ob_debug(OB_DEBUG_MULTIHEAD, "adding the next %d monitors",
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "adding the next %d monitors",
                      screen_num_monitors - old_num_monitors);
 
             for (i = old_num_monitors; i < screen_num_monitors; i++)

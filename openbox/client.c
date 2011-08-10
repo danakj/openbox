@@ -3458,7 +3458,8 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
             ob_debug(OB_DEBUG_MULTIHEAD, "unmaximizing window %s", self->title);
             ob_debug(OB_DEBUG_MULTIHEAD, "\tit wants to go to monitor %d",
                      screen_find_monitor(area));
-            ob_debug(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", desk_mon);
+            ob_debug(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", 
+                     desk_mon);
             ob_debug(OB_DEBUG_MULTIHEAD, "\tmoreover, it claims it's on %d",
                      client_monitor(self));
 

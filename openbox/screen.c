@@ -435,7 +435,8 @@ void screen_startup(gboolean reconfig)
         screen_set_num_desktops(config_desktops_num);
 
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
-    ob_debug(OB_DEBUG_MULTIHEAD, "setting the first %d desktops as visible", screen_num_monitors);
+    ob_debug(OB_DEBUG_MULTIHEAD, "setting the first %d desktops as visible", 
+             screen_num_monitors);
     for (i = 0; i < screen_num_monitors; i++)
         screen_visible_desktops = g_slist_append(screen_visible_desktops, i);
 
@@ -746,8 +747,9 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
         if ((cur_monitor = g_slist_index(screen_visible_desktops, 
                                          previous)) > -1) {
-            ob_debug(OB_DEBUG_MULTIHEAD, "changing monitor %d desktop from %d to %d",
-                     cur_monitor, previous, screen_desktop);
+            ob_debug(OB_DEBUG_MULTIHEAD, 
+                     "changing monitor %d desktop from %d to %d", cur_monitor, 
+                     previous, screen_desktop);
             g_slist_nth(screen_visible_desktops, 
                         cur_monitor)->data = screen_desktop;
         }

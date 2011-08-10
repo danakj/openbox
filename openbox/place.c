@@ -156,7 +156,8 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
     ob_debug(OB_DEBUG_MULTIHEAD, "PICKING HEAD FOR %s...", c->title);
 
     if((cur_mon = g_slist_index(screen_visible_desktops, c->desktop)) > -1) {
-        ob_debug(OB_DEBUG_MULTIHEAD, "\tpicked %d monitor because of desktop %d",
+        ob_debug(OB_DEBUG_MULTIHEAD, 
+                 "\tpicked %d monitor because of desktop %d",
                  cur_mon, c->desktop);
         area = screen_area(c->desktop, cur_mon, NULL);
 
@@ -616,8 +617,9 @@ gboolean place_client_onscreen(ObClient *client, guint new_mon,
     RECT_SET(*client_area, client->frame->area.x, client->frame->area.y,
              client->frame->area.width, client->frame->area.height);
 
-    ob_debug(OB_DEBUG_MULTIHEAD, "Move client %s from %d monitor to %d monitor?",
-             client->title, client_monitor(client), new_mon);
+    ob_debug(OB_DEBUG_MULTIHEAD, 
+             "Move client %s from %d monitor to %d monitor?", client->title, 
+             client_monitor(client), new_mon);
     ob_debug(OB_DEBUG_MULTIHEAD, "\tOriginal client geometry (%d, %d) %dx%d",
              client_area->x, client_area->y,
              client_area->width, client_area->height);

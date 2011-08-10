@@ -435,7 +435,7 @@ void screen_startup(gboolean reconfig)
         screen_set_num_desktops(config_desktops_num);
 
     get_xinerama_screens(&monitor_area, &screen_num_monitors);
-    ag_debug("setting the first %d desktops as visible", screen_num_monitors);
+    ob_debug(OB_DEBUG_MULTIHEAD, "setting the first %d desktops as visible", screen_num_monitors);
     for (i = 0; i < screen_num_monitors; i++)
         screen_visible_desktops = g_slist_append(screen_visible_desktops, i);
 
@@ -652,10 +652,10 @@ void screen_set_desktop(guint num, gboolean dofocus)
     guint previous;
     gulong ignore_start;
 
-    ag_debug("number of desktops %d; switching to %d", 
+    ob_debug(OB_DEBUG_MULTIHEAD, "number of desktops %d; switching to %d", 
              screen_num_desktops, num);
-    ag_debug("current desktop %d", screen_desktop);
-    ag_debug("index in visible list %d",
+    ob_debug(OB_DEBUG_MULTIHEAD, "current desktop %d", screen_desktop);
+    ob_debug(OB_DEBUG_MULTIHEAD, "index in visible list %d",
              g_slist_index(screen_visible_desktops, screen_desktop));
 
     g_assert(num < screen_num_desktops);
@@ -746,7 +746,7 @@ void screen_set_desktop(guint num, gboolean dofocus)
 
         if ((cur_monitor = g_slist_index(screen_visible_desktops, 
                                          previous)) > -1) {
-            ag_debug("changing monitor %d desktop from %d to %d",
+            ob_debug(OB_DEBUG_MULTIHEAD, "changing monitor %d desktop from %d to %d",
                      cur_monitor, previous, screen_desktop);
             g_slist_nth(screen_visible_desktops, 
                         cur_monitor)->data = screen_desktop;
@@ -1452,7 +1452,7 @@ gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent)
 
     for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit))
         if (desktop == sit->data) {
-            /* ag_debug("%d is visible", desktop); */
+            /* ob_debug(OB_DEBUG_MULTIHEAD, "%d is visible", desktop); */
             return TRUE;
         }
 
@@ -1501,7 +1501,7 @@ void screen_update_areas(void)
     if (old_num_monitors && old_num_monitors != screen_num_monitors) {
         GSList *new_visible;
 
-        ag_debug("there were %d monitors; now there are %d",
+        ob_debug(OB_DEBUG_MULTIHEAD, "there were %d monitors; now there are %d",
                  old_num_monitors, screen_num_monitors);
 
         /* Rebuild the visible desktop list.
@@ -1510,7 +1510,7 @@ void screen_update_areas(void)
         if (screen_num_monitors < old_num_monitors) {
             GSList *svd, *sit;
 
-            ag_debug("removing the last %d monitors", 
+            ob_debug(OB_DEBUG_MULTIHEAD, "removing the last %d monitors", 
                      old_num_monitors - screen_num_monitors);
 
             svd = screen_visible_desktops;
@@ -1526,7 +1526,7 @@ void screen_update_areas(void)
         else { /* screen_num_monitors > old_num_monitors */
             guint d;
 
-            ag_debug("adding the next %d monitors",
+            ob_debug(OB_DEBUG_MULTIHEAD, "adding the next %d monitors",
                      screen_num_monitors - old_num_monitors);
 
             for (i = old_num_monitors; i < screen_num_monitors; i++)

@@ -153,17 +153,17 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
     GSList *it;
     gint cur_mon;
 
-    ag_debug("PICKING HEAD FOR %s...", c->title);
+    ob_debug(OB_DEBUG_MULTIHEAD, "PICKING HEAD FOR %s...", c->title);
 
     if((cur_mon = g_slist_index(screen_visible_desktops, c->desktop)) > -1) {
-        ag_debug("\tpicked %d monitor because of desktop %d",
+        ob_debug(OB_DEBUG_MULTIHEAD, "\tpicked %d monitor because of desktop %d",
                  cur_mon, c->desktop);
         area = screen_area(c->desktop, cur_mon, NULL);
 
         return area;
     }
 
-    ag_debug("\tusing original picking algorithm because"
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tusing original picking algorithm because"
              " desktop %d is hidden...", c->desktop);
 
     choice = g_new(ObPlaceHead, screen_num_monitors);
@@ -576,26 +576,26 @@ gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width,
     last_area = screen_area(last_desk, last_mon, NULL);
     new_area = screen_area(new_desk, new_mon, NULL);
 
-    ag_debug("\told monitor: (%d, %d) %dx%d",
+    ob_debug(OB_DEBUG_MULTIHEAD, "\told monitor: (%d, %d) %dx%d",
              last_area->x, last_area->y, last_area->width, last_area->height);
-    ag_debug("\tnew monitor: (%d, %d) %dx%d",
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tnew monitor: (%d, %d) %dx%d",
              new_area->x, new_area->y, new_area->width, new_area->height);
 
     xrat = (float)new_area->width / (float)last_area->width;
     yrat = (float)new_area->height / (float)last_area->height;
 
-    ag_debug("\tx ratio %.4f", xrat);
-    ag_debug("\ty ratio %.4f", yrat);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tx ratio %.4f", xrat);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\ty ratio %.4f", yrat);
 
     *x = new_area->x + (*x - last_area->x) * xrat;
     *y = new_area->y + (*y - last_area->y) * yrat;
     *width *= xrat;
     *height *= yrat;
 
-    ag_debug("\tnew x %d", *x);
-    ag_debug("\tnew y %d", *y);
-    ag_debug("\tnew width %d", *width);
-    ag_debug("\tnew height %d", *height);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tnew x %d", *x);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tnew y %d", *y);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tnew width %d", *width);
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tnew height %d", *height);
 
     g_slice_free(Rect, cur_area);
     g_slice_free(Rect, last_area);
@@ -616,20 +616,20 @@ gboolean place_client_onscreen(ObClient *client, guint new_mon,
     RECT_SET(*client_area, client->frame->area.x, client->frame->area.y,
              client->frame->area.width, client->frame->area.height);
 
-    ag_debug("Move client %s from %d monitor to %d monitor?",
+    ob_debug(OB_DEBUG_MULTIHEAD, "Move client %s from %d monitor to %d monitor?",
              client->title, client_monitor(client), new_mon);
-    ag_debug("\tOriginal client geometry (%d, %d) %dx%d",
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tOriginal client geometry (%d, %d) %dx%d",
              client_area->x, client_area->y,
              client_area->width, client_area->height);
 
     if (!place_onscreen(new_mon, &client_area->x, &client_area->y,
                         &client_area->width, &client_area->height)) {
-        ag_debug("Skip set monitor for %s", client->title);
+        ob_debug(OB_DEBUG_MULTIHEAD, "Skip set monitor for %s", client->title);
         g_slice_free(Rect, client_area);
         return FALSE;
     }
 
-    ag_debug("\tNew client geometry (%d, %d) %dx%d",
+    ob_debug(OB_DEBUG_MULTIHEAD, "\tNew client geometry (%d, %d) %dx%d",
              client_area->x, client_area->y,
              client_area->width, client_area->height);
 

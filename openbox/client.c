@@ -3455,11 +3455,11 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
             RECT_SET(*area, x, y, w, h);
             desk_mon = g_slist_index(screen_visible_desktops, self->desktop);
 
-            ag_debug("unmaximizing window %s", self->title);
-            ag_debug("\tit wants to go to monitor %d",
+            ob_debug(OB_DEBUG_MULTIHEAD, "unmaximizing window %s", self->title);
+            ob_debug(OB_DEBUG_MULTIHEAD, "\tit wants to go to monitor %d",
                      screen_find_monitor(area));
-            ag_debug("\tbut it should be on monitor %d", desk_mon);
-            ag_debug("\tmoreover, it claims it's on %d",
+            ob_debug(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", desk_mon);
+            ob_debug(OB_DEBUG_MULTIHEAD, "\tmoreover, it claims it's on %d",
                      client_monitor(self));
 
             if (screen_find_monitor(area) != desk_mon)

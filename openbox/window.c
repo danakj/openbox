@@ -208,7 +208,7 @@ void window_manage(Window win)
             gchar *data = NULL;
             OBT_PROP_GETS(win, WM_NAME, &data);
             ob_debug("not managing override redirect window 0x%x", win);
-            ag_debug("which is named %s", data);
+            ob_debug(OB_DEBUG_MULTIHEAD, "which is named %s", data);
             g_free(data);
             grab_server(FALSE);
         }

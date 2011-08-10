@@ -27,15 +27,6 @@ c.core.ChangeWindowAttributes(root, xcb.xproto.CW.EventMask,
                               [xcb.xproto.EventMask.PropertyChange])
 c.flush()
 
-# Get a mapping from Xinerama screen number to physical screen number
-xtophys = {}
-screenpos = []
-screens = xinerama.QueryScreens().reply()
-for i, s in enumerate(screens.screen_info):
-    screenpos.append((s.y_org, s.x_org, i))
-for physscreen, (x, y, xscreen) in enumerate(sorted(screenpos)):
-    xtophys[xscreen] = physscreen
-
 sleep = False
 visibles = None
 while visibles is None:
@@ -52,12 +43,21 @@ def do_output(visibles, currentdesk, names, deskcnt):
     out_visible = []
     out_hidden = []
 
+    # Get a mapping from Xinerama screen number to physical screen number
+    xtophys = {}
+    screenpos = []
+    screens = xinerama.QueryScreens().reply()
+    for i, s in enumerate(screens.screen_info):
+        screenpos.append((s.y_org, s.x_org, i))
+    for physscreen, (x, y, xscreen) in enumerate(sorted(screenpos)):
+        xtophys[xscreen] = physscreen
+
     visibles = sorted(visibles, key=lambda desk: xtophys[visibles.index(desk)])
     for visible in visibles:
         if visible == currentdesk:
-            out_visible.append('<fc=#00FF00>%s</fc>' % names[visible])
+            out_visible.append('^fg(#00FF00)%s^fg()' % names[visible])
         else:
-            out_visible.append('<fc=#FF0000>%s</fc>' % names[visible])
+            out_visible.append('^fg(#FF0000)%s^fg()' % names[visible])
 
     clients = ewmh.get_client_list(c, root).reply()
     nonemptydesks = set()
@@ -67,9 +67,9 @@ def do_output(visibles, currentdesk, names, deskcnt):
     for d in xrange(deskcnt):
         if d not in visibles:
             if d in nonemptydesks:
-                out_hidden.append('<fc=#FFA500>%s</fc>' % names[d])
+                out_hidden.append('^fg(#FFA500)%s^fg()' % names[d])
             else:
-                out_hidden.append('<fc=#FFFFFF>%s</fc>' % names[d])
+                out_hidden.append('^fg(#FFFFFF)%s^fg()' % names[d])
 
     print '[%s] %s' % (' '.join(out_visible), ' '.join(out_hidden))
 

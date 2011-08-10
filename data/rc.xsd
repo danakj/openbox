@@ -120,6 +120,7 @@
                 </xsd:complexType>
             </xsd:element>
             <xsd:element minOccurs="0" name="popupTime" type="xsd:integer"/>
+            <xsd:element minOccurs="0" name="greedy" type="ob:bool"/>
         </xsd:all>
     </xsd:complexType>
     <xsd:complexType name="resize">

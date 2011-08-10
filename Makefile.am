@@ -202,6 +202,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \
+	openbox/actions/focusroot.c \
 	openbox/actions/focustobottom.c \
 	openbox/actions/fullscreen.c \
 	openbox/actions/growtoedge.c \

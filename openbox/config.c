@@ -61,10 +61,11 @@ RrFont *config_font_menutitle;
 RrFont *config_font_activeosd;
 RrFont *config_font_inactiveosd;
 
-guint   config_desktops_num;
-GSList *config_desktops_names;
-guint   config_screen_firstdesk;
-guint   config_desktop_popup_time;
+guint     config_desktops_num;
+GSList   *config_desktops_names;
+guint     config_screen_firstdesk;
+guint     config_desktop_popup_time;
+gboolean  config_desktop_greedy;
 
 gboolean         config_resize_redraw;
 gint             config_resize_popup_show;
@@ -741,6 +742,8 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
     }
     if ((n = obt_xml_find_node(node, "popupTime")))
         config_desktop_popup_time = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "greedy")))
+        config_desktop_greedy = obt_xml_node_bool(n);
 }
 
 static void parse_resize(xmlNodePtr node, gpointer d)
@@ -1040,6 +1043,7 @@ void config_startup(ObtXmlInst *i)
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
+    config_desktop_greedy = 0;
 
     obt_xml_register(i, "desktops", parse_desktops, NULL);
 

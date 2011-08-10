@@ -302,7 +302,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         }
 
         if (go) {
-            screen_set_desktop(d, TRUE);
+            screen_set_desktop(d, TRUE, FALSE);
             if (data->client)
                 client_bring_helper_windows(data->client);
         }

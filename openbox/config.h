@@ -168,6 +168,10 @@ extern guint config_screen_firstdesk;
 extern GSList *config_desktops_names;
 /*! Amount of time to show the desktop switch dialog */
 extern guint config_desktop_popup_time;
+/*! Whether to replace the next desktop with the current one
+ *  if the next desktop is already visible
+ */
+extern gboolean config_desktop_greedy;
 
 /*! The keycode of the key combo which resets the keybaord chains */
 extern guint config_keyboard_reset_keycode;

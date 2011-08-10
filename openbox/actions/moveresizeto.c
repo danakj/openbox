@@ -164,7 +164,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_find_onscreen(c, &x, &y, w, h, mon != cmon);
 
         actions_client_move(data, TRUE);
-        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
+        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE, FALSE);
         actions_client_move(data, FALSE);
 
         g_slice_free(Rect, area);

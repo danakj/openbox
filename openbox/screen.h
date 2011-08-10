@@ -70,7 +70,8 @@ void screen_set_num_desktops(guint num);
 /*! Store the current desktop (and update _NET_CURRENT_DESKTOP) */
 gboolean screen_store_desktop(guint num);
 /*! Change the current desktop */
-void screen_set_desktop(guint num, gboolean dofocus);
+void screen_set_desktop(guint num, gboolean dofocus,
+                        gboolean force_no_greedy);
 /*! Add a new desktop either at the end or inserted at the current desktop */
 void screen_add_desktop(gboolean current);
 /*! Remove a desktop, either at the end or the current desktop */

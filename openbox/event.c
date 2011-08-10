@@ -761,7 +761,7 @@ static void event_handle_root(XEvent *e)
                                   "a timestamp");
                 else
                     event_sourcetime = e->xclient.data.l[1];
-                screen_set_desktop(d, TRUE);
+                screen_set_desktop(d, TRUE, FALSE);
             }
         } else if (msgtype == OBT_PROP_ATOM(NET_NUMBER_OF_DESKTOPS)) {
             guint d = e->xclient.data.l[0];
@@ -1337,7 +1337,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             ob_debug("Granting ConfigureRequest x %d y %d w %d h %d",
                      x, y, w, h);
-            client_configure(client, x, y, w, h, FALSE, TRUE, TRUE);
+            client_configure(client, x, y, w, h, FALSE, TRUE, TRUE, FALSE);
         }
         break;
     }
@@ -1534,7 +1534,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
 
             client_find_onscreen(client, &x, &y, w, h, FALSE);
 
-            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
+            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE, FALSE);
 
             client->gravity = ograv;
         } else if (msgtype == OBT_PROP_ATOM(NET_RESTACK_WINDOW)) {
@@ -1626,7 +1626,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                make it reply with a configurenotify unless something changed.
                emacs will update its normal hints every time it receives a
                configurenotify */
-            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE);
+            client_configure(client, x, y, w, h, FALSE, TRUE, FALSE, FALSE);
         } else if (msgtype == OBT_PROP_ATOM(MOTIF_WM_HINTS)) {
             client_get_mwm_hints(client);
             /* This can override some mwm hints */

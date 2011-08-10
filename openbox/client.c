@@ -2669,7 +2669,7 @@ gboolean client_show(ObClient *self)
     gint cur_mon;
 
     if ((cur_mon = g_slist_index(screen_visible_desktops, self->desktop)) > -1)
-        client_set_monitor(self, cur_mon);
+        client_set_monitor(self, cur_mon, FALSE);
 
     if (client_should_show(self)) {
         /* replay pending pointer event before showing the window, in case it
@@ -2825,7 +2825,7 @@ static void client_apply_startup_state(ObClient *self,
        not, so this needs to be called even if we have fullscreened/maxed
     */
     self->area = oldarea;
-    client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
+    client_configure(self, x, y, w, h, FALSE, TRUE, FALSE, FALSE);
 
     /* nothing to do for the other states:
        skip_taskbar
@@ -3079,7 +3079,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 }
 
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
-                      gboolean user, gboolean final, gboolean force_reply)
+                      gboolean user, gboolean final, gboolean force_reply,
+                      gboolean ignore_monitor)
 {
     Rect oldframe, oldclient;
     gboolean send_resize_client;
@@ -3230,7 +3231,7 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
     if (self->managed) {
         guint oldm, newm, newdesk;
 
-        if(client_normal(self)) {
+        if(client_normal(self) && !ignore_monitor) {
             oldm = screen_find_monitor(&oldframe);
             newm = screen_find_monitor(&self->frame->area);
 
@@ -3455,12 +3456,12 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
             RECT_SET(*area, x, y, w, h);
             desk_mon = g_slist_index(screen_visible_desktops, self->desktop);
 
-            ob_debug(OB_DEBUG_MULTIHEAD, "unmaximizing window %s", self->title);
-            ob_debug(OB_DEBUG_MULTIHEAD, "\tit wants to go to monitor %d",
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "unmaximizing window %s", self->title);
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tit wants to go to monitor %d",
                      screen_find_monitor(area));
-            ob_debug(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", 
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", 
                      desk_mon);
-            ob_debug(OB_DEBUG_MULTIHEAD, "\tmoreover, it claims it's on %d",
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tmoreover, it claims it's on %d",
                      client_monitor(self));
 
             if (screen_find_monitor(area) != desk_mon)
@@ -4050,7 +4051,7 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
         if (here)
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else {
-            screen_set_desktop(self->desktop, FALSE);
+            screen_set_desktop(self->desktop, FALSE, TRUE);
         }
     } 
     else if (!self->frame->visible)
@@ -4167,11 +4168,12 @@ guint client_monitor(ObClient *self)
     return screen_find_monitor(&self->frame->area);
 }
 
-gboolean client_set_monitor(ObClient *self, guint new_mon)
+gboolean client_set_monitor(ObClient *self, guint new_mon, 
+                            gboolean ignore_monitor)
 {
     guint x, y, w, h;
     if(place_client_onscreen(self, new_mon, &x, &y, &w, &h)) {
-        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
+        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE, ignore_monitor);
         return TRUE;
     }
 

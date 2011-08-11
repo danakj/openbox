@@ -146,6 +146,7 @@ extern gboolean config_animate_iconify;
 extern guint config_theme_window_list_icon_size;
 
 /*! The font for the active window's title */
+XXX save all the properties instead of the font object itself.
 extern RrFont *config_font_activewindow;
 /*! The font for inactive windows' titles */
 extern RrFont *config_font_inactivewindow;

@@ -533,98 +533,6 @@ static void parse_context(xmlNodePtr n, gpointer d)
     g_free(cxstr);
 }
 
-static void parse_theme(xmlNodePtr node, gpointer d)
-{
-    xmlNodePtr n;
-
-    node = node->children;
-
-    if ((n = obt_xml_find_sibling(node, "name"))) {
-        gchar *c;
-
-        g_free(config_theme);
-        c = obt_xml_node_string(n);
-        config_theme = obt_paths_expand_tilde(c);
-        g_free(c);
-    }
-    if ((n = obt_xml_find_sibling(node, "titleLayout"))) {
-        gchar *c, *d;
-
-        g_free(config_title_layout);
-        config_title_layout = obt_xml_node_string(n);
-
-        /* replace duplicates with spaces */
-        for (c = config_title_layout; *c != '\0'; ++c)
-            for (d = c+1; *d != '\0'; ++d)
-                if (*c == *d) *d = ' ';
-    }
-    if ((n = obt_xml_find_sibling(node, "keepBorder")))
-        config_theme_keepborder = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "animateIconify")))
-        config_animate_iconify = obt_xml_node_bool(n);
-    if ((n = obt_xml_find_sibling(node, "windowListIconSize"))) {
-        config_theme_window_list_icon_size = obt_xml_node_int(n);
-        if (config_theme_window_list_icon_size < 16)
-            config_theme_window_list_icon_size = 16;
-        else if (config_theme_window_list_icon_size > 96)
-            config_theme_window_list_icon_size = 96;
-    }
-
-    n = obt_xml_find_sibling(node, "font");
-    while (n) {
-        xmlNodePtr   fnode;
-        RrFont     **font;
-        gchar       *name = g_strdup(RrDefaultFontFamily);
-        gint         size = RrDefaultFontSize;
-        RrFontWeight weight = RrDefaultFontWeight;
-        RrFontSlant  slant = RrDefaultFontSlant;
-
-        if (obt_xml_attr_contains(n, "place", "ActiveWindow"))
-            font = &config_font_activewindow;
-        else if (obt_xml_attr_contains(n, "place", "InactiveWindow"))
-            font = &config_font_inactivewindow;
-        else if (obt_xml_attr_contains(n, "place", "MenuHeader"))
-            font = &config_font_menutitle;
-        else if (obt_xml_attr_contains(n, "place", "MenuItem"))
-            font = &config_font_menuitem;
-        else if (obt_xml_attr_contains(n, "place", "ActiveOnScreenDisplay"))
-            font = &config_font_activeosd;
-        else if (obt_xml_attr_contains(n, "place", "OnScreenDisplay"))
-            font = &config_font_activeosd;
-        else if (obt_xml_attr_contains(n, "place","InactiveOnScreenDisplay"))
-            font = &config_font_inactiveosd;
-        else
-            goto next_font;
-
-        if ((fnode = obt_xml_find_sibling(n->children, "name"))) {
-            g_free(name);
-            name = obt_xml_node_string(fnode);
-        }
-        if ((fnode = obt_xml_find_sibling(n->children, "size"))) {
-            int s = obt_xml_node_int(fnode);
-            if (s > 0) size = s;
-        }
-        if ((fnode = obt_xml_find_sibling(n->children, "weight"))) {
-            gchar *w = obt_xml_node_string(fnode);
-            if (!g_ascii_strcasecmp(w, "Bold"))
-                weight = RR_FONTWEIGHT_BOLD;
-            g_free(w);
-        }
-        if ((fnode = obt_xml_find_sibling(n->children, "slant"))) {
-            gchar *s = obt_xml_node_string(fnode);
-            if (!g_ascii_strcasecmp(s, "Italic"))
-                slant = RR_FONTSLANT_ITALIC;
-            if (!g_ascii_strcasecmp(s, "Oblique"))
-                slant = RR_FONTSLANT_OBLIQUE;
-            g_free(s);
-        }
-
-        *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
-        g_free(name);
-    next_font:
-        n = obt_xml_find_sibling(n->next, "font");
-    }
-}
 
 static void parse_desktops(xmlNodePtr node, gpointer d)
 {
@@ -979,11 +887,13 @@ void config_load_config(void)
 {
     xmlNodePtr n, root, e;
     gboolean ok;
+    gchar *c;
 
     config_inst = obt_xml_instance_new();
     ok = obt_xml_load_cache_file(config_inst, "openbox", "config", "config");
     root = obt_xml_root(config_inst);
 
+    /* focus */
     n = obt_xml_path_get_node(root, "focus", "");
     config_focus_new = obt_xml_path_bool(n, "focusNew", "yes");
     config_focus_follow = obt_xml_path_bool(n, "followMouse", "no");
@@ -993,6 +903,7 @@ void config_load_config(void)
     config_focus_under_mouse = obt_xml_path_bool(n, "underMouse", "no");
     config_unfocus_leave = obt_xml_path_bool(n, "unfocusOnLeave", "no");
 
+    /* placement */
     n = obt_xml_path_get_node(root, "placement", "");
     e = obt_xml_path_get_node(n, "policy", "smart");
     if (obt_xml_node_contains(e, "smart"))
@@ -1027,6 +938,7 @@ void config_load_config(void)
         config_primary_monitor_index = obt_xml_node_int(e);
     }
 
+    /* margins */
     n = obt_xml_path_get_node(root, "margins", "");
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     config_margins.top = MAX(0, obt_xml_path_int(n, "top", "0"));
@@ -1034,21 +946,97 @@ void config_load_config(void)
     config_margins.right = MAX(0, obt_xml_path_int(n, "right", "0"));
     config_margins.bottom = MAX(0, obt_xml_path_int(n, "bottom", "0"));
 
-    config_theme = NULL;
+    /* theme */
+    n = obt_xml_path_get_node(root, "theme", "");
+    g_free(config_theme);
+    c = obt_xml_path_string(n, "name", NULL);
+    config_theme = obt_paths_expand_tilde(c);
+    g_free(c);
 
-    config_animate_iconify = TRUE;
-    config_title_layout = g_strdup("NLIMC");
-    config_theme_keepborder = TRUE;
-    config_theme_window_list_icon_size = 36;
+    g_free(config_title_layout);
+    config_title_layout = obt_xml_path_string(n, "titleLayout", "NLIMC");
+    /* replace duplicates with spaces */
+    for (c = config_title_layout; *c != '\0'; ++c)
+        for (d = c+1; *d != '\0'; ++d)
+            if (*c == *d) *d = ' ';
 
-    config_font_activewindow = NULL;
-    config_font_inactivewindow = NULL;
-    config_font_menuitem = NULL;
-    config_font_menutitle = NULL;
-    config_font_activeosd = NULL;
-    config_font_inactiveosd = NULL;
+    config_animate_iconify = obt_xml_path_bool(n, "animateIconify", "true");
+    config_theme_keepborder = obt_xml_path_bool(n, "keepBorder", "true");
+    config_theme_window_list_icon_size =
+        MAX(16, MIN(96, obt_xml_path_int(n, "windowListIconSize", 36)));
+
+    RrFontClose(config_font_activewindow);
+    config_font_activewindow = read_font(n, "font:place=ActiveWindow");
+    RrFontClose(config_font_inactivewindow);
+    config_font_inactivewindow = read_font(n, "font:place=InactiveWindow");
+    RrFontClose(config_font_menuitem);
+    config_font_menuitem = read_font(n, "font:place=MenuItem");
+    RrFontClose(config_font_menutitle);
+    config_font_menutitle = read_font(n, "font:place=MenuHeader");
+    RrFontClose(config_font_activeosd);
+    config_font_activeosd = read_font(n, "font:place=ActiveOnScreenDisplay");
+    RrFontClose(config_font_inactiveosd);
+    config_font_inactiveosd = read_font(n, "font:place=InactiveOnScreenDisplay");
 
     obt_xml_register(config_inst, "theme", parse_theme, NULL);
+static void parse_theme(xmlNodePtr node, gpointer d)
+{
+
+    n = obt_xml_find_sibling(node, "font");
+    while (n) {
+        xmlNodePtr   fnode;
+        RrFont     **font;
+        gchar       *name = g_strdup(RrDefaultFontFamily);
+        gint         size = RrDefaultFontSize;
+        RrFontWeight weight = RrDefaultFontWeight;
+        RrFontSlant  slant = RrDefaultFontSlant;
+
+        if (obt_xml_attr_contains(n, "place", "ActiveWindow"))
+            font = &config_font_activewindow;
+        else if (obt_xml_attr_contains(n, "place", "InactiveWindow"))
+            font = &config_font_inactivewindow;
+        else if (obt_xml_attr_contains(n, "place", "MenuHeader"))
+            font = &config_font_menutitle;
+        else if (obt_xml_attr_contains(n, "place", "MenuItem"))
+            font = &config_font_menuitem;
+        else if (obt_xml_attr_contains(n, "place", "ActiveOnScreenDisplay"))
+            font = &config_font_activeosd;
+        else if (obt_xml_attr_contains(n, "place", "OnScreenDisplay"))
+            font = &config_font_activeosd;
+        else if (obt_xml_attr_contains(n, "place","InactiveOnScreenDisplay"))
+            font = &config_font_inactiveosd;
+        else
+            goto next_font;
+
+        if ((fnode = obt_xml_find_sibling(n->children, "name"))) {
+            g_free(name);
+            name = obt_xml_node_string(fnode);
+        }
+        if ((fnode = obt_xml_find_sibling(n->children, "size"))) {
+            int s = obt_xml_node_int(fnode);
+            if (s > 0) size = s;
+        }
+        if ((fnode = obt_xml_find_sibling(n->children, "weight"))) {
+            gchar *w = obt_xml_node_string(fnode);
+            if (!g_ascii_strcasecmp(w, "Bold"))
+                weight = RR_FONTWEIGHT_BOLD;
+            g_free(w);
+        }
+        if ((fnode = obt_xml_find_sibling(n->children, "slant"))) {
+            gchar *s = obt_xml_node_string(fnode);
+            if (!g_ascii_strcasecmp(s, "Italic"))
+                slant = RR_FONTSLANT_ITALIC;
+            if (!g_ascii_strcasecmp(s, "Oblique"))
+                slant = RR_FONTSLANT_OBLIQUE;
+            g_free(s);
+        }
+
+        *font = RrFontOpen(ob_rr_inst, name, size, weight, slant);
+        g_free(name);
+    next_font:
+        n = obt_xml_find_sibling(n->next, "font");
+    }
+}
 
     config_desktops_num = 4;
     config_screen_firstdesk = 1;

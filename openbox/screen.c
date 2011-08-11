@@ -1955,12 +1955,6 @@ gboolean screen_pointer_pos(gint *x, gint *y)
 
 gboolean screen_compare_desktops(guint a, guint b)
 {
-    /* if (a == DESKTOP_ALL) */
-        /* a = screen_desktop; */
-    /* if (b == DESKTOP_ALL) */
-        /* b = screen_desktop; */
-    /* return a == b; */
-
     if (screen_desktop_is_visible(a, TRUE) &&
         screen_desktop_is_visible(b, TRUE))
         return TRUE;

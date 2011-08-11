@@ -1,14 +1,19 @@
 #!/usr/bin/env python2
 
-# This script is designed to have its output sent to xmobar.
-# I'll probably make this a bit more extensible so that it can play nice with
-# dzen2 as well. (i.e., allow the markup to be customized.)
+# This script is designed to have its output sent to a dock like dzen or xmobar.
 #
-# This script is cut ridiculous short by my xpybutil library. It allows us to 
-# omit a lot of the nasty details of fetching properties from the root window.
+# This script is cut ridiculously short by my xpybutil library. It allows us to 
+# omit a lot of the nasty details of fetching properties windows.
 #
 # The biggest trick in this script is to re-orient the Xinerama screens in 
 # their proper physical order (top to bottom then left to right).
+
+markup = {
+    'current':      '^fg(#00FF00)%s^fg()',
+    'visible':      '^fg(#FF0000)%s^fg()',
+    'hidden':       '^fg(#FFA500)%s^fg()',
+    'hidden_empty': '^fg(#FFFFFF)%s^fg()',
+}
 
 import sys
 import time
@@ -55,9 +60,9 @@ def do_output(visibles, currentdesk, names, deskcnt):
     visibles = sorted(visibles, key=lambda desk: xtophys[visibles.index(desk)])
     for visible in visibles:
         if visible == currentdesk:
-            out_visible.append('^fg(#00FF00)%s^fg()' % names[visible])
+            out_visible.append(markup['current'] % names[visible])
         else:
-            out_visible.append('^fg(#FF0000)%s^fg()' % names[visible])
+            out_visible.append(markup['visible'] % names[visible])
 
     clients = ewmh.get_client_list(c, root).reply()
     nonemptydesks = set()
@@ -67,9 +72,9 @@ def do_output(visibles, currentdesk, names, deskcnt):
     for d in xrange(deskcnt):
         if d not in visibles:
             if d in nonemptydesks:
-                out_hidden.append('^fg(#FFA500)%s^fg()' % names[d])
+                out_hidden.append(markup['hidden'] % names[d])
             else:
-                out_hidden.append('^fg(#FFFFFF)%s^fg()' % names[d])
+                out_hidden.append(markup['hidden_empty'] % names[d])
 
     print '[%s] %s' % (' '.join(out_visible), ' '.join(out_hidden))
 

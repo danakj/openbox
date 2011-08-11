@@ -1,0 +1,87 @@
+This is the multihead branch of Openbox, which features better support for
+multiple monitors when using the Xinerama extension. (Which will implicitly 
+support users using TwinView and RandR.)
+
+What's different?
+=================
+
+The biggest difference by far is the change in the desktop model.
+
+In traditional Openbox (and indeed, in most window managers), there can only be
+one desktop viewable at any time. Namely, even when there are multiple monitors 
+active, a single desktop spans all available monitors.
+
+In Openbox Multihead, each monitor gets it own desktop. Namely, monitors can 
+switch its currently active desktop independent of the other monitors. This 
+makes workflow much more dynamic in multi-monitor setups, since it allows finer 
+control over what you can see at any point in time.
+
+There is a price to pay, however; to make "independent desktops" work, Openbox 
+needs to break the Extended Window Manager Hints spec. In particular, it 
+violates the assumption that one and only one desktop is viewable at any point 
+in time. This results in a significant loss of functionality in existing 
+pagers. (They won't break, but what it shows you will be confusing.)
+
+To remedy this, I've provided a small Python script ('ob-visible-desks') that 
+acts as a simple text-based (and non-interactive) pager. My plan is to build 
+something more elaborate, but this will have to do for now.
+
+You can pipe the output of 'ob-visible-desks' to a status bar like dzen or 
+xmobar. For example:
+
+  ob-visible-desks | dzen2 -dock
+  
+While it isn't ideal, you can modify the colors at the top of the script itself. 
+It groups each desktop into one of four categories: current, visible, hidden 
+with windows and hidden without windows.
+
+This script should be considered temporary and will probably be removed in the 
+future in favor of something released separately.
+
+
+A new desktop list menu
+=======================
+
+Another downside of independent desktops is that it makes the "next/prev 
+desktop" functions a bit quirky. To help remedy this, there is a new menu 
+called 'desktop-list-menu' that will give a simple list of desktops; which 
+provides a simple mechanism of switching to any desktop.
+
+
+New configuration options
+=========================
+
+Greedy desktop switching
+------------------------
+In the "<desktops>" section, a new boolean option "<greedy>" has been added. 
+When it is enabled, it makes desktop switching "greedy." In particular, if you 
+are switching to a desktop that is already visible, instead of going to the 
+monitor that desktop is on, the desktop will be brought to the monitor you are 
+currently on (and will put the current desktop on the other monitor).
+
+
+A new action 'FocusRoot'
+------------------------
+Openbox already provides one the ability of moving clients to another monitor 
+via the 'MoveResizeTo' action, but it does not provide the ability to move 
+*focus* from one monitor to the next. This is precisely what 'FocusRoot' 
+provides.
+
+It has two child options, "<monitor>" and "<pointer>". The former is required 
+and the latter is optional. The former specifies a monitor index starting from 
+1, or a relative monitor position ("next" or "prev").
+
+The "<pointer>" option allows you to move the pointer with the focus. It takes 
+two child options "<x>" and "<y>". They should be specified relative to the 
+monitor being focused. Negative values are allowed.
+
+
+Transparent inactive windows (easter egg)
+-----------------------------------------
+In the "<focus>" section, a new option "<inactiveOpacity>" has been added. Its 
+value should be interpreted as a percentage where 100 is full opaqueness (and 
+disables the feature) and 0 is full transparency (invisible).
+
+This option simply sets the opacity level of all inactive windows. You'll need 
+a compositing manager for it to actually work, though.
+

@@ -302,6 +302,7 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Going to try activate new window? %s",
              try_activate ? "yes" : "no");
+    ob_debug("the focus %d", settings->focus);
     if (try_activate)
         do_activate = client_can_steal_focus(
             self, settings->focus == 1,
@@ -809,21 +810,25 @@ static gboolean client_can_steal_focus(ObClient *self,
     else if (focus_client) {
         /* If the user is working in another window right now, then don't
            steal focus */
-        if (!relative_focused &&
-            event_last_user_time &&
+        /* I think this rule is bogus. There are occasions when I open a
+         * Konsole window, and it doesn't get focus. I wasn't able to figure
+         * out why. - Andrew
+         */
+        /* if (!relative_focused && */
+            /* event_last_user_time && */
             /* last user time must be strictly > launch_time to block focus */
-            (event_time_after(event_last_user_time, launch_time) &&
-             event_last_user_time != launch_time) &&
-            event_time_after(event_last_user_time,
-                             steal_time - OB_EVENT_USER_TIME_DELAY))
-        {
-            steal = FALSE;
-            ob_debug("Not focusing the window because the user is "
-                     "working in another window that is not its relative");
-        }
+            /* (event_time_after(event_last_user_time, launch_time) && */
+             /* event_last_user_time != launch_time) && */
+            /* event_time_after(event_last_user_time, */
+                             /* steal_time - OB_EVENT_USER_TIME_DELAY)) */
+        /* { */
+            /* steal = FALSE; */
+            /* ob_debug("Not focusing the window because the user is " */
+                     /* "working in another window that is not its relative"); */
+        /* } */
         /* Don't move focus if it's not going to go to this window
            anyway */
-        else if (client_focus_target(self) != self) {
+        if (client_focus_target(self) != self) {
             steal = FALSE;
             ob_debug("Not focusing the window because another window "
                      "would get the focus anyway");

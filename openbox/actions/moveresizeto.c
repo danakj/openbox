@@ -3,6 +3,7 @@
 #include "openbox/screen.h"
 #include "openbox/frame.h"
 #include "openbox/config.h"
+#include "openbox/stacking.h"
 
 enum {
     CURRENT_MONITOR = -1,
@@ -166,6 +167,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         actions_client_move(data, TRUE);
         client_configure(c, x, y, w, h, TRUE, TRUE, FALSE, FALSE);
         actions_client_move(data, FALSE);
+
+        if (mon != cmon)
+            stacking_raise(CLIENT_AS_WINDOW(c));
 
         g_slice_free(Rect, area);
         g_slice_free(Rect, carea);

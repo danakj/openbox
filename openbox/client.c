@@ -302,7 +302,6 @@ void client_manage(Window window, ObPrompt *prompt)
 
     ob_debug("Going to try activate new window? %s",
              try_activate ? "yes" : "no");
-    ob_debug("the focus %d", settings->focus);
     if (try_activate)
         do_activate = client_can_steal_focus(
             self, settings->focus == 1,

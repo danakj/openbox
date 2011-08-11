@@ -34,6 +34,7 @@ bin_PROGRAMS = \
 	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control \
 	tools/obxprop/obxprop
+	tools/ob-visible-desks
 
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \

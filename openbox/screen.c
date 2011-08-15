@@ -525,7 +525,9 @@ void screen_resize(void)
 void screen_set_num_desktops(guint num)
 {
     gulong *viewport;
+    guint mon;
     GList *it, *stacking_copy;
+    GSList *sit;
 
     g_assert(num > 0);
 
@@ -571,6 +573,24 @@ void screen_set_num_desktops(guint num)
     /* change our desktop if we're on one that no longer exists! */
     if (screen_desktop >= screen_num_desktops)
         screen_set_desktop(num - 1, TRUE, FALSE);
+    for (mon = 0, sit = screen_visible_desktops; sit; 
+         mon++, sit = g_slist_next(sit))
+        if (sit->data >= screen_num_desktops) {
+            guint d;
+            for (d = 0; d < num; d++)
+                if (g_slist_index(screen_visible_desktops, d) == -1) {
+                    sit->data = d;
+                    for (it = stacking_list; it; it = g_list_next(it))
+                        if (WINDOW_IS_CLIENT(it->data)) {
+                            ObClient *c = it->data;
+                            if (c->desktop == d)
+                                client_set_monitor(c, mon, TRUE);
+                        }
+                    break;
+                }
+        }
+
+    screen_set_visible_desktops();
 }
 
 static void screen_fallback_focus(void)
@@ -1507,7 +1527,7 @@ static void screen_correct_clients(void)
 
             desk_mon = g_slist_index(screen_visible_desktops, 
                                      c->desktop);
-            if ((cmon = client_monitor(c)) != desk_mon)
+            if (desk_mon != -1 && (cmon = client_monitor(c)) != desk_mon)
                 client_set_monitor(c, desk_mon, FALSE);
         }
 }

@@ -571,8 +571,12 @@ void screen_set_num_desktops(guint num)
     screen_update_desktop_names();
 
     /* change our desktop if we're on one that no longer exists! */
-    if (screen_desktop >= screen_num_desktops)
-        screen_set_desktop(num - 1, TRUE, FALSE);
+    if (screen_desktop >= screen_num_desktops) {
+        guint i = num - 1;
+        while (g_slist_index(screen_visible_desktops, i) != -1)
+            i--;
+        screen_set_desktop(i, TRUE, FALSE);
+    }
     for (mon = 0, sit = screen_visible_desktops; sit; 
          mon++, sit = g_slist_next(sit))
         if (sit->data >= screen_num_desktops) {

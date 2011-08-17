@@ -575,7 +575,7 @@ void screen_set_num_desktops(guint num)
         guint i = num - 1;
         while (g_slist_index(screen_visible_desktops, i) != -1)
             i--;
-        screen_set_desktop(i, TRUE, FALSE);
+        screen_set_desktop(i, TRUE, TRUE);
     }
     for (mon = 0, sit = screen_visible_desktops; sit; 
          mon++, sit = g_slist_next(sit))

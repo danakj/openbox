@@ -52,6 +52,9 @@
        from 1, specifying a particular monitor.  Or it can be one of the
        following: 'Mouse' - where the mouse is, or
                   'Active' - where the active window is -->
+  <scaleWindows>yes</scaleWindows>
+  <!-- This will scale window sizes and positions when moving a window
+       or workspace from monitor to monitor. -->
 </placement>
 
 <theme>

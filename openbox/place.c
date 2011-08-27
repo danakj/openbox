@@ -590,9 +590,12 @@ gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width,
 
     *x = new_area->x + (*x - last_area->x) * xrat;
     *y = new_area->y + (*y - last_area->y) * yrat;
-    *width *= xrat;
-    *height *= yrat;
 
+    if (config_scale_windows) {
+        *width *= xrat;
+        *height *= yrat;
+    }
+    
     ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew x %d", *x);
     ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew y %d", *y);
     ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew width %d", *width);
@@ -631,6 +634,10 @@ gboolean place_client_onscreen(ObClient *client, guint new_mon,
         g_slice_free(Rect, client_area);
         return FALSE;
     }
+
+    /* Adjust the width/height for decorations */
+    client_area->width -= (client->frame->area.width - client->area.width);
+    client_area->height -= (client->frame->area.height - client->area.height);
 
     ob_debug_type(OB_DEBUG_MULTIHEAD, "\tNew client geometry (%d, %d) %dx%d",
              client_area->x, client_area->y,

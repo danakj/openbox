@@ -95,6 +95,8 @@ extern ObPlaceMonitor config_place_monitor;
 extern guint config_primary_monitor_index;
 /*! Where to place dialogs and stuff if it is not specified by index. */
 extern ObPlaceMonitor config_primary_monitor;
+/*! Whether to scale windows when moving from monitor to monitor. */
+extern gboolean config_scale_windows;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;

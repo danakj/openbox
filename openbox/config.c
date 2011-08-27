@@ -44,6 +44,7 @@ ObPlaceMonitor config_place_monitor;
 
 guint          config_primary_monitor_index;
 ObPlaceMonitor config_primary_monitor;
+gboolean       config_scale_windows;
 
 StrutPartial config_margins;
 
@@ -599,6 +600,8 @@ static void parse_placement(xmlNodePtr node, gpointer d)
                 config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
         }
     }
+    if ((n = obt_xml_find_node(node, "scaleWindows")))
+        config_scale_windows = obt_xml_node_bool(n);
 }
 
 static void parse_margins(xmlNodePtr node, gpointer d)
@@ -1020,6 +1023,7 @@ void config_startup(ObtXmlInst *i)
 
     config_primary_monitor_index = 1;
     config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
+    config_scale_windows = TRUE;
 
     obt_xml_register(i, "placement", parse_placement, NULL);
 

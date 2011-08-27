@@ -75,6 +75,7 @@
             <xsd:element minOccurs="0" name="center" type="ob:bool"/>
             <xsd:element minOccurs="0" name="monitor" type="ob:placementmonitor"/>
             <xsd:element minOccurs="0" name="monitor" type="ob:primarymonitor"/>
+            <xsd:element minOccurs="0" name="scaleWindows" type="ob:bool"/>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="margins">

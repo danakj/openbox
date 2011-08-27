@@ -63,6 +63,7 @@
             <xsd:element minOccurs="0" name="raiseOnFocus" type="ob:bool"/>
             <xsd:element minOccurs="0" name="unfocusOnLeave" type="ob:bool"/>
             <xsd:element minOccurs="0" name="inactiveOpacity" type="xsd:integer" />
+            <xsd:element minOccurs="0" name="monitorFollowMouse" type="ob:bool"/>
         </xsd:all>
     </xsd:complexType>
     <xsd:complexType name="placement">

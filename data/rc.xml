@@ -32,6 +32,8 @@
   <!-- when a window is not active, it's opacity level will be decreased to
        the percentage specified here. set to 100 to disable. (0 will make
        windows completely transparent) -->
+  <monitorFollowMouse>yes</monitorFollowMouse>
+  <!-- Move focus to another monitor when the mouse enters that monitor -->
 </focus>
 
 <placement>

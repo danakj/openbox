@@ -60,6 +60,13 @@ monitor that desktop is on, the desktop will be brought to the monitor you are
 currently on (and will put the current desktop on the other monitor).
 
 
+Monitor focus follows mouse
+---------------------------
+By popular demand, the currently active monitor can now be switched just by
+moving your mouse to that monitor. It is enabled by default. The option
+"<monitorFollowMouse>" found in the "<focus>" section can be disabled.
+
+
 A new action 'FocusRoot'
 ------------------------
 Openbox already provides one the ability of moving clients to another monitor 

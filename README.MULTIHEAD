@@ -67,6 +67,14 @@ moving your mouse to that monitor. It is enabled by default. The option
 "<monitorFollowMouse>" found in the "<focus>" section can be disabled.
 
 
+Scale windows when a workspace goes to a new monitor
+----------------------------------------------------
+Whenever a workspace gets moved to another monitor, windows had their width
+and height scaled to reflect the change in monitor size (if any). This may be
+undesirable, so a new option '<scaleWindows>' has been added to the 
+'<placement>' section. It is now disabled
+
+
 A new action 'FocusRoot'
 ------------------------
 Openbox already provides one the ability of moving clients to another monitor 

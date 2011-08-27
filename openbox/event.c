@@ -726,6 +726,7 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
     {
+        screen_update_mouse_coords(e->xbutton.x_root, e->xbutton.y_root);
         used = event_handle_user_input(client, e);
 
         if (prompt && !used)
@@ -746,6 +747,10 @@ static void event_handle_root(XEvent *e)
     case SelectionClear:
         ob_debug("Another WM has requested to replace us. Exiting.");
         ob_exit_replace();
+        break;
+
+    case MotionNotify:
+        screen_update_mouse_coords(e->xbutton.x_root, e->xbutton.y_root);
         break;
 
     case ClientMessage:
@@ -1005,6 +1010,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
         /* when there is a grab on the pointer, we won't get enter/leave
            notifies, but we still get motion events */
         if (grab_on_pointer()) break;
+
+        screen_update_mouse_coords(e->xbutton.x_root, e->xbutton.y_root);
 
         con = frame_context(client, e->xmotion.window,
                             e->xmotion.x, e->xmotion.y);

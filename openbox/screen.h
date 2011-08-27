@@ -152,6 +152,8 @@ Rect* screen_area(guint desktop, guint head, Rect *search);
 
 gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
 
+void screen_update_mouse_coords(guint x, guint y);
+
 /*! Determines which physical monitor a rectangle is on by calculating the
     area of the part of the rectable on each monitor.  The number of the
     monitor containing the greatest area of the rectangle is returned.

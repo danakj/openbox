@@ -50,7 +50,8 @@
 #define ROOT_EVENTMASK (StructureNotifyMask | PropertyChangeMask | \
                         EnterWindowMask | LeaveWindowMask | \
                         SubstructureRedirectMask | FocusChangeMask | \
-                        ButtonPressMask | ButtonReleaseMask)
+                        ButtonPressMask | ButtonReleaseMask | \
+                        PointerMotionMask)
 
 static gboolean screen_validate_layout(ObDesktopLayout *l);
 static gboolean replace_wm(void);
@@ -83,6 +84,9 @@ static GSList *struts_bottom = NULL;
 static ObPagerPopup *desktop_popup;
 static guint         desktop_popup_timer = 0;
 static gboolean      desktop_popup_perm;
+
+static guint         root_x = 0;
+static guint         root_y = 0;
 
 static void get_xinerama_screens(Rect **xin_areas, guint *nxin);
 static void screen_set_visible_desktops(void);
@@ -595,6 +599,25 @@ void screen_set_num_desktops(guint num)
         }
 
     screen_set_visible_desktops();
+
+    /* Make *sure* clients are on the right monitor and desktop */
+    for (it = stacking_list; it; it = g_list_next(it))
+        if (WINDOW_IS_CLIENT(it->data)) {
+            guint32 d;
+            ObClient *c = it->data;
+            if (OBT_PROP_GET32(c->window, NET_WM_DESKTOP, CARDINAL, &d))
+                c->desktop = d;
+            client_showhide(c);
+        }
+
+    for (mon = 0, sit = screen_visible_desktops; sit; 
+         mon++, sit = g_slist_next(sit))
+        for (it = stacking_list; it; it = g_list_next(it))
+            if (WINDOW_IS_CLIENT(it->data)) {
+                ObClient *c = it->data;
+                if (c->desktop == sit->data && client_monitor(c) != mon)
+                    client_set_monitor(c, mon, TRUE);
+            }
 }
 
 static void screen_fallback_focus(void)
@@ -1852,6 +1875,35 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
     a->width = r - l + 1;
     a->height = b - t + 1;
     return a;
+}
+
+void screen_update_mouse_coords(guint x, guint y)
+{
+    Rect *a;
+    GSList *desk;
+    guint cur_mon, mouse_mon;
+
+    if (!config_monitor_focus_follow || (root_x == x && root_y == y))
+        return;
+
+    root_x = x;
+    root_y = y;
+
+    a = g_slice_new(Rect);
+    RECT_SET(*a, x, y, 1, 1);
+
+    cur_mon = g_slist_index(screen_visible_desktops, screen_desktop);
+    mouse_mon = screen_find_monitor(a);
+    if (cur_mon != mouse_mon)
+        if((desk = g_slist_nth(screen_visible_desktops, mouse_mon)) != NULL) {
+            /* If the client focuses, it will switch the desktop for us */
+            if(!client_focus(focus_order_find_first(desk->data))) {
+                focus_nothing();
+                screen_store_desktop(desk->data);
+            }
+        }
+
+    g_slice_free(Rect, a);
 }
 
 guint screen_find_monitor(const Rect *search)

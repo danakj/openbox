@@ -79,6 +79,8 @@ extern gboolean config_focus_under_mouse;
 extern gboolean config_unfocus_leave;
 /*! Set the opacity level of an unfocused window */
 extern guint    config_inactive_opacity;
+/*! The current monitor in focus follows the mouse */
+extern gboolean config_monitor_focus_follow;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;

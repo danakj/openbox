@@ -58,10 +58,10 @@
 
 /*! The event mask to grab on client windows */
 #define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask | \
-                          ColormapChangeMask)
+                          ColormapChangeMask | PointerMotionMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
-                                ButtonMotionMask)
+                                ButtonMotionMask | PointerMotionMask)
 
 typedef struct
 {

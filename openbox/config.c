@@ -36,6 +36,7 @@ gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 gboolean config_unfocus_leave;
 guint    config_inactive_opacity;
+gboolean config_monitor_focus_follow;
 
 ObPlacePolicy  config_place_policy;
 gboolean       config_place_center;
@@ -568,6 +569,8 @@ static void parse_focus(xmlNodePtr node, gpointer d)
         config_unfocus_leave = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "inactiveOpacity")))
         config_inactive_opacity = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "monitorFollowMouse")))
+        config_monitor_focus_follow = obt_xml_node_bool(n);
 }
 
 static void parse_placement(xmlNodePtr node, gpointer d)
@@ -1007,6 +1010,7 @@ void config_startup(ObtXmlInst *i)
     config_focus_under_mouse = FALSE;
     config_unfocus_leave = FALSE;
     config_inactive_opacity = 100;
+    config_monitor_focus_follow = TRUE;
 
     obt_xml_register(i, "focus", parse_focus, NULL);
 

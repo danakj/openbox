@@ -700,6 +700,8 @@ static void event_process(const XEvent *ec, gpointer data)
         static guint pressed = 0;
         static Window pressed_win = None;
 
+        event_sourcetime = event_curtime;
+
         /* If the button press was on some non-root window, or was physically
            on the root window... */
         if (window != obt_root(ob_screen) ||
@@ -726,6 +728,8 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
     {
+        event_sourcetime = event_curtime;
+
         used = event_handle_user_input(client, e);
 
         if (prompt && !used)

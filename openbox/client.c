@@ -717,11 +717,13 @@ static gboolean client_can_steal_focus(ObClient *self,
     /* This is focus stealing prevention */
     ob_debug("Want to focus window 0x%x at time %u "
              "launched at %u (last user interaction time %u) "
-             "request from %s, allow other desktop: %s",
+             "request from %s, allow other desktop: %s, "
+             "desktop switch time %u",
              self->window, steal_time, launch_time,
              event_last_user_time,
              (request_from_user ? "user" : "other"),
-             (allow_other_desktop ? "yes" : "no"));
+             (allow_other_desktop ? "yes" : "no"),
+             screen_desktop_user_time);
 
     /*
       if no launch time is provided for an application, make one up.
@@ -777,18 +779,24 @@ static gboolean client_can_steal_focus(ObClient *self,
     }
 
     /* if it's on another desktop
-       then if allow_other_desktop is true, we don't want to let it steal
+       and if allow_other_desktop is true, we generally let it steal focus.
+       but if it didn't come from the user, don't let it steal unless it was
+       launched before the user switched desktops.
        focus, unless it was launched after we changed desktops and the request
        came from the user
      */
-    if (!(self->desktop == screen_desktop ||
-          self->desktop == DESKTOP_ALL) &&
-        (!allow_other_desktop ||
-         (request_from_user && screen_desktop_user_time &&
-          !event_time_after(launch_time, screen_desktop_user_time))))
-    {
-        steal = FALSE;
-        ob_debug("Not focusing the window because its on another desktop\n");
+    if (!screen_compare_desktops(screen_desktop, self->desktop)) {
+        /* must be allowed */
+        if (!allow_other_desktop) {
+            steal = FALSE;
+            ob_debug("Not focusing the window because its on another desktop");
+        }
+        /* if we don't know when the desktop changed, but request is from an
+           application, don't let it change desktop on you */
+        else if (!request_from_user) {
+            steal = FALSE;
+            ob_debug("Not focusing the window because non-user request");
+        }
     }
     /* If something is focused... */
     else if (focus_client) {

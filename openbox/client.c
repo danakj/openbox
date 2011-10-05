@@ -256,6 +256,15 @@ void client_manage(Window window, ObPrompt *prompt)
     /* the session should get the last say though */
     client_restore_session_state(self);
 
+    /* don't put helper/modal windows on a different desktop if they are
+       related to the focused window.  */
+    if (!screen_compare_desktops(self->desktop, screen_desktop) &&
+        focus_client && client_search_transient(focus_client, self)  &&
+        (client_helper(self) || self->modal))
+    {
+        self->desktop = screen_desktop;
+    }
+
     /* tell startup notification that this app started */
     launch_time = sn_app_started(self->startup_id, self->class, self->name);
 
@@ -3928,6 +3937,9 @@ gboolean client_focus(ObClient *self)
         return FALSE;
     }
 
+    /* if we have helper windows they should be there with the window */
+    client_bring_helper_windows(self);
+
     ob_debug_type(OB_DEBUG_FOCUS,
                   "Focusing client \"%s\" (0x%x) at time %u",
                   self->title, self->window, event_time());
@@ -4020,7 +4032,7 @@ static void client_bring_windows_recursive(ObClient *self,
 
     if (((helpers && client_helper(self)) ||
          (modals && self->modal)) &&
-        ((self->desktop != desktop && self->desktop != DESKTOP_ALL) ||
+        (!screen_compare_desktops(self->desktop, desktop) ||
          (iconic && self->iconic)))
     {
         if (iconic && self->iconic)

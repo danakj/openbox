@@ -736,6 +736,9 @@ static void event_process(const XEvent *ec, gpointer data)
             used = event_handle_prompt(prompt, e);
     }
 
+    /* show any debug prompts that are queued */
+    ob_debug_show_prompts();
+
     /* if something happens and it's not from an XEvent, then we don't know
        the time, so clear it here until the next event is handled */
     event_curtime = event_sourcetime = CurrentTime;

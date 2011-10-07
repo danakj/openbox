@@ -6,6 +6,7 @@ localedir       = $(datadir)/locale
 configdir       = $(sysconfdir)/xdg
 rcdir           = $(configdir)/openbox
 xsessionsdir    = $(datadir)/xsessions
+gnomesessiondir = $(datadir)/gnome-session/sessions
 gnomewmfilesdir = $(datadir)/gnome/wm-properties
 pkgconfigdir    = $(libdir)/pkgconfig
 obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
@@ -513,6 +514,9 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-gnome.desktop \
 	data/xsession/openbox-kde.desktop
 
+dist_gnomesession_DATA = \
+	data/xsession/openbox-gnome.session
+
 dist_noinst_DATA = \
 	data/rc.xsd \
 	data/menu.xsd \
@@ -581,6 +585,7 @@ EXTRA_DIST = \
 CLEANFILES = \
 	$(nodist_man_MANS) \
 	$(nodist_bin_SCRIPTS) \
+	$(dist_gnomesession_DATA) \
 	$(nodist_xsessions_DATA) \
 	$(nodist_rc_SCRIPTS) \
 	$(nodist_libexec_SCRIPTS)

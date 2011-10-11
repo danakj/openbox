@@ -585,7 +585,6 @@ EXTRA_DIST = \
 CLEANFILES = \
 	$(nodist_man_MANS) \
 	$(nodist_bin_SCRIPTS) \
-	$(dist_gnomesession_DATA) \
 	$(nodist_xsessions_DATA) \
 	$(nodist_rc_SCRIPTS) \
 	$(nodist_libexec_SCRIPTS)

@@ -33,6 +33,13 @@
 
 typedef struct _ObAppSettings ObAppSettings;
 
+typedef enum {
+    OB_APP_SETTINGS_MONITOR_FIXED,
+    OB_APP_SETTINGS_MONITOR_PRIMARY,
+    OB_APP_SETTINGS_MONITOR_ACTIVE,
+    OB_APP_SETTINGS_MONITOR_MOUSE
+} ObAppSettingsMonitor;
+
 struct _ObAppSettings
 {
     GPatternSpec *class;
@@ -49,6 +56,7 @@ struct _ObAppSettings
     gint shade;
     gint decor;
     gint focus;
+    ObAppSettingsMonitor monitor_type;
     gint monitor;
     gint iconic;
     gint skip_pager;

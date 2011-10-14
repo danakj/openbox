@@ -111,6 +111,7 @@ ObAppSettings* config_create_app_settings(void)
     settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
+    settings->monitor_type = 0;
     settings->monitor = -1;
     settings->focus = -1;
     settings->desktop = 0;
@@ -135,6 +136,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     copy_if(type, (ObClientType)-1);
     copy_if(decor, -1);
     copy_if(shade, -1);
+    copy_if(monitor_type, 0);
     copy_if(monitor, -1);
     copy_if(focus, -1);
     copy_if(desktop, 0);
@@ -200,8 +202,8 @@ void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 
 /* Manages settings for individual applications.
    Some notes: monitor is the screen number in a multi monitor
-   (Xinerama) setup (starting from 0) or mouse, meaning the
-   monitor the pointer is on. Default: mouse.
+   (Xinerama) setup (starting from 0), or mouse: the monitor the pointer
+   is on, active: the active monitor, primary: the primary monitor.
    Layer can be three values, above (Always on top), below
    (Always on bottom) and everything else (normal behaviour).
    Positions can be an integer value or center, which will
@@ -294,7 +296,14 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     if (!obt_xml_node_contains(c, "default")) {
                         gchar *s = obt_xml_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))
-                            settings->monitor = 0;
+                            settings->monitor_type =
+                                    OB_APP_SETTINGS_MONITOR_MOUSE;
+                        else if (!g_ascii_strcasecmp(s, "active"))
+                            settings->monitor_type =
+                                    OB_APP_SETTINGS_MONITOR_ACTIVE;
+                        else if (!g_ascii_strcasecmp(s, "primary"))
+                            settings->monitor_type =
+                                    OB_APP_SETTINGS_MONITOR_PRIMARY;
                         else
                             settings->monitor = obt_xml_node_int(c);
                         g_free(s);

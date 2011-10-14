@@ -451,7 +451,15 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     ob_debug("placing by per-app settings");
 
     /* Find which head the pointer is on */
-    if (settings->monitor == 0) {
+    if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_PRIMARY) {
+        guint m = screen_monitor_primary(TRUE);
+        screen = screen_area(client->desktop, m, NULL);
+    }
+    else if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_ACTIVE) {
+        guint m = screen_monitor_active();
+        screen = screen_area(client->desktop, m, NULL);
+    }
+    else if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_MOUSE) {
         screen = pick_pointer_head(client);
         g_assert(screen);
     }

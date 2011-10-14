@@ -451,9 +451,10 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     ob_debug("placing by per-app settings");
 
     /* Find which head the pointer is on */
-    if (settings->monitor == 0)
-        /* this can return NULL */
+    if (settings->monitor == 0) {
         screen = pick_pointer_head(client);
+        g_assert(screen);
+    }
     else {
         guint m = settings->monitor;
         if (m < 1 || m > screen_num_monitors)

@@ -522,6 +522,12 @@ void client_shade(ObClient *self, gboolean shade);
 /*! Set a client window to have decorations or not */
 void client_set_undecorated(ObClient *self, gboolean undecorated);
 
+/*! Set a client window to be skipped by the taskbar or not */
+void client_set_skip_taskbar(ObClient *self, gboolean skip);
+
+/*! Set a client window to be skipped by the taskbar or not */
+void client_set_skip_pager(ObClient *self, gboolean skip);
+
 /*! Hilite the window to make the user notice it */
 void client_hilite(ObClient *self, gboolean hilite);
 

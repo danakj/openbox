@@ -228,6 +228,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/shade.c \
 	openbox/actions/showdesktop.c \
 	openbox/actions/showmenu.c \
+	openbox/actions/skip_taskbar_pager.c \
 	openbox/actions/unfocus.c \
 	openbox/filters/_all.c \
 	openbox/filters/_all.h \

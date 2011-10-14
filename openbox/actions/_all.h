@@ -54,3 +54,4 @@ void action_layer_startup(void);
 void action_movetoedge_startup(void);
 void action_growtoedge_startup(void);
 void action_focustobottom_startup(void);
+void action_skip_taskbar_pager_startup(void);

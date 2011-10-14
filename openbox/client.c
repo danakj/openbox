@@ -3497,6 +3497,18 @@ void client_shade(ObClient *self, gboolean shade)
     frame_adjust_area(self->frame, FALSE, TRUE, FALSE);
 }
 
+void client_set_skip_taskbar(ObClient *self, gboolean skip)
+{
+    self->skip_taskbar = skip;
+    client_change_state(self);
+}
+
+void client_set_skip_pager(ObClient *self, gboolean skip)
+{
+    self->skip_pager = skip;
+    client_change_state(self);
+}
+
 static void client_ping_event(ObClient *self, gboolean dead)
 {
     if (self->not_responding != dead) {

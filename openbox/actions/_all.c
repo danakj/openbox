@@ -56,4 +56,5 @@ void actions__all_startup(void)
     action_movetoedge_startup();
     action_growtoedge_startup();
     action_focustobottom_startup();
+    action_skip_taskbar_pager_startup();
 }

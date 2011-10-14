@@ -313,7 +313,8 @@ void keyboard_rebind(void)
 
     old = keyboard_firstnode;
     keyboard_firstnode = NULL;
-    node_rebind(old);
+    if (old)
+        node_rebind(old);
 
     tree_destroy(old);
     set_curpos(NULL);

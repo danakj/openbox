@@ -256,6 +256,10 @@ void client_manage(Window window, ObPrompt *prompt)
     /* the session should get the last say though */
     client_restore_session_state(self);
 
+    /* this needs to occur once we have a frame, since it sets a property on
+       the frame */
+    client_update_opacity(self);
+
     /* don't put helper/modal windows on a different desktop if they are
        related to the focused window.  */
     if (!screen_compare_desktops(self->desktop, screen_desktop) &&
@@ -1663,6 +1667,16 @@ void client_update_colormap(ObClient *self, Colormap colormap)
         screen_install_colormap(self, TRUE); /* install new one */
     } else
         self->colormap = colormap;
+}
+
+void client_update_opacity(ObClient *self)
+{
+    guint32 o;
+
+    if (OBT_PROP_GET32(self->window, NET_WM_WINDOW_OPACITY, CARDINAL, &o))
+        OBT_PROP_SET32(self->frame->window, NET_WM_WINDOW_OPACITY, CARDINAL, o);
+    else
+        OBT_PROP_ERASE(self->frame->window, NET_WM_WINDOW_OPACITY);
 }
 
 void client_update_normal_hints(ObClient *self)

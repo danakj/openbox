@@ -1681,6 +1681,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 event_last_user_time = t;
             }
         }
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY)) {
+            client_update_opacity(client);
+        }
 #ifdef SYNC
         else if (msgtype == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER)) {
             /* if they are resizing right now this would cause weird behaviour.

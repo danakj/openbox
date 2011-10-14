@@ -249,6 +249,7 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DIALOG);
     supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_NORMAL);
     supported[i++] = OBT_PROP_ATOM(NET_WM_ALLOWED_ACTIONS);
+    supported[i++] = OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY);
     supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MOVE);
     supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_RESIZE);
     supported[i++] = OBT_PROP_ATOM(NET_WM_ACTION_MINIMIZE);

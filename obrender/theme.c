@@ -1797,6 +1797,7 @@ static gboolean read_string(XrmDatabase db, const gchar *rname, gchar **value)
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
+        g_strstrip(retvalue.addr);
         *value = retvalue.addr;
         ret = TRUE;
     }
@@ -1815,7 +1816,12 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
 
     if (XrmGetResource(db, rname, rclass, &rettype, &retvalue) &&
         retvalue.addr != NULL) {
-        RrColor *c = RrColorParse(inst, retvalue.addr);
+        RrColor *c;
+
+        /* retvalue.addr is inside the xrdb database so we can't destroy it
+           but we can edit it in place, as g_strstrip does. */
+        g_strstrip(retvalue.addr);
+        c = RrColorParse(inst, retvalue.addr);
         if (c != NULL) {
             *value = c;
             ret = TRUE;

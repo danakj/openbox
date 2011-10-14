@@ -70,24 +70,25 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         gint left = o->left, right = o->right, top = o->top, bottom = o->bottom;
 
         if (o->left_denom)
-            left = (left * c->area.width / c->size_inc.width) / o->left_denom;
+            left = left * c->area.width / o->left_denom;
         if (o->right_denom)
-            right = (right * c->area.width / c->size_inc.width) / o->right_denom;
+            right = right * c->area.width / o->right_denom;
         if (o->top_denom)
-            top = (top * c->area.height / c->size_inc.height) / o->top_denom;
+            top = top * c->area.height / o->top_denom;
         if (o->bottom_denom)
-            bottom = (bottom * c->area.height / c->size_inc.height) / o->bottom_denom;
+            bottom = bottom * c->area.height / o->bottom_denom;
 
+        // When resizing, if the resize has a non-zero value then make sure it
+        // is at least as big as the size increment so the window does actually
+        // resize.
         x = c->area.x;
         y = c->area.y;
         ow = c->area.width;
-        xoff = -left * c->size_inc.width;
-        nw = ow + right * c->size_inc.width
-            + left * c->size_inc.width;
+        xoff = -MAX(left, (left ? c->size_inc.width : 0));
+        nw = ow + MAX(right + left, (right + left ? c->size_inc.width : 0));
         oh = c->area.height;
-        yoff = -top * c->size_inc.height;
-        nh = oh + bottom * c->size_inc.height
-            + top * c->size_inc.height;
+        yoff = -MAX(top, (top ? c->size_inc.height : 0));
+        nh = oh + MAX(bottom + top, (bottom + top ? c->size_inc.height : 0));
 
         client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
         xoff = xoff == 0 ? 0 :

@@ -112,6 +112,8 @@ static gboolean client_can_steal_focus(ObClient *self,
                                        gboolean allow_other_desktop,
                                        gboolean request_from_user,
                                        Time steal_time, Time launch_time);
+static void client_setup_default_decor_and_functions(ObClient *self);
+static void client_setup_decor_undecorated(ObClient *self);
 
 void client_startup(gboolean reconfig)
 {
@@ -238,6 +240,18 @@ void client_manage(Window window, ObPrompt *prompt)
        that needs to be freed with g_free(). */
     settings = client_get_settings_state(self);
 
+    /* the session should get the last say though */
+    client_restore_session_state(self);
+
+    /* the per-app settings/session may have changed the decorations for
+       the window, so we setup decorations for that here.  this is a special
+       case because we want to place the window according to these decoration
+       changes.
+       we do this before setting up the frame so that it will reflect the
+       decorations of the window as it will be placed on screen.
+    */
+    client_setup_decor_undecorated(self);
+
     /* specify that if we exit, the window should not be destroyed and
        should be reparented back to root automatically, unless we are managing
        an internal ObPrompt window  */
@@ -252,9 +266,6 @@ void client_manage(Window window, ObPrompt *prompt)
     /* we've grabbed everything and set everything that we need to at mapping
        time now */
     grab_server(FALSE);
-
-    /* the session should get the last say though */
-    client_restore_session_state(self);
 
     /* this needs to occur once we have a frame, since it sets a property on
        the frame */
@@ -1177,11 +1188,8 @@ static void client_get_all(ObClient *self, gboolean real)
     client_get_type_and_transientness(self);
     client_update_normal_hints(self);
 
-    /* set up the decor/functions before getting the state.  the states may
-       affect which functions are available, but we want to know the maximum
-       decor/functions are available to this window, so we can then apply them
-       in client_apply_startup_state() */
-    client_setup_decor_and_functions(self, FALSE);
+    /* set up the maximum possible decor/functions */
+    client_setup_default_decor_and_functions(self);
 
     client_get_state(self);
 
@@ -1735,7 +1743,7 @@ void client_update_normal_hints(ObClient *self)
         ob_debug("Normal hints: not set");
 }
 
-void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
+static void client_setup_default_decor_and_functions(ObClient *self)
 {
     /* start with everything (cept fullscreen) */
     self->decorations =
@@ -1868,6 +1876,23 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
         self->functions &= ~OB_CLIENT_FUNC_MAXIMIZE;
         self->decorations &= ~OB_FRAME_DECOR_MAXIMIZE;
     }
+}
+
+/*! Set up decor for a client based on its undecorated state. */
+static void client_setup_decor_undecorated(ObClient *self)
+{
+    /* If the user requested no decorations, then remove all the decorations,
+       except the border.  But don't add a border if there wasn't one. */
+    if (self->undecorated)
+        self->decorations &= (config_theme_keepborder ?
+                              OB_FRAME_DECOR_BORDER : 0);
+}
+
+void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
+{
+    client_setup_default_decor_and_functions(self);
+
+    client_setup_decor_undecorated(self);
 
     if (self->max_horz && self->max_vert) {
         /* once upon a time you couldn't resize maximized windows, that is not
@@ -1876,12 +1901,6 @@ void client_setup_decor_and_functions(ObClient *self, gboolean reconfig)
            but do kill the handle on fully maxed windows */
         self->decorations &= ~(OB_FRAME_DECOR_HANDLE | OB_FRAME_DECOR_GRIPS);
     }
-
-    /* finally, the user can have requested no decorations, which overrides
-       everything (but doesnt give it a border if it doesnt have one) */
-    if (self->undecorated)
-        self->decorations &= (config_theme_keepborder ?
-                              OB_FRAME_DECOR_BORDER : 0);
 
     /* if we don't have a titlebar, then we cannot shade! */
     if (!(self->decorations & OB_FRAME_DECOR_TITLEBAR))
@@ -2813,6 +2832,9 @@ static void client_apply_startup_state(ObClient *self,
     /* fullscreen removes the ability to apply other states */
     if (fullscreen)
         client_fullscreen(self, TRUE);
+
+    /* make sure client_setup_decor_and_functions() is called at least once */
+    client_setup_decor_and_functions(self, FALSE);
 
     /* if the window hasn't been configured yet, then do so now, in fact the
        x,y,w,h may _not_ be the same as the area rect, which can end up

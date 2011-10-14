@@ -258,7 +258,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 if ((c = obt_xml_find_sibling(n->children, "x")))
                     if (!obt_xml_node_contains(c, "default")) {
                         ObConfigValue *v = config_value_new_string(
-                            obt_xml_node_string(node));
+                            obt_xml_node_string(c));
                         config_value_gravity_coord(v, &settings->position.x);
                         config_value_unref(v);
                         x_pos_given = TRUE;
@@ -267,7 +267,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 if (x_pos_given && (c = obt_xml_find_sibling(n->children, "y")))
                     if (!obt_xml_node_contains(c, "default")) {
                         ObConfigValue *v = config_value_new_string(
-                            obt_xml_node_string(node));
+                            obt_xml_node_string(c));
                         config_value_gravity_coord(v, &settings->position.y);
                         config_value_unref(v);
                         settings->pos_given = TRUE;

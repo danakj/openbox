@@ -291,8 +291,8 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                         settings->pos_given = TRUE;
                     }
 
-                if (settings->pos_given &&
-                    (c = obt_xml_find_node(n->children, "monitor")))
+                /* monitor can be set without setting x or y */
+                if ((c = obt_xml_find_node(n->children, "monitor")))
                     if (!obt_xml_node_contains(c, "default")) {
                         gchar *s = obt_xml_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))

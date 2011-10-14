@@ -37,27 +37,29 @@ static Rect *pick_pointer_head(ObClient *c)
 
    When a window is being placed in the FOREGROUND, use a monitor chosen in
    the following order:
-   1. same monitor as parent
-   2. primary monitor if placement=PRIMARY
+   1. per-app settings
+   2. same monitor as parent
+   3. primary monitor if placement=PRIMARY
       active monitor if placement=ACTIVE
       pointer monitor if placement=MOUSE
-   3. primary monitor
-   4. other monitors where the window has group members on the same desktop
-   5. other monitors where the window has group members on other desktops
-   6. other monitors
+   4. primary monitor
+   5. other monitors where the window has group members on the same desktop
+   6. other monitors where the window has group members on other desktops
+   7. other monitors
 
    When a window is being placed in the BACKGROUND, use a monitor chosen in the
    following order:
-   1. same monitor as parent
-   2. other monitors where the window has group members on the same desktop
-    2a. primary monitor in this set
-    2b. other monitors in this set
-   3. other monitors where the window has group members on other desktops
+   1. per-app settings
+   2. same monitor as parent
+   3. other monitors where the window has group members on the same desktop
     3a. primary monitor in this set
     3b. other monitors in this set
-   4. other monitors
+   4. other monitors where the window has group members on other desktops
     4a. primary monitor in this set
     4b. other monitors in this set
+   5. other monitors
+    5a. primary monitor in this set
+    5b. other monitors in this set
 */
 
 /*! One for each possible head, used to sort them in order of precedence. */
@@ -73,6 +75,7 @@ enum {
     HEAD_PRIMARY = 1 << 2, /* primary monitor */
     HEAD_GROUP_DESK = 1 << 3, /* has a group member on the same desktop */
     HEAD_GROUP = 1 << 4, /* has a group member on another desktop */
+    HEAD_PERAPP = 1 << 5, /* chosen by per-app settings */
 };
 
 gint cmp_foreground(const void *a, const void *b)
@@ -82,6 +85,10 @@ gint cmp_foreground(const void *a, const void *b)
     gint i = 0;
 
     if (h1->monitor == h2->monitor) return 0;
+
+    if (h1->flags & HEAD_PERAPP) --i;
+    if (h2->flags & HEAD_PERAPP) ++i;
+    if (i) return i;
 
     if (h1->flags & HEAD_PARENT) --i;
     if (h2->flags & HEAD_PARENT) ++i;
@@ -114,6 +121,10 @@ gint cmp_background(const void *a, const void *b)
 
     if (h1->monitor == h2->monitor) return 0;
 
+    if (h1->flags & HEAD_PERAPP) --i;
+    if (h2->flags & HEAD_PERAPP) ++i;
+    if (i) return i;
+
     if (h1->flags & HEAD_PARENT) --i;
     if (h2->flags & HEAD_PARENT) ++i;
     if (i) return i;
@@ -144,7 +155,8 @@ gint cmp_background(const void *a, const void *b)
 }
 
 /*! Pick a monitor to place a window on. */
-static Rect *pick_head(ObClient *c, gboolean foreground)
+static Rect *pick_head(ObClient *c, gboolean foreground,
+                       ObAppSettings *settings)
 {
     Rect *area;
     ObPlaceHead *choice;
@@ -180,6 +192,29 @@ static Rect *pick_head(ObClient *c, gboolean foreground)
         choice[i].flags |= HEAD_PRIMARY;
         if (config_place_monitor == OB_PLACE_MONITOR_PRIMARY)
             choice[i].flags |= HEAD_PLACED;
+        if (settings &&
+            settings->monitor_type == OB_APP_SETTINGS_MONITOR_PRIMARY)
+            choice[i].flags |= HEAD_PERAPP;
+    }
+
+    i = screen_monitor_active();
+    if (i < screen_num_monitors) {
+        if (settings &&
+            settings->monitor_type == OB_APP_SETTINGS_MONITOR_ACTIVE)
+            choice[i].flags |= HEAD_PERAPP;
+    }
+
+    i = screen_monitor_pointer();
+    if (i < screen_num_monitors) {
+        if (settings &&
+            settings->monitor_type == OB_APP_SETTINGS_MONITOR_MOUSE)
+            choice[i].flags |= HEAD_PERAPP;
+    }
+
+    if (settings) {
+        i = settings->monitor - 1;
+        if (i < screen_num_monitors)
+            choice[i].flags |= HEAD_PERAPP;
     }
 
     /* direct parent takes highest precedence */
@@ -440,35 +475,14 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
-static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
+static gboolean place_per_app_setting(ObClient *client, Rect *screen,
+                                      gint *x, gint *y,
                                       ObAppSettings *settings)
 {
-    Rect *screen = NULL;
-
     if (!settings || (settings && !settings->pos_given))
         return FALSE;
 
     ob_debug("placing by per-app settings");
-
-    /* Find which head the pointer is on */
-    if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_PRIMARY) {
-        guint m = screen_monitor_primary(TRUE);
-        screen = screen_area(client->desktop, m, NULL);
-    }
-    else if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_ACTIVE) {
-        guint m = screen_monitor_active();
-        screen = screen_area(client->desktop, m, NULL);
-    }
-    else if (settings->monitor_type == OB_APP_SETTINGS_MONITOR_MOUSE) {
-        screen = pick_pointer_head(client);
-        g_assert(screen);
-    }
-    else {
-        guint m = settings->monitor;
-        if (m < 1 || m > screen_num_monitors)
-            m = screen_monitor_primary(TRUE) + 1;
-        screen = screen_area(client->desktop, m - 1, NULL);
-    }
 
     if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
@@ -490,7 +504,6 @@ static gboolean place_per_app_setting(ObClient *client, gint *x, gint *y,
     if (settings->position.y.denom)
         *y = (*y * screen->height) / settings->position.y.denom;
 
-    g_slice_free(Rect, screen);
     return TRUE;
 }
 
@@ -557,10 +570,10 @@ gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
          !(settings && settings->pos_given)))
         return FALSE;
 
-    area = pick_head(client, foreground);
+    area = pick_head(client, foreground, settings);
 
     /* try a number of methods */
-    ret = place_per_app_setting(client, x, y, settings) ||
+    ret = place_per_app_setting(client, area, x, y, settings) ||
         place_transient_splash(client, area, x, y) ||
         (config_place_policy == OB_PLACE_POLICY_MOUSE &&
          place_under_mouse(client, x, y)) ||

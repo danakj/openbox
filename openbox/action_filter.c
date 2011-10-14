@@ -56,7 +56,8 @@ void action_filter_shutdown(gboolean reconfig)
 
     for (it = registered; it; it = g_slist_next(it))
         action_filter_unregister(it->data);
-    g_slist_free(it);
+    g_slist_free(registered);
+    registered = NULL;
 }
 
 gboolean action_filter_register(const gchar *name,

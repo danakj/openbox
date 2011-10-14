@@ -101,6 +101,12 @@ void ob_debug_enable(ObDebugType type, gboolean enable)
     enabled_types[type] = enable;
 }
 
+gboolean ob_debug_get_enabled(ObDebugType type)
+{
+    g_assert(type < OB_DEBUG_TYPE_NUM);
+    return enabled_types[type];
+}
+
 static inline void log_print(FILE *out, const gchar* log_domain,
                              const gchar *level, const gchar *message)
 {

@@ -259,9 +259,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_INT("border.width", theme->fbwidth, 0, 100, 1);
     READ_INT("menu.border.width", theme->mbwidth, 0, 100, theme->fbwidth);
     READ_INT("osd.border.width", theme->obwidth, 0, 100, theme->fbwidth);
+    READ_INT("undecorated.border.width", theme->ubwidth, 0, 100,
+             theme->fbwidth);
     READ_INT("menu.separator.width", theme->menu_sep_width, 1, 100, 1);
-    READ_INT("menu.separator.padding.width", theme->menu_sep_paddingx, 0, 100, 6);
-    READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy, 0, 100, 3);
+    READ_INT("menu.separator.padding.width", theme->menu_sep_paddingx,
+             0, 100, 6);
+    READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy,
+             0, 100, 3);
     READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100,
              theme->paddingx);
     READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100,
@@ -270,7 +274,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     /* load colors */
     READ_COLOR_("window.active.border.color", "border.color",
                 theme->frame_focused_border_color, RrColorNew(inst, 0, 0, 0));
-
+    /* undecorated focused border color inherits from frame focused border
+       color */
+    READ_COLOR("window.undecorated.active.border.color",
+               theme->frame_undecorated_focused_border_color,
+               RrColorCopy(theme->frame_focused_border_color));
     /* title separator focused color inherits from focused border color */
     READ_COLOR("window.active.title.separator.color",
                theme->title_separator_focused_color,
@@ -280,6 +288,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR("window.inactive.border.color",
                theme->frame_unfocused_border_color,
                RrColorCopy(theme->frame_focused_border_color));
+
+    /* undecorated unfocused border color inherits from frame unfocused border
+       color */
+    READ_COLOR("window.undecorated.inactive.border.color",
+               theme->frame_undecorated_unfocused_border_color,
+               RrColorCopy(theme->frame_unfocused_border_color));
 
     /* title separator unfocused color inherits from unfocused border color */
     READ_COLOR("window.inactive.title.separator.color",

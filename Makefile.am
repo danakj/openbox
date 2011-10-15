@@ -516,7 +516,8 @@ nodist_xsessions_DATA = \
 	data/xsession/openbox-kde.desktop
 
 dist_gnomesession_DATA = \
-	data/xsession/openbox-gnome.session
+	data/gnome-session/openbox-gnome.session \
+	data/gnome-session/openbox-gnome-fallback.session
 
 dist_noinst_DATA = \
 	data/rc.xsd \

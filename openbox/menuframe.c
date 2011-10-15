@@ -38,7 +38,8 @@
 #define FRAME_EVENTMASK (ButtonPressMask |ButtonMotionMask | EnterWindowMask |\
                          LeaveWindowMask)
 #define ENTRY_EVENTMASK (EnterWindowMask | LeaveWindowMask | \
-                         ButtonPressMask | ButtonReleaseMask)
+                         ButtonPressMask | ButtonReleaseMask | \
+                         PointerMotionMask)
 
 GList *menu_frame_visible;
 GHashTable *menu_frame_map;

@@ -345,6 +345,11 @@ gboolean obt_xml_save_cache_file(ObtXmlInst *inst,
     return ok;
 }
 
+const gchar* obt_xml_file_path(ObtXmlInst *inst)
+{
+    return inst->path;
+}
+
 void obt_xml_close(ObtXmlInst *i)
 {
     if (i && i->doc) {
@@ -374,11 +379,27 @@ void obt_xml_tree_from_root(ObtXmlInst *i)
     obt_xml_tree(i, i->root->children);
 }
 
+guint obt_xml_node_line(xmlNodePtr node)
+{
+    return XML_GET_LINE(node);
+}
+
 gchar *obt_xml_node_string(xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeGetContent(node);
+    xmlChar *c;
     gchar *s;
+    c = xmlNodeIsText(node->children) ? xmlNodeGetContent(node) : NULL;
     if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
+    s = g_strdup(c ? (gchar*)c : "");
+    xmlFree(c);
+    return s;
+}
+
+gchar *obt_xml_node_string_raw(xmlNodePtr node)
+{
+    xmlChar *c;
+    gchar *s;
+    c = xmlNodeIsText(node->children) ? xmlNodeGetContent(node) : NULL;
     s = g_strdup(c ? (gchar*)c : "");
     xmlFree(c);
     return s;
@@ -386,8 +407,9 @@ gchar *obt_xml_node_string(xmlNodePtr node)
 
 gint obt_xml_node_int(xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeGetContent(node);
+    xmlChar *c;
     gint i;
+    c = xmlNodeIsText(node->children) ? xmlNodeGetContent(node) : NULL;
     if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
     i = c ? atoi((gchar*)c) : 0;
     xmlFree(c);
@@ -396,8 +418,9 @@ gint obt_xml_node_int(xmlNodePtr node)
 
 gboolean obt_xml_node_bool(xmlNodePtr node)
 {
-    xmlChar *c = xmlNodeGetContent(node);
+    xmlChar *c;
     gboolean b = FALSE;
+    c = xmlNodeIsText(node->children) ? xmlNodeGetContent(node) : NULL;
     if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
     if (c && !xmlStrcasecmp(c, (const xmlChar*) "true"))
         b = TRUE;
@@ -411,8 +434,9 @@ gboolean obt_xml_node_bool(xmlNodePtr node)
 
 gboolean obt_xml_node_contains(xmlNodePtr node, const gchar *val)
 {
-    xmlChar *c = xmlNodeGetContent(node);
+    xmlChar *c;
     gboolean r;
+    c = xmlNodeIsText(node->children) ? xmlNodeGetContent(node) : NULL;
     if (c) g_strstrip((char*)c); /* strip leading/trailing whitespace */
     r = !xmlStrcasecmp(c, (const xmlChar*) val);
     xmlFree(c);

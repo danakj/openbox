@@ -69,6 +69,11 @@ gboolean obt_xml_save_cache_file(ObtXmlInst *inst,
 xmlDocPtr obt_xml_doc(ObtXmlInst *inst);
 xmlNodePtr obt_xml_root(ObtXmlInst *inst);
 
+/*! Returns the path to the file loaded by @inst, if one exists, or NULL.
+  The returned string is owned by @inst and will be freed along with it.
+ */
+const gchar* obt_xml_file_path(ObtXmlInst *inst);
+
 void obt_xml_close(ObtXmlInst *inst);
 
 void obt_xml_register(ObtXmlInst *inst, const gchar *tag,
@@ -82,8 +87,10 @@ void obt_xml_tree_from_root(ObtXmlInst *i);
 
 xmlNodePtr obt_xml_find_sibling(xmlNodePtr node, const gchar *name);
 
+guint    obt_xml_node_line     (xmlNodePtr node);
 gboolean obt_xml_node_contains (xmlNodePtr node, const gchar *val);
-gchar   *obt_xml_node_string   (xmlNodePtr node);
+gchar   *obt_xml_node_string   (xmlNodePtr node);  /* strips whitespace */
+gchar   *obt_xml_node_string_raw(xmlNodePtr node); /* unstripped version */
 gint     obt_xml_node_int      (xmlNodePtr node);
 gboolean obt_xml_node_bool     (xmlNodePtr node);
 

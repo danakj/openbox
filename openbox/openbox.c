@@ -576,7 +576,7 @@ static void run_startup_cmd(void)
                        G_SPAWN_SEARCH_PATH |
                        G_SPAWN_DO_NOT_REAP_CHILD,
                        NULL, NULL, NULL, &e);
-    if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+    if (!ok) {
         g_message("Error launching startup command: %s",
                   e->message);
         g_error_free(e);

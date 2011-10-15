@@ -21,11 +21,35 @@
 struct _ObActionList;
 
 typedef struct _ObActionParser ObActionParser;
+typedef struct _ObActionParserError ObActionParserError;
 
-ObActionParser* action_parser_new(void);
+struct _ObActionParserError {
+    gchar   *source;
+    guint    line;
+    gchar   *message;
+    gboolean is_error; /*!< If false, it was a warning and not fatal. */
+};
+
+/*! A callback for when an error occurs while parsing.  Return TRUE to show
+  the error, and FALSE otherwise.  This function can adjust the line number
+  if it is parsing data nested within a source.
+*/
+typedef gboolean (*ObActionParserErrorFunc)(guint *line, const gchar *message,
+                                            gpointer user_data);
+
+ObActionParser* action_parser_new(const gchar *source);
 
 void action_parser_ref(ObActionParser *p);
 void action_parser_unref(ObActionParser *p);
+
+void action_parser_set_on_error(ObActionParser *p,
+                                ObActionParserErrorFunc callback,
+                                gpointer user_data);
+
+/*! Returns the last parsing error, or NULL if no errors occured. */
+const ObActionParserError* action_parser_get_last_error(void);
+
+void action_parser_reset_last_error(void);
 
 struct _ObActionList* action_parser_read_string(ObActionParser *p,
                                                 const gchar *text);

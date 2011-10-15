@@ -369,6 +369,16 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
     }
 }
 
+static gboolean action_parser_error(guint *line, const gchar *message,
+                                    gpointer data)
+{
+    /* offset the position of the error by the position we are reading from in
+       the Xml document */
+    guint *xml_line = (guint*)data;
+    *line = *xml_line + *line - 1;
+    return TRUE;
+}
+
 /*
 
 <keybind key="C-x">
@@ -379,7 +389,7 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
 */
 
-static void parse_key(xmlNodePtr node, GList *keylist)
+static void parse_key(xmlNodePtr node, GList *keylist, ObtXmlInst *i)
 {
     gchar *keystring, **keys, **key;
     xmlNodePtr n;
@@ -396,21 +406,27 @@ static void parse_key(xmlNodePtr node, GList *keylist)
 
         if ((n = obt_xml_find_sibling(node->children, "keybind"))) {
             while (n) {
-                parse_key(n, keylist);
+                parse_key(n, keylist, i);
                 n = obt_xml_find_sibling(n->next, "keybind");
             }
         }
         else if ((n = obt_xml_find_sibling(node->children, "action"))) {
-            while (n) {
-                ObActionParser *p;
-                ObActionList *actions;
-                xmlChar *c;
+            ObActionParser *p;
 
-                c = xmlNodeGetContent(node);
-                p = action_parser_new();
+            p = action_parser_new(obt_xml_file_path(i));
+            while (n) {
+                ObActionList *actions;
+                gchar *c;
+                guint line;
+
+                /* Set an error callback for the action parser that will offset
+                   the line of the error by the posision of the containing
+                   tag in the Xml document */
+                c = obt_xml_node_string_raw(n);
+                line = obt_xml_node_line(n);
+                action_parser_set_on_error(p, action_parser_error, &line);
                 actions = action_parser_read_string(p, (gchar*)c);
-                xmlFree(c);
-                action_parser_unref(p);
+                g_free(c);
 
                 if (actions)
                     keyboard_bind(keylist, actions);
@@ -418,6 +434,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
                 action_list_unref(actions);
                 n = obt_xml_find_sibling(n->next, "action");
             }
+            action_parser_unref(p);
         }
 
 
@@ -432,6 +449,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
 
 static void parse_keyboard(xmlNodePtr node, gpointer d)
 {
+    ObtXmlInst *i = (ObtXmlInst*)d;
     xmlNodePtr n;
     gchar *key;
 
@@ -446,7 +464,7 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
     if ((n = obt_xml_find_sibling(node->children, "keybind")))
         while (n) {
-            parse_key(n, NULL);
+            parse_key(n, NULL, i);
             n = obt_xml_find_sibling(n->next, "keybind");
         }
 }
@@ -463,6 +481,7 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
 static void parse_mouse(xmlNodePtr node, gpointer d)
 {
+    ObtXmlInst *i = (ObtXmlInst*)d;
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
     gchar *cxstr;
@@ -509,6 +528,9 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
             nbut = obt_xml_find_sibling(n->children, "mousebind");
             while (nbut) {
+                ObActionParser *p;
+
+                buttonstr = NULL;
                 if (!obt_xml_attr_string(nbut, "button", &buttonstr))
                     goto next_nbut;
                 if (obt_xml_attr_contains(nbut, "action", "press"))
@@ -524,24 +546,31 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                 else
                     goto next_nbut;
 
+                p = action_parser_new(obt_xml_file_path(i));
+
                 nact = obt_xml_find_sibling(nbut->children, "action");
                 while (nact) {
                     ObActionList *actions;
-                    ObActionParser *p;
-                    xmlChar *c;
+                    gchar *c;
+                    guint line;
 
-                    c = xmlNodeGetContent(nact);
-                    p = action_parser_new();
+                    /* Set an error callback for the action parser that will
+                       offset the line of the error by the posision of the
+                       containing tag in the Xml document */
+                    c = obt_xml_node_string_raw(nact);
+                    line = obt_xml_node_line(nact);
+                    action_parser_set_on_error(p, action_parser_error, &line);
                     if ((actions = action_parser_read_string(p, (gchar*)c)))
                         mouse_bind(buttonstr, cx, mact, actions);
                     nact = obt_xml_find_sibling(nact->next, "action");
                     action_list_unref(actions);
-                    xmlFree(c);
-                    action_parser_unref(p);
+                    g_free(c);
                 }
-            g_free(buttonstr);
+
+                action_parser_unref(p);
             next_nbut:
-            nbut = obt_xml_find_sibling(nbut->next, "mousebind");
+                g_free(buttonstr);
+                nbut = obt_xml_find_sibling(nbut->next, "mousebind");
             }
         }
         g_free(modcxstr);
@@ -938,7 +967,7 @@ static void bind_default_keyboard(void)
     };
     ObActionParser *p;
 
-    p = action_parser_new();
+    p = action_parser_new(NULL);
     for (it = binds; it->key; ++it) {
         GList *l = g_list_append(NULL, g_strdup(it->key));
         ObActionList *actions = action_parser_read_string(p, it->actiontext);
@@ -1012,7 +1041,7 @@ static void bind_default_mouse(void)
     ObActionParser *p;
     ObActionList *actions;
 
-    p = action_parser_new();
+    p = action_parser_new(NULL);
     for (it = binds; it->button; ++it) {
         actions = action_parser_read_string(p, it->actname);
         mouse_bind(it->button, frame_context_from_string(it->context),
@@ -1098,7 +1127,7 @@ void config_startup(ObtXmlInst *i)
 
     bind_default_keyboard();
 
-    obt_xml_register(i, "keyboard", parse_keyboard, NULL);
+    obt_xml_register(i, "keyboard", parse_keyboard, i);
 
     config_mouse_threshold = 8;
     config_mouse_dclicktime = 500;
@@ -1107,7 +1136,7 @@ void config_startup(ObtXmlInst *i)
 
     bind_default_mouse();
 
-    obt_xml_register(i, "mouse", parse_mouse, NULL);
+    obt_xml_register(i, "mouse", parse_mouse, i);
 
     config_resist_win = 10;
     config_resist_edge = 20;

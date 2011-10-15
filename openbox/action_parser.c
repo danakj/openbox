@@ -45,14 +45,20 @@ struct _ObConfigValue* parse_value(ObActionParser *p,
                                    gboolean allow_actions,
                                    gboolean *e);
 gchar* parse_string(ObActionParser *p, guchar end, gboolean *e);
+static void display_error(GScanner *scanner, gchar *message, gboolean error);
 
 struct _ObActionParser
 {
     gint ref;
     GScanner *scan;
+
+    ObActionParserErrorFunc on_error;
+    gpointer on_error_user_data;
 };
 
-ObActionParser* action_parser_new(void)
+static ObActionParserError last_error;
+
+ObActionParser* action_parser_new(const gchar *source)
 {
     ObActionParser *p;
     GScannerConfig config = {
@@ -84,9 +90,12 @@ ObActionParser* action_parser_new(void)
         .store_int64 = FALSE
     };
 
-    p = g_slice_new(ObActionParser);
+    p = g_slice_new0(ObActionParser);
     p->ref = 1;
     p->scan = g_scanner_new(&config);
+    p->scan->input_name = source;
+    p->scan->msg_handler = display_error;
+    p->scan->user_data = p;
     return p;
 }
 
@@ -108,7 +117,8 @@ ObActionList* action_parser_read_string(ObActionParser *p, const gchar *text)
     gboolean e;
 
     g_scanner_input_text(p->scan, text, strlen(text));
-    p->scan->input_name = "(console)";
+    if (!p->scan->input_name)
+        p->scan->input_name = "(console)";
 
     e = FALSE;
     return parse_list(p, G_TOKEN_EOF, &e);
@@ -131,6 +141,52 @@ ObActionList* actions_parser_read_file(ObActionParser *p,
     return parse_list(p, G_TOKEN_EOF, &e);
 }
 
+void action_parser_set_on_error(ObActionParser *p, ObActionParserErrorFunc f,
+                                gpointer data)
+{
+    p->on_error = f;
+    p->on_error_user_data = data;
+}
+
+const ObActionParserError* action_parser_get_last_error(void)
+{
+    return last_error.message ? &last_error : NULL;
+}
+
+void action_parser_reset_last_error(void)
+{
+    g_free(last_error.source);
+    g_free(last_error.message);
+    last_error.source = last_error.message = NULL;
+}
+
+static void display_error(GScanner *scanner, gchar *message, gboolean error)
+{
+    ObActionParser *p = (ObActionParser*) scanner->user_data;
+    guint line = scanner->line;
+    if (!p->on_error || p->on_error(&line, message, p->on_error_user_data)) {
+        action_parser_reset_last_error();
+
+        last_error.source = g_strdup(scanner->input_name);
+        last_error.line = line;
+        last_error.message = g_strdup(message);
+        last_error.is_error = error;
+        g_message("%s:%u: %s: %s",
+                  p->scan->input_name,
+                  last_error.line,
+                  (last_error.is_error ? "error" : "warning"),
+                  last_error.message);
+    }
+}
+
+gpointer parse_error(ObActionParser *p, GTokenType exp, const gchar *message,
+                     gboolean *e)
+{
+    g_scanner_unexp_token(p->scan, exp, NULL, NULL, NULL, message, TRUE);
+    *e = TRUE;
+    return NULL;
+}
+
 /*************  Parser functions.  The list is the entry point.  ************
 BNF for the language:
 
@@ -150,14 +206,6 @@ STRING := "TEXT" | (TEXT) |
   be escaped by an backslash.
   \\ \( \) and \" are all valid escaped characters.
 **************                                                   ************/
-
-gpointer parse_error(ObActionParser *p, GTokenType exp, const gchar *message,
-                     gboolean *e)
-{
-    g_scanner_unexp_token(p->scan, exp, NULL, NULL, NULL, message, TRUE);
-    *e = TRUE;
-    return NULL;
-}
 
 ObActionList* parse_list(ObActionParser *p, GTokenType end, gboolean *e)
 {
@@ -203,7 +251,7 @@ ObActionList* parse_action(ObActionParser *p, gboolean *e)
 {
     GTokenType t;
     ObActionList *al;
-    gchar *name;
+    gchar *name, *error_msg;
     GHashTable *config;
 
     t = g_scanner_get_next_token(p->scan);
@@ -261,13 +309,22 @@ ObActionList* parse_action(ObActionParser *p, gboolean *e)
         t = g_scanner_peek_next_token(p->scan);
     }
 
+    error_msg = NULL;
+
     al = g_slice_new(ObActionList);
     al->ref = 1;
     al->isfilterset = FALSE;
-    al->u.action = action_new(name, config);
+    al->u.action = action_new(name, config, &error_msg);
     al->next = NULL;
     g_free(name);
     g_hash_table_unref(config);
+
+    if (error_msg) {
+        display_error(p->scan, error_msg, TRUE);
+        *e = TRUE;
+        g_free(error_msg);
+    }
+
     return al;
 }
 

@@ -93,7 +93,7 @@ gboolean action_is_interactive(ObAction *act);
   @values The values of the options passed to the action, paired with the
     keys.  These are ObActionListValue objects.
 */
-ObAction* action_new(const gchar *name, GHashTable *config);
+ObAction* action_new(const gchar *name, GHashTable *config, gchar **error);
 
 void action_ref(ObAction *act);
 void action_unref(ObAction *act);

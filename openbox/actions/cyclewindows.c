@@ -107,7 +107,7 @@ static gpointer setup_func(GHashTable *config,
         action_list_ref(o->actions);
     }
     else {
-        ObActionParser *p = action_parser_new();
+        ObActionParser *p = action_parser_new(NULL);
         o->actions = action_parser_read_string(p,
                                                "focus\n"
                                                "raise\n"

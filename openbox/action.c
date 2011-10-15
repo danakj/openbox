@@ -37,7 +37,7 @@ static void     action_definition_ref(ObActionDefinition *def);
 static void     action_definition_unref(ObActionDefinition *def);
 static gboolean action_interactive_begin_act(ObAction *act, guint state);
 static void     action_interactive_end_act();
-static ObAction* action_find_by_name(const gchar *name);
+static ObAction* action_find_by_name(const gchar *name, gchar **error);
 
 static ObAction *current_i_act = NULL;
 static guint     current_i_initial_state = 0;
@@ -179,7 +179,7 @@ static void action_definition_unref(ObActionDefinition *def)
     }
 }
 
-static ObAction* action_find_by_name(const gchar *name)
+static ObAction* action_find_by_name(const gchar *name, gchar **error)
 {
     GSList *it;
     ObActionDefinition *def = NULL;
@@ -204,18 +204,20 @@ static ObAction* action_find_by_name(const gchar *name)
         act->i_cancel = NULL;
         act->i_post = NULL;
         act->options = NULL;
-    } else
-        g_message(_("Invalid action \"%s\" requested. No such action exists."),
-                  name);
+    }
+    else if (error)
+        *error = g_strdup_printf(
+            _("Invalid action \"%s\" requested. No such action exists."),
+            name);
 
     return act;
 }
 
-ObAction* action_new(const gchar *name, GHashTable *config)
+ObAction* action_new(const gchar *name, GHashTable *config, gchar **error)
 {
     ObAction *act = NULL;
 
-    act = action_find_by_name(name);
+    act = action_find_by_name(name, error);
     if (act) {
         /* there is more stuff to parse here */
         if (act->def->canbeinteractive) {
@@ -261,11 +263,9 @@ gboolean action_run(ObAction *act, const ObActionListRun *data,
                     struct _ObClientSet *set)
 {
     gboolean ran_interactive;
-    gboolean update_user_time;
     gboolean run, run_i;
 
     ran_interactive = FALSE;
-    update_user_time = FALSE;
 
     /* If we're starting an interactive action:
        - if the current interactive action is the same, do nothing and

@@ -17,6 +17,7 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "action_parser.h"
 #include "debug.h"
 #include "openbox.h"
 #include "session.h"
@@ -225,8 +226,6 @@ gint main(gint argc, gchar **argv)
         event_reset_time();
 
         do {
-            ObPrompt *xmlprompt = NULL;
-
             if (reconfigure) obt_keyboard_reload();
 
             {
@@ -365,26 +364,30 @@ gint main(gint argc, gchar **argv)
 
             /* look for parsing errors */
             {
-                xmlErrorPtr e = xmlGetLastError();
-                if (e) {
+                xmlErrorPtr xe = NULL;
+                const ObActionParserError *ae = NULL;
+
+                xe = xmlGetLastError();
+                if (!xe) ae = action_parser_get_last_error();
+                if (xe || ae) {
                     gchar *m;
 
-                    m = g_strdup_printf(_("One or more XML syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"), e->file, e->line, e->message);
-                    xmlprompt =
-                        prompt_show_message(m, _("Openbox Syntax Error"), _("Close"));
+                    m = g_strdup_printf(
+                        _("One or more syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"),
+                        (xe ? xe->file : ae->source),
+                        (xe ? xe->line : (signed)ae->line),
+                        (xe ? xe->message : ae->message));
+                    prompt_show_message(m, _("Openbox Syntax Error"),
+                                        _("Close"));
                     g_free(m);
-                    xmlResetError(e);
+                    if (xe) xmlResetError(xe);
+                    else action_parser_reset_last_error();
                 }
             }
 
             g_main_loop_run(ob_main_loop);
             ob_set_state(reconfigure ?
                          OB_STATE_RECONFIGURING : OB_STATE_EXITING);
-
-            if (xmlprompt) {
-                prompt_unref(xmlprompt);
-                xmlprompt = NULL;
-            }
 
             if (!reconfigure)
                 window_unmanage_all();

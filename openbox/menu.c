@@ -43,6 +43,7 @@ typedef struct _ObMenuParseState ObMenuParseState;
 
 struct _ObMenuParseState
 {
+    const gchar *source;
     ObMenu *parent;
     ObMenu *pipe_creator;
 };
@@ -90,6 +91,7 @@ void menu_startup(gboolean reconfig)
                                      "openbox_menu"))
         {
             loaded = TRUE;
+            menu_parse_state.source = obt_xml_file_path(menu_parse_inst);
             obt_xml_tree_from_root(menu_parse_inst);
             obt_xml_close(menu_parse_inst);
         } else
@@ -270,6 +272,14 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
     return shortcut;
 }
 
+static gboolean action_parser_error(guint *line, const gchar *message,
+                                    gpointer data)
+{
+    guint *xml_line = (guint*)data;
+    *line = *xml_line + *line - 1;
+    return TRUE;
+}
+
 static void parse_menu_item(xmlNodePtr node,  gpointer data)
 {
     ObMenuParseState *state = data;
@@ -283,18 +293,25 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
 
         if (obt_xml_attr_string(node, "label", &label)) {
             xmlNodePtr c;
-            xmlChar *cc;
+            gchar *cc;
             ObActionList *acts = NULL;
             ObActionParser *p;
 
             c = obt_xml_find_sibling(node->children, "action");
-            p = action_parser_new();
+            p = action_parser_new(state->source);
             while (c) {
                 ObActionList *al;
+                guint line;
 
-                cc = xmlNodeGetContent(c);
+                /* We read text from the XML file and get its line position,
+                   Then we set an error handler which will offset errors
+                   within the text by their position in the XML file.
+                */
+                cc = obt_xml_node_string_raw(c);
+                line = obt_xml_node_line(c);
+                action_parser_set_on_error(p, action_parser_error, &line);
                 al = action_parser_read_string(p, (gchar*)cc);
-                xmlFree(cc);
+                g_free(cc);
                 acts = action_list_concat(acts, al);
 
                 c = obt_xml_find_sibling(c->next, "action");

@@ -287,7 +287,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
                 ObActionsAct *action = actions_parse(c);
                 if (action)
                     acts = g_slist_append(acts, action);
-                c = obt_xml_find_node(node->next, "action");
+                c = obt_xml_find_node(c->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, acts, TRUE);
             

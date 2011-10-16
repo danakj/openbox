@@ -111,7 +111,7 @@ ObAppSettings* config_create_app_settings(void)
     settings->type = -1;
     settings->decor = -1;
     settings->shade = -1;
-    settings->monitor_type = 0;
+    settings->monitor_type = OB_PLACE_MONITOR_ANY;
     settings->monitor = -1;
     settings->focus = -1;
     settings->desktop = 0;
@@ -136,7 +136,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     copy_if(type, (ObClientType)-1);
     copy_if(decor, -1);
     copy_if(shade, -1);
-    copy_if(monitor_type, 0);
+    copy_if(monitor_type, OB_PLACE_MONITOR_ANY);
     copy_if(monitor, -1);
     copy_if(focus, -1);
     copy_if(desktop, 0);
@@ -297,13 +297,13 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                         gchar *s = obt_xml_node_string(c);
                         if (!g_ascii_strcasecmp(s, "mouse"))
                             settings->monitor_type =
-                                    OB_APP_SETTINGS_MONITOR_MOUSE;
+                                    OB_PLACE_MONITOR_MOUSE;
                         else if (!g_ascii_strcasecmp(s, "active"))
                             settings->monitor_type =
-                                    OB_APP_SETTINGS_MONITOR_ACTIVE;
+                                    OB_PLACE_MONITOR_ACTIVE;
                         else if (!g_ascii_strcasecmp(s, "primary"))
                             settings->monitor_type =
-                                    OB_APP_SETTINGS_MONITOR_PRIMARY;
+                                    OB_PLACE_MONITOR_PRIMARY;
                         else
                             settings->monitor = obt_xml_node_int(c);
                         g_free(s);

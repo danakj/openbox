@@ -193,21 +193,25 @@ static Rect *pick_head(ObClient *c, gboolean foreground,
         if (config_place_monitor == OB_PLACE_MONITOR_PRIMARY)
             choice[i].flags |= HEAD_PLACED;
         if (settings &&
-            settings->monitor_type == OB_APP_SETTINGS_MONITOR_PRIMARY)
+            settings->monitor_type == OB_PLACE_MONITOR_PRIMARY)
             choice[i].flags |= HEAD_PERAPP;
     }
 
     i = screen_monitor_active();
     if (i < screen_num_monitors) {
+        if (config_place_monitor == OB_PLACE_MONITOR_ACTIVE)
+            choice[i].flags |= HEAD_PLACED;
         if (settings &&
-            settings->monitor_type == OB_APP_SETTINGS_MONITOR_ACTIVE)
+            settings->monitor_type == OB_PLACE_MONITOR_ACTIVE)
             choice[i].flags |= HEAD_PERAPP;
     }
 
     i = screen_monitor_pointer();
     if (i < screen_num_monitors) {
+        if (config_place_monitor == OB_PLACE_MONITOR_MOUSE)
+            choice[i].flags |= HEAD_PLACED;
         if (settings &&
-            settings->monitor_type == OB_APP_SETTINGS_MONITOR_MOUSE)
+            settings->monitor_type == OB_PLACE_MONITOR_MOUSE)
             choice[i].flags |= HEAD_PERAPP;
     }
 

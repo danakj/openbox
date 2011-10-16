@@ -1680,22 +1680,24 @@ guint screen_find_monitor(const Rect *search)
 
         monitor = screen_physical_area_monitor(config_primary_monitor_index);
 
-        RECT_SET_INTERSECTION(on_current_monitor, *monitor, *search);
-        area = RECT_AREA(on_current_monitor);
+        if (RECT_INTERSECTS_RECT(*monitor, *search)) {
+            RECT_SET_INTERSECTION(on_current_monitor, *monitor, *search);
+            area = RECT_AREA(on_current_monitor);
 
-        if (area > mostpx) {
-            mostpx = area;
-            most = config_primary_monitor_index;
-        }
+            if (area > mostpx) {
+                mostpx = area;
+                most = config_primary_monitor_index;
+            }
 
-        /* add the intersection rect on the current monitor to the
-           counted list. that's easy for the first one, we just mark it for
-           subtraction */
-        {
-            RectArithmetic *ra = g_slice_new(RectArithmetic);
-            ra->r = on_current_monitor;
-            ra->subtract = TRUE;
-            counted = g_slist_prepend(counted, ra);
+            /* add the intersection rect on the current monitor to the
+               counted list. that's easy for the first one, we just mark it for
+               subtraction */
+            {
+                RectArithmetic *ra = g_slice_new(RectArithmetic);
+                ra->r = on_current_monitor;
+                ra->subtract = TRUE;
+                counted = g_slist_prepend(counted, ra);
+            }
         }
     }
 

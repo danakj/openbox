@@ -319,8 +319,9 @@ static gboolean i_input_func(guint initial_state,
                              gpointer options,
                              gboolean *used)
 {
-    guint mods;
+    guint mods, initial_mods;
 
+    initial_mods = obt_keyboard_only_modmasks(initial_state);
     mods = obt_keyboard_only_modmasks(e->xkey.state);
     if (e->type == KeyRelease) {
         /* remove from the state the mask of the modifier key being
@@ -336,11 +337,11 @@ static gboolean i_input_func(guint initial_state,
             return FALSE;
 
         /* There were no modifiers and they pressed enter */
-        else if ((sym == XK_Return || sym == XK_KP_Enter) && !initial_state)
+        else if ((sym == XK_Return || sym == XK_KP_Enter) && !initial_mods)
             return FALSE;
     }
     /* They released the modifiers */
-    else if (e->type == KeyRelease && initial_state && !(mods & initial_state))
+    else if (e->type == KeyRelease && initial_mods && !(mods & initial_mods))
     {
         return FALSE;
     }
@@ -350,7 +351,8 @@ static gboolean i_input_func(guint initial_state,
 
 static gboolean i_pre_func(guint initial_state, gpointer options)
 {
-    if (!initial_state) {
+    guint initial_mods = obt_keyboard_only_modmasks(initial_state);
+    if (!inital_mods) {
         Options *o = options;
         o->interactive = FALSE;
         return FALSE;

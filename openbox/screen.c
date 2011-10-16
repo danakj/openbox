@@ -480,17 +480,12 @@ void screen_shutdown(gboolean reconfig)
 
 void screen_resize(void)
 {
-    static gint oldw = 0, oldh = 0;
     gint w, h;
     GList *it;
     gulong geometry[2];
 
     w = WidthOfScreen(ScreenOfDisplay(obt_display, ob_screen));
     h = HeightOfScreen(ScreenOfDisplay(obt_display, ob_screen));
-
-    if (w == oldw && h == oldh) return;
-
-    oldw = w; oldh = h;
 
     /* Set the _NET_DESKTOP_GEOMETRY hint */
     screen_physical_size.width = geometry[0] = w;
@@ -504,9 +499,8 @@ void screen_resize(void)
     /* this calls screen_update_areas(), which we need ! */
     dock_configure();
 
-    if (oldw)
-        for (it = client_list; it; it = g_list_next(it))
-            client_move_onscreen(it->data, FALSE);
+    for (it = client_list; it; it = g_list_next(it))
+        client_move_onscreen(it->data, FALSE);
 }
 
 void screen_set_num_desktops(guint num)

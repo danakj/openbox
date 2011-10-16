@@ -65,6 +65,8 @@ typedef struct _Rect {
 #define RECT_RIGHT(r) ((r).x + (r).width - 1)
 #define RECT_BOTTOM(r) ((r).y + (r).height - 1)
 
+#define RECT_AREA(r) ((r).width * (r).height)
+
 #define RECT_SET_POINT(r, nx, ny) \
     (r).x = (nx), (r).y = (ny)
 #define RECT_SET_SIZE(r, w, h) \

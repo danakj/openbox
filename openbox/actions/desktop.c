@@ -352,7 +352,7 @@ static gboolean i_input_func(guint initial_state,
 static gboolean i_pre_func(guint initial_state, gpointer options)
 {
     guint initial_mods = obt_keyboard_only_modmasks(initial_state);
-    if (!inital_mods) {
+    if (!initial_mods) {
         Options *o = options;
         o->interactive = FALSE;
         return FALSE;

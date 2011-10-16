@@ -1,0 +1,3 @@
+See 6f92931f843f8049d27d73937977b54d5f869499
+
+we need to make this not reset the submenudelay timer, or the submenus will never open if you move the mouse slowly across an entry. if this is already how this works, it's good with me.

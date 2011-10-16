@@ -49,7 +49,7 @@ void obt_keyboard_context_renew(ObtIC *ic);
 static XModifierKeymap *modmap;
 static KeySym *keymap;
 static gint min_keycode, max_keycode, keysyms_per_keycode;
-/* This is a bitmask of the different masks for each modifier key */
+/*! This is a bitmask of the different masks for each modifier key */
 static guchar modkeys_keys[OBT_KEYBOARD_NUM_MODKEYS];
 
 static gboolean alt_l = FALSE;
@@ -190,40 +190,20 @@ void xim_init(void)
     g_free(aname);
 }
 
-ObtModkeysKey obt_keyboard_keyevent_to_modkey(XEvent *e)
+guint obt_keyboard_keyevent_to_modmask(XEvent *e)
 {
-    KeySym sym;
+    gint i, masknum;
 
     g_return_val_if_fail(e->type == KeyPress || e->type == KeyRelease,
                          OBT_KEYBOARD_MODKEY_NONE);
 
-    XLookupString(&e->xkey, NULL, 0, &sym, NULL);
-
-    switch (sym) {
-    case XK_Num_Lock: return OBT_KEYBOARD_MODKEY_NUMLOCK;
-    case XK_Scroll_Lock: return OBT_KEYBOARD_MODKEY_SCROLLLOCK;
-    case XK_Caps_Lock: return OBT_KEYBOARD_MODKEY_SHIFT;
-    case XK_Alt_L:
-    case XK_Alt_R: return OBT_KEYBOARD_MODKEY_ALT;
-    case XK_Super_L:
-    case XK_Super_R: return OBT_KEYBOARD_MODKEY_SUPER;
-    case XK_Hyper_L:
-    case XK_Hyper_R: return OBT_KEYBOARD_MODKEY_HYPER;
-    case XK_Meta_L:
-    case XK_Meta_R: return OBT_KEYBOARD_MODKEY_META;
-    case XK_Control_L:
-    case XK_Control_R: return OBT_KEYBOARD_MODKEY_CONTROL;
-    case XK_Shift_L:
-    case XK_Shift_R: return OBT_KEYBOARD_MODKEY_SHIFT;
-    default: return OBT_KEYBOARD_MODKEY_NONE;
-    }
-}
-
-guint obt_keyboard_keyevent_to_modmask(XEvent *e)
-{
-    g_return_val_if_fail(e->type == KeyPress || e->type == KeyRelease, 0);
-
-    return obt_keyboard_modkey_to_modmask(obt_keyboard_keyevent_to_modkey(e));
+    for (masknum = 0; masknum < NUM_MASKS; ++masknum)
+        for (i = 0; i < modmap->max_keypermod; ++i) {
+            KeyCode c = modmap->modifiermap[masknum*modmap->max_keypermod + i];
+            if (c == e->xkey.keycode)
+                return 1<<masknum;
+        }
+    return 0;
 }
 
 guint obt_keyboard_only_modmasks(guint mask)

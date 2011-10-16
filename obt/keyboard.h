@@ -59,9 +59,6 @@ guint obt_keyboard_only_modmasks(guint mask);
   right keys when there are both. */
 guint obt_keyboard_modkey_to_modmask(ObtModkeysKey key);
 
-/*! Get the modifier key which was pressed or released in a keyboard event */
-ObtModkeysKey obt_keyboard_keyevent_to_modkey(XEvent *e);
-
 /*! Convert a KeySym to all the KeyCodes which generate it. */
 KeyCode* obt_keyboard_keysym_to_keycode(KeySym sym);
 

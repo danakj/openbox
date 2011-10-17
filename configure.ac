@@ -1,7 +1,9 @@
 AC_PREREQ([2.54])
 AC_INIT([openbox], [3.5.0], [http://bugzilla.icculus.org])
-AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([openbox/openbox.c])
+
+AM_INIT_AUTOMAKE([foreign])
+AM_SILENT_RULES([yes])
 
 OB_VERSION=$PACKAGE_VERSION
 AC_SUBST(OB_VERSION)

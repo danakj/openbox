@@ -1,0 +1,43 @@
+/* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
+
+   filters/visible.c for the Openbox window manager
+   Copyright (c) 2011             Dana Jansens
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   See the COPYING file for a copy of the GNU General Public License.
+*/
+
+#include "openbox/action_filter.h"
+#include "openbox/action_list_run.h"
+#include "openbox/client.h"
+#include "openbox/client_set.h"
+#include "openbox/screen.h"
+
+static gboolean test_visible(ObClient *c, gpointer data)
+{
+    return screen_compare_desktops(c->desktop, screen_desktop);
+}
+
+static ObClientSet* filter(gboolean invert, const ObActionListRun *data,
+                           gpointer setup_data)
+{
+    return client_set_expand(client_set_empty(), test_visible, NULL);
+}
+
+/*! The "visible" filter matches all clients that are visible currently
+  (including iconic windows).  In the classic paradigm this is all windows
+  visible on the current desktop.
+*/
+void filter_visible_startup(void)
+{
+    action_filter_register("visible", NULL, NULL, filter);
+}

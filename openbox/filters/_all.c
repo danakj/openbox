@@ -18,8 +18,13 @@
 
 #include "_all.h"
 
+void filter_all_startup(void);
+void filter_target_startup(void);
+void filter_visible_startup(void);
+
 void filters__all_startup(void)
 {
     filter_all_startup();
     filter_target_startup();
+    filter_visible_startup();
 }

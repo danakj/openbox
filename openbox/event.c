@@ -813,10 +813,13 @@ void event_enter_client(ObClient *client)
     g_assert(config_focus_follow);
 
     if (is_enter_focus_event_ignored(event_curserial)) {
-        ob_debug_type(OB_DEBUG_FOCUS, "Ignoring enter event with serial %lu\n"
+        ob_debug_type(OB_DEBUG_FOCUS, "Ignoring enter event with serial %lu "
                       "on client 0x%x", event_curserial, client->window);
         return;
     }
+
+    ob_debug_type(OB_DEBUG_FOCUS, "using enter event with serial %lu "
+                  "on client 0x%x", event_curserial, client->window);
 
     if (client_enter_focusable(client) && client_can_focus(client)) {
         if (config_focus_delay) {

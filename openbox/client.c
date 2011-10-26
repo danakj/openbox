@@ -218,6 +218,7 @@ void client_manage(Window window, ObPrompt *prompt)
     Time launch_time;
     guint32 user_time;
     gboolean obplaced;
+    gulong ignore_start;
 
     ob_debug("Managing window: 0x%lx", window);
 
@@ -483,19 +484,13 @@ void client_manage(Window window, ObPrompt *prompt)
     /* grab mouse bindings before showing the window */
     mouse_grab_for_client(self, TRUE);
 
+    if (!config_focus_under_mouse)
+        ignore_start = event_start_ignore_all_enters();
+
     /* this has to happen before we try focus the window, but we want it to
        happen after the client's stacking has been determined or it looks bad
     */
-    {
-        gulong ignore_start;
-        if (!config_focus_under_mouse)
-            ignore_start = event_start_ignore_all_enters();
-
-        client_show(self);
-
-        if (!config_focus_under_mouse)
-            event_end_ignore_all_enters(ignore_start);
-    }
+    client_show(self);
 
     /* activate/hilight/raise the window */
     if (try_activate) {
@@ -522,6 +517,9 @@ void client_manage(Window window, ObPrompt *prompt)
         if (!client_restore_session_stacking(self))
             stacking_raise(CLIENT_AS_WINDOW(self));
     }
+
+    if (!config_focus_under_mouse)
+        event_end_ignore_all_enters(ignore_start);
 
     /* add to client list/map */
     client_list = g_list_append(client_list, self);

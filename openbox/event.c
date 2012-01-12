@@ -700,6 +700,8 @@ static void event_process(const XEvent *ec, gpointer data)
         static guint pressed = 0;
         static Window pressed_win = None;
 
+        event_sourcetime = event_curtime;
+
         /* If the button press was on some non-root window, or was physically
            on the root window... */
         if (window != obt_root(ob_screen) ||
@@ -726,11 +728,16 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == KeyPress || e->type == KeyRelease ||
              e->type == MotionNotify)
     {
+        event_sourcetime = event_curtime;
+
         used = event_handle_user_input(client, e);
 
         if (prompt && !used)
             used = event_handle_prompt(prompt, e);
     }
+
+    /* show any debug prompts that are queued */
+    ob_debug_show_prompts();
 
     /* if something happens and it's not from an XEvent, then we don't know
        the time, so clear it here until the next event is handled */
@@ -1673,6 +1680,9 @@ static void event_handle_client(ObClient *client, XEvent *e)
             {
                 event_last_user_time = t;
             }
+        }
+        else if (msgtype == OBT_PROP_ATOM(NET_WM_WINDOW_OPACITY)) {
+            client_update_opacity(client);
         }
 #ifdef SYNC
         else if (msgtype == OBT_PROP_ATOM(NET_WM_SYNC_REQUEST_COUNTER)) {

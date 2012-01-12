@@ -49,6 +49,7 @@ struct _ObAppSettings
     gint shade;
     gint decor;
     gint focus;
+    ObPlaceMonitor monitor_type;
     gint monitor;
     gint iconic;
     gint skip_pager;

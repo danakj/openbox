@@ -616,6 +616,8 @@ void client_update_sync_request_counter(ObClient *self);
 #endif
 /*! Updates the window's colormap */
 void client_update_colormap(ObClient *self, Colormap colormap);
+/*! Updates the requested opacity for the window from the client. */
+void client_update_opacity(ObClient *self);
 /*! Updates the WMNormalHints and adjusts things if they change */
 void client_update_normal_hints(ObClient *self);
 

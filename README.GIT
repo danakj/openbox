@@ -3,7 +3,7 @@ To build Openbox from git you need:
 A C Compiler (GNU GCC 3.2+ suggested)
 -GNU Gettext 0.14.4
 -GNU Autoconf 2.50+
--GNU Automake 1.9 (no more, no less)
+-GNU Automake 1.11+
 -GNU Libtool
 -Xlib library/headers (devel package)
 -Pkg-Config

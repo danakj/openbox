@@ -226,7 +226,7 @@
 <mouse>
   <dragThreshold>8</dragThreshold>
   <!-- number of pixels the mouse must move before a drag begins -->
-  <doubleClickTime>200</doubleClickTime>
+  <doubleClickTime>500</doubleClickTime>
   <!-- in milliseconds (1000 = 1 second) -->
 
   <context name="Frame">

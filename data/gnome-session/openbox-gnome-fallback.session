@@ -1,0 +1,6 @@
+[GNOME Session]
+Name=GNOME/Openbox fallback (Safe Mode)
+RequiredComponents=gnome-settings-daemon;
+RequiredProviders=windowmanager;
+DefaultProvider-windowmanager=openbox
+DesktopName=GNOME

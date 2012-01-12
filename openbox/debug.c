@@ -38,6 +38,8 @@ static guint     rr_handler_id = 0;
 static guint     obt_handler_id = 0;
 static guint     ob_handler_id = 0;
 static guint     ob_handler_prompt_id = 0;
+static GList    *prompt_queue = NULL;
+static gboolean  allow_prompts = TRUE;
 
 static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
                         const gchar *message, gpointer user_data);
@@ -134,8 +136,8 @@ static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
 static void prompt_handler(const gchar *log_domain, GLogLevelFlags log_level,
                            const gchar *message, gpointer data)
 {
-    if (ob_state() == OB_STATE_RUNNING)
-        prompt_show_message(message, "Openbox", _("Close"));
+    if (ob_state() == OB_STATE_RUNNING && allow_prompts)
+        prompt_queue = g_list_prepend(prompt_queue, g_strdup(message));
     else
         log_handler(log_domain, log_level, message, data);
 }
@@ -178,10 +180,26 @@ void ob_debug(const gchar *a, ...)
 }
 
 void ob_debug_type(ObDebugType type, const gchar *a, ...)
+<<<<<<< HEAD
+=======
 {
     va_list vl;
 
     va_start(vl, a);
     log_argv(type, a, vl);
     va_end(vl);
+}
+
+void ob_debug_show_prompts(void)
+>>>>>>> master
+{
+    if (prompt_queue) {
+        allow_prompts = FALSE; /* avoid recursive prompts */
+        while (prompt_queue) {
+            prompt_show_message(prompt_queue->data, "Openbox", _("Close"));
+            g_free(prompt_queue->data);
+            prompt_queue = g_list_delete_link(prompt_queue, prompt_queue);
+        }
+        allow_prompts = TRUE;
+    }
 }

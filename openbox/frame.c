@@ -348,7 +348,8 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         self->shaded = self->client->shaded;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER)
-            self->bwidth = ob_rr_theme->fbwidth;
+            self->bwidth = self->client->undecorated ?
+                ob_rr_theme->ubwidth : ob_rr_theme->fbwidth;
         else
             self->bwidth = 0;
 

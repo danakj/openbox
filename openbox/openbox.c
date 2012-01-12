@@ -515,9 +515,9 @@ static void print_version(void)
 {
     g_print("Openbox %s\n", PACKAGE_VERSION);
     g_print(_("Copyright (c)"));
-    g_print(" 2008        Mikael Magnusson\n");
+    g_print(" 2008-2011   Mikael Magnusson\n");
     g_print(_("Copyright (c)"));
-    g_print(" 2003-2006   Dana Jansens\n\n");
+    g_print(" 2003-2011   Dana Jansens\n\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
@@ -577,7 +577,7 @@ static void run_startup_cmd(void)
                        G_SPAWN_SEARCH_PATH |
                        G_SPAWN_DO_NOT_REAP_CHILD,
                        NULL, NULL, NULL, &e);
-    if (!g_shell_parse_argv(startup_cmd, NULL, &argv, &e)) {
+    if (!ok) {
         g_message("Error launching startup command: %s",
                   e->message);
         g_error_free(e);

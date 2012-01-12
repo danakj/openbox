@@ -82,9 +82,13 @@ void framerender_frame(ObFrame *self)
         XSetWindowBackground(obt_display, self->innerbrb, px);
         XClearWindow(obt_display, self->innerbrb);
 
-        px = (self->focused ?
-              RrColorPixel(ob_rr_theme->frame_focused_border_color) :
-              RrColorPixel(ob_rr_theme->frame_unfocused_border_color));
+        px = RrColorPixel(self->focused ?
+            (self->client->undecorated ?
+             ob_rr_theme->frame_undecorated_focused_border_color :
+             ob_rr_theme->frame_focused_border_color) :
+            (self->client->undecorated ?
+             ob_rr_theme->frame_undecorated_unfocused_border_color :
+             ob_rr_theme->frame_unfocused_border_color));
 
         XSetWindowBackground(obt_display, self->left, px);
         XClearWindow(obt_display, self->left);

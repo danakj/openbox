@@ -1,4 +1,6 @@
 TAGS
+tags
+*/tags
 ABOUT-NLS
 Makefile
 Makefile.in
@@ -28,6 +30,7 @@ ltmain.sh
 m4/*.m4
 *.o
 *.orig
+*.rej
 *.lo
 *.la
 missing

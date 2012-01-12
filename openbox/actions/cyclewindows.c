@@ -75,6 +75,8 @@ static gpointer setup_func(xmlNodePtr node,
     if ((n = obt_xml_find_node(node, "dialog"))) {
         if (obt_xml_node_contains(n, "none"))
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
+        else if (obt_xml_node_contains(n, "no"))
+            o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_NONE;
         else if (obt_xml_node_contains(n, "icons"))
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }

@@ -39,4 +39,6 @@ void ob_debug_type(ObDebugType type, const gchar *a, ...);
 
 void ob_debug_enable(ObDebugType type, gboolean enable);
 
+void ob_debug_show_prompts(void);
+
 #endif

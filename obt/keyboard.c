@@ -389,12 +389,11 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev)
 KeySym obt_keyboard_keypress_to_keysym(XEvent *ev)
 {
     KeySym sym;
-    gint r;
 
     g_return_val_if_fail(ev->type == KeyPress, None);
 
     sym = None;
-    r = XLookupString(&ev->xkey, NULL, 0, &sym, NULL);
+    XLookupString(&ev->xkey, NULL, 0, &sym, NULL);
     return sym;
 }
 

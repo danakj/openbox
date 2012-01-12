@@ -180,8 +180,6 @@ void ob_debug(const gchar *a, ...)
 }
 
 void ob_debug_type(ObDebugType type, const gchar *a, ...)
-<<<<<<< HEAD
-=======
 {
     va_list vl;
 
@@ -191,7 +189,6 @@ void ob_debug_type(ObDebugType type, const gchar *a, ...)
 }
 
 void ob_debug_show_prompts(void)
->>>>>>> master
 {
     if (prompt_queue) {
         allow_prompts = FALSE; /* avoid recursive prompts */

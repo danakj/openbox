@@ -2709,23 +2709,12 @@ void client_calc_layer(ObClient *self)
 
 gboolean client_should_show(ObClient *self)
 {
-<<<<<<< HEAD
-    GSList *sit;
-    
-=======
->>>>>>> master
     if (self->iconic)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop)
         return FALSE;
     if (screen_desktop_is_visible(self->desktop, TRUE))
         return TRUE;
-    /* if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL) */
-        /* return TRUE; */
-/*  */
-    /* for (sit = screen_visible_desktops; sit; sit = g_slist_next(sit)) */
-        /* if (self->desktop == sit->data) */
-            /* return TRUE; */
 
     return FALSE;
 }
@@ -4167,12 +4156,7 @@ static void client_bring_windows_recursive(ObClient *self,
 
     if (((helpers && client_helper(self)) ||
          (modals && self->modal)) &&
-<<<<<<< HEAD
-        /* ((self->desktop != desktop && self->desktop != DESKTOP_ALL) || */
         (!screen_desktop_is_visible(self->desktop, TRUE) ||
-=======
-        (!screen_compare_desktops(self->desktop, desktop) ||
->>>>>>> master
          (iconic && self->iconic)))
     {
         if (iconic && self->iconic)

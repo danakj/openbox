@@ -153,7 +153,6 @@ typedef enum {
     OBT_PROP_NET_WM_USER_TIME,
 /*  OBT_PROP_NET_WM_USER_TIME_WINDOW, */
     OBT_PROP_NET_FRAME_EXTENTS,
-    OBT_PROP_NET_WM_WINDOW_OPACITY, /* non-standard */
 
     /* application protocols */
     OBT_PROP_NET_WM_PING,

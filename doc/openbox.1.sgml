@@ -106,19 +106,26 @@ manpage.1: manpage.sgml
       <varlistentry>
         <term><option>--help</option></term>
         <listitem>
-          <para>Show a summary of the options available.</para>
+          <para>Show a summary of the command line options available
+            and exit.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term><option>--version</option></term>
         <listitem>
-          <para>Show the version of the program.</para>
+          <para>Show the version of the program and exit.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term><option>--replace</option></term>
         <listitem>
           <para>Replace the currently running window manager.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--config-file FILE</option></term>
+        <listitem>
+          <para>Specify the path to the config file to use.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -137,6 +144,12 @@ manpage.1: manpage.sgml
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>--exit</option></term>
+        <listitem>
+          <para>Exit Openbox.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>--sm-disable</option></term>
         <listitem>
           <para>Do not connect to the session manager.</para>
@@ -149,6 +162,12 @@ manpage.1: manpage.sgml
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>--startup CMD</option></term>
+        <listitem>
+          <para>Run CMD after starting.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>--debug</option></term>
         <listitem>
           <para>Display debugging output.</para>
@@ -158,6 +177,12 @@ manpage.1: manpage.sgml
         <term><option>--debug-focus</option></term>
         <listitem>
           <para>Display debugging output for focus handling.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--debug-session</option></term>
+        <listitem>
+          <para>Display debugging output for session management.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

@@ -1495,7 +1495,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
             }
             else if ((Atom)e->xclient.data.l[2] ==
                      OBT_PROP_ATOM(NET_WM_MOVERESIZE_CANCEL))
-                moveresize_end(TRUE);
+                if (moveresize_client)
+                    moveresize_end(TRUE);
         } else if (msgtype == OBT_PROP_ATOM(NET_MOVERESIZE_WINDOW)) {
             gint ograv, x, y, w, h;
 

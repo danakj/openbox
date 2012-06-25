@@ -326,6 +326,16 @@ void moveresize_end(gboolean cancel)
 #endif
     }
 
+    if (!moveresize_client) {
+        ob_debug("moveresize_end: moveresize_client is NULL!");
+        return;
+    }
+
+    if (!moveresize_in_progress) {
+        ob_debug("moveresize_end: moveresize_in_progress is FALSE!");
+        return;
+    }
+
     /* don't use client_move() here, use the same width/height as
        we've been using during the move, otherwise we get different results
        when moving maximized windows between monitors of different sizes !

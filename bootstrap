@@ -4,7 +4,7 @@ sh() {
   /bin/sh -c "set -x; $*"
 }
 
-export WANT_AUTOMAKE=1.9
+export WANT_AUTOMAKE=1.11
 
 sh autopoint --force || exit 1 # for GNU gettext
 sh libtoolize --copy --force --automake || exit 1

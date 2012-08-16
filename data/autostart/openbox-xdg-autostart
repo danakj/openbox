@@ -29,7 +29,7 @@ try:
     from xdg.Exceptions import ParsingError
 except ImportError:
     print
-    print "ERROR:", ME, "requires PyXDG to be installed"
+    print >>sys.stderr, "ERROR:", ME, "requires PyXDG to be installed"
     print
     sys.exit(1)
 

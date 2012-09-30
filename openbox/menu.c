@@ -279,7 +279,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
         /* Don't try to extract "icon" attribute if icons in user-defined
            menus are not enabled. */
 
-        if (obt_xml_attr_string(node, "label", &label)) {
+        if (obt_xml_attr_string_unstripped(node, "label", &label)) {
             xmlNodePtr c;
             GSList *acts = NULL;
 
@@ -314,7 +314,7 @@ static void parse_menu_separator(xmlNodePtr node, gpointer data)
     if (state->parent) {
         gchar *label;
 
-        if (!obt_xml_attr_string(node, "label", &label))
+        if (!obt_xml_attr_string_unstripped(node, "label", &label))
             label = NULL;
 
         menu_add_separator(state->parent, -1, label);
@@ -334,7 +334,7 @@ static void parse_menu(xmlNodePtr node, gpointer data)
         goto parse_menu_fail;
 
     if (!g_hash_table_lookup(menu_hash, name)) {
-        if (!obt_xml_attr_string(node, "label", &title))
+        if (!obt_xml_attr_string_unstripped(node, "label", &title))
             goto parse_menu_fail;
 
         if ((menu = menu_new(name, title, TRUE, NULL))) {

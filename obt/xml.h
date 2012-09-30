@@ -72,12 +72,15 @@ void obt_xml_tree_from_root(ObtXmlInst *i);
 xmlNodePtr obt_xml_find_node   (xmlNodePtr node, const gchar *name);
 
 gboolean obt_xml_node_contains (xmlNodePtr node, const gchar *val);
+gchar   *obt_xml_node_string_unstripped(xmlNodePtr node);
 gchar   *obt_xml_node_string   (xmlNodePtr node);
 gint     obt_xml_node_int      (xmlNodePtr node);
 gboolean obt_xml_node_bool     (xmlNodePtr node);
 
 gboolean obt_xml_attr_contains (xmlNodePtr node, const gchar *name,
                                 const gchar *val);
+gboolean obt_xml_attr_string_unstripped(xmlNodePtr node, const gchar *name,
+                                        gchar **value);
 gboolean obt_xml_attr_string   (xmlNodePtr node, const gchar *name,
                                 gchar **value);
 gboolean obt_xml_attr_int      (xmlNodePtr node, const gchar *name,

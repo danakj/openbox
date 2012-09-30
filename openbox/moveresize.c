@@ -630,6 +630,10 @@ static void do_edge_warp(gint x, gint y)
 
     for (i = 0; i < screen_num_monitors; ++i) {
         const Rect *a = screen_physical_area_monitor(i);
+
+        if (!RECT_CONTAINS(*a, x, y))
+            continue;
+
         if (x == RECT_LEFT(*a)) dir = OB_DIRECTION_WEST;
         if (x == RECT_RIGHT(*a)) dir = OB_DIRECTION_EAST;
         if (y == RECT_TOP(*a)) dir = OB_DIRECTION_NORTH;

@@ -595,7 +595,7 @@ static void prompt_run_callback(ObPrompt *self, gint result)
 {
     prompt_ref(self);
     if (self->func) {
-        gboolean clean = self->func(self, self->focus->result, self->data);
+        gboolean clean = self->func(self, result, self->data);
         if (clean && self->cleanup)
             self->cleanup(self, self->data);
     }

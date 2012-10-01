@@ -1224,12 +1224,14 @@ static void client_get_all(ObClient *self, gboolean real)
        from per-app settings */
     client_get_session_ids(self);
 
-    /* now we got everything that can affect the decorations */
+    /* get this early so we have it for debugging, also this can be used
+     by app rule matching */
+    client_update_title(self);
+
+    /* now we got everything that can affect the decorations or app rule
+       matching */
     if (!real)
         return;
-
-    /* get this early so we have it for debugging */
-    client_update_title(self);
 
     /* save the values of the variables used for app rule matching */
     client_save_app_rule_values(self);

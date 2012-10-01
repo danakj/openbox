@@ -33,6 +33,7 @@ void action_execute_startup(void)
 {
     actions_register("Execute", setup_func, free_func, run_func);
     actions_set_shutdown("Execute", shutdown_func);
+    actions_set_modifies_focused_window("Execute", FALSE);
 
     client_add_destroy_notify(client_dest, NULL);
 }

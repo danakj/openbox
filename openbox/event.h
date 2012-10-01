@@ -26,7 +26,7 @@ struct _ObClient;
 
 /*! The amount of time before a window appears that is checked for user input
     to determine if the user is working in another window */
-#define OB_EVENT_USER_TIME_DELAY (1000) /* 1.0 seconds */
+#define OB_EVENT_USER_TIME_DELAY (1000) /* milliseconds */
 
 /*! The last user-interaction time, as given by the clients */
 extern Time event_last_user_time;

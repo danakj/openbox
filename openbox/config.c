@@ -26,7 +26,6 @@
 #include "screen.h"
 #include "openbox.h"
 #include "gettext.h"
-#include "place.h"
 #include "obt/paths.h"
 
 gboolean config_focus_new;

@@ -2,11 +2,11 @@
 
 # Set a background color
 BG=""
-if which hsetroot >/dev/null; then
+if which hsetroot >/dev/null 2>/dev/null; then
   BG=hsetroot
-elif which esetroot >/dev/null; then
+elif which esetroot >/dev/null 2>/dev/null; then
   BG=esetroot
-elif which xsetroot >/dev/null; then
+elif which xsetroot >/dev/null 2>/dev/null; then
   BG=xsetroot
 fi
 test -z $BG || $BG -solid "#303030"

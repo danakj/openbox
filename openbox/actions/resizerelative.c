@@ -78,17 +78,26 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         if (o->bottom_denom)
             bottom = bottom * c->area.height / o->bottom_denom;
 
+        if (left && ABS(left) < c->size_inc.width)
+            left = left < 0 ? -c->size_inc.width : c->size_inc.width;
+        if (right && ABS(right) < c->size_inc.width)
+            right = right < 0 ? -c->size_inc.width : c->size_inc.width;
+        if (top && ABS(top) < c->size_inc.height)
+            top = top < 0 ? -c->size_inc.height : c->size_inc.height;
+        if (bottom && ABS(bottom) < c->size_inc.height)
+            bottom = bottom < 0 ? -c->size_inc.height : c->size_inc.height;
+
         // When resizing, if the resize has a non-zero value then make sure it
         // is at least as big as the size increment so the window does actually
         // resize.
         x = c->area.x;
         y = c->area.y;
         ow = c->area.width;
-        xoff = -MAX(left, (left ? c->size_inc.width : 0));
-        nw = ow + MAX(right + left, (right + left ? c->size_inc.width : 0));
+        xoff = -left;
+        nw = ow + right + left;
         oh = c->area.height;
-        yoff = -MAX(top, (top ? c->size_inc.height : 0));
-        nh = oh + MAX(bottom + top, (bottom + top ? c->size_inc.height : 0));
+        yoff = -top;
+        nh = oh + bottom + top;
 
         client_try_configure(c, &x, &y, &nw, &nh, &lw, &lh, TRUE);
         xoff = xoff == 0 ? 0 :

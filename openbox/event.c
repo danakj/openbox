@@ -698,7 +698,6 @@ static void event_process(const XEvent *ec, gpointer data)
     if (e->type == ButtonPress || e->type == ButtonRelease) {
         ObWindow *w;
         static guint pressed = 0;
-        static Window pressed_win = None;
 
         event_sourcetime = event_curtime;
 
@@ -719,10 +718,8 @@ static void event_process(const XEvent *ec, gpointer data)
             if (prompt && !used)
                 used = event_handle_prompt(prompt, e);
 
-            if (e->type == ButtonPress) {
+            if (e->type == ButtonPress)
                 pressed = e->xbutton.button;
-                pressed_win = e->xbutton.subwindow;
-            }
         }
     }
     else if (e->type == KeyPress || e->type == KeyRelease ||

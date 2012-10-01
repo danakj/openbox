@@ -28,8 +28,7 @@ struct _ObAppSettings;
 typedef enum
 {
     OB_PLACE_POLICY_SMART,
-    OB_PLACE_POLICY_MOUSE,
-    OB_PLACE_POLICY_LEASTOVERLAP,
+    OB_PLACE_POLICY_MOUSE
 } ObPlacePolicy;
 
 typedef enum

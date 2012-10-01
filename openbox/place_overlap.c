@@ -18,25 +18,26 @@
 
 #include "config.h"
 #include "geom.h"
-#include "overlap.h"
+#include "place_overlap.h"
 
 #include <stdlib.h>
 
-static void
-make_grid(const Rect* client_rects, int n_client_rects, const Rect* bound,
-          int* x_edges, int* y_edges, int max_edges);
+static void make_grid(const Rect* client_rects, int n_client_rects,
+                      const Rect* bound, int* x_edges, int* y_edges,
+                      int max_edges);
 
-static int
-best_direction(const Point* grid_point,
-               const Rect* client_rects, int n_client_rects,
-               const Rect* bound, const Size* req_size, Point* best_top_left);
+static int best_direction(const Point* grid_point,
+                          const Rect* client_rects, int n_client_rects,
+                          const Rect* bound, const Size* req_size,
+                          Point* best_top_left);
 
 /* Choose the placement on a grid with least overlap */
 
-void
-overlap_find_least_placement(const Rect* client_rects, int n_client_rects,
-                             Rect *const bound,
-                             const Size* req_size, Point* result)
+void place_overlap_find_least_placement(const Rect* client_rects,
+                                        int n_client_rects,
+                                        Rect *const bound,
+                                        const Size* req_size,
+                                        Point* result)
 {
     result->x = result->y = 0;
     int overlap = G_MAXINT;
@@ -94,9 +95,9 @@ static void uniquify(int* edges, int n_edges)
         edges[i] = G_MAXINT;
 }
 
-static void
-make_grid(const Rect* client_rects, int n_client_rects, const Rect* bound,
-          int* x_edges, int* y_edges, int max_edges)
+static void make_grid(const Rect* client_rects, int n_client_rects,
+                      const Rect* bound, int* x_edges, int* y_edges,
+                      int max_edges)
 {
     int i;
     int n_edges = 0;
@@ -136,17 +137,17 @@ static int total_overlap(const Rect* client_rects, int n_client_rects,
 }
 
 /* Given a list of Rect RECTS, a Point PT and a Size size, determine the
- * direction from PT which results in the least total overlap with RECTS
- * if a rectangle is placed in that direction.  Return the top/left
- * Point of such rectangle and the resulting overlap amount.  Only
- * consider placements within BOUNDS. */
+   direction from PT which results in the least total overlap with RECTS
+   if a rectangle is placed in that direction.  Return the top/left
+   Point of such rectangle and the resulting overlap amount.  Only
+   consider placements within BOUNDS. */
 
 #define NUM_DIRECTIONS 4
 
-static int
-best_direction(const Point* grid_point,
-               const Rect* client_rects, int n_client_rects,
-               const Rect* bound, const Size* req_size, Point* best_top_left)
+static int best_direction(const Point* grid_point,
+                          const Rect* client_rects, int n_client_rects,
+                          const Rect* bound, const Size* req_size,
+                          Point* best_top_left)
 {
     static const Size directions[NUM_DIRECTIONS] = {
         {0, 0}, {0, -1}, {-1, 0}, {-1, -1}
@@ -159,8 +160,7 @@ best_direction(const Point* grid_point,
             .y = grid_point->y + (req_size->height * directions[i].height)
         };
         Rect r;
-        RECT_SET_POINT(r, pt.x, pt.y);
-        RECT_SET_SIZE(r, req_size->width, req_size->height);
+        RECT_SET(r, pt.x, pt.y, req_size->width, req_size->height);
         if (!RECT_CONTAINS_RECT(*bound, r))
             continue;
         int this_overlap = total_overlap(client_rects, n_client_rects, &r);

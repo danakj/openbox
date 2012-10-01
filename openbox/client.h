@@ -363,6 +363,10 @@ gboolean client_normal(ObClient *self);
   (utilty, menu, etc) */
 gboolean client_helper(ObClient *self);
 
+/*! Returns true if the window occupies space in the monitor conceptually, or
+  false if it does not and its presence should be ignored when possible. */
+gboolean client_occupies_space(ObClient *self);
+
 /*! Return if the client is a type which should be given focus from mouse
   presses on the *client* window. This doesn't affect clicking on the
   decorations. This doesn't count for focus cycling, different rules apply to

@@ -2774,6 +2774,12 @@ gboolean client_helper(ObClient *self)
             self->type == OB_CLIENT_TYPE_TOOLBAR);
 }
 
+gboolean client_occupies_space(ObClient *self)
+{
+    return !(self->type == OB_CLIENT_TYPE_DESKTOP ||
+             self->type == OB_CLIENT_TYPE_SPLASH);
+}
+
 gboolean client_mouse_focusable(ObClient *self)
 {
     return !(self->type == OB_CLIENT_TYPE_MENU ||

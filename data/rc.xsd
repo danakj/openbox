@@ -511,7 +511,6 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="Smart"/>
             <xsd:enumeration value="UnderMouse"/>
-            <xsd:enumeration value="LeastOverlap"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="placementmonitor">

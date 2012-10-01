@@ -18,7 +18,8 @@
 
 #include "geom.h"
 
-void
-overlap_find_least_placement(const Rect* client_rects, int n_client_rects,
-                             Rect *const bounds, const Size* req_size,
-                             Point* result);
+void place_overlap_find_least_placement(const Rect* client_rects,
+                                        int n_client_rects,
+                                        Rect *const bounds,
+                                        const Size* req_size,
+                                        Point* result);

@@ -25,7 +25,7 @@
 #include "config.h"
 #include "dock.h"
 #include "debug.h"
-#include "overlap.h"
+#include "place_overlap.h"
 
 extern ObDock *dock;
 
@@ -256,203 +256,6 @@ static Rect *pick_head(ObClient *c, gboolean foreground,
     return area;
 }
 
-static gboolean place_random(ObClient *client, Rect *area, gint *x, gint *y)
-{
-    gint l, r, t, b;
-
-    ob_debug("placing randomly");
-
-    l = area->x;
-    t = area->y;
-    r = area->x + area->width - client->frame->area.width;
-    b = area->y + area->height - client->frame->area.height;
-
-    if (r > l) *x = g_random_int_range(l, r + 1);
-    else       *x = area->x;
-    if (b > t) *y = g_random_int_range(t, b + 1);
-    else       *y = area->y;
-
-    return TRUE;
-}
-
-static GSList* area_add(GSList *list, Rect *a)
-{
-    Rect *r = g_slice_new(Rect);
-    *r = *a;
-    return g_slist_prepend(list, r);
-}
-
-static GSList* area_remove(GSList *list, Rect *a)
-{
-    GSList *sit;
-    GSList *result = NULL;
-
-    for (sit = list; sit; sit = g_slist_next(sit)) {
-        Rect *r = sit->data;
-
-        if (!RECT_INTERSECTS_RECT(*r, *a)) {
-            result = g_slist_prepend(result, r);
-            /* dont free r, it's moved to the result list */
-        } else {
-            Rect isect, extra;
-
-            /* Use an intersection of a and r to determine the space
-               around r that we can use.
-
-               NOTE: the spaces calculated can overlap.
-            */
-
-            RECT_SET_INTERSECTION(isect, *r, *a);
-
-            if (RECT_LEFT(isect) > RECT_LEFT(*r)) {
-                RECT_SET(extra, r->x, r->y,
-                         RECT_LEFT(isect) - r->x, r->height);
-                result = area_add(result, &extra);
-            }
-
-            if (RECT_TOP(isect) > RECT_TOP(*r)) {
-                RECT_SET(extra, r->x, r->y,
-                         r->width, RECT_TOP(isect) - r->y + 1);
-                result = area_add(result, &extra);
-            }
-
-            if (RECT_RIGHT(isect) < RECT_RIGHT(*r)) {
-                RECT_SET(extra, RECT_RIGHT(isect) + 1, r->y,
-                         RECT_RIGHT(*r) - RECT_RIGHT(isect), r->height);
-                result = area_add(result, &extra);
-            }
-
-            if (RECT_BOTTOM(isect) < RECT_BOTTOM(*r)) {
-                RECT_SET(extra, r->x, RECT_BOTTOM(isect) + 1,
-                         r->width, RECT_BOTTOM(*r) - RECT_BOTTOM(isect));
-                result = area_add(result, &extra);
-            }
-
-            /* 'r' is not being added to the result list, so free it */
-            g_slice_free(Rect, r);
-        }
-    }
-    g_slist_free(list);
-    return result;
-}
-
-enum {
-    IGNORE_FULLSCREEN = 1,
-    IGNORE_MAXIMIZED  = 2,
-    IGNORE_MENUTOOL   = 3,
-    /*IGNORE_SHADED     = 3,*/
-    IGNORE_NONGROUP   = 4,
-    IGNORE_BELOW      = 5,
-    /*IGNORE_NONFOCUS   = 1 << 5,*/
-    IGNORE_DOCK       = 6,
-    IGNORE_END        = 7
-};
-
-static gboolean place_nooverlap(ObClient *c, Rect *area, gint *x, gint *y)
-{
-    gint ignore;
-    gboolean ret;
-    gint maxsize;
-    GSList *spaces = NULL, *sit, *maxit;
-
-    ob_debug("placing nonoverlap");
-
-    ret = FALSE;
-    maxsize = 0;
-    maxit = NULL;
-
-    /* try ignoring different things to find empty space */
-    for (ignore = 0; ignore < IGNORE_END && !ret; ignore++) {
-        GList *it;
-
-        /* add the whole monitor */
-        spaces = area_add(spaces, area);
-
-        /* go thru all the windows */
-        for (it = client_list; it; it = g_list_next(it)) {
-            ObClient *test = it->data;
-
-            /* should we ignore this client? */
-            if (screen_showing_desktop) continue;
-            if (c == test) continue;
-            if (test->iconic) continue;
-            if (c->desktop != DESKTOP_ALL) {
-                if (test->desktop != c->desktop &&
-                    test->desktop != DESKTOP_ALL) continue;
-            } else {
-                if (test->desktop != screen_desktop &&
-                    test->desktop != DESKTOP_ALL) continue;
-            }
-            if (test->type == OB_CLIENT_TYPE_SPLASH ||
-                test->type == OB_CLIENT_TYPE_DESKTOP) continue;
-
-
-            if ((ignore >= IGNORE_FULLSCREEN) &&
-                test->fullscreen) continue;
-            if ((ignore >= IGNORE_MAXIMIZED) &&
-                test->max_horz && test->max_vert) continue;
-            if ((ignore >= IGNORE_MENUTOOL) &&
-                (test->type == OB_CLIENT_TYPE_MENU ||
-                 test->type == OB_CLIENT_TYPE_TOOLBAR) &&
-                client_has_parent(c)) continue;
-            /*
-              if ((ignore >= IGNORE_SHADED) &&
-              test->shaded) continue;
-            */
-            if ((ignore >= IGNORE_NONGROUP) &&
-                client_has_group_siblings(c) &&
-                test->group != c->group) continue;
-            if ((ignore >= IGNORE_BELOW) &&
-                test->layer < c->layer) continue;
-            /*
-              if ((ignore >= IGNORE_NONFOCUS) &&
-              focus_client != test) continue;
-            */
-            /* don't ignore this window, so remove it from the available
-               area */
-            spaces = area_remove(spaces, &test->frame->area);
-        }
-
-        if (ignore < IGNORE_DOCK) {
-            Rect a;
-            dock_get_area(&a);
-            spaces = area_remove(spaces, &a);
-        }
-
-        for (sit = spaces; sit; sit = g_slist_next(sit)) {
-            Rect *r = sit->data;
-
-            if (r->width >= c->frame->area.width &&
-                r->height >= c->frame->area.height &&
-                r->width * r->height > maxsize)
-            {
-                maxsize = r->width * r->height;
-                maxit = sit;
-            }
-        }
-
-        if (maxit) {
-            Rect *r = maxit->data;
-
-            /* center it in the area */
-            *x = r->x;
-            *y = r->y;
-            if (config_place_center) {
-                *x += (r->width - c->frame->area.width) / 2;
-                *y += (r->height - c->frame->area.height) / 2;
-            }
-            ret = TRUE;
-        }
-
-        while (spaces) {
-            g_slice_free(Rect, spaces->data);
-            spaces = g_slist_delete_link(spaces, spaces);
-        }
-    }
-
-    return ret;
-}
-
 static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 {
     gint l, r, t, b;
@@ -559,50 +362,55 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     return FALSE;
 }
 
-static gboolean place_least_overlap(ObClient *c, gint *x, gint *y, Rect * const head)
+static gboolean place_least_overlap(ObClient *c, Rect * const head,
+                                    gint *x, gint *y)
 {
-    /* assemble the list of "interesting" windows to calculate overlap against */
-    GSList* interesting_clients = NULL;
+    /* Assemble the list of windows that could overlap with @c in the user's
+       current view. */
+    GSList* potential_overlap_clients = NULL;
     int n_client_rects = 0;
 
     /* if we're "showing desktop", ignore all existing windows */
     if (!screen_showing_desktop) {
         GList* it;
         for (it = client_list; it != NULL; it = g_list_next(it)) {
-            ObClient* maybe_client = (ObClient*) it->data;
+            ObClient* maybe_client = (ObClient*)it->data;
             if (maybe_client == c)
                 continue;
             if (maybe_client->iconic)
                 continue;
+            if (!client_occupies_space(maybe_client))
+                continue;
             if (c->desktop != DESKTOP_ALL) {
                 if (maybe_client->desktop != c->desktop &&
-                    maybe_client->desktop != DESKTOP_ALL) continue;
+                    maybe_client->desktop != DESKTOP_ALL)
+                    continue;
             } else {
                 if (maybe_client->desktop != screen_desktop &&
-                    maybe_client->desktop != DESKTOP_ALL) continue;
+                    maybe_client->desktop != DESKTOP_ALL)
+                    continue;
             }
-            if (maybe_client->type == OB_CLIENT_TYPE_SPLASH ||
-                maybe_client->type == OB_CLIENT_TYPE_DESKTOP) continue;
-            /* it is interesting, so add it */
-            interesting_clients = g_slist_prepend(interesting_clients, maybe_client);
+
+            potential_overlap_clients = g_slist_prepend(
+                potential_overlap_clients, maybe_client);
             n_client_rects += 1;
         }
     }
     Rect client_rects[n_client_rects];
     GSList* it;
     unsigned int i = 0;
-    for (it = interesting_clients; it != NULL; it = g_slist_next(it)) {
-        ObClient* interesting_client = (ObClient*) it->data;
-        client_rects[i] = interesting_client->frame->area;
+    for (it = potential_overlap_clients; it != NULL; it = g_slist_next(it)) {
+        ObClient* potential_overlap_client = (ObClient*)it->data;
+        client_rects[i] = potential_overlap_client->frame->area;
         i += 1;
     }
-    g_slist_free(interesting_clients);
+    g_slist_free(potential_overlap_clients);
 
     Point result;
     Size req_size;
     SIZE_SET(req_size, c->frame->area.width, c->frame->area.height);
-    overlap_find_least_placement(client_rects, n_client_rects, head,
-                                 &req_size, &result);
+    place_overlap_find_least_placement(client_rects, n_client_rects, head,
+                                       &req_size, &result);
     *x = result.x;
     *y = result.y;
 
@@ -630,12 +438,9 @@ gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
     /* try a number of methods */
     ret = place_per_app_setting(client, area, x, y, settings) ||
         place_transient_splash(client, area, x, y) ||
-        (config_place_policy == OB_PLACE_POLICY_MOUSE
-            && place_under_mouse  (client, x, y)) ||
-        (config_place_policy == OB_PLACE_POLICY_LEASTOVERLAP
-            && place_least_overlap(client, x, y, area)) ||
-        place_nooverlap(client, area, x, y) ||
-        place_random(client, area, x, y);
+        (config_place_policy == OB_PLACE_POLICY_MOUSE &&
+         place_under_mouse(client, x, y)) ||
+        place_least_overlap(client, area, x, y);
     g_assert(ret);
 
     g_slice_free(Rect, area);

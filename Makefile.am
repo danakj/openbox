@@ -282,12 +282,12 @@ openbox_openbox_SOURCES = \
 	openbox/mwm.h \
 	openbox/openbox.c \
 	openbox/openbox.h \
-	openbox/overlap.c \
-	openbox/overlap.h \
 	openbox/ping.c \
 	openbox/ping.h \
 	openbox/place.c \
 	openbox/place.h \
+	openbox/place_overlap.c \
+	openbox/place_overlap.h \
 	openbox/prompt.c \
 	openbox/prompt.h \
 	openbox/popup.c \

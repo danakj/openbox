@@ -1,8 +1,7 @@
 [Desktop Entry]
-Encoding=UTF-8
 Name=GNOME/Openbox
 Comment=Use the Openbox window manager inside of the GNOME desktop environment
 Exec=@bindir@/openbox-gnome-session
 TryExec=gnome-session
-Icon=openbox.png
-Type=XSession
+Icon=openbox
+Type=Application

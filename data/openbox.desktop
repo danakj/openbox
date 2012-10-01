@@ -1,6 +1,5 @@
 [Desktop Entry]
 Type=Application
-Encoding=UTF-8
 Name=Openbox
 Exec=openbox
 Icon=openbox

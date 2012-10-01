@@ -127,6 +127,10 @@ struct _ObClient
     gchar *class;
     /*! The specified role of the window, used for identification */
     gchar *role;
+    /*! The application that created the window's group. */
+    gchar *group_name;
+    /*! The class of the window's group, can used for grouping */
+    gchar *group_class;
     /*! The session client id for the window. *This can be NULL!* */
     gchar *sm_client_id;
 

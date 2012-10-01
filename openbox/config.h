@@ -38,6 +38,8 @@ struct _ObAppSettings
     GPatternSpec *class;
     GPatternSpec *name;
     GPatternSpec *role;
+    GPatternSpec *group_class;
+    GPatternSpec *group_name;
     GPatternSpec *title;
     ObClientType  type;
 

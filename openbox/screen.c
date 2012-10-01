@@ -305,6 +305,8 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(OB_APP_TITLE);
     supported[i++] = OBT_PROP_ATOM(OB_APP_NAME);
     supported[i++] = OBT_PROP_ATOM(OB_APP_CLASS);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_GROUP_NAME);
+    supported[i++] = OBT_PROP_ATOM(OB_APP_GROUP_CLASS);
     supported[i++] = OBT_PROP_ATOM(OB_APP_TYPE);
     g_assert(i == num_support);
 

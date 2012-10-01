@@ -250,6 +250,8 @@ void client_manage(Window window, ObPrompt *prompt)
     ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
     ob_debug("Window name: %s class: %s role: %s title: %s",
              self->name, self->class, self->role, self->title);
+    ob_debug("Window group name: %s group class: %s",
+             self->group_name, self->group_class);
 
     /* per-app settings override stuff from client_get_all, and return the
        settings for other uses too. the returned settings is a shallow copy,
@@ -723,6 +725,8 @@ void client_unmanage(ObClient *self)
     g_free(self->name);
     g_free(self->class);
     g_free(self->role);
+    g_free(self->group_name);
+    g_free(self->group_class);
     g_free(self->client_machine);
     g_free(self->sm_client_id);
     g_slice_free(ObClient, self);
@@ -915,14 +919,24 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
 
         g_assert(app->name != NULL || app->class != NULL ||
                  app->role != NULL || app->title != NULL ||
+                 app->group_name != NULL || app->group_class != NULL ||
                  (signed)app->type >= 0);
 
         if (app->name &&
             !g_pattern_match(app->name, strlen(self->name), self->name, NULL))
             match = FALSE;
+        else if (app->group_name &&
+            !g_pattern_match(app->group_name,
+                             strlen(self->group_name), self->group_name, NULL))
+            match = FALSE;
         else if (app->class &&
                  !g_pattern_match(app->class,
                                   strlen(self->class), self->class, NULL))
+            match = FALSE;
+        else if (app->group_class &&
+                 !g_pattern_match(app->group_class,
+                                  strlen(self->group_class), self->group_class,
+                                  NULL))
             match = FALSE;
         else if (app->role &&
                  !g_pattern_match(app->role,
@@ -2365,6 +2379,25 @@ static void client_get_session_ids(ObClient *self)
     if (self->name == NULL) self->name = g_strdup("");
     if (self->class == NULL) self->class = g_strdup("");
 
+    /* get the WM_CLASS (name and class) from the group leader. make them "" if
+       they are not provided */
+    if (leader)
+        got = OBT_PROP_GETSS_TYPE(leader, WM_CLASS, STRING_NO_CC, &ss);
+    else
+        got = FALSE;
+
+    if (got) {
+        if (ss[0]) {
+            self->group_name = g_strdup(ss[0]);
+            if (ss[1])
+                self->group_class = g_strdup(ss[1]);
+        }
+        g_strfreev(ss);
+    }
+
+    if (self->group_name == NULL) self->group_name = g_strdup("");
+    if (self->group_class == NULL) self->group_class = g_strdup("");
+
     /* get the WM_WINDOW_ROLE. make it "" if it is not provided */
     got = OBT_PROP_GETS_XPCS(self->window, WM_WINDOW_ROLE, &s);
 
@@ -2434,6 +2467,8 @@ static void client_save_app_rule_values(ObClient *self)
     OBT_PROP_SETS(self->window, OB_APP_ROLE, self->role);
     OBT_PROP_SETS(self->window, OB_APP_NAME, self->name);
     OBT_PROP_SETS(self->window, OB_APP_CLASS, self->class);
+    OBT_PROP_SETS(self->window, OB_APP_GROUP_NAME, self->group_name);
+    OBT_PROP_SETS(self->window, OB_APP_GROUP_CLASS, self->group_class);
     OBT_PROP_SETS(self->window, OB_APP_TITLE, self->original_title);
 
     switch (self->type) {

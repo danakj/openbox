@@ -215,8 +215,9 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = obt_xml_find_node(node->children, "application");
     gchar *name = NULL, *class = NULL, *role = NULL, *title = NULL,
-        *type_str = NULL;
-    gboolean name_set, class_set, type_set, role_set, title_set;
+        *type_str = NULL, *group_name = NULL, *group_class = NULL;
+    gboolean name_set, class_set, type_set, role_set, title_set,
+        group_name_set, group_class_set;
     ObClientType type;
     gboolean x_pos_given;
 
@@ -225,6 +226,8 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
         class_set = obt_xml_attr_string(app, "class", &class);
         name_set = obt_xml_attr_string(app, "name", &name);
+        group_class_set = obt_xml_attr_string(app, "groupclass", &group_class);
+        group_name_set = obt_xml_attr_string(app, "groupname", &group_name);
         type_set = obt_xml_attr_string(app, "type", &type_str);
         role_set = obt_xml_attr_string(app, "role", &role);
         title_set = obt_xml_attr_string(app, "title", &title);
@@ -251,7 +254,9 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 type_set = FALSE; /* not valid! */
         }
 
-        if (class_set || name_set || role_set || title_set || type_set) {
+        if (class_set || name_set || role_set || title_set || type_set ||
+            group_class_set || group_name_set)
+        {
             xmlNodePtr n, c;
             ObAppSettings *settings = config_create_app_settings();
 
@@ -260,6 +265,12 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 
             if (class_set)
                 settings->class = g_pattern_spec_new(class);
+
+            if (group_name_set)
+                settings->group_name = g_pattern_spec_new(group_name);
+
+            if (group_class_set)
+                settings->group_class = g_pattern_spec_new(group_class);
 
             if (role_set)
                 settings->role = g_pattern_spec_new(role);
@@ -377,10 +388,13 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                                                      (gpointer) settings);
             g_free(name);
             g_free(class);
+            g_free(group_name);
+            g_free(group_class);
             g_free(role);
             g_free(title);
             g_free(type_str);
-            name = class = role = title = type_str = NULL;
+            name = class = group_name = group_class = role = title = type_str =
+                NULL;
         }
 
         app = obt_xml_find_node(app->next, "application");
@@ -1132,10 +1146,12 @@ void config_shutdown(void)
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *itd = (ObAppSettings *)it->data;
-        if (itd->name)  g_pattern_spec_free(itd->name);
-        if (itd->role)  g_pattern_spec_free(itd->role);
+        if (itd->name) g_pattern_spec_free(itd->name);
+        if (itd->role) g_pattern_spec_free(itd->role);
         if (itd->title) g_pattern_spec_free(itd->title);
         if (itd->class) g_pattern_spec_free(itd->class);
+        if (itd->group_name) g_pattern_spec_free(itd->group_name);
+        if (itd->group_class) g_pattern_spec_free(itd->group_class);
         g_slice_free(ObAppSettings, it->data);
     }
     g_slist_free(config_per_app_settings);

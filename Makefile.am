@@ -282,6 +282,8 @@ openbox_openbox_SOURCES = \
 	openbox/mwm.h \
 	openbox/openbox.c \
 	openbox/openbox.h \
+	openbox/overlap.c \
+	openbox/overlap.h \
 	openbox/ping.c \
 	openbox/ping.h \
 	openbox/place.c \

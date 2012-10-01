@@ -74,7 +74,7 @@ void focus_cycle_addremove(ObClient *c, gboolean redraw)
         gboolean v, s;
 
         v = focus_cycle_valid(c);
-        s = focus_cycle_popup_is_showing(c);
+        s = focus_cycle_popup_is_showing(c) || c == focus_cycle_target;
 
         if (v != s)
             focus_cycle_reorder();

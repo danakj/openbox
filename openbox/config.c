@@ -26,6 +26,7 @@
 #include "screen.h"
 #include "openbox.h"
 #include "gettext.h"
+#include "place.h"
 #include "obt/paths.h"
 
 gboolean config_focus_new;
@@ -581,9 +582,13 @@ static void parse_placement(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "policy")))
+    if ((n = obt_xml_find_node(node, "policy"))) {
         if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
+        else if (obt_xml_node_contains(n, "LeastOverlap"))
+            config_place_policy = OB_PLACE_POLICY_LEASTOVERLAP;
+
+    }
     if ((n = obt_xml_find_node(node, "center")))
         config_place_center = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "monitor"))) {

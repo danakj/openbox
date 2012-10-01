@@ -90,7 +90,16 @@ void menu_startup(gboolean reconfig)
             loaded = TRUE;
             obt_xml_tree_from_root(menu_parse_inst);
             obt_xml_close(menu_parse_inst);
-        } else
+        }
+        else if (obt_xml_load_file(menu_parse_inst,
+                                   it->data,
+                                   "openbox_menu"))
+        {
+            loaded = TRUE;
+            obt_xml_tree_from_root(menu_parse_inst);
+            obt_xml_close(menu_parse_inst);
+        }
+        else
             g_message(_("Unable to find a valid menu file \"%s\""),
                       (const gchar*)it->data);
     }

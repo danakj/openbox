@@ -1644,8 +1644,10 @@ typedef struct {
 guint screen_find_monitor(const Rect *search)
 {
     guint i;
-    guint most = screen_num_monitors;
+    guint mostpx_index = screen_num_monitors;
     guint mostpx = 0;
+    guint closest_distance_index = screen_num_monitors;
+    guint closest_distance = G_MAXUINT;
     GSList *counted = NULL;
 
     /* we want to count the number of pixels search has on each monitor, but not
@@ -1686,7 +1688,7 @@ guint screen_find_monitor(const Rect *search)
 
             if (area > mostpx) {
                 mostpx = area;
-                most = config_primary_monitor_index;
+                mostpx_index = config_primary_monitor_index;
             }
 
             /* add the intersection rect on the current monitor to the
@@ -1709,10 +1711,21 @@ guint screen_find_monitor(const Rect *search)
 
         monitor = screen_physical_area_monitor(i);
 
+        if (!RECT_INTERSECTS_RECT(*monitor, *search)) {
+            /* If we don't intersect then find the distance between the search
+               rect and the monitor. We'll use the closest monitor from this
+               metric if none of the monitors intersect. */
+            guint distance = rect_manhatten_distance(*monitor, *search);
+
+            if (distance < closest_distance) {
+                closest_distance = distance;
+                closest_distance_index = i;
+            }
+            continue;
+        }
+
         if (i == config_primary_monitor_index)
             continue;  /* already did this one */
-        if (!RECT_INTERSECTS_RECT(*monitor, *search))
-            continue;  /* nothing to see here */
 
         RECT_SET_INTERSECTION(on_current_monitor, *monitor, *search);
         area = RECT_AREA(on_current_monitor);
@@ -1729,7 +1742,7 @@ guint screen_find_monitor(const Rect *search)
 
         if (area > mostpx) {
             mostpx = area;
-            most = i;
+            mostpx_index = i;
         }
 
         /* add the intersection rect on the current monitor I to the counted
@@ -1765,7 +1778,11 @@ guint screen_find_monitor(const Rect *search)
         counted = g_slist_delete_link(counted, counted);
     }
 
-    return most < screen_num_monitors ? most : screen_monitor_primary(FALSE);
+    if (mostpx_index < screen_num_monitors)
+        return mostpx_index;
+
+    g_assert(closest_distance_index < screen_num_monitors);
+    return closest_distance_index;
 }
 
 const Rect* screen_physical_area_all_monitors(void)

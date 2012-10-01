@@ -104,6 +104,25 @@ typedef struct _Rect {
      (r).height = MIN((a).y + (a).height - 1, \
                       (b).y + (b).height - 1) - (r).y + 1)
 
+/* Returns the shortest manhatten distance between two rects, or 0 if they
+   intersect. */
+static inline gint rect_manhatten_distance(Rect r, Rect o)
+{
+    if (RECT_INTERSECTS_RECT(r, o))
+        return 0;
+
+    gint min_distance = G_MAXINT;
+    if (RECT_RIGHT(o) < RECT_LEFT(r))
+        min_distance = MIN(min_distance, RECT_LEFT(r) - RECT_RIGHT(o));
+    if (RECT_LEFT(o) > RECT_RIGHT(r))
+        min_distance = MIN(min_distance, RECT_LEFT(o) - RECT_RIGHT(r));
+    if (RECT_BOTTOM(o) < RECT_TOP(r))
+        min_distance = MIN(min_distance, RECT_TOP(r) - RECT_BOTTOM(o));
+    if (RECT_TOP(o) > RECT_BOTTOM(r))
+        min_distance = MIN(min_distance, RECT_TOP(o) - RECT_BOTTOM(r));
+    return min_distance;
+}
+
 typedef struct _Strut {
     int left;
     int top;

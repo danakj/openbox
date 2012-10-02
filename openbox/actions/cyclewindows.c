@@ -16,6 +16,7 @@ typedef struct {
     gboolean forward;
     gboolean bar;
     gboolean raise;
+    gboolean interactive;
     ObFocusCyclePopupMode dialog_mode;
     GSList *actions;
 
@@ -69,6 +70,7 @@ static gpointer setup_func(xmlNodePtr node,
     o = g_slice_new0(Options);
     o->bar = TRUE;
     o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_LIST;
+    o->interactive = TRUE;
 
     if ((n = obt_xml_find_node(node, "linear")))
         o->linear = obt_xml_node_bool(n);
@@ -80,6 +82,8 @@ static gpointer setup_func(xmlNodePtr node,
         else if (obt_xml_node_contains(n, "icons"))
             o->dialog_mode = OB_FOCUS_CYCLE_POPUP_MODE_ICONS;
     }
+    if ((n = obt_xml_find_node(node, "interactive")))
+        o->interactive = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "bar")))
         o->bar = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "raise")))
@@ -157,21 +161,24 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
     struct _ObClient *ft;
 
-    ft = focus_cycle(o->forward,
-                     o->all_desktops,
-                     !o->only_hilite_windows,
-                     o->dock_windows,
-                     o->desktop_windows,
-                     o->linear,
-                     TRUE,
-                     o->bar,
-                     o->dialog_mode,
-                     FALSE, FALSE);
+    gboolean done = FALSE;
+    gboolean cancel = FALSE;
+
+    ft = focus_cycle(
+        o->forward,
+        o->all_desktops,
+        !o->only_hilite_windows,
+        o->dock_windows,
+        o->desktop_windows,
+        o->linear,
+        (o->interactive ? o->bar : FALSE),
+        (o->interactive ? o->dialog_mode : OB_FOCUS_CYCLE_POPUP_MODE_NONE),
+        done, cancel);
 
     stacking_restore();
     if (o->raise && ft) stacking_temp_raise(CLIENT_AS_WINDOW(ft));
 
-    return TRUE;
+    return o->interactive;
 }
 
 static gboolean i_input_func(guint initial_state,
@@ -231,16 +238,17 @@ static void i_post_func(gpointer options)
     Options *o = options;
     struct _ObClient *ft;
 
+    gboolean done = TRUE;
+
     ft = focus_cycle(o->forward,
                      o->all_desktops,
                      !o->only_hilite_windows,
                      o->dock_windows,
                      o->desktop_windows,
                      o->linear,
-                     TRUE,
                      o->bar,
                      o->dialog_mode,
-                     TRUE, o->cancel);
+                     done, o->cancel);
 
     if (ft)
         actions_run_acts(o->actions, OB_USER_ACTION_KEYBOARD_KEY,

@@ -93,7 +93,7 @@ void focus_cycle_reorder()
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
             focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-                        TRUE, TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
+                        TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
                         TRUE, TRUE);
     }
 }
@@ -101,8 +101,8 @@ void focus_cycle_reorder()
 ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                       gboolean nonhilite_windows,
                       gboolean dock_windows, gboolean desktop_windows,
-                      gboolean linear, gboolean interactive,
-                      gboolean showbar, ObFocusCyclePopupMode mode,
+                      gboolean linear, gboolean showbar,
+                      ObFocusCyclePopupMode mode,
                       gboolean done, gboolean cancel)
 {
     static GList *order = NULL;
@@ -110,23 +110,17 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     ObClient *ft = NULL;
     ObClient *ret = NULL;
 
-    if (interactive) {
-        if (cancel) {
-            focus_cycle_target = NULL;
-            goto done_cycle;
-        } else if (done)
-            goto done_cycle;
+    if (cancel) {
+        focus_cycle_target = NULL;
+        goto done_cycle;
+    } else if (done)
+        goto done_cycle;
 
-        if (!focus_order)
-            goto done_cycle;
+    if (!focus_order)
+        goto done_cycle;
 
-        if (linear) list = client_list;
-        else        list = focus_order;
-    } else {
-        if (!focus_order)
-            goto done_cycle;
-        list = client_list;
-    }
+    if (linear) list = client_list;
+    else        list = focus_order;
 
     if (focus_cycle_target == NULL) {
         focus_cycle_linear = linear;
@@ -153,21 +147,14 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
         }
         ft = it->data;
         if (focus_cycle_valid(ft)) {
-            if (interactive) {
-                if (ft != focus_cycle_target) { /* prevents flicker */
-                    focus_cycle_target = ft;
-                    focus_cycle_type = OB_CYCLE_NORMAL;
-                    focus_cycle_draw_indicator(showbar ? ft : NULL);
-                }
-                /* same arguments as focus_target_valid */
-                focus_cycle_popup_show(ft, mode, focus_cycle_linear);
-                return focus_cycle_target;
-            } else if (ft != focus_cycle_target) {
+            if (ft != focus_cycle_target) { /* prevents flicker */
                 focus_cycle_target = ft;
                 focus_cycle_type = OB_CYCLE_NORMAL;
-                done = TRUE;
-                break;
+                focus_cycle_draw_indicator(showbar ? ft : NULL);
             }
+            /* same arguments as focus_target_valid */
+            focus_cycle_popup_show(ft, mode, focus_cycle_linear);
+            return focus_cycle_target;
         }
     } while (it != start);
 
@@ -179,10 +166,8 @@ done_cycle:
     g_list_free(order);
     order = NULL;
 
-    if (interactive) {
-        focus_cycle_draw_indicator(NULL);
-        focus_cycle_popup_hide();
-    }
+    focus_cycle_draw_indicator(NULL);
+    focus_cycle_popup_hide();
 
     return ret;
 }

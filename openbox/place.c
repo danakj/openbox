@@ -29,12 +29,12 @@
 
 extern ObDock *dock;
 
-static Rect *pick_pointer_head(ObClient *c)
+static Rect *choose_pointer_monitor(ObClient *c)
 {
     return screen_area(c->desktop, screen_monitor_pointer(), NULL);
 }
 
-/* use the following priority lists for pick_head()
+/* use the following priority lists for choose_monitor()
 
    When a window is being placed in the FOREGROUND, use a monitor chosen in
    the following order:
@@ -156,8 +156,8 @@ gint cmp_background(const void *a, const void *b)
 }
 
 /*! Pick a monitor to place a window on. */
-static Rect *pick_head(ObClient *c, gboolean foreground,
-                       ObAppSettings *settings)
+static Rect* choose_monitor(ObClient *c, gboolean client_to_be_foregrounded,
+                            ObAppSettings *settings)
 {
     Rect *area;
     ObPlaceHead *choice;
@@ -230,7 +230,7 @@ static Rect *pick_head(ObClient *c, gboolean foreground,
     }
 
     qsort(choice, screen_num_monitors, sizeof(ObPlaceHead),
-          foreground ? cmp_foreground : cmp_background);
+          client_to_be_foregrounded ? cmp_foreground : cmp_background);
 
     /* save the areas of the monitors in order of their being chosen */
     for (i = 0; i < screen_num_monitors; ++i)
@@ -256,8 +256,12 @@ static Rect *pick_head(ObClient *c, gboolean foreground,
     return area;
 }
 
-static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
+static gboolean place_under_mouse(ObClient *client, gint *x, gint *y,
+                                  Size frame_size)
 {
+    if (config_place_policy != OB_PLACE_POLICY_MOUSE)
+        return FALSE;
+
     gint l, r, t, b;
     gint px, py;
     Rect *area;
@@ -266,16 +270,16 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
 
     if (!screen_pointer_pos(&px, &py))
         return FALSE;
-    area = pick_pointer_head(client);
+    area = choose_pointer_monitor(client);
 
     l = area->x;
     t = area->y;
-    r = area->x + area->width - client->frame->area.width;
-    b = area->y + area->height - client->frame->area.height;
+    r = area->x + area->width - frame_size.width;
+    b = area->y + area->height - frame_size.height;
 
-    *x = px - client->area.width / 2 - client->frame->size.left;
+    *x = px - frame_size.width / 2;
     *x = MIN(MAX(*x, l), r);
-    *y = py - client->area.height / 2 - client->frame->size.top;
+    *y = py - frame_size.height / 2;
     *y = MIN(MAX(*y, t), b);
 
     g_slice_free(Rect, area);
@@ -283,11 +287,12 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y)
     return TRUE;
 }
 
-static gboolean place_per_app_setting(ObClient *client, Rect *screen,
-                                      gint *x, gint *y,
-                                      ObAppSettings *settings)
+static gboolean place_per_app_setting_position(ObClient *client, Rect *screen,
+                                               gint *x, gint *y,
+                                               ObAppSettings *settings,
+                                               Size frame_size)
 {
-    if (!settings || (settings && !settings->pos_given))
+    if (!settings || !settings->pos_given)
         return FALSE;
 
     ob_debug("placing by per-app settings");
@@ -295,7 +300,7 @@ static gboolean place_per_app_setting(ObClient *client, Rect *screen,
     if (settings->position.x.center)
         *x = screen->x + screen->width / 2 - client->area.width / 2;
     else if (settings->position.x.opposite)
-        *x = screen->x + screen->width - client->frame->area.width -
+        *x = screen->x + screen->width - frame_size.width -
             settings->position.x.pos;
     else
         *x = screen->x + settings->position.x.pos;
@@ -305,7 +310,7 @@ static gboolean place_per_app_setting(ObClient *client, Rect *screen,
     if (settings->position.y.center)
         *y = screen->y + screen->height / 2 - client->area.height / 2;
     else if (settings->position.y.opposite)
-        *y = screen->y + screen->height - client->frame->area.height -
+        *y = screen->y + screen->height - frame_size.height -
             settings->position.y.pos;
     else
         *y = screen->y + settings->position.y.pos;
@@ -315,8 +320,37 @@ static gboolean place_per_app_setting(ObClient *client, Rect *screen,
     return TRUE;
 }
 
+static void place_per_app_setting_size(ObClient *client, Rect *screen,
+                                       gint *w, gint *h,
+                                       ObAppSettings *settings)
+{
+    if (!settings || !settings->size_given)
+        return;
+
+    ob_debug("sizing by per-app settings");
+
+    g_assert(settings->width_num > 0);
+    g_assert(settings->width_denom >= 0);
+    g_assert(settings->height_num > 0);
+    g_assert(settings->height_denom >= 0);
+
+    if (!settings->width_denom)
+        *w = settings->width_num;
+    else {
+        *w = screen->width * settings->width_num / settings->width_denom;
+        *w = MIN(*w, screen->width);
+    }
+
+    if (!settings->height_denom)
+        *h = settings->height_num;
+    else {
+        *h = screen->height * settings->height_num / settings->height_denom;
+        *h = MIN(*h, screen->height);
+    }
+}
+
 static gboolean place_transient_splash(ObClient *client, Rect *area,
-                                       gint *x, gint *y)
+                                       gint *x, gint *y, Size frame_size)
 {
     if (client->type == OB_CLIENT_TYPE_DIALOG) {
         GSList *it;
@@ -342,8 +376,8 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
                 }
             }
             if (!first) {
-                *x = ((r + 1 - l) - client->frame->area.width) / 2 + l;
-                *y = ((b + 1 - t) - client->frame->area.height) / 2 + t;
+                *x = ((r + 1 - l) - frame_size.width) / 2 + l;
+                *y = ((b + 1 - t) - frame_size.height) / 2 + t;
                 return TRUE;
             }
         }
@@ -354,21 +388,21 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
     {
         ob_debug("placing dialog or splash");
 
-        *x = (area->width - client->frame->area.width) / 2 + area->x;
-        *y = (area->height - client->frame->area.height) / 2 + area->y;
+        *x = (area->width - frame_size.width) / 2 + area->x;
+        *y = (area->height - frame_size.height) / 2 + area->y;
         return TRUE;
     }
 
     return FALSE;
 }
 
-static gboolean place_least_overlap(ObClient *c, Rect * const head,
-                                    gint *x, gint *y)
+static gboolean place_least_overlap(ObClient *c, Rect *head, int *x, int *y,
+                                    Size frame_size)
 {
     /* Assemble the list of windows that could overlap with @c in the user's
        current view. */
     GSList* potential_overlap_clients = NULL;
-    int n_client_rects = 0;
+    gint n_client_rects = 0;
 
     /* if we're "showing desktop", ignore all existing windows */
     if (!screen_showing_desktop) {
@@ -397,8 +431,9 @@ static gboolean place_least_overlap(ObClient *c, Rect * const head,
         }
     }
     Rect client_rects[n_client_rects];
+
     GSList* it;
-    unsigned int i = 0;
+    guint i = 0;
     for (it = potential_overlap_clients; it != NULL; it = g_slist_next(it)) {
         ObClient* potential_overlap_client = (ObClient*)it->data;
         client_rects[i] = potential_overlap_client->frame->area;
@@ -407,43 +442,64 @@ static gboolean place_least_overlap(ObClient *c, Rect * const head,
     g_slist_free(potential_overlap_clients);
 
     Point result;
-    Size req_size;
-    SIZE_SET(req_size, c->frame->area.width, c->frame->area.height);
     place_overlap_find_least_placement(client_rects, n_client_rects, head,
-                                       &req_size, &result);
+                                       &frame_size, &result);
     *x = result.x;
     *y = result.y;
 
     return TRUE;
 }
 
-/*! Return TRUE if openbox chose the position for the window, and FALSE if
-  the application chose it */
-gboolean place_client(ObClient *client, gboolean foreground, gint *x, gint *y,
-                      ObAppSettings *settings)
+static gboolean should_set_client_position(ObClient *client,
+                                           ObAppSettings *settings)
 {
-    Rect *area;
-    gboolean ret;
+    gboolean has_position = settings && settings->pos_given;
+    gboolean has_forced_position = has_position && settings->pos_force;
 
-    /* per-app settings override program specified position
-     * but not user specified, unless pos_force is enabled */
-    if (((client->positioned & USPosition) &&
-         !(settings && settings->pos_given && settings->pos_force)) ||
-        ((client->positioned & PPosition) &&
-         !(settings && settings->pos_given)))
+    gboolean user_positioned = client->positioned & USPosition;
+    if (user_positioned && !has_forced_position)
         return FALSE;
 
-    area = pick_head(client, foreground, settings);
+    gboolean program_positioned = client->positioned & PPosition;
+    if (program_positioned && !has_position)
+        return FALSE;
 
-    /* try a number of methods */
-    ret = place_per_app_setting(client, area, x, y, settings) ||
-        place_transient_splash(client, area, x, y) ||
-        (config_place_policy == OB_PLACE_POLICY_MOUSE &&
-         place_under_mouse(client, x, y)) ||
-        place_least_overlap(client, area, x, y);
+    return TRUE;
+}
+
+gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
+                      Rect* client_area, ObAppSettings *settings)
+{
+    gboolean ret;
+    Rect *monitor_area;
+    int *x, *y, *w, *h;
+    Size frame_size;
+
+    monitor_area = choose_monitor(client, client_to_be_foregrounded, settings);
+
+    w = &client_area->width;
+    h = &client_area->height;
+    place_per_app_setting_size(client, monitor_area, w, h, settings);
+
+    if (!should_set_client_position(client, settings))
+        return FALSE;
+
+    x = &client_area->x;
+    y = &client_area->y;
+
+    SIZE_SET(frame_size,
+             *w + client->frame->size.left + client->frame->size.right,
+             *h + client->frame->size.top + client->frame->size.bottom);
+
+    ret =
+        place_per_app_setting_position(client, monitor_area, x, y, settings,
+                                       frame_size) ||
+        place_transient_splash(client, monitor_area, x, y, frame_size) ||
+        place_under_mouse(client, x, y, frame_size) ||
+        place_least_overlap(client, monitor_area, x, y, frame_size);
     g_assert(ret);
 
-    g_slice_free(Rect, area);
+    g_slice_free(Rect, monitor_area);
 
     /* get where the client should be */
     frame_frame_gravity(client->frame, x, y);

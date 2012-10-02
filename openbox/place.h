@@ -20,6 +20,8 @@
 #ifndef ob__place_h
 #define ob__place_h
 
+#include "geom.h"
+
 #include <glib.h>
 
 struct _ObClient;
@@ -39,7 +41,10 @@ typedef enum
     OB_PLACE_MONITOR_PRIMARY
 } ObPlaceMonitor;
 
-gboolean place_client(struct _ObClient *client, gboolean foreground,
-                      gint *x, gint *y, struct _ObAppSettings *settings);
+/*! Return TRUE if openbox chose the position for the window, and FALSE if
+  the application chose it */
+gboolean place_client(struct _ObClient *client,
+                      gboolean client_to_be_foregrounded,
+                      Rect* client_area, struct _ObAppSettings *settings);
 
 #endif

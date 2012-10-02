@@ -370,8 +370,7 @@ void client_manage(Window window, ObPrompt *prompt)
                      "program + user specified" :
                      "BADNESS !?")))), place.width, place.height);
 
-        obplaced = place_client(self, do_activate, &place.x, &place.y,
-                                settings);
+        obplaced = place_client(self, do_activate, &place, settings);
 
         /* watch for buggy apps that ask to be placed at (0,0) when there is
            a strut there */

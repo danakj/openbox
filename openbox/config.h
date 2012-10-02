@@ -47,6 +47,12 @@ struct _ObAppSettings
     gboolean pos_given;
     gboolean pos_force;
 
+    gint width_num;
+    gint width_denom;
+    gint height_num;
+    gint height_denom;
+    gboolean size_given;
+
     guint desktop;
     gint shade;
     gint decor;

@@ -153,6 +153,14 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
         dst->position = src->position;
         /* monitor is copied above */
     }
+
+    if (src->size_given) {
+        dst->size_given = TRUE;
+        dst->width_num = src->width_num;
+        dst->width_denom = src->width_denom;
+        dst->height_num = src->height_num;
+        dst->height_denom = src->height_denom;
+    }
 }
 
 void config_parse_relative_number(gchar *s, gint *num, gint *denom)
@@ -219,9 +227,10 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
         group_name_set, group_class_set;
     ObClientType type;
     gboolean x_pos_given;
+    gboolean width_given;
 
     while (app) {
-        x_pos_given = FALSE;
+        x_pos_given = width_given = FALSE;
 
         class_set = obt_xml_attr_string(app, "class", &class);
         name_set = obt_xml_attr_string(app, "name", &name);
@@ -320,6 +329,40 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                     }
 
                 obt_xml_attr_bool(n, "force", &settings->pos_force);
+            }
+
+            if ((n = obt_xml_find_node(app->children, "size"))) {
+                if ((c = obt_xml_find_node(n->children, "width"))) {
+                    if (!obt_xml_node_contains(c, "default")) {
+                        gchar *s = obt_xml_node_string(c);
+                        config_parse_relative_number(
+                            s,
+                            &settings->width_num,
+                            &settings->width_denom);
+                        if (settings->width_num > 0 &&
+                            settings->width_denom >= 0)
+                        {
+                            width_given = TRUE;
+                        }
+                        g_free(s);
+                    }
+                }
+
+                if (width_given &&
+                    (c = obt_xml_find_node(n->children, "height")))
+                {
+                        gchar *s = obt_xml_node_string(c);
+                        config_parse_relative_number(
+                            s,
+                            &settings->height_num,
+                            &settings->height_denom);
+                        if (settings->height_num > 0 &&
+                            settings->height_denom >= 0)
+                        {
+                            settings->size_given = TRUE;
+                        }
+                        g_free(s);
+                }
             }
 
             if ((n = obt_xml_find_node(app->children, "focus")))

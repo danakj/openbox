@@ -131,6 +131,103 @@ static void prompt_cleanup(ObPrompt *p, gpointer options)
     free_func(options);
 }
 
+/* Replace occurrences of $variables */
+static gchar* expand_variables(gchar* cmd, ObActionsData* data)
+{
+    gchar *c, *before, *expand;
+
+    expand = NULL;
+    before = cmd;
+
+    while ((c = strchr(before, '$'))) {
+        if ((c[1] == 'p' || c[1] == 'P') &&
+            (c[2] == 'i' || c[2] == 'I') &&
+            (c[3] == 'd' || c[3] == 'D') &&
+            !g_ascii_isalnum(c[4]))
+        {
+            /* found $pid */
+            gchar *tmp;
+
+            *c = '\0';
+            tmp = expand;
+            expand = g_strdup_printf("%s%s%u",
+                                     (expand ? expand : ""),
+                                     before,
+                                     data->client ? data->client->pid : 0);
+            g_free(tmp);
+
+            before = c + 4; /* 4 = strlen("$pid") */
+        }
+        else if ((c[1] == 'w' || c[1] == 'W') &&
+                 (c[2] == 'i' || c[2] == 'I') &&
+                 (c[3] == 'd' || c[3] == 'D') &&
+                 !g_ascii_isalnum(c[4]))
+        {
+            /* found $wid */
+            gchar *tmp;
+
+            *c = '\0';
+            tmp = expand;
+            expand = g_strdup_printf("%s%s%lu",
+                                     (expand ? expand : ""),
+                                     before,
+                                     data->client ? data->client->window : 0);
+            g_free(tmp);
+
+            before = c + 4; /* 4 = strlen("$wid") */
+        }
+        else if ((c[1] == 'p' || c[1] == 'P') &&
+                 (c[2] == 'o' || c[2] == 'O') &&
+                 (c[3] == 'i' || c[3] == 'I') &&
+                 (c[4] == 'n' || c[4] == 'N') &&
+                 (c[5] == 't' || c[5] == 'T') &&
+                 (c[6] == 'e' || c[6] == 'E') &&
+                 (c[7] == 'r' || c[7] == 'R') &&
+                 !g_ascii_isalnum(c[8]))
+        {
+            /* found $pointer */
+            gchar *tmp;
+
+            *c = '\0';
+            tmp = expand;
+            expand = g_strdup_printf("%s%s%u %u",
+                                     (expand ? expand : ""),
+                                     before,
+                                     data->x, data->y);
+            g_free(tmp);
+
+            before = c + 8; /* 4 = strlen("$pointer") */
+        }
+        else {
+            /* found something unknown, copy the $ and continue */
+            gchar *tmp;
+
+            *c = '\0';
+            tmp = expand;
+            expand = g_strdup_printf("%s%s$",
+                                     (expand ? expand : ""),
+                                     before);
+            g_free(tmp);
+
+            before = c + 1; /* 1 = strlen("$") */
+        }
+    }
+
+    if (expand) {
+        gchar *tmp;
+
+        /* add on the end of the string after the last replacement */
+        tmp = expand;
+        expand = g_strconcat(expand, before, NULL);
+        g_free(tmp);
+
+        /* replace the command with the expanded one */
+        g_free(cmd);
+        cmd = expand;
+    }
+    return cmd;
+}
+
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
@@ -163,68 +260,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         return FALSE;
     }
 
-    if (data->client) {
-        gchar *c, *before, *expand;
-
-        /* replace occurrences of $pid and $wid */
-
-        expand = NULL;
-        before = cmd;
-
-        while ((c = strchr(before, '$'))) {
-            if ((c[1] == 'p' || c[1] == 'P') &&
-                (c[2] == 'i' || c[2] == 'I') &&
-                (c[3] == 'd' || c[3] == 'D') &&
-                !g_ascii_isalnum(c[4]))
-            {
-                /* found $pid */
-                gchar *tmp;
-
-                *c = '\0';
-                tmp = expand;
-                expand = g_strdup_printf("%s%s%u",
-                                         (expand ? expand : ""),
-                                         before,
-                                         data->client->pid);
-                g_free(tmp);
-
-                before = c + 4; /* 4 = strlen("$pid") */
-            }
-            else if ((c[1] == 'w' || c[1] == 'W') &&
-                     (c[2] == 'i' || c[2] == 'I') &&
-                     (c[3] == 'd' || c[3] == 'D') &&
-                     !g_ascii_isalnum(c[4]))
-            {
-                /* found $wid */
-                gchar *tmp;
-
-                *c = '\0';
-                tmp = expand;
-                expand = g_strdup_printf("%s%s%lu",
-                                         (expand ? expand : ""),
-                                         before,
-                                         data->client->window);
-                g_free(tmp);
-
-                before = c + 4; /* 4 = strlen("$wid") */
-            }
-            else
-                before = c + 1; /* no infinite loops plz */
-        }
-
-        if (expand) {
-            gchar *tmp;
-
-            /* add on the end of the string after the last replacement */
-            tmp = expand;
-            expand = g_strconcat(expand, before, NULL);
-            g_free(tmp);
-
-            /* replace the command with the expanded one */
-            g_free(cmd);
-            cmd = expand;
-        }
-    }
+    cmd = expand_variables(cmd, data);
 
     /* If there is a keyboard grab going on then we need to cancel
        it so the application can grab things */

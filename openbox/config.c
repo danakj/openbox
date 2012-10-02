@@ -207,6 +207,144 @@ void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
   </applications>
 */
 
+static void parse_single_per_app_settings(xmlNodePtr app,
+                                          ObAppSettings *settings)
+{
+    xmlNodePtr n, c;
+    gboolean x_pos_given = FALSE;
+    gboolean width_given = FALSE;
+
+    if ((n = obt_xml_find_node(app->children, "decor")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->decor = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "shade")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->shade = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "position"))) {
+        if ((c = obt_xml_find_node(n->children, "x"))) {
+            if (!obt_xml_node_contains(c, "default")) {
+                config_parse_gravity_coord(c, &settings->position.x);
+                x_pos_given = TRUE;
+            }
+        }
+
+        if (x_pos_given && (c = obt_xml_find_node(n->children, "y"))) {
+            if (!obt_xml_node_contains(c, "default")) {
+                config_parse_gravity_coord(c, &settings->position.y);
+                settings->pos_given = TRUE;
+            }
+        }
+
+        /* monitor can be set without setting x or y */
+        if ((c = obt_xml_find_node(n->children, "monitor"))) {
+            if (!obt_xml_node_contains(c, "default")) {
+                gchar *s = obt_xml_node_string(c);
+                if (!g_ascii_strcasecmp(s, "mouse"))
+                    settings->monitor_type = OB_PLACE_MONITOR_MOUSE;
+                else if (!g_ascii_strcasecmp(s, "active"))
+                    settings->monitor_type = OB_PLACE_MONITOR_ACTIVE;
+                else if (!g_ascii_strcasecmp(s, "primary"))
+                    settings->monitor_type = OB_PLACE_MONITOR_PRIMARY;
+                else
+                    settings->monitor = obt_xml_node_int(c);
+                g_free(s);
+            }
+        }
+
+        obt_xml_attr_bool(n, "force", &settings->pos_force);
+    }
+
+    if ((n = obt_xml_find_node(app->children, "size"))) {
+        if ((c = obt_xml_find_node(n->children, "width"))) {
+            if (!obt_xml_node_contains(c, "default")) {
+                gchar *s = obt_xml_node_string(c);
+                config_parse_relative_number(s,
+                                             &settings->width_num,
+                                             &settings->width_denom);
+                if (settings->width_num > 0 && settings->width_denom >= 0)
+                    width_given = TRUE;
+                g_free(s);
+            }
+        }
+
+        if (width_given && (c = obt_xml_find_node(n->children, "height"))) {
+            gchar *s = obt_xml_node_string(c);
+            config_parse_relative_number(s,
+                                         &settings->height_num,
+                                         &settings->height_denom);
+            if (settings->height_num > 0 && settings->height_denom >= 0)
+                settings->size_given = TRUE;
+            g_free(s);
+        }
+    }
+
+    if ((n = obt_xml_find_node(app->children, "focus"))) {
+        if (!obt_xml_node_contains(n, "default"))
+            settings->focus = obt_xml_node_bool(n);
+    }
+
+    if ((n = obt_xml_find_node(app->children, "desktop"))) {
+        if (!obt_xml_node_contains(n, "default")) {
+            gchar *s = obt_xml_node_string(n);
+            if (!g_ascii_strcasecmp(s, "all"))
+                settings->desktop = DESKTOP_ALL;
+            else {
+                gint i = obt_xml_node_int(n);
+                if (i > 0)
+                    settings->desktop = i;
+            }
+            g_free(s);
+        }
+    }
+
+    if ((n = obt_xml_find_node(app->children, "layer"))) {
+        if (!obt_xml_node_contains(n, "default")) {
+            gchar *s = obt_xml_node_string(n);
+            if (!g_ascii_strcasecmp(s, "above"))
+                settings->layer = 1;
+            else if (!g_ascii_strcasecmp(s, "below"))
+                settings->layer = -1;
+            else
+                settings->layer = 0;
+            g_free(s);
+        }
+    }
+
+    if ((n = obt_xml_find_node(app->children, "iconic")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->iconic = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "skip_pager")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->skip_pager = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "skip_taskbar")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->skip_taskbar = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "fullscreen")))
+        if (!obt_xml_node_contains(n, "default"))
+            settings->fullscreen = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "maximized"))) {
+        if (!obt_xml_node_contains(n, "default")) {
+            gchar *s = obt_xml_node_string(n);
+            if (!g_ascii_strcasecmp(s, "horizontal")) {
+                settings->max_horz = TRUE;
+                settings->max_vert = FALSE;
+            } else if (!g_ascii_strcasecmp(s, "vertical")) {
+                settings->max_horz = FALSE;
+                settings->max_vert = TRUE;
+            } else
+                settings->max_horz = settings->max_vert =
+                    obt_xml_node_bool(n);
+            g_free(s);
+        }
+    }
+}
+
 /* Manages settings for individual applications.
    Some notes: monitor is the screen number in a multi monitor
    (Xinerama) setup (starting from 0), or mouse: the monitor the pointer
@@ -221,16 +359,14 @@ void config_parse_gravity_coord(xmlNodePtr node, GravityCoord *c)
 static void parse_per_app_settings(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr app = obt_xml_find_node(node->children, "application");
-    gchar *name = NULL, *class = NULL, *role = NULL, *title = NULL,
-        *type_str = NULL, *group_name = NULL, *group_class = NULL;
-    gboolean name_set, class_set, type_set, role_set, title_set,
-        group_name_set, group_class_set;
-    ObClientType type;
-    gboolean x_pos_given;
-    gboolean width_given;
+    for (; app; app = obt_xml_find_node(app->next, "application")) {
+        ObAppSettings *settings;
 
-    while (app) {
-        x_pos_given = width_given = FALSE;
+        gboolean name_set, class_set, role_set, title_set,
+            type_set, group_name_set, group_class_set;
+        gchar *name = NULL, *class = NULL, *role = NULL, *title = NULL,
+            *type_str = NULL, *group_name = NULL, *group_class = NULL;
+        ObClientType type;
 
         class_set = obt_xml_attr_string(app, "class", &class);
         name_set = obt_xml_attr_string(app, "name", &name);
@@ -262,184 +398,38 @@ static void parse_per_app_settings(xmlNodePtr node, gpointer d)
                 type_set = FALSE; /* not valid! */
         }
 
-        if (class_set || name_set || role_set || title_set || type_set ||
-            group_class_set || group_name_set)
-        {
-            xmlNodePtr n, c;
-            ObAppSettings *settings = config_create_app_settings();
+        if (!(class_set || name_set || role_set || title_set ||
+              type_set || group_class_set || group_name_set))
+            continue;
 
-            if (name_set)
-                settings->name = g_pattern_spec_new(name);
+        settings = config_create_app_settings();
 
-            if (class_set)
-                settings->class = g_pattern_spec_new(class);
+        if (name_set)
+            settings->name = g_pattern_spec_new(name);
+        if (class_set)
+            settings->class = g_pattern_spec_new(class);
+        if (group_name_set)
+            settings->group_name = g_pattern_spec_new(group_name);
+        if (group_class_set)
+            settings->group_class = g_pattern_spec_new(group_class);
+        if (role_set)
+            settings->role = g_pattern_spec_new(role);
+        if (title_set)
+            settings->title = g_pattern_spec_new(title);
+        if (type_set)
+            settings->type = type;
 
-            if (group_name_set)
-                settings->group_name = g_pattern_spec_new(group_name);
+        g_free(name);
+        g_free(class);
+        g_free(group_name);
+        g_free(group_class);
+        g_free(role);
+        g_free(title);
+        g_free(type_str);
 
-            if (group_class_set)
-                settings->group_class = g_pattern_spec_new(group_class);
-
-            if (role_set)
-                settings->role = g_pattern_spec_new(role);
-
-            if (title_set)
-                settings->title = g_pattern_spec_new(title);
-
-            if (type_set)
-                settings->type = type;
-
-            if ((n = obt_xml_find_node(app->children, "decor")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->decor = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "shade")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->shade = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "position"))) {
-                if ((c = obt_xml_find_node(n->children, "x")))
-                    if (!obt_xml_node_contains(c, "default")) {
-                        config_parse_gravity_coord(c, &settings->position.x);
-                        x_pos_given = TRUE;
-                    }
-
-                if (x_pos_given && (c = obt_xml_find_node(n->children, "y")))
-                    if (!obt_xml_node_contains(c, "default")) {
-                        config_parse_gravity_coord(c, &settings->position.y);
-                        settings->pos_given = TRUE;
-                    }
-
-                /* monitor can be set without setting x or y */
-                if ((c = obt_xml_find_node(n->children, "monitor")))
-                    if (!obt_xml_node_contains(c, "default")) {
-                        gchar *s = obt_xml_node_string(c);
-                        if (!g_ascii_strcasecmp(s, "mouse"))
-                            settings->monitor_type =
-                                    OB_PLACE_MONITOR_MOUSE;
-                        else if (!g_ascii_strcasecmp(s, "active"))
-                            settings->monitor_type =
-                                    OB_PLACE_MONITOR_ACTIVE;
-                        else if (!g_ascii_strcasecmp(s, "primary"))
-                            settings->monitor_type =
-                                    OB_PLACE_MONITOR_PRIMARY;
-                        else
-                            settings->monitor = obt_xml_node_int(c);
-                        g_free(s);
-                    }
-
-                obt_xml_attr_bool(n, "force", &settings->pos_force);
-            }
-
-            if ((n = obt_xml_find_node(app->children, "size"))) {
-                if ((c = obt_xml_find_node(n->children, "width"))) {
-                    if (!obt_xml_node_contains(c, "default")) {
-                        gchar *s = obt_xml_node_string(c);
-                        config_parse_relative_number(
-                            s,
-                            &settings->width_num,
-                            &settings->width_denom);
-                        if (settings->width_num > 0 &&
-                            settings->width_denom >= 0)
-                        {
-                            width_given = TRUE;
-                        }
-                        g_free(s);
-                    }
-                }
-
-                if (width_given &&
-                    (c = obt_xml_find_node(n->children, "height")))
-                {
-                        gchar *s = obt_xml_node_string(c);
-                        config_parse_relative_number(
-                            s,
-                            &settings->height_num,
-                            &settings->height_denom);
-                        if (settings->height_num > 0 &&
-                            settings->height_denom >= 0)
-                        {
-                            settings->size_given = TRUE;
-                        }
-                        g_free(s);
-                }
-            }
-
-            if ((n = obt_xml_find_node(app->children, "focus")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->focus = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "desktop"))) {
-                if (!obt_xml_node_contains(n, "default")) {
-                    gchar *s = obt_xml_node_string(n);
-                    if (!g_ascii_strcasecmp(s, "all"))
-                        settings->desktop = DESKTOP_ALL;
-                    else {
-                        gint i = obt_xml_node_int(n);
-                        if (i > 0)
-                            settings->desktop = i;
-                    }
-                    g_free(s);
-                }
-            }
-
-            if ((n = obt_xml_find_node(app->children, "layer")))
-                if (!obt_xml_node_contains(n, "default")) {
-                    gchar *s = obt_xml_node_string(n);
-                    if (!g_ascii_strcasecmp(s, "above"))
-                        settings->layer = 1;
-                    else if (!g_ascii_strcasecmp(s, "below"))
-                        settings->layer = -1;
-                    else
-                        settings->layer = 0;
-                    g_free(s);
-                }
-
-            if ((n = obt_xml_find_node(app->children, "iconic")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->iconic = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "skip_pager")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->skip_pager = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "skip_taskbar")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->skip_taskbar = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "fullscreen")))
-                if (!obt_xml_node_contains(n, "default"))
-                    settings->fullscreen = obt_xml_node_bool(n);
-
-            if ((n = obt_xml_find_node(app->children, "maximized")))
-                if (!obt_xml_node_contains(n, "default")) {
-                    gchar *s = obt_xml_node_string(n);
-                    if (!g_ascii_strcasecmp(s, "horizontal")) {
-                        settings->max_horz = TRUE;
-                        settings->max_vert = FALSE;
-                    } else if (!g_ascii_strcasecmp(s, "vertical")) {
-                        settings->max_horz = FALSE;
-                        settings->max_vert = TRUE;
-                    } else
-                        settings->max_horz = settings->max_vert =
-                            obt_xml_node_bool(n);
-                    g_free(s);
-                }
-
-            config_per_app_settings = g_slist_append(config_per_app_settings,
-                                                     (gpointer) settings);
-            g_free(name);
-            g_free(class);
-            g_free(group_name);
-            g_free(group_class);
-            g_free(role);
-            g_free(title);
-            g_free(type_str);
-            name = class = group_name = group_class = role = title = type_str =
-                NULL;
-        }
-
-        app = obt_xml_find_node(app->next, "application");
+        parse_single_per_app_settings(app, settings);
+        config_per_app_settings = g_slist_append(config_per_app_settings,
+                                                 (gpointer)settings);
     }
 }
 

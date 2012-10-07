@@ -19,6 +19,8 @@ typedef struct {
     gint h;
     gint h_denom;
     gint monitor;
+    gboolean w_sets_client_size;
+    gboolean h_sets_client_size;
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
@@ -57,12 +59,16 @@ static gpointer setup_func(xmlNodePtr node)
         if (g_ascii_strcasecmp(s, "current") != 0)
             config_parse_relative_number(s, &o->w, &o->w_denom);
         g_free(s);
+
+        obt_xml_attr_bool(n, "client", &o->w_sets_client_size);
     }
     if ((n = obt_xml_find_node(node, "height"))) {
         gchar *s = obt_xml_node_string(n);
         if (g_ascii_strcasecmp(s, "current") != 0)
             config_parse_relative_number(s, &o->h, &o->h_denom);
         g_free(s);
+
+        obt_xml_attr_bool(n, "client", &o->h_sets_client_size);
     }
 
     if ((n = obt_xml_find_node(node, "monitor"))) {
@@ -118,13 +124,30 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         area = screen_area(c->desktop, mon, NULL);
         carea = screen_area(c->desktop, cmon, NULL);
 
+        /* find a target size for the client/frame. */
         w = o->w;
-        if (w == G_MININT) w = c->area.width;
+        if (w == G_MININT) {
+            if (o->w_sets_client_size)
+                w = c->area.width;
+            else
+                w = c->frame->area.width;
+        }
         else if (o->w_denom) w = (w * area->width) / o->w_denom;
 
         h = o->h;
-        if (h == G_MININT) h = c->area.height;
+        if (h == G_MININT) {
+            if (o->w_sets_client_size)
+                h = c->area.height;
+            else
+                h = c->frame->area.height;
+        }
         else if (o->h_denom) h = (h * area->height) / o->h_denom;
+
+        /* get back to the client's size. */
+        if (!o->w_sets_client_size)
+            w -= c->frame->size.left + c->frame->size.right;
+        if (!o->h_sets_client_size)
+            h -= c->frame->size.top + c->frame->size.bottom;
 
         /* it might not be able to resize how they requested, so find out what
            it will actually be resized to */

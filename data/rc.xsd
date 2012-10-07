@@ -393,7 +393,8 @@
             <xsd:enumeration value="InactiveWindow"/>
             <xsd:enumeration value="MenuHeader"/>
             <xsd:enumeration value="MenuItem"/>
-            <xsd:enumeration value="OnScreenDisplay"/>
+            <xsd:enumeration value="ActiveOnScreenDisplay"/>
+            <xsd:enumeration value="InactiveOnScreenDisplay"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="fontweight">

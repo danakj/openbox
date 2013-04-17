@@ -27,8 +27,6 @@
 #include "debug.h"
 #include "place_overlap.h"
 
-extern ObDock *dock;
-
 static Rect *choose_pointer_monitor(ObClient *c)
 {
     return screen_area(c->desktop, screen_monitor_pointer(), NULL);
@@ -402,7 +400,7 @@ static gboolean place_least_overlap(ObClient *c, Rect *head, int *x, int *y,
     /* Assemble the list of windows that could overlap with @c in the user's
        current view. */
     GSList* potential_overlap_clients = NULL;
-    gint n_client_rects = 0;
+    gint n_client_rects = config_dock_hide ? 0 : 1;
 
     /* if we're "showing desktop", ignore all existing windows */
     if (!screen_showing_desktop) {
@@ -434,6 +432,8 @@ static gboolean place_least_overlap(ObClient *c, Rect *head, int *x, int *y,
 
     GSList* it;
     guint i = 0;
+    if (!config_dock_hide)
+        dock_get_area(&client_rects[i++]);
     for (it = potential_overlap_clients; it != NULL; it = g_slist_next(it)) {
         ObClient* potential_overlap_client = (ObClient*)it->data;
         client_rects[i] = potential_overlap_client->frame->area;

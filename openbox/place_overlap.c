@@ -39,7 +39,7 @@ void place_overlap_find_least_placement(const Rect* client_rects,
                                         const Size* req_size,
                                         Point* result)
 {
-    POINT_SET(*result, 0, 0);
+    POINT_SET(*result, bound->x, bound->y);
     int overlap = G_MAXINT;
     int max_edges = 2 * (n_client_rects + 1);
 

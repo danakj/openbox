@@ -83,6 +83,8 @@ static void client_dest(ObClient *client, gpointer data)
 {
     if (moveresize_client == client)
         moveresize_end(TRUE);
+    if (popup && client == popup->client)
+        popup->client = NULL;
 }
 
 void moveresize_startup(gboolean reconfig)
@@ -167,6 +169,7 @@ static void popup_coords(ObClient *c, const gchar *format, gint a, gint b)
 
         popup_position(popup, gravity, x, y);
     }
+    popup->client = c;
     popup_show(popup, text);
     g_free(text);
 }
@@ -312,6 +315,7 @@ void moveresize_end(gboolean cancel)
     ungrab_pointer();
 
     popup_hide(popup);
+    popup->client = NULL;
 
     if (!moving) {
 #ifdef SYNC

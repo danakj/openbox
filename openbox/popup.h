@@ -19,6 +19,7 @@
 #ifndef __popup_h
 #define __popup_h
 
+#include "client.h"
 #include "window.h"
 #include "obrender/render.h"
 #include <glib.h>
@@ -57,6 +58,8 @@ struct _ObPopup
 
     void (*draw_icon)(gint x, gint y, gint w, gint h, gpointer data);
     gpointer draw_icon_data;
+
+    ObClient *client;
 };
 
 struct _ObIconPopup

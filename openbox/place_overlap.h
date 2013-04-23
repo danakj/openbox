@@ -20,6 +20,6 @@
 
 void place_overlap_find_least_placement(const Rect* client_rects,
                                         int n_client_rects,
-                                        Rect *const bounds,
+                                        const Rect* bounds,
                                         const Size* req_size,
                                         Point* result);

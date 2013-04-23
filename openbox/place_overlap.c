@@ -23,29 +23,29 @@
 #include <stdlib.h>
 
 static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* bound, int* x_edges, int* y_edges,
+                      const Rect* monitor, int* x_edges, int* y_edges,
                       int max_edges);
 
 static int best_direction(const Point* grid_point,
                           const Rect* client_rects, int n_client_rects,
-                          const Rect* bound, const Size* req_size,
+                          const Rect* monitor, const Size* req_size,
                           Point* best_top_left);
 
 /* Choose the placement on a grid with least overlap */
 
 void place_overlap_find_least_placement(const Rect* client_rects,
                                         int n_client_rects,
-                                        Rect *const bound,
+                                        const Rect *monitor,
                                         const Size* req_size,
                                         Point* result)
 {
-    POINT_SET(*result, bound->x, bound->y);
+    POINT_SET(*result, monitor->x, monitor->y);
     int overlap = G_MAXINT;
     int max_edges = 2 * (n_client_rects + 1);
 
     int x_edges[max_edges];
     int y_edges[max_edges];
-    make_grid(client_rects, n_client_rects, bound,
+    make_grid(client_rects, n_client_rects, monitor,
             x_edges, y_edges, max_edges);
     int i;
     for (i = 0; i < max_edges; ++i) {
@@ -59,7 +59,7 @@ void place_overlap_find_least_placement(const Rect* client_rects,
             Point best_top_left;
             int this_overlap =
                 best_direction(&grid_point, client_rects, n_client_rects,
-                        bound, req_size, &best_top_left);
+                        monitor, req_size, &best_top_left);
             if (this_overlap < overlap) {
                 overlap = this_overlap;
                 *result = best_top_left;
@@ -96,23 +96,23 @@ static void uniquify(int* edges, int n_edges)
 }
 
 static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* bound, int* x_edges, int* y_edges,
+                      const Rect* monitor, int* x_edges, int* y_edges,
                       int max_edges)
 {
     int i;
     int n_edges = 0;
     for (i = 0; i < n_client_rects; ++i) {
-        if (!RECT_INTERSECTS_RECT(client_rects[i], *bound))
+        if (!RECT_INTERSECTS_RECT(client_rects[i], *monitor))
             continue;
         x_edges[n_edges] = client_rects[i].x;
         y_edges[n_edges++] = client_rects[i].y;
         x_edges[n_edges] = client_rects[i].x + client_rects[i].width;
         y_edges[n_edges++] = client_rects[i].y + client_rects[i].height;
     }
-    x_edges[n_edges] = bound->x;
-    y_edges[n_edges++] = bound->y;
-    x_edges[n_edges] = bound->x + bound->width;
-    y_edges[n_edges++] = bound->y + bound->height;
+    x_edges[n_edges] = monitor->x;
+    y_edges[n_edges++] = monitor->y;
+    x_edges[n_edges] = monitor->x + monitor->width;
+    y_edges[n_edges++] = monitor->y + monitor->height;
     for (i = n_edges; i < max_edges; ++i)
         x_edges[i] = y_edges[i] = G_MAXINT;
     qsort(x_edges, n_edges, sizeof(int), compare_ints);
@@ -146,7 +146,7 @@ static int total_overlap(const Rect* client_rects, int n_client_rects,
 
 static int best_direction(const Point* grid_point,
                           const Rect* client_rects, int n_client_rects,
-                          const Rect* bound, const Size* req_size,
+                          const Rect* monitor, const Size* req_size,
                           Point* best_top_left)
 {
     static const Size directions[NUM_DIRECTIONS] = {
@@ -161,7 +161,7 @@ static int best_direction(const Point* grid_point,
         };
         Rect r;
         RECT_SET(r, pt.x, pt.y, req_size->width, req_size->height);
-        if (!RECT_CONTAINS_RECT(*bound, r))
+        if (!RECT_CONTAINS_RECT(*monitor, r))
             continue;
         int this_overlap = total_overlap(client_rects, n_client_rects, &r);
         if (this_overlap < overlap) {

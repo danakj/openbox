@@ -68,9 +68,9 @@ void screen_set_num_desktops(guint num);
 /*! Change the current desktop */
 void screen_set_desktop(guint num, gboolean dofocus);
 /*! Add a new desktop either at the end or inserted at the current desktop */
-void screen_add_desktop(gboolean current);
+void screen_add_desktop(guint index);
 /*! Remove a desktop, either at the end or the current desktop */
-void screen_remove_desktop(gboolean current);
+void screen_remove_desktop(guint index);
 
 guint screen_find_desktop(guint from, ObDirection dir,
                           gboolean wrap, gboolean linear);

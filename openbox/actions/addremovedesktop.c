@@ -3,7 +3,7 @@
 #include <glib.h>
 
 typedef struct {
-    gboolean current;
+    guint index;
     gboolean add;
 } Options;
 
@@ -44,9 +44,11 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_xml_find_node(node, "where"))) {
         gchar *s = obt_xml_node_string(n);
         if (!g_ascii_strcasecmp(s, "last"))
-            o->current = FALSE;
+            o->index = screen_num_desktops;
         else if (!g_ascii_strcasecmp(s, "current"))
-            o->current = TRUE;
+            o->index = screen_desktop;
+        else if (atoi(s) > 0)
+            o->index = atoi(s);
         g_free(s);
     }
 
@@ -80,9 +82,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     actions_client_move(data, TRUE);
 
     if (o->add)
-        screen_add_desktop(o->current);
+        screen_add_desktop(o->index);
     else
-        screen_remove_desktop(o->current);
+        screen_remove_desktop(o->index);
 
     actions_client_move(data, FALSE);
 
@@ -93,27 +95,27 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 static gpointer setup_addcurrent_func(xmlNodePtr node)
 {
     Options *o = setup_add_func(node);
-    o->current = TRUE;
+    o->index = screen_desktop;
     return o;
 }
 
 static gpointer setup_addlast_func(xmlNodePtr node)
 {
     Options *o = setup_add_func(node);
-    o->current = FALSE;
+    o->index = screen_num_desktops;
     return o;
 }
 
 static gpointer setup_removecurrent_func(xmlNodePtr node)
 {
     Options *o = setup_remove_func(node);
-    o->current = TRUE;
+    o->index = screen_desktop;
     return o;
 }
 
 static gpointer setup_removelast_func(xmlNodePtr node)
 {
     Options *o = setup_remove_func(node);
-    o->current = FALSE;
+    o->index = screen_num_desktops;
     return o;
 }

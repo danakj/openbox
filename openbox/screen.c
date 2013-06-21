@@ -740,22 +740,29 @@ void screen_set_desktop(guint num, gboolean dofocus)
         screen_desktop_user_time = event_source_time();
 }
 
-void screen_add_desktop(gboolean current)
+void screen_add_desktop(guint index)
 {
     gulong ignore_start;
 
     /* ignore enter events caused by this */
     ignore_start = event_start_ignore_all_enters();
 
-    screen_set_num_desktops(screen_num_desktops+1);
-
-    /* move all the clients over */
-    if (current) {
+    /* create extra desktops */
+    if (index > screen_num_desktops)
+    {
+        /* no moving clients is needed */
+        screen_set_num_desktops(index);
+    } else {
+        /* add one desktop to the end */
+        screen_set_num_desktops(screen_num_desktops + 1);
         GList *it;
-
+        /* move over the clients in desktops higher than index 
+           to make it look like the new desktop is at index */
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop &&
+            /* NOTE: ObClient.data.desktop is zero-indexed and 
+               index is one-indexed */
+            if (c->desktop != DESKTOP_ALL && c->desktop + 1 >= index &&
                 /* don't move direct children, they'll be moved with their
                    parent - which will have to be on the same desktop */
                 !client_direct_parent(c))
@@ -764,31 +771,33 @@ void screen_add_desktop(gboolean current)
                 client_set_desktop(c, c->desktop+1, FALSE, TRUE);
             }
         }
+        /* Follow current windows */
+        screen_set_desktop(screen_desktop+1, TRUE);
     }
-
+    /* end ignore */
     event_end_ignore_all_enters(ignore_start);
 }
 
-void screen_remove_desktop(gboolean current)
+void screen_remove_desktop(guint index)
 {
-    guint rmdesktop, movedesktop;
+    guint movedesktop;
     GList *it, *stacking_copy;
     gulong ignore_start;
 
-    if (screen_num_desktops <= 1) return;
+    if ((index > screen_num_desktops) || (screen_num_desktops == 1)) return;
 
     /* ignore enter events caused by this */
     ignore_start = event_start_ignore_all_enters();
 
     /* what desktop are we removing and moving to? */
-    if (current)
-        rmdesktop = screen_desktop;
+    // if (current)
+    //     rmdesktop = screen_desktop;
+    // else
+    //     rmdesktop = screen_num_desktops - 1;
+    if (index < screen_num_desktops - 1)
+        movedesktop = index + 1;
     else
-        rmdesktop = screen_num_desktops - 1;
-    if (rmdesktop < screen_num_desktops - 1)
-        movedesktop = rmdesktop + 1;
-    else
-        movedesktop = rmdesktop;
+        movedesktop = index;
 
     /* make a copy of the list cuz we're changing it */
     stacking_copy = g_list_copy(stacking_list);
@@ -806,8 +815,8 @@ void screen_remove_desktop(gboolean current)
             }
             /* raise all the windows that are on the current desktop which
                is being merged */
-            if ((screen_desktop == rmdesktop - 1 ||
-                 screen_desktop == rmdesktop) &&
+            if ((screen_desktop == index - 1 ||
+                 screen_desktop == index) &&
                 (d == DESKTOP_ALL || d == screen_desktop))
             {
                 stacking_raise(CLIENT_AS_WINDOW(c));

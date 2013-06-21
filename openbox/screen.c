@@ -756,11 +756,11 @@ void screen_add_desktop(guint index)
         /* add one desktop to the end */
         screen_set_num_desktops(screen_num_desktops + 1);
         GList *it;
-        /* move over the clients in desktops higher than index 
+        /* move over the clients in desktops higher than index
            to make it look like the new desktop is at index */
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            /* NOTE: ObClient.data.desktop is zero-indexed and 
+            /* NOTE: ObClient.data.desktop is zero-indexed and
                index is one-indexed */
             if (c->desktop != DESKTOP_ALL && c->desktop + 1 >= index &&
                 /* don't move direct children, they'll be moved with their

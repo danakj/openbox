@@ -49,6 +49,7 @@ gcc
 gettext
 automake
 autoconf
+autopoint
 libtool
 libpango1.0-dev
 pkg-config

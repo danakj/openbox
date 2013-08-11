@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox git\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2011-08-01 18:20+0200\n"
+"POT-Creation-Date: 2013-08-11 00:35-0400\n"
 "PO-Revision-Date: 2013-01-01 20:23+0200\n"
 "Last-Translator: Eli Zaretskii <eliz@gnu.org>\n"
 "Language-Team: Rahut <genghiskhan@gmx.ca>\n"
@@ -21,29 +21,29 @@ msgstr ""
 "X-Generator: Poedit 1.5.4\n"
 
 # אין פעולה כזו קיימת
-#: openbox/actions.c:198
+#: openbox/actions.c:216
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "התבקשה פעולה שגויה ‫\"%s\". פעולה שכזו לא קיימת."
 
-#: openbox/actions/execute.c:147
+#: openbox/actions/execute.c:245
 msgid "No"
 msgstr "לא"
 
-#: openbox/actions/execute.c:148
+#: openbox/actions/execute.c:246
 msgid "Yes"
 msgstr "כן"
 
-#: openbox/actions/execute.c:152
+#: openbox/actions/execute.c:250
 msgid "Execute"
 msgstr "הרצה"
 
-#: openbox/actions/execute.c:161
+#: openbox/actions/execute.c:259
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "כשל בהמרת הנתיב ‫\"%s\" מן ‫utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3550
+#: openbox/actions/exit.c:69 openbox/client.c:3659
 msgid "Cancel"
 msgstr "ביטול"
 
@@ -68,19 +68,19 @@ msgstr "האם אכן ברצונך לצאת מן ‫Openbox?"
 msgid "Exit Openbox"
 msgstr "יציאה מן ‫Openbox"
 
-#: openbox/client.c:2037
+#: openbox/client.c:2115
 msgid "Unnamed Window"
 msgstr "חלון ללא שם"
 
-#: openbox/client.c:2051 openbox/client.c:2082
+#: openbox/client.c:2129 openbox/client.c:2160
 msgid "Killing..."
 msgstr "הורג כעת..."
 
-#: openbox/client.c:2053 openbox/client.c:2084
+#: openbox/client.c:2131 openbox/client.c:2162
 msgid "Not Responding"
 msgstr "לא מגיב"
 
-#: openbox/client.c:3539
+#: openbox/client.c:3648
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -88,18 +88,18 @@ msgid ""
 msgstr ""
 "נראה שהחלון ‫\"%s\" לא מגיב.  האם ברצונך לכפות אותו לצאת על ידי שליחת האות ‫%s?"
 
-#: openbox/client.c:3541
+#: openbox/client.c:3650
 msgid "End Process"
 msgstr "סיום תהליך"
 
-#: openbox/client.c:3545
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "נראה שהחלון ‫\"%s\" לא מגיב.  האם ברצונך לנתקו מן השרת ‫X?"
 
-#: openbox/client.c:3547
+#: openbox/client.c:3656
 msgid "Disconnect"
 msgstr "ניתוק"
 
@@ -188,28 +188,28 @@ msgstr "אי/עיטור (_D)"
 msgid "_Close"
 msgstr "סגור (_C)"
 
-#: openbox/config.c:503
+#: openbox/config.c:558
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "הקשר שגוי ‫\"%s\" בכריכת עכבר"
 
-#: openbox/config.c:857
+#: openbox/config.c:910
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "לחצן שגוי ‫\"%s\" צוין בקובץ תצורה"
 
-#: openbox/config.c:882
+#: openbox/config.c:935
 msgid ""
-"Openbox was compiled without image loading support. Icons in menus "
-"will not be loaded."
+"Openbox was compiled without image loading support. Icons in menus will not "
+"be loaded."
 msgstr "‫Openbox הודר ללא תמיכת הטענת תמונות. צלמיות בתפריטים לא יוטענו."
 
-#: openbox/debug.c:55
+#: openbox/debug.c:57
 #, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "לא ניתן ליצור מדור ‫'%s': ‫%s"
 
-#: openbox/debug.c:138 openbox/openbox.c:372
+#: openbox/debug.c:195 openbox/openbox.c:377
 msgid "Close"
 msgstr "סגור"
 
@@ -218,32 +218,32 @@ msgstr "סגור"
 msgid "Conflict with key binding in config file"
 msgstr "התנגשות עם כריכת מקש בקובץ תצורה"
 
-#: openbox/menu.c:94 openbox/menu.c:106
+#: openbox/menu.c:103 openbox/menu.c:115
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
 msgstr "לא ניתן למצוא קובץ תפריט תקף ‫\"%s\""
 
 # קנה
-#: openbox/menu.c:158
+#: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
 msgstr "כשל בהרצת פקודה עבור תפריט-צינור ‫\"%s\": ‫%s"
 
-#: openbox/menu.c:172
+#: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
 msgstr "פלט שגוי מן תפריט-צינור ‫\"%s\""
 
-#: openbox/menu.c:185
+#: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
 msgstr "מנסה לגשת אל תפריט ‫\"%s\" אך הוא לא קיים"
 
-#: openbox/menu.c:400 openbox/menu.c:401
+#: openbox/menu.c:411 openbox/menu.c:412
 msgid "More..."
 msgstr "עוד..."
 
-#: openbox/mouse.c:376
+#: openbox/mouse.c:382
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
 msgstr "לחצן שגוי ‫\"%s\" בכריכת עכבר"
@@ -254,9 +254,8 @@ msgid "Unable to change to home directory \"%s\": %s"
 msgstr "לא ניתן לשנות מדור בית ‫\"%s\": ‫%s"
 
 #: openbox/openbox.c:152
-#, fuzzy
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "cli"
+msgstr ""
 
 #: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
@@ -270,15 +269,11 @@ msgstr "שרת ‫X לא תומך מקומיות."
 msgid "Cannot set locale modifiers for the X server."
 msgstr "לא ניתן להגדיר משתני מקומיות עבור השרת ‫X."
 
-#: openbox/openbox.c:253
+#: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "לא ניתן למצוא קובץ תצורה תקף, עושה שימוש כעת בהגדרות משתמטות פשוטות"
 
-#: openbox/openbox.c:286
-msgid "Unable to load a theme."
-msgstr "לא ניתן להטעין מוטיב."
-
-#: openbox/openbox.c:370
+#: openbox/openbox.c:270
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -289,145 +284,130 @@ msgstr ""
 "stdout עבור מידע נוסף.  השגיאה האחרונה שנראתה הייתה בקובץ ‫\"%s\" שורה %d, עם "
 "הודעה: %s"
 
-#: openbox/openbox.c:372
+#: openbox/openbox.c:295
+msgid "Unable to load a theme."
+msgstr "לא ניתן להטעין מוטיב."
+
+#: openbox/openbox.c:376
 msgid "Openbox Syntax Error"
 msgstr "שגיאת תחביר ‫Openbox"
 
-#: openbox/openbox.c:438
+#: openbox/openbox.c:442
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
 
-#: openbox/openbox.c:517 openbox/openbox.c:519
-#, fuzzy
+#: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:528
-#, fuzzy
+#: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:529
-#, fuzzy
+#: openbox/openbox.c:533
 msgid ""
 "\n"
 "Options:\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:530
-#, fuzzy
+#: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:531
-#, fuzzy
+#: openbox/openbox.c:535
 msgid "  --version           Display the version and exit\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:532
-#, fuzzy
+#: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr "cli"
+msgstr ""
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:536
-#, fuzzy
+#: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:537
-#, fuzzy
+#: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:538
-#, fuzzy
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:539
-#, fuzzy
+#: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:540
-#, fuzzy
+#: openbox/openbox.c:544
 msgid "  --restart           Restart Openbox\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:541
-#, fuzzy
+#: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:542
-#, fuzzy
+#: openbox/openbox.c:546
 msgid ""
 "\n"
 "Debugging options:\n"
-msgstr "cli"
-
-#: openbox/openbox.c:543
-#, fuzzy
-msgid "  --sync              Run in synchronous mode\n"
-msgstr "cli"
-
-#: openbox/openbox.c:544
-#, fuzzy
-msgid "  --startup CMD       Run CMD after starting\n"
-msgstr "cli"
-
-#: openbox/openbox.c:545
-#, fuzzy
-msgid "  --debug             Display debugging output\n"
-msgstr "cli"
-
-#: openbox/openbox.c:546
-#, fuzzy
-msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr "cli"
+msgstr ""
 
 #: openbox/openbox.c:547
-#, fuzzy
-msgid "  --debug-session     Display debugging output for session management\n"
-msgstr "cli"
+msgid "  --sync              Run in synchronous mode\n"
+msgstr ""
 
 #: openbox/openbox.c:548
-#, fuzzy
-msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "cli"
+msgid "  --startup CMD       Run CMD after starting\n"
+msgstr ""
 
 #: openbox/openbox.c:549
-#, fuzzy, c-format
+msgid "  --debug             Display debugging output\n"
+msgstr ""
+
+#: openbox/openbox.c:550
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+
+#: openbox/openbox.c:551
+msgid "  --debug-session     Display debugging output for session management\n"
+msgstr ""
+
+#: openbox/openbox.c:552
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+
+#: openbox/openbox.c:553
+#, c-format
 msgid ""
 "\n"
 "Please report bugs at %s\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:632 openbox/openbox.c:666
-#, fuzzy, c-format
+#: openbox/openbox.c:636 openbox/openbox.c:670
+#, c-format
 msgid "%s requires an argument\n"
-msgstr "cli"
+msgstr ""
 
-#: openbox/openbox.c:709
-#, fuzzy, c-format
+#: openbox/openbox.c:713
+#, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "cli"
+msgstr ""
 
 #: openbox/screen.c:106 openbox/screen.c:191
-#, fuzzy, c-format
+#, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "cli"
+msgstr ""
 
 #: openbox/screen.c:127
-#, fuzzy, c-format
+#, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "cli"
+msgstr ""
 
 #: openbox/screen.c:150
 #, c-format
@@ -438,7 +418,7 @@ msgstr "מנהל החלונות שעל מרקע %d אינו קיים"
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:418
+#: openbox/screen.c:421
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -453,7 +433,7 @@ msgstr[1] ""
 "‫Openbox הינו מוגדר עבור %d מרחבים, אולם לסשן הנוכחי יש %d.  עוקף כעת את "
 "התצורה של ‫Openbox."
 
-#: openbox/screen.c:1205
+#: openbox/screen.c:1204
 #, c-format
 msgid "desktop %i"
 msgstr "מרחב ‫%i"
@@ -483,6 +463,6 @@ msgstr "שם מקש שגוי ‫\"%s\" בכריכת מקש"
 msgid "Requested key \"%s\" does not exist on the display"
 msgstr "מקש מבוקש ‫\"%s\" לא קיים על הצג"
 
-#: openbox/prompt.c:153
+#: openbox/prompt.c:154
 msgid "OK"
 msgstr "אישור"

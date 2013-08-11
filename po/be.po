@@ -3,12 +3,12 @@
 # This file is distributed under the same license as the openbox package.
 # Mikalai Udodau <crom-a@tut.by>, 2012.
 #
-#, fuzzy
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.4.11\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"POT-Creation-Date: 2013-08-11 00:35-0400\n"
 "PO-Revision-Date: 2012-07-16 20:55+0300\n"
 "Last-Translator: Mikalai Udodau <crom-a@tut.by>\n"
 "Language-Team: Belarusian <i18n@mova.org>\n"
@@ -16,232 +16,235 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
-"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: openbox/actions.c:149
+#: openbox/actions.c:216
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Запытана недапушчальнае дзеянне \"%s\". Няма такога дзеяння."
 
-#: openbox/actions/execute.c:128
+#: openbox/actions/execute.c:245
 msgid "No"
 msgstr "Не"
 
-#: openbox/actions/execute.c:129
+#: openbox/actions/execute.c:246
 msgid "Yes"
 msgstr "Так"
 
-#: openbox/actions/execute.c:133
+#: openbox/actions/execute.c:250
 msgid "Execute"
 msgstr "Выканаць"
 
-#: openbox/actions/execute.c:142
+#: openbox/actions/execute.c:259
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Не ўдалося пераўтварыць шлях \"%s\" з utf8"
 
-#: openbox/actions/exit.c:52 openbox/actions/session.c:64
-#: openbox/client.c:3465
+#: openbox/actions/exit.c:69 openbox/client.c:3659
 msgid "Cancel"
 msgstr "Скасаваць"
 
-#: openbox/actions/exit.c:53
+#: openbox/actions/exit.c:70
 msgid "Exit"
 msgstr "Выйсці"
 
-#: openbox/actions/exit.c:56
-msgid "Are you sure you want to exit Openbox?"
-msgstr "Сапраўды хочаце выйсці з Openbox?"
-
-#: openbox/actions/exit.c:57
-msgid "Exit Openbox"
-msgstr "Выйсці з Openbox"
-
-#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
-#. name of the action you write in rc.xml
-#: openbox/actions/session.c:43
-msgid ""
-"The SessionLogout action is not available since Openbox was built without "
-"session management support"
-msgstr ""
-"Дзеянне SessionLogout недаступна, таму што Openbox сабраны без падтрымкі "
-"кіравання сеансамі"
-
-#: openbox/actions/session.c:65 openbox/actions/session.c:70
-msgid "Log Out"
-msgstr "Выйсці"
-
-#: openbox/actions/session.c:69
+#: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
 msgstr "Вы сапраўды хочаце выйсці?"
 
-#: openbox/client.c:2012
+#: openbox/actions/exit.c:75
+msgid "Log Out"
+msgstr "Выйсці"
+
+#: openbox/actions/exit.c:78
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Сапраўды хочаце выйсці з Openbox?"
+
+#: openbox/actions/exit.c:79
+msgid "Exit Openbox"
+msgstr "Выйсці з Openbox"
+
+#: openbox/client.c:2115
 msgid "Unnamed Window"
 msgstr "Неназванае вакно"
 
-#: openbox/client.c:2026 openbox/client.c:2058
+#: openbox/client.c:2129 openbox/client.c:2160
 msgid "Killing..."
 msgstr "Прыбіццё..."
 
-#: openbox/client.c:2028 openbox/client.c:2060
+#: openbox/client.c:2131 openbox/client.c:2162
 msgid "Not Responding"
 msgstr "Не адказвае"
 
-#: openbox/client.c:3454
+#: openbox/client.c:3648
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"Акно \"%s\" не адказвае, здаецца. Ці хочаце прымусіць яго закрыцца, "
-"даслаўшы яму сігнал %s?"
+"Акно \"%s\" не адказвае, здаецца. Ці хочаце прымусіць яго закрыцца, даслаўшы "
+"яму сігнал %s?"
 
-#: openbox/client.c:3456
+#: openbox/client.c:3650
 msgid "End Process"
 msgstr "Скончыць працэс"
 
-#: openbox/client.c:3460
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
-"Вакно \"%s\" не адказвае, здаецца.  Вы хочаце адлучыць яго "
-"ад X-сервера?"
+"Вакно \"%s\" не адказвае, здаецца.  Вы хочаце адлучыць яго ад X-сервера?"
 
-#: openbox/client.c:3462
+#: openbox/client.c:3656
 msgid "Disconnect"
 msgstr "Адлучыць"
 
-#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
+#: openbox/client_list_combined_menu.c:93 openbox/client_list_menu.c:90
 msgid "Go there..."
 msgstr "Перайсці..."
 
-#: openbox/client_list_combined_menu.c:94
+#: openbox/client_list_combined_menu.c:100
 msgid "Manage desktops"
 msgstr "Кіраваць прасторамі"
 
-#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
+#: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
 msgstr "Дадаць прастору"
 
-#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
+#: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
 msgstr "Сцерці апошнюю прастору"
 
-#: openbox/client_list_combined_menu.c:149
+#: openbox/client_list_combined_menu.c:157
 msgid "Windows"
 msgstr "Вокны"
 
-#: openbox/client_list_menu.c:203
+#: openbox/client_list_menu.c:214
 msgid "Desktops"
 msgstr "Прасторы"
 
-#: openbox/client_menu.c:258
+#: openbox/client_menu.c:259
 msgid "All desktops"
 msgstr "Усе прасторы"
 
-#: openbox/client_menu.c:370
+#: openbox/client_menu.c:371
 msgid "_Layer"
 msgstr "Узровень (_L)"
 
-#: openbox/client_menu.c:375
+#: openbox/client_menu.c:376
 msgid "Always on _top"
 msgstr "Заўжды наверсе (_T)"
 
-#: openbox/client_menu.c:376
+#: openbox/client_menu.c:377
 msgid "_Normal"
 msgstr "Звычайны (_N)"
 
-#: openbox/client_menu.c:377
+#: openbox/client_menu.c:378
 msgid "Always on _bottom"
 msgstr "Заўжды долу (_B)"
 
-#: openbox/client_menu.c:379
+#: openbox/client_menu.c:380
 msgid "_Send to desktop"
 msgstr "Даслаць на прастору (_S)"
 
-#: openbox/client_menu.c:383
+#: openbox/client_menu.c:384
 msgid "Client menu"
 msgstr "Кліенцкае меню"
 
-#: openbox/client_menu.c:393
+#: openbox/client_menu.c:394
 msgid "R_estore"
 msgstr "Узнавіць (_E)"
 
-#: openbox/client_menu.c:397
+#: openbox/client_menu.c:398
 msgid "_Move"
 msgstr "Перамясціць (_M)"
 
-#: openbox/client_menu.c:399
+#: openbox/client_menu.c:400
 msgid "Resi_ze"
 msgstr "Змяніць памер (_Z)"
 
-#: openbox/client_menu.c:401
+#: openbox/client_menu.c:402
 msgid "Ico_nify"
 msgstr "Згарнуць (_N)"
 
-#: openbox/client_menu.c:405
+#: openbox/client_menu.c:406
 msgid "Ma_ximize"
 msgstr "Максімізаваць (_X)"
 
-#: openbox/client_menu.c:409
+#: openbox/client_menu.c:410
 msgid "_Roll up/down"
 msgstr "Скруціць/раскруціць (_R)"
 
-#: openbox/client_menu.c:411
+#: openbox/client_menu.c:414
 msgid "Un/_Decorate"
 msgstr "Раз/Абрамленне (_D)"
 
-#: openbox/client_menu.c:415
+#: openbox/client_menu.c:418
 msgid "_Close"
 msgstr "Закрыць (_C)"
 
-#: openbox/config.c:781
-#, c-format
-msgid "Invalid button \"%s\" specified in config file"
-msgstr "Недапушчальная клавіша \"%s\" пазначана ў файле канфігурацыі"
-
-#: openbox/keyboard.c:157
-msgid "Conflict with key binding in config file"
-msgstr "Канфлікт з клавіятурным скаротам у файле канфігурацыі"
-
-#: openbox/menu.c:102 openbox/menu.c:110
-#, c-format
-msgid "Unable to find a valid menu file \"%s\""
-msgstr "Немагчыма знайсці спраўны файл меню \"%s\""
-
-#: openbox/menu.c:170
-#, c-format
-msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Не ўдалося выканаць загад з канальнага меню \"%s\": %s"
-
-#: openbox/menu.c:184
-#, c-format
-msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Недапушчальны вывад з канальнага меню \"%s\""
-
-#: openbox/menu.c:197
-#, c-format
-msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Спроба адкрыць меню \"%s\", але яно не існуе"
-
-#: openbox/menu.c:367 openbox/menu.c:368
-msgid "More..."
-msgstr "Яшчэ..."
-
-#: openbox/mouse.c:373
-#, c-format
-msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Недапушчальная кнопка \"%s\" у спалучэнні мышы"
-
-#: openbox/mouse.c:379
+#: openbox/config.c:558
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Недапушчальны кантэкст \"%s\" у спалучэнні мышы"
 
-#: openbox/openbox.c:133
+#: openbox/config.c:910
+#, c-format
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Недапушчальная клавіша \"%s\" пазначана ў файле канфігурацыі"
+
+#: openbox/config.c:935
+msgid ""
+"Openbox was compiled without image loading support. Icons in menus will not "
+"be loaded."
+msgstr ""
+
+#: openbox/debug.c:57
+#, c-format
+msgid "Unable to make directory '%s': %s"
+msgstr ""
+
+#: openbox/debug.c:195 openbox/openbox.c:377
+msgid "Close"
+msgstr "Закрыць"
+
+#: openbox/keyboard.c:161
+msgid "Conflict with key binding in config file"
+msgstr "Канфлікт з клавіятурным скаротам у файле канфігурацыі"
+
+#: openbox/menu.c:103 openbox/menu.c:115
+#, c-format
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Немагчыма знайсці спраўны файл меню \"%s\""
+
+#: openbox/menu.c:168
+#, c-format
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Не ўдалося выканаць загад з канальнага меню \"%s\": %s"
+
+#: openbox/menu.c:182
+#, c-format
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Недапушчальны вывад з канальнага меню \"%s\""
+
+#: openbox/menu.c:195
+#, c-format
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Спроба адкрыць меню \"%s\", але яно не існуе"
+
+#: openbox/menu.c:411 openbox/menu.c:412
+msgid "More..."
+msgstr "Яшчэ..."
+
+#: openbox/mouse.c:382
+#, c-format
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Недапушчальная кнопка \"%s\" у спалучэнні мышы"
+
+#: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
 msgstr "Немагчыма перайсці ў хатні каталог \"%s\": %s"
@@ -250,27 +253,23 @@ msgstr "Немагчыма перайсці ў хатні каталог \"%s\":
 msgid "Failed to open the display from the DISPLAY environment variable."
 msgstr "Не ўдалося адкрыць дысплей, пазначаны ў пераменнай асяроддзя DISPLAY"
 
-#: openbox/openbox.c:183
+#: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
 msgstr "Не ўдалося ініцыялізаваць бібліятэку obrender"
 
-#: openbox/openbox.c:194
+#: openbox/openbox.c:193
 msgid "X server does not support locale."
 msgstr "X-сервер не падтрымлівае локал."
 
-#: openbox/openbox.c:196
+#: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
 msgstr "Немагчыма ўстанавіць мадыфікатары локала для X-сервера."
 
-#: openbox/openbox.c:263
+#: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr "Не знойдзены спраўны файл канфігурацыі, ужываем прадвызначэнні"
 
-#: openbox/openbox.c:297
-msgid "Unable to load a theme."
-msgstr "Немагчыма прачытаць тэму."
-
-#: openbox/openbox.c:377
+#: openbox/openbox.c:270
 #, c-format
 msgid ""
 "One or more XML syntax errors were found while parsing the Openbox "
@@ -278,30 +277,31 @@ msgid ""
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
 "Адна ці больш памылак сінтаксісу XML сустрэліся падчас разбору "
-"канфігурацыйных файлаў Openbox. Гл. стд.вывад за дэталямі. Апошняя бачаная памылка "
-"была ў файле \"%s\" радок %d, з паведамленнем: %s"
+"канфігурацыйных файлаў Openbox. Гл. стд.вывад за дэталямі. Апошняя бачаная "
+"памылка была ў файле \"%s\" радок %d, з паведамленнем: %s"
 
-#: openbox/openbox.c:379
+#: openbox/openbox.c:295
+msgid "Unable to load a theme."
+msgstr "Немагчыма прачытаць тэму."
+
+#: openbox/openbox.c:376
 msgid "Openbox Syntax Error"
 msgstr "Памылка сінтаксісу Openbox"
 
-#: openbox/openbox.c:379
-msgid "Close"
-msgstr "Закрыць"
-
-#: openbox/openbox.c:448
+#: openbox/openbox.c:442
+#, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr "Перазапуск не змог запусціць новы выканальны файл \"%s\": %s"
 
-#: openbox/openbox.c:518 openbox/openbox.c:520
+#: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
 msgstr "Аўтарскае права (c)"
 
-#: openbox/openbox.c:529
+#: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
 msgstr "Сінтаксіс: openbox [опцыі]\n"
 
-#: openbox/openbox.c:530
+#: openbox/openbox.c:533
 msgid ""
 "\n"
 "Options:\n"
@@ -309,30 +309,30 @@ msgstr ""
 "\n"
 "Опцыі:\n"
 
-#: openbox/openbox.c:531
+#: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
 msgstr "  --help              Паказаць гэту даведку і выйсці\n"
 
-#: openbox/openbox.c:532
+#: openbox/openbox.c:535
 msgid "  --version           Display the version and exit\n"
 msgstr "  --version           Паказаць нумар версіі і выйсці\n"
 
-#: openbox/openbox.c:533
+#: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr "  --replace           Замяніць запушчаны цяпер кіраўнік вокнаў\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
 #. fine to leave it as FILE though.
-#: openbox/openbox.c:537
+#: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr "  --config-file ФАЙЛ  Задаць шлях да файла канфігурацыі\n"
 
-#: openbox/openbox.c:538
+#: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
 msgstr "  --sm-disable        Забараніць злучэнне з кіраўніком сеансаў\n"
 
-#: openbox/openbox.c:539
+#: openbox/openbox.c:542
 msgid ""
 "\n"
 "Passing messages to a running Openbox instance:\n"
@@ -340,19 +340,19 @@ msgstr ""
 "\n"
 "Дасыланне паведамленняў бягучаму асобніку Openbox:\n"
 
-#: openbox/openbox.c:540
+#: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
 msgstr "  --reconfigure       Перачытаць канфігурацыю Openbox'а\n"
 
-#: openbox/openbox.c:541
+#: openbox/openbox.c:544
 msgid "  --restart           Restart Openbox\n"
 msgstr "  --restart           Перазапусціць Openbox\n"
 
-#: openbox/openbox.c:542
+#: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
 msgstr "  --exit              Выйсці з Openbox\n"
 
-#: openbox/openbox.c:543
+#: openbox/openbox.c:546
 msgid ""
 "\n"
 "Debugging options:\n"
@@ -360,23 +360,32 @@ msgstr ""
 "\n"
 "Опцыі адладкі:\n"
 
-#: openbox/openbox.c:544
+#: openbox/openbox.c:547
 msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Выконваць у сінхронным рэжыме\n"
 
-#: openbox/openbox.c:545
+#: openbox/openbox.c:548
+msgid "  --startup CMD       Run CMD after starting\n"
+msgstr ""
+
+#: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
 msgstr "  --debug             Паказваць вывад адладкі\n"
 
-#: openbox/openbox.c:546
+#: openbox/openbox.c:550
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Паказваць вывад адладкі па кіраванні фокусам\n"
 
-#: openbox/openbox.c:547
-msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Разбіць дысплей на несапраўдныя экраны xinerama\n"
+#: openbox/openbox.c:551
+msgid "  --debug-session     Display debugging output for session management\n"
+msgstr ""
 
-#: openbox/openbox.c:548
+#: openbox/openbox.c:552
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr ""
+"  --debug-xinerama    Разбіць дысплей на несапраўдныя экраны xinerama\n"
+
+#: openbox/openbox.c:553
 #, c-format
 msgid ""
 "\n"
@@ -385,26 +394,27 @@ msgstr ""
 "\n"
 "Паведамляйце пра памылкі на %s\n"
 
-#: openbox/openbox.c:617
-msgid "--config-file requires an argument\n"
-msgstr "--config-file патрабуе аргумент\n"
+#: openbox/openbox.c:636 openbox/openbox.c:670
+#, c-format
+msgid "%s requires an argument\n"
+msgstr "%s патрабуе аргумент\n"
 
-#: openbox/openbox.c:660
+#: openbox/openbox.c:713
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
 msgstr "Недапушчальны аргумент загаднага радка \"%s\"\n"
 
-#: openbox/screen.c:102 openbox/screen.c:190
+#: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
 msgstr "Кіраўнік вокнаў ужо выконваецца для экрана %d"
 
-#: openbox/screen.c:124
+#: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
 msgstr "Немагчыма ўзяць вылучэнне кіраўніка вокнаў на экране %d"
 
-#: openbox/screen.c:145
+#: openbox/screen.c:150
 #, c-format
 msgid "The WM on screen %d is not exiting"
 msgstr "Кіраўнік вокнаў на экране %d не завяршаецца"
@@ -413,7 +423,7 @@ msgstr "Кіраўнік вокнаў на экране %d не завяршае
 #. arguments, you can use %1$d for the first one and %2$d for the
 #. second one. For example,
 #. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
-#: openbox/screen.c:412
+#: openbox/screen.c:421
 #, c-format
 msgid ""
 "Openbox is configured for %d desktop, but the current session has %d.  "
@@ -431,31 +441,12 @@ msgstr[2] ""
 "Openbox сканфігураваны на %d прастораў, але ж бягучы сеанс мае %d.  "
 "Перагледжваем канфігурацыю Openbox."
 
-#: openbox/screen.c:1180
+#: openbox/screen.c:1204
 #, c-format
 msgid "desktop %i"
 msgstr "працоўная прастора %i"
 
-#: openbox/session.c:104
-#, c-format
-msgid "Unable to make directory \"%s\": %s"
-msgstr "Немагчыма стварыць каталог \"%s\": %s"
-
-#: openbox/session.c:466
-#, c-format
-msgid "Unable to save the session to \"%s\": %s"
-msgstr "Немагчыма запісаць сеанс у \"%s\": %s"
-
-#: openbox/session.c:605
-#, c-format
-msgid "Error while saving the session to \"%s\": %s"
-msgstr "Памылка захавання сеансу ў \"%s\": %s"
-
-#: openbox/session.c:842
-msgid "Not connected to a session manager"
-msgstr "Не далучана да кіраўніка сеансаў"
-
-#: openbox/startupnotify.c:243
+#: openbox/startupnotify.c:241
 #, c-format
 msgid "Running %s"
 msgstr "Запуск %s"
@@ -480,11 +471,6 @@ msgstr "Недапушчальная назва клавішы \"%s\" у спа�
 msgid "Requested key \"%s\" does not exist on the display"
 msgstr "Запытаны ключ \"%s\" не існуе на гэтым дысплеі"
 
-#: openbox/xerror.c:40
-#, c-format
-msgid "X Error: %s"
-msgstr "Памылка X: %s"
-
-#: openbox/prompt.c:200
+#: openbox/prompt.c:154
 msgid "OK"
 msgstr "ОК"

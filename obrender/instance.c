@@ -57,8 +57,6 @@ void print_refs(gint id)
 
 RrInstance* RrInstanceNew (Display *display, gint screen)
 {
-    g_type_init(); /* supposedly needed for pango but seems to work without */
-
     definst = g_slice_new(RrInstance);
     definst->display = display;
     definst->screen = screen;

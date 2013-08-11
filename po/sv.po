@@ -197,10 +197,10 @@ msgstr "Ogiltig knapp \"%s\" angiven i konfigurationsfilen"
 
 #: openbox/config.c:882
 msgid ""
-"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"Openbox was compiled without image loading support. Icons in menus "
 "will not be loaded."
 msgstr ""
-"Openbox kompilerades utan stöd för att ladda bilder via Imlib2. Ikoner i "
+"Openbox kompilerades utan stöd för att ladda bilder. Ikoner i "
 "menyer kommer inte att laddas."
 
 #: openbox/debug.c:55

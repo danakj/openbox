@@ -196,7 +196,7 @@ msgstr "Ugyldig tast \"%s\" spesifisert i konfigurasjonsfilen"
 
 #: openbox/config.c:882
 msgid ""
-"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"Openbox was compiled without image loading support. Icons in menus "
 "will not be loaded."
 msgstr ""
 

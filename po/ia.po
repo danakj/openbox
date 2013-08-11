@@ -289,7 +289,7 @@ msgid ""
 msgstr ""
 "Un o plus errores de syntaxe XML se ha trovate durante le analyse de files "
 "de configuration de Openbox. Reguarda stdout pro plus del information. Le "
-"ultime error trovate esseva in le file \"%s\" al linea %s, con le message: %s"
+"ultime error trovate esseva in le file \"%s\" al linea %d, con le message: %s"
 
 #: openbox/openbox.c:372
 msgid "Openbox Syntax Error"

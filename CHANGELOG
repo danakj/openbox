@@ -1,3 +1,25 @@
+3.5.1:
+  * New translations: Afrikaans, Belarusian, Interlingua, Hebrew, Romanian,
+    Greek.
+  * Updated translations: Italian, Serbian, Spanish, Czech, Hungarian, Turkish,
+    German, Arabic, Polish, Dutch, Lithuanian, Portuguese, Estonian.
+  * SVG icon support. This is optional, depending on librsvg being installed.
+  * Allow application rules to control window size with a new <size> tag.
+  * Allow application rules to pick a monitor for new windows without forcing
+    a position.
+  * Allow non-interactive focus cycling with a new <interactive> tag.
+  * New LeastOverlap window placement policy replaces the old default
+    behaviour. It finds a place on a given monitor that overlaps as few
+    windows as possible. Contributed by Ian Zimmerman.
+  * Improved Xinerama behaviour.
+  * Correctly interface with latest gnome-session for Gnome/Openbox X sessions.
+  * Allow third-party control of window opacity in compositing managers.
+  * Improved themeing options. Contributed by Dave Foster.
+  * Addresses bugs #4661, #5506, #5186, #5758, #5410, #5228, #5277, #5731,
+    #5746, #5737, #5419, #5721, #5711, #5385, #5500, #4992, #5443, #5518,
+    #5444, #4782, #5237, #5228, #5173, #5203, #5246, #5180, #5179, #5150,
+    #5132, #4937, #4889, #5253, #3769, among others.
+
 3.5.0:
   * New alt-tab dialog shows windows in a vertical list.
   * Improved Xinerama support.

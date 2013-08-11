@@ -136,7 +136,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         h = o->h;
         if (h == G_MININT) {
-            if (o->w_sets_client_size)
+            if (o->h_sets_client_size)
                 h = c->area.height;
             else
                 h = c->frame->area.height;

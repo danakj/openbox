@@ -212,7 +212,7 @@ static gpointer setup_center_func(xmlNodePtr node)
     o->y.pos = G_MININT;
     o->w = G_MININT;
     o->h = G_MININT;
-    o->monitor = -1;
+    o->monitor = CURRENT_MONITOR;
     o->x.center = TRUE;
     o->y.center = TRUE;
     return o;

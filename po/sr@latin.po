@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2010-05-18 15:43+0100\n"
 "Last-Translator: Jay Alexander Fleming <tito.nehru.naser@gmail.com>\n"
 "Language-Team: None\n"
@@ -187,17 +187,17 @@ msgstr "Ne/Ukrasi"
 msgid "_Close"
 msgstr "Zatvori"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Pogrešan sadržaj „%s“ u spajanju miša"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Pogrešno dugme „%s“ navedeno u datoteci za podešavanje"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

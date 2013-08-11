@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2013-06-13 20:37+0100\n"
 "Last-Translator: Piotr Strębski <strebski@o2.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -189,17 +189,17 @@ msgstr "Wyświetl/ukryj _dekoracje"
 msgid "_Close"
 msgstr "Z_amknij"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Nieprawidłowy kontekst \"%s\" w skrócie myszy"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Nieprawidłowy przycisk \"%s\" określony w pliku konfiguracyjnym"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

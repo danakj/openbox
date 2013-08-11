@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2012-09-18 21:51+0100\n"
 "Last-Translator: Volker Ribbert <volker.nospam@netcologne.de>\n"
 "Language-Team:  <de@li.org>\n"
@@ -189,17 +189,17 @@ msgstr "_Titelleiste ein/aus"
 msgid "_Close"
 msgstr "_Schließen"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Maus-Einbindung mit ungültigem Kontext \"%s\""
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Ungültige Taste \"%s\" in Konfigurationsdatei"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

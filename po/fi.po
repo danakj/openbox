@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.11\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2010-03-13 21:56+0100\n"
 "Last-Translator: Lauri Hakko <aperculum@gmail.com>\n"
 "Language-Team: None\n"
@@ -188,17 +188,17 @@ msgstr "(Epä)_reunusta"
 msgid "_Close"
 msgstr "_Sulje"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Virheellinen asiayhteys \"%s\" hiirisidonnoissa"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Asetustiedostossa määritelty painike \"%s\" on virheellinen"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

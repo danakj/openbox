@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2008-10-22 18:06+0100\n"
 "Last-Translator: Inko I. A. <inkoia@gmail.com>\n"
 "Language-Team: Inko I. A. <inkoia@gmail.com>\n"
@@ -185,17 +185,17 @@ msgstr "Des/_Dekoratu"
 msgid "_Close"
 msgstr "_Itxi"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Baliogabeko \"%s\" testuingurua sagu elkarketan"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Konfigurazio fitxategian zehaztutako \"%s\" botoia baliogabea"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

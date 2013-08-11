@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox-3.4.8\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2009-07-16 17:30+0200\n"
 "Last-Translator: Frantisek Elias <elias.frantisek@gmail.com>\n"
 "Language-Team: Slovak <sk@sk.org>\n"
@@ -182,17 +182,17 @@ msgstr "(Ne)_Dekorovať"
 msgid "_Close"
 msgstr "Z_avrieť"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Neplatný kontext \"%s\" v priradení myši"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Neplatné tlačidlo \"%s\" špecifikované v konfiguračnom súbore"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

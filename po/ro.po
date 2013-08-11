@@ -29,7 +29,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 00:35-0400\n"
+"POT-Creation-Date: 2013-08-11 13:47-0400\n"
 "PO-Revision-Date: 2010-10-26 23:51+0100\n"
 "Last-Translator: Radu Feflea <rfeflea@googlemail.com>\n"
 "Language-Team: none\n"
@@ -206,17 +206,17 @@ msgstr "_Ascunde/afișează bara de titlu"
 msgid "_Close"
 msgstr "În_chide"
 
-#: openbox/config.c:558
+#: openbox/config.c:556
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Context invalid “%s” în configurarea mouse-ului"
 
-#: openbox/config.c:910
+#: openbox/config.c:908
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Buton invalid “%s” specificat în fișierul de configurare"
 
-#: openbox/config.c:935
+#: openbox/config.c:933
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

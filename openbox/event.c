@@ -2004,9 +2004,9 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
 
     switch (ev->type) {
     case MotionNotify:
-        // We need to catch MotionNotify in addition to EnterNotify because
-        // it is possible for the menu to be opened under the mouse cursor, and
-        // moving the mouse should select the item.
+        /* We need to catch MotionNotify in addition to EnterNotify because
+           it is possible for the menu to be opened under the mouse cursor, and
+           moving the mouse should select the item. */
         if ((e = g_hash_table_lookup(menu_frame_map, &ev->xmotion.window))) {
             if (e->ignore_enters)
                 --e->ignore_enters;
@@ -2029,7 +2029,7 @@ static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
         }
         break;
     case LeaveNotify:
-        /*ignore leaves when we're already in the window */
+        /* ignore leaves when we're already in the window */
         if (ev->xcrossing.detail == NotifyInferior)
             break;
 

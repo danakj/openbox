@@ -87,9 +87,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         if (bottom && ABS(bottom) < c->size_inc.height)
             bottom = bottom < 0 ? -c->size_inc.height : c->size_inc.height;
 
-        // When resizing, if the resize has a non-zero value then make sure it
-        // is at least as big as the size increment so the window does actually
-        // resize.
+        /* When resizing, if the resize has a non-zero value then make sure it
+           is at least as big as the size increment so the window does actually
+           resize. */
         x = c->area.x;
         y = c->area.y;
         ow = c->area.width;

@@ -15,10 +15,12 @@
   * Correctly interface with latest gnome-session for Gnome/Openbox X sessions.
   * Allow third-party control of window opacity in compositing managers.
   * Improved themeing options. Contributed by Dave Foster.
+  * Add <monitor>, <title type="regex">, <title type="plain"> and
+    <activedesktop> options to If action.
   * Addresses bugs #4661, #5506, #5186, #5758, #5410, #5228, #5277, #5731,
     #5746, #5737, #5419, #5721, #5711, #5385, #5500, #4992, #5443, #5518,
     #5444, #4782, #5237, #5228, #5173, #5203, #5246, #5180, #5179, #5150,
-    #5132, #4937, #4889, #5253, #3769, among others.
+    #5132, #4937, #4889, #5253, #3769, #5819, #5811, #5081, #5426 among others.
 
 3.5.0:
   * New alt-tab dialog shows windows in a vertical list.

@@ -51,7 +51,6 @@ struct _ObAppSettings
     gint width_denom;
     gint height_num;
     gint height_denom;
-    gboolean size_given;
 
     guint desktop;
     gint shade;

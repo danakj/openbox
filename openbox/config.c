@@ -154,13 +154,10 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
         /* monitor is copied above */
     }
 
-    if (src->size_given) {
-        dst->size_given = TRUE;
-        dst->width_num = src->width_num;
-        dst->width_denom = src->width_denom;
-        dst->height_num = src->height_num;
-        dst->height_denom = src->height_denom;
-    }
+    dst->width_num = src->width_num;
+    dst->width_denom = src->width_denom;
+    dst->height_num = src->height_num;
+    dst->height_denom = src->height_denom;
 }
 
 void config_parse_relative_number(gchar *s, gint *num, gint *denom)
@@ -212,7 +209,6 @@ static void parse_single_per_app_settings(xmlNodePtr app,
 {
     xmlNodePtr n, c;
     gboolean x_pos_given = FALSE;
-    gboolean width_given = FALSE;
 
     if ((n = obt_xml_find_node(app->children, "decor")))
         if (!obt_xml_node_contains(n, "default"))
@@ -263,20 +259,22 @@ static void parse_single_per_app_settings(xmlNodePtr app,
                 config_parse_relative_number(s,
                                              &settings->width_num,
                                              &settings->width_denom);
-                if (settings->width_num > 0 && settings->width_denom >= 0)
-                    width_given = TRUE;
+                if (settings->width_num <= 0 || settings->width_denom < 0)
+                    settings->width_num = settings->width_denom = 0;
                 g_free(s);
             }
         }
 
-        if (width_given && (c = obt_xml_find_node(n->children, "height"))) {
-            gchar *s = obt_xml_node_string(c);
-            config_parse_relative_number(s,
-                                         &settings->height_num,
-                                         &settings->height_denom);
-            if (settings->height_num > 0 && settings->height_denom >= 0)
-                settings->size_given = TRUE;
-            g_free(s);
+        if ((c = obt_xml_find_node(n->children, "height"))) {
+            if (!obt_xml_node_contains(c, "default")) {
+                gchar *s = obt_xml_node_string(c);
+                config_parse_relative_number(s,
+                                             &settings->height_num,
+                                             &settings->height_denom);
+                if (settings->height_num <= 0 || settings->height_denom < 0)
+                    settings->height_num = settings->height_denom = 0;
+                g_free(s);
+            }
         }
     }
 

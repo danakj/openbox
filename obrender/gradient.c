@@ -527,13 +527,15 @@ static void gradient_splitvertical(RrAppearance *a, gint w, gint h)
     /* find the color for the first pixel of each row first */
     data = sf->pixel_data;
 
-    for (y1 = y1sz-1; y1 > 0; --y1) {
+    if (y1sz) {
+        for (y1 = y1sz-1; y1 > 0; --y1) {
+            *data = COLOR(y1);
+            data += w;
+            NEXT(y1);
+        }
         *data = COLOR(y1);
         data += w;
-        NEXT(y1);
     }
-    *data = COLOR(y1);
-    data += w;
     if (y2sz) {
         for (y2 = y2sz-1; y2 > 0; --y2) {
             *data = COLOR(y2);

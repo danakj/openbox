@@ -662,7 +662,7 @@ void dock_hide(gboolean hide)
     } else {
         if (!dock->hidden && config_dock_hide) {
             hide_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
-                                                 config_dock_show_delay,
+                                                 config_dock_hide_delay,
                                                  hide_timeout, NULL, NULL);
         } else if (dock->hidden && config_dock_hide && show_timeout_id) {
             if (show_timeout_id) g_source_remove(show_timeout_id);

@@ -1,17 +1,17 @@
 # Hungarian translation of openbox.
-# Copyright (C) 2007 Dana Jansens
+# Copyright (C) 2007-2011 Dana Jansens
 # This file is distributed under the same license as the openbox package.
 # Robert Kuszinger <hiding@freemail.hu>, 2007.
-# Laszlo Dvornik <dvornik@gnome.hu>, 2010.
+# Laszlo Dvornik <rezuri@zoho.com>, 2010-2011.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: openbox 3.4.10\n"
+"Project-Id-Version: openbox\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2011-08-01 18:20+0200\n"
-"PO-Revision-Date: 2010-01-14 11:04+0100\n"
-"Last-Translator: Laszlo Dvornik <dvornik@gnome.hu>\n"
-"Language-Team: Hungarian <translation-team-hu@lists.sourceforge.net>\n"
+"PO-Revision-Date: 2011-09-03 16:09+0200\n"
+"Last-Translator: Laszlo Dvornik <rezuri@zoho.com>\n"
+"Language-Team: Hungarian\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -195,14 +195,16 @@ msgstr "Érvénytelen gomb a konfigurációs fájlban \"%s\""
 
 #: openbox/config.c:882
 msgid ""
-"Openbox was compiled without Imlib2 image loading support. Icons in menus "
+"Openbox was compiled without image loading support. Icons in menus "
 "will not be loaded."
 msgstr ""
+"Az Openbox képbetöltési támogatás nélkül lett fordítva. Az ikonok a "
+"menükben nem lesznek betöltve."
 
 #: openbox/debug.c:55
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr "Nem lehet létrehozni a könyvtárat '%s': %s"
+msgstr "Nem lehet létrehozni a(z) \"%s\" könyvtárat: %s"
 
 #: openbox/debug.c:138 openbox/openbox.c:372
 msgid "Close"
@@ -225,7 +227,7 @@ msgstr "Nem sikerült végrehajtani a parancsot a csővezeték-menüben \"%s\": 
 #: openbox/menu.c:172
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Érvnytelen kimenet a csővezeték-menüből \"%s\""
+msgstr "Érvénytelen kimenet a csővezeték-menüből \"%s\""
 
 #: openbox/menu.c:185
 #, c-format
@@ -368,7 +370,7 @@ msgstr "  --sync              Futtatás szinkron módban\n"
 
 #: openbox/openbox.c:544
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr ""
+msgstr "  --startup PARANCS   PARANCS futtatása indulás után\n"
 
 #: openbox/openbox.c:545
 msgid "  --debug             Display debugging output\n"
@@ -383,6 +385,8 @@ msgstr ""
 #: openbox/openbox.c:547
 msgid "  --debug-session     Display debugging output for session management\n"
 msgstr ""
+"  --debug-session     Munkamenet-kezelésre vonatkozó hibakeresési kimenetek "
+"megjelenítése\n"
 
 #: openbox/openbox.c:548
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
@@ -395,17 +399,17 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Kérjük a hibákat itt jelentse:  %s\n"
+"Kérjük a hibákat itt jelentse: %s\n"
 
 #: openbox/openbox.c:632 openbox/openbox.c:666
 #, c-format
 msgid "%s requires an argument\n"
-msgstr "%s használatakor paraméter megadása kötelező\n"
+msgstr "%s kapcsolónak szüksége van egy argumentumra\n"
 
 #: openbox/openbox.c:709
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "Érvénytelen parancssori opció: \"%s\"\n"
+msgstr "Érvénytelen parancssori argumentum: \"%s\"\n"
 
 #: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
@@ -475,22 +479,3 @@ msgstr "A kért billentyű \"%s\" nem létezik a képernyőn"
 #: openbox/prompt.c:153
 msgid "OK"
 msgstr "OK"
-
-#, fuzzy
-#~ msgid "Openbox"
-#~ msgstr "Kilépés az Openboxból"
-
-#~ msgid "--config-file requires an argument\n"
-#~ msgstr "--config-file használatakor paraméter megadása kötelező\n"
-
-#~ msgid "Unable to save the session to \"%s\": %s"
-#~ msgstr "Nem lehet menteni ide a futó munkamenetet \"%s\": %s"
-
-#~ msgid "Error while saving the session to \"%s\": %s"
-#~ msgstr "Hiba a munkamenet mentése közben \"%s\": %s"
-
-#~ msgid "Not connected to a session manager"
-#~ msgstr "Nincs kapcsolódva a munkamenet-kezelőhöz"
-
-#~ msgid "X Error: %s"
-#~ msgstr "X-hiba: %s"

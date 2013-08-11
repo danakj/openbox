@@ -24,6 +24,9 @@
 #ifdef USE_IMLIB2
 #include <Imlib2.h>
 #endif
+#ifdef USE_LIBRSVG
+#include <librsvg/rsvg.h>
+#endif
 
 #include <glib.h>
 
@@ -463,17 +466,164 @@ RrImage* RrImageNewFromData(RrImageCache *cache, RrPixel32 *data,
     return self;
 }
 
+#if defined(USE_IMLIB2)
+typedef struct _ImlibLoader ImlibLoader;
+
+struct _ImlibLoader
+{
+    Imlib_Image img;
+};
+
+void DestroyImlibLoader(ImlibLoader *loader)
+{
+    if (!loader)
+        return;
+
+    imlib_free_image();
+    g_slice_free(ImlibLoader, loader);
+}
+
+ImlibLoader* LoadWithImlib(gchar *path,
+                           RrPixel32 **pixel_data,
+                           gint *width,
+                           gint *height)
+{
+    ImlibLoader *loader = g_slice_new0(ImlibLoader);
+    if (!(loader->img = imlib_load_image(path))) {
+        DestroyImlibLoader(loader);
+        return NULL;
+    }
+
+    /* Get data and dimensions of the image.
+
+       WARNING: This stuff is NOT threadsafe !!
+    */
+    imlib_context_set_image(loader->img);
+    *pixel_data = imlib_image_get_data_for_reading_only();
+    *width = imlib_image_get_width();
+    *height = imlib_image_get_height();
+
+    return loader;
+}
+#endif  /* USE_IMLIB2 */
+
+#if defined(USE_LIBRSVG)
+typedef struct _RsvgLoader RsvgLoader;
+
+struct _RsvgLoader
+{
+    RsvgHandle *handle;
+    cairo_surface_t *surface;
+    RrPixel32 *pixel_data;
+};
+
+void DestroyRsvgLoader(RsvgLoader *loader)
+{
+    if (!loader)
+        return;
+
+    if (loader->pixel_data)
+        g_free(loader->pixel_data);
+    if (loader->surface)
+        cairo_surface_destroy(loader->surface);
+    if (loader->handle)
+        g_object_unref(loader->handle);
+    g_slice_free(RsvgLoader, loader);
+}
+
+RsvgLoader* LoadWithRsvg(gchar *path,
+                         RrPixel32 **pixel_data,
+                         gint *width,
+                         gint *height)
+{
+    RsvgLoader *loader = g_slice_new0(RsvgLoader);
+
+    if (!(loader->handle = rsvg_handle_new_from_file(path, NULL))) {
+        DestroyRsvgLoader(loader);
+        return NULL;
+    }
+
+    if (!rsvg_handle_close(loader->handle, NULL)) {
+        DestroyRsvgLoader(loader);
+        return NULL;
+    }
+
+    RsvgDimensionData dimension_data;
+    rsvg_handle_get_dimensions(loader->handle, &dimension_data);
+    *width = dimension_data.width;
+    *height = dimension_data.height;
+
+    loader->surface = cairo_image_surface_create(
+        CAIRO_FORMAT_ARGB32, *width, *height);
+
+    cairo_t* context = cairo_create(loader->surface);
+    gboolean success = rsvg_handle_render_cairo(loader->handle, context);
+    cairo_destroy(context);
+
+    if (!success) {
+        DestroyRsvgLoader(loader);
+        return NULL;
+    }
+
+    loader->pixel_data = g_new(guint32, *width * *height);
+
+    /*
+      Cairo has its data in ARGB with premultiplied alpha, but RrPixel32
+      non-premultipled, so convert that. Also, RrPixel32 doesn't allow
+      strides not equal to the width of the image.
+    */
+
+    /* Verify that RrPixel32 has the same ordering as cairo. */
+    g_assert(RrDefaultAlphaOffset == 24);
+    g_assert(RrDefaultRedOffset == 16);
+    g_assert(RrDefaultGreenOffset == 8);
+    g_assert(RrDefaultBlueOffset == 0);
+
+    guint32 *out_row = loader->pixel_data;
+
+    guint32 *in_row =
+        (guint32*)cairo_image_surface_get_data(loader->surface);
+    gint in_stride = cairo_image_surface_get_stride(loader->surface);
+
+    gint y;
+    for (y = 0; y < *height; ++y) {
+        gint x;
+        for (x = 0; x < *width; ++x) {
+            guchar a = in_row[x] >> 24;
+            guchar r = (in_row[x] >> 16) & 0xff;
+            guchar g = (in_row[x] >> 8) & 0xff;
+            guchar b = in_row[x] & 0xff;
+            out_row[x] =
+                ((r * 256 / (a + 1)) << RrDefaultRedOffset) +
+                ((g * 256 / (a + 1)) << RrDefaultGreenOffset) +
+                ((b * 256 / (a + 1)) << RrDefaultBlueOffset) +
+                (a << RrDefaultAlphaOffset);
+        }
+        in_row += in_stride / 4;
+        out_row += *width;
+    }
+
+    *pixel_data = loader->pixel_data;
+
+    return loader;
+}
+#endif  /* USE_LIBRSVG */
+
 RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name)
 {
-#ifndef USE_IMLIB2
-    return NULL;
-#else
     RrImage *self;
     RrImageSet *set;
-    Imlib_Image img;
     gint w, h;
     RrPixel32 *data;
     gchar *path;
+    gboolean loaded;
+
+#if defined(USE_IMLIB2)
+    ImlibLoader *imlib_loader = NULL;
+#endif
+#if defined(USE_LIBRSVG)
+    RsvgLoader *rsvg_loader = NULL;
+#endif
 
     g_return_val_if_fail(cache != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
@@ -488,21 +638,32 @@ RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name)
     /* XXX find the path via freedesktop icon spec (use obt) ! */
     path = g_strdup(name);
 
-    if (!(img = imlib_load_image(path)))
-        g_message("Cannot load image \"%s\" from file \"%s\"", name, path);
+    loaded = FALSE;
+#if defined(USE_LIBRSVG)
+    if (!loaded) {
+        rsvg_loader = LoadWithRsvg(path, &data, &w, &h);
+        loaded = !!rsvg_loader;
+    }
+#endif
+#if defined(USE_IMLIB2)
+    if (!loaded) {
+        imlib_loader = LoadWithImlib(path, &data, &w, &h);
+        loaded = !!imlib_loader;
+    }
+#endif
+
     g_free(path);
 
-    if (!img)
+    if (!loaded) {
+        g_message("Cannot load image \"%s\" from file \"%s\"", name, path);
+#if defined(USE_LIBRSVG)
+        DestroyRsvgLoader(rsvg_loader);
+#endif
+#if defined(USE_IMLIB2)
+        DestroyImlibLoader(imlib_loader);
+#endif
         return NULL;
-
-    /* Get data and dimensions of the image.
-
-       WARNING: This stuff is NOT threadsafe !!
-    */
-    imlib_context_set_image(img);
-    data = imlib_image_get_data_for_reading_only();
-    w = imlib_image_get_width();
-    h = imlib_image_get_height();
+    }
 
     /* get an RrImage that contains an RrImageSet with this picture in it.
        the RrImage might be new, or reused if the picture was already in the
@@ -517,9 +678,14 @@ RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name)
     self = RrImageNewFromData(cache, data, w, h);
     RrImageSetAddName(self->set, name);
 
-    imlib_free_image();
-    return self;
+#if defined(USE_LIBRSVG)
+    DestroyRsvgLoader(rsvg_loader);
 #endif
+#if defined(USE_IMLIB2)
+    DestroyImlibLoader(imlib_loader);
+#endif
+
+    return self;
 }
 
 /************************************************************************

@@ -51,6 +51,12 @@ gboolean obt_xml_load_theme_file(ObtXmlInst *inst,
 gboolean obt_xml_load_mem(ObtXmlInst *inst,
                           gpointer data, guint len, const gchar *root_node);
 
+/* Returns true if an error is present. */
+gboolean obt_xml_last_error(ObtXmlInst *inst);
+gchar* obt_xml_last_error_file(ObtXmlInst *inst);
+gint obt_xml_last_error_line(ObtXmlInst *inst);
+gchar* obt_xml_last_error_message(ObtXmlInst *inst);
+
 gboolean obt_xml_save_file(ObtXmlInst *inst,
                            const gchar *path,
                            gboolean pretty);

@@ -48,7 +48,12 @@ struct _ObtXmlInst {
     xmlDocPtr doc;
     xmlNodePtr root;
     gchar *path;
+    gchar *last_error_file;
+    gint last_error_line;
+    gchar *last_error_message;
 };
+
+static void obt_xml_save_last_error(ObtXmlInst* inst);
 
 static void destfunc(struct Callback *c)
 {
@@ -66,6 +71,9 @@ ObtXmlInst* obt_xml_instance_new(void)
     i->doc = NULL;
     i->root = NULL;
     i->path = NULL;
+    i->last_error_file = NULL;
+    i->last_error_line = -1;
+    i->last_error_message = NULL;
     return i;
 }
 
@@ -79,6 +87,8 @@ void obt_xml_instance_unref(ObtXmlInst *i)
     if (i && --i->ref == 0) {
         obt_paths_unref(i->xdg_paths);
         g_hash_table_destroy(i->callbacks);
+        g_free(i->last_error_file);
+        g_free(i->last_error_message);
         g_slice_free(ObtXmlInst, i);
     }
 }
@@ -128,6 +138,8 @@ static gboolean load_file(ObtXmlInst *i,
 
     g_assert(i->doc == NULL); /* another doc isn't open already? */
 
+    xmlResetLastError();
+
     for (it = paths; !r && it; it = g_slist_next(it)) {
         gchar *path;
         struct stat s;
@@ -168,6 +180,8 @@ static gboolean load_file(ObtXmlInst *i,
 
         g_free(path);
     }
+
+    obt_xml_save_last_error(i);
 
     return r;
 }
@@ -264,6 +278,8 @@ gboolean obt_xml_load_mem(ObtXmlInst *i,
 
     g_assert(i->doc == NULL); /* another doc isn't open already? */
 
+    xmlResetLastError();
+
     i->doc = xmlParseMemory(data, len);
     if (i) {
         i->root = xmlDocGetRootElement(i->doc);
@@ -282,7 +298,49 @@ gboolean obt_xml_load_mem(ObtXmlInst *i,
         else
             r = TRUE; /* ok ! */
     }
+
+    obt_xml_save_last_error(i);
+
     return r;
+}
+
+static void obt_xml_save_last_error(ObtXmlInst* inst)
+{
+    xmlErrorPtr error = xmlGetLastError();
+    if (error) {
+        inst->last_error_file = g_strdup(error->file);
+        inst->last_error_line = error->line;
+        inst->last_error_message = g_strdup(error->message);
+        xmlResetError(error);
+    }
+}
+
+gboolean obt_xml_last_error(ObtXmlInst *inst)
+{
+    return inst->last_error_file &&
+        inst->last_error_line >= 0 &&
+        inst->last_error_message;
+}
+
+gchar* obt_xml_last_error_file(ObtXmlInst *inst)
+{
+    if (!obt_xml_last_error(inst))
+        return NULL;
+    return inst->last_error_file;
+}
+
+gint obt_xml_last_error_line(ObtXmlInst *inst)
+{
+    if (!obt_xml_last_error(inst))
+        return -1;
+    return inst->last_error_line;
+}
+
+gchar* obt_xml_last_error_message(ObtXmlInst *inst)
+{
+    if (!obt_xml_last_error(inst))
+        return NULL;
+    return inst->last_error_message;
 }
 
 gboolean obt_xml_save_file(ObtXmlInst *inst,

@@ -224,6 +224,7 @@ gint main(gint argc, gchar **argv)
         event_reset_time();
 
         do {
+            gchar *xml_error_string = NULL;
             ObPrompt *xmlprompt = NULL;
 
             if (reconfigure) obt_keyboard_reload();
@@ -263,6 +264,14 @@ gint main(gint argc, gchar **argv)
                 }
                 else
                     OBT_PROP_ERASE(obt_root(ob_screen), OB_CONFIG_FILE);
+
+                if (obt_xml_last_error(i)) {
+                    xml_error_string = g_strdup_printf(
+                        _("One or more XML syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"),
+                        obt_xml_last_error_file(i),
+                        obt_xml_last_error_line(i),
+                        obt_xml_last_error_message(i));
+                }
 
                 /* we're done with parsing now, kill it */
                 obt_xml_instance_unref(i);
@@ -362,17 +371,12 @@ gint main(gint argc, gchar **argv)
             reconfigure = FALSE;
 
             /* look for parsing errors */
-            {
-                xmlErrorPtr e = xmlGetLastError();
-                if (e) {
-                    gchar *m;
-
-                    m = g_strdup_printf(_("One or more XML syntax errors were found while parsing the Openbox configuration files.  See stdout for more information.  The last error seen was in file \"%s\" line %d, with message: %s"), e->file, e->line, e->message);
-                    xmlprompt =
-                        prompt_show_message(m, _("Openbox Syntax Error"), _("Close"));
-                    g_free(m);
-                    xmlResetError(e);
-                }
+            if (xml_error_string) {
+                xmlprompt = prompt_show_message(xml_error_string,
+                                                _("Openbox Syntax Error"),
+                                                _("Close"));
+                g_free(xml_error_string);
+                xml_error_string = NULL;
             }
 
             g_main_loop_run(ob_main_loop);

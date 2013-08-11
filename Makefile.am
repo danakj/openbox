@@ -75,6 +75,7 @@ obrender_libobrender_la_CPPFLAGS = \
 	$(XML_CFLAGS) \
 	$(PANGO_CFLAGS) \
 	$(IMLIB2_CFLAGS) \
+	$(LIBRSVG_CFLAGS) \
 	-DG_LOG_DOMAIN=\"ObRender\" \
 	-DDEFAULT_THEME=\"$(theme)\"
 obrender_libobrender_la_LDFLAGS = \
@@ -85,6 +86,7 @@ obrender_libobrender_la_LIBADD = \
 	$(PANGO_LIBS) \
 	$(GLIB_LIBS) \
 	$(IMLIB2_LIBS) \
+	$(LIBRSVG_LIBS) \
 	$(XML_LIBS)
 obrender_libobrender_la_SOURCES = \
 	gettext.h \

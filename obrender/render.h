@@ -49,7 +49,7 @@ typedef struct _RrImagePic         RrImagePic;
 typedef struct _RrImageCache       RrImageCache;
 typedef struct _RrButton           RrButton;
 
-typedef guint32 RrPixel32;  /* RGBA format */
+typedef guint32 RrPixel32;  /* ARGB format, not premultiplied alpha */
 typedef guint16 RrPixel16;
 typedef guchar  RrPixel8;
 

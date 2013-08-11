@@ -78,6 +78,13 @@ make >/dev/null 2>/dev/null || \
   error "make (with --disable-imlib2) failed"
 make clean >/dev/null || error "make clean failed"
 
+echo Check compile with librsvg disabled
+./configure -C --disable-imlib2 >/dev/null || \
+  error "configure failed"
+make >/dev/null 2>/dev/null || \
+  error "make (with --disable-librsvg) failed"
+make clean >/dev/null || error "make clean failed"
+
 echo Check compile with session management disabled
 ./configure -C --disable-session-management >/dev/null || \
   error "configure failed"

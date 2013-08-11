@@ -90,7 +90,6 @@ obrender_libobrender_la_LIBADD = \
 	$(XML_LIBS)
 obrender_libobrender_la_SOURCES = \
 	gettext.h \
-	obrender/button.h \
 	obrender/button.c \
 	obrender/color.h \
 	obrender/color.c \

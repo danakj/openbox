@@ -122,11 +122,11 @@ msgstr "Διαχείριση επιφανειών εργασίας"
 
 #: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
 msgid "_Add new desktop"
-msgstr "_Προσθήκη νέας επιφάνειας εργασίας"
+msgstr "Προσθήκη νέας επιφάνειας εργασίας (_A)"
 
 #: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
 msgid "_Remove last desktop"
-msgstr "_Αφαίρεση τελευταίας επιφάνειας εργασίας"
+msgstr "Αφαίρεση τελευταίας επιφάνειας εργασίας (_R)"
 
 #: openbox/client_list_combined_menu.c:149
 msgid "Windows"
@@ -138,27 +138,27 @@ msgstr "Επιφάνειες Εργασίας"
 
 #: openbox/client_menu.c:258
 msgid "All desktops"
-msgstr "Ό_λες οι επιφάνειες εργασίας"
+msgstr "Όλες οι επιφάνειες εργασίας"
 
 #: openbox/client_menu.c:370
 msgid "_Layer"
-msgstr "_Επίπεδο"
+msgstr "Επίπεδο (_L)"
 
 #: openbox/client_menu.c:375
 msgid "Always on _top"
-msgstr "Πάντα στο _προσκήνιο"
+msgstr "Πάντα στο προσκήνιο (_T)"
 
 #: openbox/client_menu.c:376
 msgid "_Normal"
-msgstr "_Κανονικό"
+msgstr "Κανονικό (_N)"
 
 #: openbox/client_menu.c:377
 msgid "Always on _bottom"
-msgstr "Πάντα στο π_αρασκήνιο"
+msgstr "Πάντα στο παρασκήνιο (_B)"
 
 #: openbox/client_menu.c:379
 msgid "_Send to desktop"
-msgstr "_Αποστολή στην επιφάνεια εργασίας"
+msgstr "Αποστολή στην επιφάνεια εργασίας (_S)"
 
 #: openbox/client_menu.c:383
 msgid "Client menu"
@@ -166,35 +166,35 @@ msgstr "Μενού πελάτη"
 
 #: openbox/client_menu.c:393
 msgid "R_estore"
-msgstr "Ε_παναφορά"
+msgstr "Επαναφορά (_R)"
 
 #: openbox/client_menu.c:397
 msgid "_Move"
-msgstr "_Μετακίνηση"
+msgstr "Μετακίνηση (_M)"
 
 #: openbox/client_menu.c:399
 msgid "Resi_ze"
-msgstr "_Αλλαγή Μεγέθους"
+msgstr "Αλλαγή Μεγέθους (_Z)"
 
 #: openbox/client_menu.c:401
 msgid "Ico_nify"
-msgstr "Εικο_νοποίηση"
+msgstr "Εικονοποίηση (_N)"
 
 #: openbox/client_menu.c:405
 msgid "Ma_ximize"
-msgstr "Με_γιστοποίηση"
+msgstr "Μεγιστοποίηση (_X)"
 
 #: openbox/client_menu.c:409
 msgid "_Roll up/down"
-msgstr "_Κύλιση επάνω/κάτω"
+msgstr "Κύλιση επάνω/κάτω (_R)"
 
 #: openbox/client_menu.c:411
 msgid "Un/_Decorate"
-msgstr "Ξε/_Στολισμός"
+msgstr "Ξε/Στολισμός (_D)"
 
 #: openbox/client_menu.c:415
 msgid "_Close"
-msgstr "_Κλείσιμο"
+msgstr "Κλείσιμο (_C)"
 
 #: openbox/config.c:781
 #, c-format

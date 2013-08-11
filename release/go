@@ -127,7 +127,7 @@ ASC="openbox-$VERSION.tar.gz.asc"
 echo Found Openbox release tarball:
 ls -d openbox-*.tar.gz
 test -e "$TAR" || \
-  error "Specified version does not match configure.am"
+  error "Specified version does not match configure.ac"
 
 # SIGN THE TARBALL
 

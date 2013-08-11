@@ -126,13 +126,14 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         /* find a target size for the client/frame. */
         w = o->w;
-        if (w == G_MININT) {
+        if (w == G_MININT) { /* not given, so no-op with current value */
             if (o->w_sets_client_size)
                 w = c->area.width;
             else
                 w = c->frame->area.width;
         }
-        else if (o->w_denom) w = (w * area->width) / o->w_denom;
+        else if (o->w_denom) /* used for eg. "1/3" or "55%" */
+            w = (w * area->width) / o->w_denom;
 
         h = o->h;
         if (h == G_MININT) {
@@ -141,7 +142,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             else
                 h = c->frame->area.height;
         }
-        else if (o->h_denom) h = (h * area->height) / o->h_denom;
+        else if (o->h_denom)
+            h = (h * area->height) / o->h_denom;
 
         /* get back to the client's size. */
         if (!o->w_sets_client_size)
@@ -159,20 +161,25 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         w += c->frame->size.left + c->frame->size.right;
         h += c->frame->size.top + c->frame->size.bottom;
 
+        /* get the position */
         x = o->x.pos;
-        if (o->x.denom)
+        if (o->x.denom) /* relative positions */
             x = (x * area->width) / o->x.denom;
         if (o->x.center) x = (area->width - w) / 2;
-        else if (x == G_MININT) x = c->frame->area.x - carea->x;
-        else if (o->x.opposite) x = area->width - w - x;
+        else if (x == G_MININT) /* not specified */
+            x = c->frame->area.x - carea->x;
+        else if (o->x.opposite) /* value relative to right edge instead of left */
+            x = area->width - w - x;
         x += area->x;
 
         y = o->y.pos;
         if (o->y.denom)
             y = (y * area->height) / o->y.denom;
         if (o->y.center) y = (area->height - h) / 2;
-        else if (y == G_MININT) y = c->frame->area.y - carea->y;
-        else if (o->y.opposite) y = area->height - h - y;
+        else if (y == G_MININT)
+            y = c->frame->area.y - carea->y;
+        else if (o->y.opposite)
+            y = area->height - h - y;
         y += area->y;
 
         /* get the client's size back */

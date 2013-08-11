@@ -1,0 +1,496 @@
+# Greek translations for PACKAGE package.
+# Copyright (C) 2012 Dana Jansens
+# This file is distributed under the same license as the PACKAGE package.
+# Efstathios Iosifidis <iosifidis@opensuse.org>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: el.po\n"
+"Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
+"POT-Creation-Date: 2008-11-15 22:28+0100\n"
+"PO-Revision-Date: 2012-04-28 23:21+0300\n"
+"Last-Translator: Efstathios Iosifidis <iosifidis@opensuse.org>\n"
+"Language-Team: Ελληνικά, Σύγχρονα <opensuse-translation-el@opensuse.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
+"Language: el\n"
+
+#: openbox/actions.c:149
+#, c-format
+msgid "Invalid action \"%s\" requested. No such action exists."
+msgstr "Αιτήθηκε μη έγκυρη ενέργεια \"%s\". Δεν υπάρχει τέτοια ενέργεια."
+
+#: openbox/actions/execute.c:128
+msgid "No"
+msgstr "Όχι"
+
+#: openbox/actions/execute.c:129
+msgid "Yes"
+msgstr "Ναι"
+
+#: openbox/actions/execute.c:133
+msgid "Execute"
+msgstr "Εκτέλεση"
+
+#: openbox/actions/execute.c:142
+#, c-format
+msgid "Failed to convert the path \"%s\" from utf8"
+msgstr "Αποτυχία μετατροπής διαδρομής \"%s\" από utf8"
+
+#: openbox/actions/exit.c:52 openbox/actions/session.c:64
+#: openbox/client.c:3465
+msgid "Cancel"
+msgstr "Άκυρο"
+
+#: openbox/actions/exit.c:53
+msgid "Exit"
+msgstr "Έξοδος"
+
+#: openbox/actions/exit.c:56
+msgid "Are you sure you want to exit Openbox?"
+msgstr "Θέλετε να εξέλθετε του Openbox;"
+
+#: openbox/actions/exit.c:57
+msgid "Exit Openbox"
+msgstr "Έξοδος Openbox"
+
+#. TRANSLATORS: Don't translate the word "SessionLogout" as it's the
+#. name of the action you write in rc.xml
+#: openbox/actions/session.c:43
+msgid ""
+"The SessionLogout action is not available since Openbox was built without "
+"session management support"
+msgstr ""
+"Η ενέργεια SessionLogout δεν είναι διαθέσιμη διότι το Openbox έχει "
+"κατασκευαστεί χωρίς υποστήριξη διαχείρισης συνεδρίας"
+
+#: openbox/actions/session.c:65 openbox/actions/session.c:70
+msgid "Log Out"
+msgstr "Αποσύνδεση"
+
+#: openbox/actions/session.c:69
+msgid "Are you sure you want to log out?"
+msgstr "Θέλετε να αποσυνδεθείτε;"
+
+#: openbox/client.c:2012
+msgid "Unnamed Window"
+msgstr "Ανώνυμο Παράθυρο"
+
+#: openbox/client.c:2026 openbox/client.c:2058
+msgid "Killing..."
+msgstr "Τερματισμός..."
+
+#: openbox/client.c:2028 openbox/client.c:2060
+msgid "Not Responding"
+msgstr "Δεν ανταποκρίνεται"
+
+#: openbox/client.c:3454
+#, c-format
+msgid ""
+"The window \"%s\" does not seem to be responding.  Do you want to force it "
+"to exit by sending the %s signal?"
+msgstr ""
+"Το παράθυρο \"%s\" δεν δείχνει να ανταποκρίνεται.  Εξαναγκασμός τερματισμού "
+"με αποστολή σήματος %s;"
+
+#: openbox/client.c:3456
+msgid "End Process"
+msgstr "Τερματισμός Διεργασίας"
+
+#: openbox/client.c:3460
+#, c-format
+msgid ""
+"The window \"%s\" does not seem to be responding.  Do you want to disconnect "
+"it from the X server?"
+msgstr ""
+"Το παράθυρο \"%s\" δεν δείχνει να ανταποκρίνεται. Θέλετε να αποσυνδεθείτε "
+"από τον εξυπηρετητή X;"
+
+#: openbox/client.c:3462
+msgid "Disconnect"
+msgstr "Αποσύνδεση"
+
+#: openbox/client_list_combined_menu.c:87 openbox/client_list_menu.c:91
+msgid "Go there..."
+msgstr "Μετακίνηση..."
+
+#: openbox/client_list_combined_menu.c:94
+msgid "Manage desktops"
+msgstr "Διαχείριση επιφανειών εργασίας"
+
+#: openbox/client_list_combined_menu.c:95 openbox/client_list_menu.c:155
+msgid "_Add new desktop"
+msgstr "_Προσθήκη νέας επιφάνειας εργασίας"
+
+#: openbox/client_list_combined_menu.c:96 openbox/client_list_menu.c:156
+msgid "_Remove last desktop"
+msgstr "_Αφαίρεση τελευταίας επιφάνειας εργασίας"
+
+#: openbox/client_list_combined_menu.c:149
+msgid "Windows"
+msgstr "Παράθυρα"
+
+#: openbox/client_list_menu.c:203
+msgid "Desktops"
+msgstr "Επιφάνειες Εργασίας"
+
+#: openbox/client_menu.c:258
+msgid "All desktops"
+msgstr "Ό_λες οι επιφάνειες εργασίας"
+
+#: openbox/client_menu.c:370
+msgid "_Layer"
+msgstr "_Επίπεδο"
+
+#: openbox/client_menu.c:375
+msgid "Always on _top"
+msgstr "Πάντα στο _προσκήνιο"
+
+#: openbox/client_menu.c:376
+msgid "_Normal"
+msgstr "_Κανονικό"
+
+#: openbox/client_menu.c:377
+msgid "Always on _bottom"
+msgstr "Πάντα στο π_αρασκήνιο"
+
+#: openbox/client_menu.c:379
+msgid "_Send to desktop"
+msgstr "_Αποστολή στην επιφάνεια εργασίας"
+
+#: openbox/client_menu.c:383
+msgid "Client menu"
+msgstr "Μενού πελάτη"
+
+#: openbox/client_menu.c:393
+msgid "R_estore"
+msgstr "Ε_παναφορά"
+
+#: openbox/client_menu.c:397
+msgid "_Move"
+msgstr "_Μετακίνηση"
+
+#: openbox/client_menu.c:399
+msgid "Resi_ze"
+msgstr "_Αλλαγή Μεγέθους"
+
+#: openbox/client_menu.c:401
+msgid "Ico_nify"
+msgstr "Εικο_νοποίηση"
+
+#: openbox/client_menu.c:405
+msgid "Ma_ximize"
+msgstr "Με_γιστοποίηση"
+
+#: openbox/client_menu.c:409
+msgid "_Roll up/down"
+msgstr "_Κύλιση επάνω/κάτω"
+
+#: openbox/client_menu.c:411
+msgid "Un/_Decorate"
+msgstr "Ξε/_Στολισμός"
+
+#: openbox/client_menu.c:415
+msgid "_Close"
+msgstr "_Κλείσιμο"
+
+#: openbox/config.c:781
+#, c-format
+msgid "Invalid button \"%s\" specified in config file"
+msgstr "Μη έγκυρο πλήκτρο \"%s\", καθορισμένο στο αρχείο ρυθμίσεων"
+
+#: openbox/keyboard.c:157
+msgid "Conflict with key binding in config file"
+msgstr "Σύγκρουση συνδυασμού πλήκτρων στο αρχείο ρυθμίσεων"
+
+#: openbox/menu.c:102 openbox/menu.c:110
+#, c-format
+msgid "Unable to find a valid menu file \"%s\""
+msgstr "Αδυναμία εύρεσης έγκυρου αρχείου μενού \"%s\""
+
+#: openbox/menu.c:170
+#, c-format
+msgid "Failed to execute command for pipe-menu \"%s\": %s"
+msgstr "Αποτυχία εκτέλεσης εντολής για το pipe-menu \"%s\": %s"
+
+#: openbox/menu.c:184
+#, c-format
+msgid "Invalid output from pipe-menu \"%s\""
+msgstr "Μη έγκυρο αποτέλεσμα από το pipe-menu \"%s\""
+
+#: openbox/menu.c:197
+#, c-format
+msgid "Attempted to access menu \"%s\" but it does not exist"
+msgstr "Έγινε προσπάθεια στο μενού πρόσβασης \"%s\" αλλά αυτό δεν υπάρχει"
+
+#: openbox/menu.c:367 openbox/menu.c:368
+msgid "More..."
+msgstr "Περισσότερα..."
+
+#: openbox/mouse.c:373
+#, c-format
+msgid "Invalid button \"%s\" in mouse binding"
+msgstr "Μη έγκυρο πλήκτρο \"%s\" στο συνδυασμό ποντικού"
+
+#: openbox/mouse.c:379
+#, c-format
+msgid "Invalid context \"%s\" in mouse binding"
+msgstr "Μη έγκυρο περιεχόμενο \"%s\" στο συνδυασμό ποντικιού"
+
+#: openbox/openbox.c:133
+#, c-format
+msgid "Unable to change to home directory \"%s\": %s"
+msgstr "Αδυναμία αλλαγής προσωπικού καταλόγου \"%s\": %s"
+
+#: openbox/openbox.c:152
+msgid "Failed to open the display from the DISPLAY environment variable."
+msgstr ""
+"Αποτυχία ανοίγματος της εμφάνισης από την μεταβλητή ΕΜΦΑΝΙΣΗ περιβάλλοντος."
+
+#: openbox/openbox.c:183
+msgid "Failed to initialize the obrender library."
+msgstr "Αποτυχία αρχικοποίησης της βιβλιοθήκης obrender."
+
+#: openbox/openbox.c:194
+msgid "X server does not support locale."
+msgstr "Ο εξυπηρετητής X δεν υποστηρίζει τοπικές ρυθμίσεις."
+
+#: openbox/openbox.c:196
+msgid "Cannot set locale modifiers for the X server."
+msgstr "Αδυναμία ορισμού μετατροπέων τοπικών ρυθμίσεων για τον εξυπηρετητή X."
+
+#: openbox/openbox.c:263
+msgid "Unable to find a valid config file, using some simple defaults"
+msgstr ""
+"Αδυναμία εύρεσης έγκυρου αρχείου ρυθμίσεων, με χρήση μερικών απλών "
+"προεπιλογών"
+
+#: openbox/openbox.c:297
+msgid "Unable to load a theme."
+msgstr "Αδυναμία φόρτωσης θέματος."
+
+#: openbox/openbox.c:377
+#, c-format
+msgid ""
+"One or more XML syntax errors were found while parsing the Openbox "
+"configuration files.  See stdout for more information.  The last error seen "
+"was in file \"%s\" line %d, with message: %s"
+msgstr ""
+"Βρέθηκαν ένα ή περισσότερα συντακτικά σφάλματα XML κατά την ανάλυση των "
+"αρχείων ρυθμίσεων του Openbox.  Για περισσότερες πληροφορίες δείτε το "
+"stdout.  Το τελευταίο σφάλμα που εμφανίστηκε ήταν στο αρχείο \"%s\" γραμμή "
+"%d, με το μήνυμα: %s"
+
+#: openbox/openbox.c:379
+msgid "Openbox Syntax Error"
+msgstr "Σφάλμα Σύνταξης Obenbox"
+
+#: openbox/openbox.c:379
+msgid "Close"
+msgstr "Κλείσιμο"
+
+#: openbox/openbox.c:448
+#, c-format
+msgid "Restart failed to execute new executable \"%s\": %s"
+msgstr "Η επανεκκίνηση απέτυχε να εκτελέσει το νέο εκτελέσιμο \"%s\": %s"
+
+#: openbox/openbox.c:518 openbox/openbox.c:520
+msgid "Copyright (c)"
+msgstr "Πνευματικά δικαιώματα (c)"
+
+#: openbox/openbox.c:529
+msgid "Syntax: openbox [options]\n"
+msgstr "Σύνταξη: openbox [options]\n"
+
+#: openbox/openbox.c:530
+msgid ""
+"\n"
+"Options:\n"
+msgstr ""
+"\n"
+"Επιλογές:\n"
+
+#: openbox/openbox.c:531
+msgid "  --help              Display this help and exit\n"
+msgstr "  --help              Εμφάνιση βοήθειας και έξοδος\n"
+
+#: openbox/openbox.c:532
+msgid "  --version           Display the version and exit\n"
+msgstr "  --version           Εμφάνιση της έκδοσης και έξοδος\n"
+
+#: openbox/openbox.c:533
+msgid "  --replace           Replace the currently running window manager\n"
+msgstr ""
+"  --replace           Αντικατάσταση του τρέχοντος διαχειριστή παραθύρων\n"
+
+#. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
+#. aligned still, if you have to, make a new line with \n and 22 spaces. It's
+#. fine to leave it as FILE though.
+#: openbox/openbox.c:537
+msgid "  --config-file FILE  Specify the path to the config file to use\n"
+msgstr ""
+"  --config-file FILE  Καθορισμός διαδρομής αρχείου ρυθμίσεων που θα "
+"χρησιμοποιηθεί\n"
+
+#: openbox/openbox.c:538
+msgid "  --sm-disable        Disable connection to the session manager\n"
+msgstr ""
+"  --sm-disable        Απενεργοποίηση σύνδεσης στον διαχειριστή συνεδρίας\n"
+
+#: openbox/openbox.c:539
+msgid ""
+"\n"
+"Passing messages to a running Openbox instance:\n"
+msgstr ""
+"\n"
+"Μεταβίβαση μηνυμάτων σε εκτελούμενη διεργασία Openbox:\n"
+
+#: openbox/openbox.c:540
+msgid "  --reconfigure       Reload Openbox's configuration\n"
+msgstr "  --reconfigure       Ανανέωση ρυθμίσεων Openbox\n"
+
+#: openbox/openbox.c:541
+msgid "  --restart           Restart Openbox\n"
+msgstr "  --restart           Επανεκκίνηση Openbox\n"
+
+#: openbox/openbox.c:542
+msgid "  --exit              Exit Openbox\n"
+msgstr "  --exit              Έξοδος Openbox\n"
+
+#: openbox/openbox.c:543
+msgid ""
+"\n"
+"Debugging options:\n"
+msgstr ""
+"\n"
+"Επιλογές αποσφαλμάτωσης:\n"
+
+#: openbox/openbox.c:544
+msgid "  --sync              Run in synchronous mode\n"
+msgstr "  --sync              Εκτέλεση σε κατάσταση συγχρονισμού\n"
+
+#: openbox/openbox.c:545
+msgid "  --debug             Display debugging output\n"
+msgstr "  --debug             Εμφάνιση αποτελεσμάτων αποσφαλμάτωσης\n"
+
+#: openbox/openbox.c:546
+msgid "  --debug-focus       Display debugging output for focus handling\n"
+msgstr ""
+"  --debug-focus       Εμφάνισης αποτελεσμάτων αποσφαλμάτωσης για εστίαση "
+"χειρισμών\n"
+
+#: openbox/openbox.c:547
+msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
+msgstr "  --debug-xinerama    Διαίρεση οθόνης σε ψευδείς οθόνες xinerama\n"
+
+#: openbox/openbox.c:548
+#, c-format
+msgid ""
+"\n"
+"Please report bugs at %s\n"
+msgstr ""
+"\n"
+"Παρακαλώ αναφέρετε σφάλματα στο %s\n"
+
+#: openbox/openbox.c:617
+msgid "--config-file requires an argument\n"
+msgstr "--config-file απαιτεί μια παράμετρο\n"
+
+#: openbox/openbox.c:660
+#, c-format
+msgid "Invalid command line argument \"%s\"\n"
+msgstr "Μη έγκυρη παράμετρος γραμμής εντολών \"%s\"\n"
+
+#: openbox/screen.c:102 openbox/screen.c:190
+#, c-format
+msgid "A window manager is already running on screen %d"
+msgstr "Ο διαχειριστής παραθύρων εκτελείται ήδη στην οθόνη %d"
+
+#: openbox/screen.c:124
+#, c-format
+msgid "Could not acquire window manager selection on screen %d"
+msgstr "Αδυναμία ανάκτησης επιλογής διαχειριστή παραθύρου στην οθόνη %d"
+
+#: openbox/screen.c:145
+#, c-format
+msgid "The WM on screen %d is not exiting"
+msgstr "Ο Διαχειριστής Παραθύρων στην οθόνη %d δεν τερματίζεται"
+
+#. TRANSLATORS: If you need to specify a different order of the
+#. arguments, you can use %1$d for the first one and %2$d for the
+#. second one. For example,
+#. "The current session has %2$d desktops, but Openbox is configured for %1$d ..."
+#: openbox/screen.c:412
+#, c-format
+msgid ""
+"Openbox is configured for %d desktop, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgid_plural ""
+"Openbox is configured for %d desktops, but the current session has %d.  "
+"Overriding the Openbox configuration."
+msgstr[0] ""
+"Το Openbox είναι ρυθμισμένο για %d επιφάνεια εργασίας, αλλά η τρέχουσα "
+"συνεδρία έχει %d.  Αντικατάσταση των ρυθμίσεων του Openbox."
+msgstr[1] ""
+"Το Openbox είναι ρυθμισμένο για %d επιφάνειες εργασίας, αλλά η τρέχουσα "
+"συνεδρία έχει %d.  Αντικατάσταση των ρυθμίσεων του Openbox."
+
+#: openbox/screen.c:1180
+#, c-format
+msgid "desktop %i"
+msgstr "επιφάνεια εργασίας %i"
+
+#: openbox/session.c:104
+#, c-format
+msgid "Unable to make directory \"%s\": %s"
+msgstr "Αδυναμία δημιουργίας καταλόγου \"%s\": %s"
+
+#: openbox/session.c:466
+#, c-format
+msgid "Unable to save the session to \"%s\": %s"
+msgstr "Αδυναμία αποθήκευσης συνεδρίας στο \"%s\": %s"
+
+#: openbox/session.c:605
+#, c-format
+msgid "Error while saving the session to \"%s\": %s"
+msgstr "Σφάλμα κατά την αποθήκευση της συνεδρίας στο \"%s\": %s"
+
+#: openbox/session.c:842
+msgid "Not connected to a session manager"
+msgstr "Δεν συνδέθηκε στον διαχειριστή συνεδρίας"
+
+#: openbox/startupnotify.c:243
+#, c-format
+msgid "Running %s"
+msgstr "Εκτελείται %s"
+
+#: openbox/translate.c:59
+#, c-format
+msgid "Invalid modifier key \"%s\" in key/mouse binding"
+msgstr "Μη έγκυρο πλήκτρο μετατροπέα \"%s\" στο συνδυασμό πλήκτρων/ποντικού"
+
+#: openbox/translate.c:138
+#, c-format
+msgid "Invalid key code \"%s\" in key binding"
+msgstr "Μη έγκυρος κώδικας πλήκτρου \"%s\" στον συνδυασμό πλήκτρου"
+
+#: openbox/translate.c:145
+#, c-format
+msgid "Invalid key name \"%s\" in key binding"
+msgstr "Μη έγκυρο όνομα πλήκτρου \"%s\" στον συνδυασμό πλήκτρου"
+
+#: openbox/translate.c:151
+#, c-format
+msgid "Requested key \"%s\" does not exist on the display"
+msgstr "Το αιτούμενο πλήκτρο \"%s\" δεν υπάρχει στην προβολή"
+
+#: openbox/xerror.c:40
+#, c-format
+msgid "X Error: %s"
+msgstr "Σφάλμα X: %s"
+
+#: openbox/prompt.c:200
+msgid "OK"
+msgstr "Εντάξει"

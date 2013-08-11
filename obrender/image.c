@@ -652,10 +652,9 @@ RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name)
     }
 #endif
 
-    g_free(path);
-
     if (!loaded) {
         g_message("Cannot load image \"%s\" from file \"%s\"", name, path);
+        g_free(path);
 #if defined(USE_LIBRSVG)
         DestroyRsvgLoader(rsvg_loader);
 #endif
@@ -664,6 +663,8 @@ RrImage* RrImageNewFromName(RrImageCache *cache, const gchar *name)
 #endif
         return NULL;
     }
+
+    g_free(path);
 
     /* get an RrImage that contains an RrImageSet with this picture in it.
        the RrImage might be new, or reused if the picture was already in the

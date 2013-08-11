@@ -46,10 +46,10 @@ void action_if_startup(void)
     actions_register("If", setup_func, free_func, run_func);
 }
 
-static inline set_bool(xmlNodePtr node,
-                       const char *name,
-                       gboolean *on,
-                       gboolean *off)
+static inline void set_bool(xmlNodePtr node,
+                            const char *name,
+                            gboolean *on,
+                            gboolean *off)
 {
     xmlNodePtr n;
 

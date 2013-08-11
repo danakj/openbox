@@ -314,6 +314,7 @@ static gboolean get_text_property(Window win, Atom prop,
         return tprop->encoding == OBT_PROP_ATOM(UTF8_STRING);
     default:
         g_assert_not_reached();
+        return FALSE;
     }
 }
 

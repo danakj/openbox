@@ -930,9 +930,9 @@ static void parse_menu(xmlNodePtr node, gpointer d)
         config_menu_manage_desktops = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "showIcons"))) {
         config_menu_show_icons = obt_xml_node_bool(n);
-#ifndef USE_IMLIB2
+#if !defined(USE_IMLIB2) && !defined(USE_LIBRSVG)
         if (config_menu_show_icons)
-            g_message(_("Openbox was compiled without Imlib2 image loading support. Icons in menus will not be loaded."));
+            g_message(_("Openbox was compiled without image loading support. Icons in menus will not be loaded."));
 #endif
     }
 

@@ -15,7 +15,7 @@
   * Correctly interface with latest gnome-session for Gnome/Openbox X sessions.
   * Allow third-party control of window opacity in compositing managers.
   * Improved themeing options. Contributed by Dave Foster.
-  * Add <monitor>, <title type="regex">, <title type="plain"> and
+  * Add <monitor>, <title type="regex">, <title type="exact"> and
     <activedesktop> options to If action.
   * Addresses bugs #4661, #5506, #5186, #5758, #5410, #5228, #5277, #5731,
     #5746, #5737, #5419, #5721, #5711, #5385, #5500, #4992, #5443, #5518,

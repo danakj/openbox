@@ -32,7 +32,7 @@ typedef struct {
     guint    client_monitor;
     GPatternSpec *matchtitle;
     GRegex *regextitle;
-    gchar  *plaintitle;
+    gchar  *exacttitle;
     GSList *thenacts;
     GSList *elseacts;
 } Options;
@@ -102,8 +102,8 @@ static gpointer setup_func(xmlNodePtr node)
                 o->matchtitle = g_pattern_spec_new(s);
             } else if (type && !g_ascii_strcasecmp(type, "regex")) {
                 o->regextitle = g_regex_new(s, 0, 0, NULL);
-            } else if (type && !g_ascii_strcasecmp(type, "plain")) {
-                o->plaintitle = g_strdup(s);
+            } else if (type && !g_ascii_strcasecmp(type, "exact")) {
+                o->exacttitle = g_strdup(s);
             }
             g_free(s);
         }
@@ -152,8 +152,8 @@ static void free_func(gpointer options)
         g_pattern_spec_free(o->matchtitle);
     if (o->regextitle)
         g_regex_unref(o->regextitle);
-    if (o->plaintitle)
-        g_free(o->plaintitle);
+    if (o->exacttitle)
+        g_free(o->exacttitle);
 
     g_slice_free(Options, o);
 }
@@ -195,8 +195,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
          (g_pattern_match_string(o->matchtitle, c->original_title))) &&
         (!o->regextitle ||
          (g_regex_match(o->regextitle, c->original_title, 0, NULL))) &&
-        (!o->plaintitle ||
-         (!strcmp(o->plaintitle, c->original_title))) &&
+        (!o->exacttitle ||
+         (!strcmp(o->exacttitle, c->original_title))) &&
         (!o->client_monitor ||
          (o->client_monitor == client_monitor(c) + 1)))
     {

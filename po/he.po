@@ -113,11 +113,11 @@ msgstr "ניהול שולחנות"
 
 #: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
-msgstr "הוס_ף מרחב חדש"
+msgstr "הוסף מרחב חדש (_A)"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
-msgstr "הס_ר מרחב אחרון"
+msgstr "הסר מרחב אחרון (_R)"
 
 #: openbox/client_list_combined_menu.c:157
 msgid "Windows"
@@ -133,23 +133,23 @@ msgstr "כל השולחנות"
 
 #: openbox/client_menu.c:371
 msgid "_Layer"
-msgstr "_רובד"
+msgstr "רובד (_L)"
 
 #: openbox/client_menu.c:376
 msgid "Always on _top"
-msgstr "תמיד _עליון"
+msgstr "תמיד עליון (_T)"
 
 #: openbox/client_menu.c:377
 msgid "_Normal"
-msgstr "_רגיל"
+msgstr "רגיל (_N)"
 
 #: openbox/client_menu.c:378
 msgid "Always on _bottom"
-msgstr "תמיד _תחתון"
+msgstr "תמיד תחתון (_B)"
 
 #: openbox/client_menu.c:380
 msgid "_Send to desktop"
-msgstr "_שלח אל מרחב"
+msgstr "שלח אל מרחב (_S)"
 
 #: openbox/client_menu.c:384
 msgid "Client menu"
@@ -157,36 +157,36 @@ msgstr "תפריט לקוח"
 
 #: openbox/client_menu.c:394
 msgid "R_estore"
-msgstr "_שחזר"
+msgstr "שחזר (_E)"
 
 #: openbox/client_menu.c:398
 msgid "_Move"
-msgstr "_הזז"
+msgstr "הזז (_M)"
 
 # מידה
 #: openbox/client_menu.c:400
 msgid "Resi_ze"
-msgstr "ש_נה גודל"
+msgstr "שנה גודל (_Z)"
 
 #: openbox/client_menu.c:402
 msgid "Ico_nify"
-msgstr "_מזער"
+msgstr "מזער (_N)"
 
 #: openbox/client_menu.c:406
 msgid "Ma_ximize"
-msgstr "ה_גדל"
+msgstr "הגדל (_X)"
 
 #: openbox/client_menu.c:410
 msgid "_Roll up/down"
-msgstr "_גלול מעלה/מטה"
+msgstr "גלול מעלה/מטה (_R)"
 
 #: openbox/client_menu.c:414
 msgid "Un/_Decorate"
-msgstr "אי/_עיטור"
+msgstr "אי/עיטור (_D)"
 
 #: openbox/client_menu.c:418
 msgid "_Close"
-msgstr "_סגור"
+msgstr "סגור (_C)"
 
 #: openbox/config.c:503
 #, c-format

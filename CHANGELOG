@@ -1,3 +1,8 @@
+3.5.2:
+  * Fix crash in theme rendering code, and in theme parsing code.
+  * Maximize windows without borders to fill the whole screen, don't leave
+    a one-pixel empty space. (Bug #5996)
+
 3.5.1:
   * New translations: Afrikaans, Belarusian, Interlingua, Hebrew, Romanian,
     Greek.

@@ -152,11 +152,16 @@ echo
 echo Edit changelog:
 echo "  http://openbox.org/oldwiki/index.php?title=Openbox:Changelog&action=edit&section=1"
 echo
+echo Add the version to the bug tracker:
+echo "  https://bugzilla.icculus.org/editversions.cgi?action=add&product=Openbox"
+echo
 echo Push the tag:
 echo "  git push origin tag release-$VERSION"
 echo
 echo Email:
 echo "  ./release/email $*"
+echo
+echo Update IRC topic and have a beer/juice!
 echo
 cd "$SRCDIR"
 ls -l "$TAR" "$ASC"

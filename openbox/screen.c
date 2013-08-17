@@ -1327,8 +1327,9 @@ typedef struct {
 static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
 {
     guint i;
-    gint n, l, r, t, b;
+    gint l, r, t, b;
 #ifdef XINERAMA
+    gint n;
     XineramaScreenInfo *info;
 #endif
 

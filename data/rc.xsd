@@ -70,6 +70,7 @@
         </xsd:annotation>
         <xsd:sequence>
             <xsd:element minOccurs="0" name="policy" type="ob:placementpolicy"/>
+            <xsd:element minOccurs="0" name="center" type="ob:bool"/>
             <xsd:element minOccurs="0" name="monitor" type="ob:placementmonitor"/>
             <xsd:element minOccurs="0" name="primaryMonitor" type="ob:primarymonitor"/>
         </xsd:sequence>

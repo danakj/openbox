@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    overlap.c for the Openbox window manager
-   Copyright (c) 2011        Ian Zimmerman
+   Copyright (c) 2011, 2013 Ian Zimmerman
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,14 +22,32 @@
 
 #include <stdlib.h>
 
-static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* monitor, int* x_edges, int* y_edges,
+static void make_grid(const Rect* client_rects,
+                      int n_client_rects,
+                      const Rect* monitor,
+                      int* x_edges,
+                      int* y_edges,
                       int max_edges);
 
 static int best_direction(const Point* grid_point,
-                          const Rect* client_rects, int n_client_rects,
-                          const Rect* monitor, const Size* req_size,
+                          const Rect* client_rects,
+                          int n_client_rects,
+                          const Rect* monitor,
+                          const Size* req_size,
                           Point* best_top_left);
+
+static int total_overlap(const Rect* client_rects,
+                         int n_client_rects,
+                         const Rect* proposed_rect);
+
+static void center_in_field(Point* grid_point,
+                            const Size* req_size,
+                            const Rect *monitor,
+                            const Rect* client_rects,
+                            int n_client_rects,
+                            const int* x_edges,
+                            const int* y_edges,
+                            int max_edges);
 
 /* Choose the placement on a grid with least overlap */
 
@@ -70,16 +88,28 @@ void place_overlap_find_least_placement(const Rect* client_rects,
         if (overlap == 0)
             break;
     }
+    if (config_place_center && overlap == 0) {
+        center_in_field(result,
+                        req_size,
+                        monitor,
+                        client_rects,
+                        n_client_rects,
+                        x_edges,
+                        y_edges,
+                        max_edges);
+    }
 }
 
-static int compare_ints(const void* a, const void* b)
+static int compare_ints(const void* a,
+                        const void* b)
 {
     const int* ia = (const int*)a;
     const int* ib = (const int*)b;
     return *ia - *ib;
 }
 
-static void uniquify(int* edges, int n_edges)
+static void uniquify(int* edges,
+                     int n_edges)
 {
     int i = 0;
     int j = 0;
@@ -91,12 +121,15 @@ static void uniquify(int* edges, int n_edges)
             ++j;
     }
     /* fill the rest with nonsense */
-    for (; i < n_edges ; ++i)
+    for (; i < n_edges; ++i)
         edges[i] = G_MAXINT;
 }
 
-static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* monitor, int* x_edges, int* y_edges,
+static void make_grid(const Rect* client_rects,
+                      int n_client_rects,
+                      const Rect* monitor,
+                      int* x_edges,
+                      int* y_edges,
                       int max_edges)
 {
     int i;
@@ -121,7 +154,8 @@ static void make_grid(const Rect* client_rects, int n_client_rects,
     uniquify(y_edges, n_edges);
 }
 
-static int total_overlap(const Rect* client_rects, int n_client_rects,
+static int total_overlap(const Rect* client_rects,
+                         int n_client_rects,
                          const Rect* proposed_rect)
 {
     int overlap = 0;
@@ -136,6 +170,129 @@ static int total_overlap(const Rect* client_rects, int n_client_rects,
     return overlap;
 }
 
+/* Unfortunately, the libc bsearch() function cannot be used to find the
+   position of a value that is not in the array, and glib doesn't
+   provide a binary search function at all.  So, tricky as it is, if we
+   want to avoid linear scan of the edge array, we have to roll our
+   own. */
+static int grid_position(int value,
+                         const int* edges,
+                         int max_edges)
+{
+    int low = 0;
+    int high = max_edges - 1;
+    int mid = low + (high - low) / 2;
+    while (low != mid) {
+        if (value < edges[mid])
+            high = mid;
+        else if (value > edges[mid])
+            low = mid;
+        else                    /* value == edges[mid] */
+            return mid;
+        mid = low + (high - low) / 2;
+    }
+    /* we get here when low == mid.  can have low == high or low == high - 1 */
+    return (value <= edges[low] ? low : high);
+}                         
+
+static void expand_width(Rect* r, int by)
+{
+    r->width += by;
+}
+
+static void expand_height(Rect* r, int by)
+{
+    r->height += by;
+}
+
+typedef void ((*expand_method)(Rect*, int));
+
+/* This structure packs most of the parametars for expand_field() in
+   order to save pushing the same parameters twice. */
+typedef struct _expand_info {
+    const Point* top_left;
+    int orig_width;
+    int orig_height;
+    const Rect* monitor;
+    const Rect* client_rects;
+    int n_client_rects;
+    int max_edges;
+} expand_info;
+
+static int expand_field(int orig_edge_index,
+                        const int* edges,
+                        expand_method exp,
+                        const expand_info* i)
+{
+    Rect field;
+    RECT_SET(field,
+             i->top_left->x,
+             i->top_left->y,
+             i->orig_width,
+             i->orig_height);
+    int edge_index = orig_edge_index;
+    while (edge_index < i->max_edges - 1) {
+        int next_edge_index = edge_index + 1;
+        (*exp)(&field, edges[next_edge_index] - edges[edge_index]);
+        int overlap = total_overlap(i->client_rects, i->n_client_rects, &field);
+        if (overlap != 0 || !RECT_CONTAINS_RECT(*(i->monitor), field))
+            break;
+        edge_index = next_edge_index;
+    }
+    return edge_index;
+}
+
+/* The algortihm used for centering a rectangle in a grid field: First
+   find the smallest rectangle of grid lines that enclose the given
+   rectangle.  By definition, there is no overlap with any of the other
+   windows if the given rectangle is centered within this minimal
+   rectangle.  Then, try extending the minimal rectangle in either
+   direction (x and y) by picking successively further grid lines for
+   the opposite edge.  If the minimal rectangle can be extended in *one*
+   direction (x or y) but *not* the other, extend it as far as possible.
+   Otherwise, just use the minimal one.  */
+
+static void center_in_field(Point* top_left,
+                            const Size* req_size,
+                            const Rect *monitor,
+                            const Rect* client_rects,
+                            int n_client_rects,
+                            const int* x_edges,
+                            const int* y_edges,
+                            int max_edges)
+{
+    /* find minimal rectangle */
+    int orig_right_edge_index =
+        grid_position(top_left->x + req_size->width, x_edges, max_edges);
+    int orig_bottom_edge_index =
+        grid_position(top_left->y + req_size->height, y_edges, max_edges);
+    expand_info i = {
+        .top_left = top_left,
+        .orig_width = x_edges[orig_right_edge_index] - top_left->x,
+        .orig_height = y_edges[orig_bottom_edge_index] - top_left->y,
+        .monitor = monitor,
+        .client_rects = client_rects,
+        .n_client_rects = n_client_rects,
+        .max_edges = max_edges};
+    /* try extending width */
+    int right_edge_index =
+        expand_field(orig_right_edge_index, x_edges, expand_width, &i);
+    /* try extending height */
+    int bottom_edge_index =
+        expand_field(orig_bottom_edge_index, y_edges, expand_height, &i);
+    int final_width = x_edges[orig_right_edge_index] - top_left->x;
+    int final_height = y_edges[orig_bottom_edge_index] - top_left->y;
+    if (right_edge_index == orig_right_edge_index
+        && bottom_edge_index != orig_bottom_edge_index)
+        final_height = y_edges[bottom_edge_index] - top_left->y;
+    else if (right_edge_index != orig_right_edge_index
+             && bottom_edge_index == orig_bottom_edge_index)
+        final_width = x_edges[right_edge_index] - top_left->x;
+    /* Now center the given rectangle within the field */
+    top_left->x += (final_width - req_size->width) / 2;
+    top_left->y += (final_height - req_size->height) / 2;
+}
+
 /* Given a list of Rect RECTS, a Point PT and a Size size, determine the
    direction from PT which results in the least total overlap with RECTS
    if a rectangle is placed in that direction.  Return the top/left
@@ -145,8 +302,10 @@ static int total_overlap(const Rect* client_rects, int n_client_rects,
 #define NUM_DIRECTIONS 4
 
 static int best_direction(const Point* grid_point,
-                          const Rect* client_rects, int n_client_rects,
-                          const Rect* monitor, const Size* req_size,
+                          const Rect* client_rects,
+                          int n_client_rects,
+                          const Rect* monitor,
+                          const Size* req_size,
                           Point* best_top_left)
 {
     static const Size directions[NUM_DIRECTIONS] = {

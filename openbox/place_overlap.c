@@ -1,7 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
    overlap.c for the Openbox window manager
-   Copyright (c) 2011        Ian Zimmerman
+   Copyright (c) 2011, 2013 Ian Zimmerman
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,13 +22,18 @@
 
 #include <stdlib.h>
 
-static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* monitor, int* x_edges, int* y_edges,
+static void make_grid(const Rect* client_rects,
+                      int n_client_rects,
+                      const Rect* monitor,
+                      int* x_edges,
+                      int* y_edges,
                       int max_edges);
 
 static int best_direction(const Point* grid_point,
-                          const Rect* client_rects, int n_client_rects,
-                          const Rect* monitor, const Size* req_size,
+                          const Rect* client_rects,
+                          int n_client_rects,
+                          const Rect* monitor,
+                          const Size* req_size,
                           Point* best_top_left);
 
 /* Choose the placement on a grid with least overlap */
@@ -72,14 +77,16 @@ void place_overlap_find_least_placement(const Rect* client_rects,
     }
 }
 
-static int compare_ints(const void* a, const void* b)
+static int compare_ints(const void* a,
+                        const void* b)
 {
     const int* ia = (const int*)a;
     const int* ib = (const int*)b;
     return *ia - *ib;
 }
 
-static void uniquify(int* edges, int n_edges)
+static void uniquify(int* edges,
+                     int n_edges)
 {
     int i = 0;
     int j = 0;
@@ -95,8 +102,11 @@ static void uniquify(int* edges, int n_edges)
         edges[i] = G_MAXINT;
 }
 
-static void make_grid(const Rect* client_rects, int n_client_rects,
-                      const Rect* monitor, int* x_edges, int* y_edges,
+static void make_grid(const Rect* client_rects,
+                      int n_client_rects,
+                      const Rect* monitor,
+                      int* x_edges,
+                      int* y_edges,
                       int max_edges)
 {
     int i;
@@ -121,7 +131,8 @@ static void make_grid(const Rect* client_rects, int n_client_rects,
     uniquify(y_edges, n_edges);
 }
 
-static int total_overlap(const Rect* client_rects, int n_client_rects,
+static int total_overlap(const Rect* client_rects,
+                         int n_client_rects,
                          const Rect* proposed_rect)
 {
     int overlap = 0;
@@ -145,8 +156,10 @@ static int total_overlap(const Rect* client_rects, int n_client_rects,
 #define NUM_DIRECTIONS 4
 
 static int best_direction(const Point* grid_point,
-                          const Rect* client_rects, int n_client_rects,
-                          const Rect* monitor, const Size* req_size,
+                          const Rect* client_rects,
+                          int n_client_rects,
+                          const Rect* monitor,
+                          const Size* req_size,
                           Point* best_top_left)
 {
     static const Size directions[NUM_DIRECTIONS] = {

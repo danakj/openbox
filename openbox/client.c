@@ -218,7 +218,7 @@ void client_manage(Window window, ObPrompt *prompt)
     Time launch_time;
     guint32 user_time;
     gboolean obplaced;
-    gulong ignore_start;
+    gulong ignore_start = FALSE;
 
     ob_debug("Managing window: 0x%lx", window);
 

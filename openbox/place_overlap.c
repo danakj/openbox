@@ -200,34 +200,38 @@ static void center_in_field(Point* grid_point,
     /* find minimal rectangle */
     int ix0 = index_in_grid(grid_point->x, x_edges, max_edges);
     int iy0 = index_in_grid(grid_point->y, y_edges, max_edges);
-    int done, ix, iy, dx, dy;
     while (x_edges[ix0] < right_edge)
         ++ix0;
     while (y_edges[iy0] < bottom_edge)
         ++iy0;
     /* try extending width */
-    for (ix = ix0, done = 0; !done ; ++ix) {
-        Rect rfield = {
-            .x = grid_point->x,
-            .y = grid_point->y,
-            .width = x_edges[ix] - grid_point->x,
-            .height = y_edges[iy0] - grid_point->y
-        };
-        if (!RECT_CONTAINS_RECT(*monitor, rfield)
-            || total_overlap(client_rects, n_client_rects, &rfield) != 0)
+    Rect rfield;
+    int ix = ix0, iy = iy0;
+    RECT_SET_POINT(rfield, grid_point->x, grid_point->y);
+    int done = 0;
+    while (!done) {
+        RECT_SET_SIZE(rfield,
+                      x_edges[ix+1] - grid_point->x,
+                      y_edges[iy0] - grid_point->y);
+        int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
+        int overlap = total_overlap(client_rects, n_client_rects, &rfield);
+        if ((!in_monitor) || (overlap != 0))
             done = 1;
+        else
+            ++ix;
     }
     /* try extending height */
-    for (iy = iy0, done = 0; !done ; ++iy) {
-        Rect rfield = {
-            .x = grid_point->x,
-            .y = grid_point->y,
-            .width = x_edges[ix0] - grid_point->x,
-            .height = y_edges[iy] - grid_point->y
-        };
-        if (!RECT_CONTAINS_RECT(*monitor, rfield)
-            || total_overlap(client_rects, n_client_rects, &rfield) != 0)
+    done = 0;
+    while (!done) {
+        RECT_SET_SIZE(rfield,
+                      x_edges[ix0] - grid_point->x,
+                      y_edges[iy+1] - grid_point->y);
+        int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
+        int overlap = total_overlap(client_rects, n_client_rects, &rfield);
+        if ((!in_monitor) || (overlap != 0))
             done = 1;
+        else
+            ++iy;
     }
     Size sfinal;
     if (ix != ix0 && iy != iy0)

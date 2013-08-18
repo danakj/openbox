@@ -46,7 +46,8 @@ static void center_in_field(Point* grid_point,
                             const Rect* client_rects,
                             int n_client_rects,
                             const int* x_edges,
-                            const int* y_edges);
+                            const int* y_edges,
+                            int max_edges);
 
 /* Choose the placement on a grid with least overlap */
 
@@ -94,7 +95,8 @@ void place_overlap_find_least_placement(const Rect* client_rects,
                         client_rects,
                         n_client_rects,
                         x_edges,
-                        y_edges);
+                        y_edges,
+                        max_edges);
     }
 }
 
@@ -192,9 +194,9 @@ static void center_in_field(Point* grid_point,
                             const Rect* client_rects,
                             int n_client_rects,
                             const int* x_edges,
-                            const int* y_edges)
+                            const int* y_edges,
+                            int max_edges)
 {
-    int max_edges = 2 * (n_client_rects + 1);
     int right_edge = grid_point->x + req_size->width;
     int bottom_edge = grid_point->y + req_size->height;
     /* find minimal rectangle */

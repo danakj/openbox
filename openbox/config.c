@@ -37,6 +37,7 @@ gboolean config_focus_under_mouse;
 gboolean config_unfocus_leave;
 
 ObPlacePolicy  config_place_policy;
+gboolean config_place_center;
 ObPlaceMonitor config_place_monitor;
 
 guint          config_primary_monitor_index;
@@ -628,6 +629,10 @@ static void parse_placement(xmlNodePtr node, gpointer d)
     if ((n = obt_xml_find_node(node, "policy")))
         if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
+    }
+    if ((n = obt_xml_find_node(node, "center"))) {
+        config_place_center = obt_xml_node_bool(n);
+    }
     if ((n = obt_xml_find_node(node, "monitor"))) {
         if (obt_xml_node_contains(n, "active"))
             config_place_monitor = OB_PLACE_MONITOR_ACTIVE;

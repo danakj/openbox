@@ -36,6 +36,18 @@ static int best_direction(const Point* grid_point,
                           const Size* req_size,
                           Point* best_top_left);
 
+static int total_overlap(const Rect* client_rects,
+                         int n_client_rects,
+                         const Rect* proposed_rect);
+
+static void center_in_field(Point* grid_point,
+                            const Size* req_size,
+                            const Rect *monitor,
+                            const Rect* client_rects,
+                            int n_client_rects,
+                            const int* x_edges,
+                            const int* y_edges);
+
 /* Choose the placement on a grid with least overlap */
 
 void place_overlap_find_least_placement(const Rect* client_rects,
@@ -74,6 +86,15 @@ void place_overlap_find_least_placement(const Rect* client_rects,
         }
         if (overlap == 0)
             break;
+    }
+    if (config_place_center && overlap == 0) {
+        center_in_field(result,
+                        req_size,
+                        monitor,
+                        client_rects,
+                        n_client_rects,
+                        x_edges,
+                        y_edges);
     }
 }
 
@@ -145,6 +166,88 @@ static int total_overlap(const Rect* client_rects,
         overlap += RECT_AREA(rtemp);
     }
     return overlap;
+}
+
+static int index_in_grid(int grid_line,
+                         const int* edges,
+                         int max_edges)
+{
+    void* p = bsearch(&grid_line, edges, max_edges, sizeof(int), compare_ints);
+    return (int*)p - edges;
+}                         
+
+/* The algortihm used for centering a rectangle in a grid field: First
+   find the smallest rectangle of grid lines that enclose the given
+   rectangle.  By definition, there is no overlap with any of the other
+   windows if the given rectangle is centered within this minimal
+   rectangle.  Then, try extending the minimal rectangle in either
+   direction (x and y) by picking successively further grid lines for
+   the opposite edge.  If the minimal rectangle can be extended in *one*
+   direction (x or y) but *not* the other, extend it as far as possible.
+   Otherwise, just use the minimal one.  */
+
+static void center_in_field(Point* grid_point,
+                            const Size* req_size,
+                            const Rect *monitor,
+                            const Rect* client_rects,
+                            int n_client_rects,
+                            const int* x_edges,
+                            const int* y_edges)
+{
+    int max_edges = 2 * (n_client_rects + 1);
+    int right_edge = grid_point->x + req_size->width;
+    int bottom_edge = grid_point->y + req_size->height;
+    /* find minimal rectangle */
+    int ix0 = index_in_grid(grid_point->x, x_edges, max_edges);
+    int iy0 = index_in_grid(grid_point->y, y_edges, max_edges);
+    int done, ix, iy, dx, dy;
+    while (x_edges[ix0] < right_edge)
+        ++ix0;
+    while (y_edges[iy0] < bottom_edge)
+        ++iy0;
+    /* try extending width */
+    for (ix = ix0, done = 0; !done ; ++ix) {
+        Rect rfield = {
+            .x = grid_point->x,
+            .y = grid_point->y,
+            .width = x_edges[ix] - grid_point->x,
+            .height = y_edges[iy0] - grid_point->y
+        };
+        if (!RECT_CONTAINS_RECT(*monitor, rfield)
+            || total_overlap(client_rects, n_client_rects, &rfield) != 0)
+            done = 1;
+    }
+    /* try extending height */
+    for (iy = iy0, done = 0; !done ; ++iy) {
+        Rect rfield = {
+            .x = grid_point->x,
+            .y = grid_point->y,
+            .width = x_edges[ix0] - grid_point->x,
+            .height = y_edges[iy] - grid_point->y
+        };
+        if (!RECT_CONTAINS_RECT(*monitor, rfield)
+            || total_overlap(client_rects, n_client_rects, &rfield) != 0)
+            done = 1;
+    }
+    Rect rfinal;
+    RECT_SET_POINT(rfinal, grid_point->x, grid_point->y);
+    if (ix != ix0 && iy != iy0)
+        RECT_SET_SIZE(rfinal,
+                      x_edges[ix0] - grid_point->x,
+                      y_edges[iy0] - grid_point->y);
+    else if (ix != ix0)
+        RECT_SET_SIZE(rfinal,
+                      x_edges[ix] - grid_point->x,
+                      y_edges[iy0] - grid_point->y);
+    else                        /* iy != iy0 */
+        RECT_SET_SIZE(rfinal,
+                      x_edges[ix0] - grid_point->x,
+                      y_edges[iy] - grid_point->y);
+    /* Now center the given rectangle within the field */
+    dx = (rfinal.width - req_size->width) / 2;
+    dy = (rfinal.height - req_size->height) / 2;
+    grid_point->x += dx;
+    grid_point->y += dy;
 }
 
 /* Given a list of Rect RECTS, a Point PT and a Size size, determine the

@@ -23,11 +23,41 @@ For openbox, we aim to have consistent coding style. Some, but surely
 not all, guidelines:
  * use 4 space indents
  * tabs should not appear in source files
- * functions should have the opening and closing braces on their own
-   lines
- * most other constructs should have braces on the same line as the
-   statement
+ * closing braces always go on a new line
+ * for functions, the opening brace goes on a new line
+     void foo()
+     {
+         hi;
+     }
+ * for control blocks, the opening brace goes on the same line as the
+   condition, unless the condition spans more than one line. then the brace
+   goes on a new line.
+     if (one line) {
+         hi;
+     }
+     if (first line &&
+         second line)
+     {
+         hi;
+     }
  * else appears on a new line, just like an if
+     if (testing) {
+         hi;
+     }
+     else if (other) {
+         bye;
+     }
+ * always use braces around conditional blocks that consist of more than one
+   line, even if they contain a single statement
+     if (check) {
+         /* Check was true. */
+         yay = true(ok,
+                    thanks);
+     }
+ * don't need to use braces for conditional blocks that use only a single
+   line, including comments.
+     if (check)
+         all_on_one_line_so_no_braces_needed();
  * when in doubt look at the rest of the source
  * vim users can use "set expandtab tabstop=4 shiftwidth=4
    softtabstop=4" for some of this

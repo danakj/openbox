@@ -229,23 +229,22 @@ static void center_in_field(Point* grid_point,
             || total_overlap(client_rects, n_client_rects, &rfield) != 0)
             done = 1;
     }
-    Rect rfinal;
-    RECT_SET_POINT(rfinal, grid_point->x, grid_point->y);
+    Size sfinal;
     if (ix != ix0 && iy != iy0)
-        RECT_SET_SIZE(rfinal,
-                      x_edges[ix0] - grid_point->x,
-                      y_edges[iy0] - grid_point->y);
+        SIZE_SET(sfinal,
+                 x_edges[ix0] - grid_point->x,
+                 y_edges[iy0] - grid_point->y);
     else if (ix != ix0)
-        RECT_SET_SIZE(rfinal,
-                      x_edges[ix] - grid_point->x,
-                      y_edges[iy0] - grid_point->y);
+        SIZE_SET(sfinal,
+                 x_edges[ix] - grid_point->x,
+                 y_edges[iy0] - grid_point->y);
     else                        /* iy != iy0 */
-        RECT_SET_SIZE(rfinal,
-                      x_edges[ix0] - grid_point->x,
-                      y_edges[iy] - grid_point->y);
+        SIZE_SET(sfinal,
+                 x_edges[ix0] - grid_point->x,
+                 y_edges[iy] - grid_point->y);
     /* Now center the given rectangle within the field */
-    dx = (rfinal.width - req_size->width) / 2;
-    dy = (rfinal.height - req_size->height) / 2;
+    dx = (sfinal.width - req_size->width) / 2;
+    dy = (sfinal.height - req_size->height) / 2;
     grid_point->x += dx;
     grid_point->y += dy;
 }

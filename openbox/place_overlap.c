@@ -247,8 +247,8 @@ static void center_in_field(Point* grid_point,
                  x_edges[ix0] - grid_point->x,
                  y_edges[iy] - grid_point->y);
     /* Now center the given rectangle within the field */
-    dx = (sfinal.width - req_size->width) / 2;
-    dy = (sfinal.height - req_size->height) / 2;
+    int dx = (sfinal.width - req_size->width) / 2;
+    int dy = (sfinal.height - req_size->height) / 2;
     grid_point->x += dx;
     grid_point->y += dy;
 }

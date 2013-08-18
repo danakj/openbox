@@ -52,6 +52,7 @@ struct _ObActionsDefinition {
     ObActionsRunFunc run;
     ObActionsShutdownFunc shutdown;
     gboolean modifies_focused_window;
+    gboolean can_stop;
 };
 
 struct _ObActionsAct {
@@ -111,6 +112,7 @@ ObActionsDefinition* do_register(const gchar *name,
     def->run = run;
     def->shutdown = NULL;
     def->modifies_focused_window = TRUE;
+    def->can_stop = FALSE;
 
     registered = g_slist_prepend(registered, def);
     return def;
@@ -168,6 +170,22 @@ gboolean actions_set_modifies_focused_window(const gchar *name,
         def = it->data;
         if (!g_ascii_strcasecmp(name, def->name)) {
             def->modifies_focused_window = modifies;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+gboolean actions_set_can_stop(const gchar *name,
+                              gboolean can_stop)
+{
+    GSList *it;
+    ObActionsDefinition *def;
+
+    for (it = registered; it; it = g_slist_next(it)) {
+        def = it->data;
+        if (!g_ascii_strcasecmp(name, def->name)) {
+            def->can_stop = can_stop;
             return TRUE;
         }
     }
@@ -356,16 +374,18 @@ void actions_run_acts(GSList *acts,
         /* fire the action's run function with this data */
         if (ok) {
             if (!act->def->run(&data, act->options)) {
-                if (actions_act_is_interactive(act))
+                if (actions_act_is_interactive(act)) {
                     actions_interactive_end_act();
+                }
                 if (client && client == focus_client &&
                     act->def->modifies_focused_window)
                 {
                     update_user_time = TRUE;
                 }
             } else {
-                /* make sure its interactive if it returned TRUE */
-                g_assert(act->i_input);
+                /* make sure its interactive or allowed to stop
+                   if it returned TRUE */
+                g_assert(act->i_input || act->def->can_stop);
 
                 /* no actions are run after the interactive one */
                 break;

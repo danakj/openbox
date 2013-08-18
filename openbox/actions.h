@@ -84,6 +84,8 @@ gboolean actions_set_shutdown(const gchar *name,
                               ObActionsShutdownFunc shutdown);
 gboolean actions_set_modifies_focused_window(const gchar *name,
                                              gboolean modifies);
+gboolean actions_set_can_stop(const gchar *name,
+                              gboolean modifies);
 
 ObActionsAct* actions_parse(xmlNodePtr node);
 ObActionsAct* actions_parse_string(const gchar *name);

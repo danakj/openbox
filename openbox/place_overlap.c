@@ -121,7 +121,7 @@ static void uniquify(int* edges,
             ++j;
     }
     /* fill the rest with nonsense */
-    for (; i < n_edges ; ++i)
+    for (; i < n_edges; ++i)
         edges[i] = G_MAXINT;
 }
 
@@ -209,31 +209,33 @@ static void center_in_field(Point* grid_point,
     /* try extending width */
     Rect rfield;
     int ix = ix0, iy = iy0;
-    RECT_SET_POINT(rfield, grid_point->x, grid_point->y);
+    RECT_SET(rfield, grid_point->x, grid_point->y, 0, 0);
     int done = 0;
     while (!done) {
+        int next_ix = ix + 1;
         RECT_SET_SIZE(rfield,
-                      x_edges[ix+1] - grid_point->x,
+                      x_edges[next_ix] - grid_point->x,
                       y_edges[iy0] - grid_point->y);
         int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
         int overlap = total_overlap(client_rects, n_client_rects, &rfield);
         if ((!in_monitor) || (overlap != 0))
             done = 1;
         else
-            ++ix;
+            ix = next_ix;
     }
     /* try extending height */
     done = 0;
     while (!done) {
+        int next_iy = iy + 1;
         RECT_SET_SIZE(rfield,
                       x_edges[ix0] - grid_point->x,
-                      y_edges[iy+1] - grid_point->y);
+                      y_edges[next_iy] - grid_point->y);
         int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
         int overlap = total_overlap(client_rects, n_client_rects, &rfield);
         if ((!in_monitor) || (overlap != 0))
             done = 1;
         else
-            ++iy;
+            iy = next_iy + 1;
     }
     Size sfinal;
     if (ix != ix0 && iy != iy0)

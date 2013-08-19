@@ -59,7 +59,7 @@ void place_overlap_find_least_placement(const Rect* client_rects,
 {
     POINT_SET(*result, monitor->x, monitor->y);
     int overlap = G_MAXINT;
-    int max_edges = 2 * (n_client_rects + 1) + 1;
+    int max_edges = 2 * (n_client_rects + 1);
 
     int x_edges[max_edges];
     int y_edges[max_edges];
@@ -170,13 +170,76 @@ static int total_overlap(const Rect* client_rects,
     return overlap;
 }
 
-static int index_in_grid(int grid_line,
+/* Unfortunately, the libc bsearch() function cannot be used to find the
+   position of a value that is not in the array, and glib doesn't
+   provide a binary search function at all.  So, tricky as it is, if we
+   want to avoid linear scan of the edge array, we have to roll our
+   own. */
+static int grid_position(int value,
                          const int* edges,
                          int max_edges)
 {
-    void* p = bsearch(&grid_line, edges, max_edges, sizeof(int), compare_ints);
-    return (int*)p - edges;
+    int low = 0;
+    int high = max_edges - 1;
+    int mid = low + (high - low) / 2;
+    while (low != mid) {
+        if (value < edges[mid])
+            high = mid;
+        else if (value > edges[mid])
+            low = mid;
+        else                    /* value == edges[mid] */
+            return mid;
+        mid = low + (high - low) / 2;
+    }
+    /* we get here when low == mid.  can have low == high or low == high - 1 */
+    return (value <= edges[low] ? low : high);
 }                         
+
+static void expand_width(Rect* r, int by)
+{
+    r->width += by;
+}
+
+static void expand_height(Rect* r, int by)
+{
+    r->height += by;
+}
+
+typedef void ((*expand_method)(Rect*, int));
+
+/* This structure packs most of the parametars for expand_field() in
+   order to save pushing the same parameters twice. */
+typedef struct _expand_info {
+    const Point* top_left;
+    const Size* orig_size;
+    const Rect* monitor;
+    const Rect* client_rects;
+    int n_client_rects;
+    int max_edges;
+} expand_info;
+
+static int expand_field(int orig_edge_index,
+                        const int* edges,
+                        expand_method exp,
+                        const expand_info* i)
+{
+    Rect field;
+    RECT_SET(field,
+             i->top_left->x,
+             i->top_left->y,
+             i->orig_size->width,
+             i->orig_size->height);
+    int edge_index = orig_edge_index;
+    while (edge_index < i->max_edges - 1) {
+        int next_edge_index = edge_index + 1;
+        (*exp)(&field, edges[next_edge_index] - edges[edge_index]);
+        int overlap = total_overlap(i->client_rects, i->n_client_rects, &field);
+        if (overlap != 0 || !RECT_CONTAINS_RECT(*(i->monitor), field))
+            break;
+        edge_index = next_edge_index;
+    }
+    return edge_index;
+}
 
 /* The algortihm used for centering a rectangle in a grid field: First
    find the smallest rectangle of grid lines that enclose the given
@@ -188,7 +251,7 @@ static int index_in_grid(int grid_line,
    direction (x or y) but *not* the other, extend it as far as possible.
    Otherwise, just use the minimal one.  */
 
-static void center_in_field(Point* grid_point,
+static void center_in_field(Point* top_left,
                             const Size* req_size,
                             const Rect *monitor,
                             const Rect* client_rects,
@@ -197,64 +260,41 @@ static void center_in_field(Point* grid_point,
                             const int* y_edges,
                             int max_edges)
 {
-    int right_edge = grid_point->x + req_size->width;
-    int bottom_edge = grid_point->y + req_size->height;
     /* find minimal rectangle */
-    int ix0 = index_in_grid(grid_point->x, x_edges, max_edges);
-    int iy0 = index_in_grid(grid_point->y, y_edges, max_edges);
-    while (x_edges[ix0] < right_edge)
-        ++ix0;
-    while (y_edges[iy0] < bottom_edge)
-        ++iy0;
+    int orig_right_edge_index =
+        grid_position(top_left->x + req_size->width, x_edges, max_edges);
+    int orig_bottom_edge_index =
+        grid_position(top_left->y + req_size->height, y_edges, max_edges);
+    Size orig_size;
+    SIZE_SET(orig_size,
+             x_edges[orig_right_edge_index] - top_left->x,
+             y_edges[orig_bottom_edge_index] - top_left->y);
+    expand_info i = {
+        .top_left = top_left,
+        .orig_size = &orig_size,
+        .monitor = monitor,
+        .client_rects = client_rects,
+        .n_client_rects = n_client_rects,
+        .max_edges = max_edges};
     /* try extending width */
-    Rect rfield;
-    int ix = ix0, iy = iy0;
-    RECT_SET(rfield, grid_point->x, grid_point->y, 0, 0);
-    int done = 0;
-    while (!done) {
-        int next_ix = ix + 1;
-        RECT_SET_SIZE(rfield,
-                      x_edges[next_ix] - grid_point->x,
-                      y_edges[iy0] - grid_point->y);
-        int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
-        int overlap = total_overlap(client_rects, n_client_rects, &rfield);
-        if ((!in_monitor) || (overlap != 0))
-            done = 1;
-        else
-            ix = next_ix;
-    }
+    int right_edge_index =
+        expand_field(orig_right_edge_index, x_edges, expand_width, &i);
     /* try extending height */
-    done = 0;
-    while (!done) {
-        int next_iy = iy + 1;
-        RECT_SET_SIZE(rfield,
-                      x_edges[ix0] - grid_point->x,
-                      y_edges[next_iy] - grid_point->y);
-        int in_monitor = RECT_CONTAINS_RECT(*monitor, rfield);
-        int overlap = total_overlap(client_rects, n_client_rects, &rfield);
-        if ((!in_monitor) || (overlap != 0))
-            done = 1;
-        else
-            iy = next_iy + 1;
-    }
-    Size sfinal;
-    if (ix != ix0 && iy != iy0)
-        SIZE_SET(sfinal,
-                 x_edges[ix0] - grid_point->x,
-                 y_edges[iy0] - grid_point->y);
-    else if (ix != ix0)
-        SIZE_SET(sfinal,
-                 x_edges[ix] - grid_point->x,
-                 y_edges[iy0] - grid_point->y);
-    else                        /* iy != iy0 */
-        SIZE_SET(sfinal,
-                 x_edges[ix0] - grid_point->x,
-                 y_edges[iy] - grid_point->y);
+    int bottom_edge_index =
+        expand_field(orig_bottom_edge_index, y_edges, expand_height, &i);
+    int final_width = x_edges[orig_right_edge_index] - top_left->x;
+    int final_height = y_edges[orig_bottom_edge_index] - top_left->y;
+    if (right_edge_index == orig_right_edge_index
+        && bottom_edge_index != orig_bottom_edge_index)
+        final_height = y_edges[bottom_edge_index] - top_left->y;
+    else if (right_edge_index != orig_right_edge_index
+             && bottom_edge_index == orig_bottom_edge_index)
+        final_width = x_edges[right_edge_index] - top_left->x;
     /* Now center the given rectangle within the field */
-    int dx = (sfinal.width - req_size->width) / 2;
-    int dy = (sfinal.height - req_size->height) / 2;
-    grid_point->x += dx;
-    grid_point->y += dy;
+    int dx = (final_width - req_size->width) / 2;
+    int dy = (final_height - req_size->height) / 2;
+    top_left->x += dx;
+    top_left->y += dy;
 }
 
 /* Given a list of Rect RECTS, a Point PT and a Size size, determine the

@@ -30,6 +30,22 @@ typedef enum {
     QUERY_TARGET_IS_FOCUS_TARGET,
 } QueryTarget;
 
+typedef enum {
+    MATCH_TYPE_NONE = 0,
+    MATCH_TYPE_PATTERN,
+    MATCH_TYPE_REGEX,
+    MATCH_TYPE_EXACT,
+} MatchType;
+
+typedef struct {
+    MatchType type;
+    union m {
+        GPatternSpec *pattern;
+        GRegex *regex;
+        gchar *exact;
+    } m;
+} TypedMatch;
+
 typedef struct {
     QueryTarget target;
     gboolean shaded_on;
@@ -55,9 +71,10 @@ typedef struct {
     guint    desktop_number;
     guint    screendesktop_number;
     guint    client_monitor;
-    GPatternSpec *matchtitle;
-    GRegex *regextitle;
-    gchar  *exacttitle;
+    TypedMatch title;
+    TypedMatch class;
+    TypedMatch name;
+    TypedMatch role;
 } Query;
 
 typedef struct {
@@ -97,6 +114,60 @@ static inline void set_bool(xmlNodePtr node,
     }
 }
 
+static void setup_typed_match(TypedMatch *tm, xmlNodePtr n)
+{
+    gchar *s;
+    if ((s = obt_xml_node_string(n))) {
+        gchar *type = NULL;
+        if (!obt_xml_attr_string(n, "type", &type) ||
+            !g_ascii_strcasecmp(type, "pattern"))
+        {
+            tm->type = MATCH_TYPE_PATTERN;
+            tm->m.pattern = g_pattern_spec_new(s);
+        } else if (type && !g_ascii_strcasecmp(type, "regex")) {
+            tm->type = MATCH_TYPE_REGEX;
+            tm->m.regex = g_regex_new(s, 0, 0, NULL);
+        } else if (type && !g_ascii_strcasecmp(type, "exact")) {
+            tm->type = MATCH_TYPE_EXACT;
+            tm->m.exact = g_strdup(s);
+        }
+        g_free(s);
+        g_free(type);
+    }
+}
+
+static void free_typed_match(TypedMatch *tm)
+{
+    switch (tm->type) {
+    case MATCH_TYPE_PATTERN:
+        g_pattern_spec_free(tm->m.pattern);
+        break;
+    case MATCH_TYPE_REGEX:
+        g_regex_unref(tm->m.regex);
+        break;
+    case MATCH_TYPE_EXACT:
+        g_free(tm->m.exact);
+        break;
+    case MATCH_TYPE_NONE:
+        break;
+    }
+}
+
+static gboolean check_typed_match(TypedMatch *tm, gchar *s)
+{
+    switch (tm->type) {
+    case MATCH_TYPE_PATTERN:
+        return g_pattern_match_string(tm->m.pattern, s);
+    case MATCH_TYPE_REGEX:
+        return g_regex_match(tm->m.regex, s, 0, NULL);
+    case MATCH_TYPE_EXACT:
+        return !strcmp(tm->m.exact, s);
+    case MATCH_TYPE_NONE:
+        return TRUE;
+    }
+    g_assert_not_reached();
+}
+
 static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     Query *q = g_slice_new0(Query);
     g_array_append_val(o->queries, q);
@@ -130,19 +201,16 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
         q->screendesktop_number = obt_xml_node_int(n);
     }
     if ((n = obt_xml_find_node(node, "title"))) {
-        gchar *s, *type = NULL;
-        if ((s = obt_xml_node_string(n))) {
-            if (!obt_xml_attr_string(n, "type", &type) ||
-                !g_ascii_strcasecmp(type, "pattern"))
-            {
-                q->matchtitle = g_pattern_spec_new(s);
-            } else if (type && !g_ascii_strcasecmp(type, "regex")) {
-                q->regextitle = g_regex_new(s, 0, 0, NULL);
-            } else if (type && !g_ascii_strcasecmp(type, "exact")) {
-                q->exacttitle = g_strdup(s);
-            }
-            g_free(s);
-        }
+        setup_typed_match(&q->title, n);
+    }
+    if ((n = obt_xml_find_node(node, "class"))) {
+        setup_typed_match(&q->class, n);
+    }
+    if ((n = obt_xml_find_node(node, "name"))) {
+        setup_typed_match(&q->name, n);
+    }
+    if ((n = obt_xml_find_node(node, "role"))) {
+        setup_typed_match(&q->role, n);
     }
     if ((n = obt_xml_find_node(node, "monitor"))) {
         q->client_monitor = obt_xml_node_int(n);
@@ -211,12 +279,10 @@ static void free_func(gpointer options)
     for (i = 0; i < o->queries->len; ++i) {
         Query *q = g_array_index(o->queries, Query*, i);
 
-        if (q->matchtitle)
-            g_pattern_spec_free(q->matchtitle);
-        if (q->regextitle)
-            g_regex_unref(q->regextitle);
-        if (q->exacttitle)
-            g_free(q->exacttitle);
+        free_typed_match(&q->title);
+        free_typed_match(&q->class);
+        free_typed_match(&q->name);
+        free_typed_match(&q->role);
 
         g_slice_free(Query, q);
     }
@@ -328,18 +394,10 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         if (q->screendesktop_number)
             is_true &= screen_desktop == q->screendesktop_number - 1;
 
-        if (q->matchtitle) {
-            is_true &= g_pattern_match_string(q->matchtitle,
-                                              query_target->original_title);
-        }
-        if (q->regextitle) {
-            is_true &= g_regex_match(q->regextitle,
-                                     query_target->original_title,
-                                     0,
-                                     NULL);
-        }
-        if (q->exacttitle)
-            is_true &= !strcmp(q->exacttitle, query_target->original_title);
+        is_true &= check_typed_match(&q->title, query_target->original_title);
+        is_true &= check_typed_match(&q->class, query_target->class);
+        is_true &= check_typed_match(&q->name, query_target->name);
+        is_true &= check_typed_match(&q->role, query_target->role);
 
         if (q->client_monitor)
             is_true &= client_monitor(query_target) == q->client_monitor - 1;

@@ -40,13 +40,6 @@ not all, guidelines:
      {
          hi;
      }
- * else appears on a new line, just like an if
-     if (testing) {
-         hi;
-     }
-     else if (other) {
-         bye;
-     }
  * always use braces around conditional blocks that consist of more than one
    line, even if they contain a single statement
      if (check) {

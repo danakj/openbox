@@ -88,8 +88,7 @@ extern gboolean config_unfocus_leave;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;
-/*! Whether to place windows in the center of the free area found or
-  the top left corner */
+/*! Place windows in the center of the free area */
 extern gboolean config_place_center;
 /*! Place windows on the active monitor (unless they are part of an application
   already on another monitor) */

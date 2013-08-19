@@ -37,7 +37,7 @@ gboolean config_focus_under_mouse;
 gboolean config_unfocus_leave;
 
 ObPlacePolicy  config_place_policy;
-gboolean config_place_center;
+gboolean       config_place_center;
 ObPlaceMonitor config_place_monitor;
 
 guint          config_primary_monitor_index;
@@ -1060,6 +1060,7 @@ void config_startup(ObtXmlInst *i)
     obt_xml_register(i, "focus", parse_focus, NULL);
 
     config_place_policy = OB_PLACE_POLICY_SMART;
+    config_place_center = TRUE;
     config_place_monitor = OB_PLACE_MONITOR_PRIMARY;
 
     config_primary_monitor_index = 1;

@@ -626,7 +626,7 @@ static void parse_placement(xmlNodePtr node, gpointer d)
 
     node = node->children;
 
-    if ((n = obt_xml_find_node(node, "policy")))
+    if ((n = obt_xml_find_node(node, "policy"))) {
         if (obt_xml_node_contains(n, "UnderMouse"))
             config_place_policy = OB_PLACE_POLICY_MOUSE;
     }

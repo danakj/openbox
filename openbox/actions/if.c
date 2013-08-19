@@ -75,6 +75,7 @@ typedef struct {
     TypedMatch class;
     TypedMatch name;
     TypedMatch role;
+    TypedMatch type;
 } Query;
 
 typedef struct {
@@ -153,7 +154,7 @@ static void free_typed_match(TypedMatch *tm)
     }
 }
 
-static gboolean check_typed_match(TypedMatch *tm, gchar *s)
+static gboolean check_typed_match(TypedMatch *tm, const gchar *s)
 {
     switch (tm->type) {
     case MATCH_TYPE_PATTERN:
@@ -211,6 +212,9 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     }
     if ((n = obt_xml_find_node(node, "role"))) {
         setup_typed_match(&q->role, n);
+    }
+    if ((n = obt_xml_find_node(node, "type"))) {
+        setup_typed_match(&q->type, n);
     }
     if ((n = obt_xml_find_node(node, "monitor"))) {
         q->client_monitor = obt_xml_node_int(n);
@@ -283,6 +287,7 @@ static void free_func(gpointer options)
         free_typed_match(&q->class);
         free_typed_match(&q->name);
         free_typed_match(&q->role);
+        free_typed_match(&q->type);
 
         g_slice_free(Query, q);
     }
@@ -398,6 +403,8 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         is_true &= check_typed_match(&q->class, query_target->class);
         is_true &= check_typed_match(&q->name, query_target->name);
         is_true &= check_typed_match(&q->role, query_target->role);
+        is_true &= check_typed_match(&q->type,
+                                     client_type_to_string(query_target));
 
         if (q->client_monitor)
             is_true &= client_monitor(query_target) == q->client_monitor - 1;

@@ -2458,19 +2458,9 @@ static void client_get_session_ids(ObClient *self)
     }
 }
 
-/*! Save the properties used for app matching rules, as seen by Openbox when
-  the window mapped, so that users can still access them later if the app
-  changes them */
-static void client_save_app_rule_values(ObClient *self)
+const gchar *client_type_to_string(ObClient *self)
 {
     const gchar *type;
-
-    OBT_PROP_SETS(self->window, OB_APP_ROLE, self->role);
-    OBT_PROP_SETS(self->window, OB_APP_NAME, self->name);
-    OBT_PROP_SETS(self->window, OB_APP_CLASS, self->class);
-    OBT_PROP_SETS(self->window, OB_APP_GROUP_NAME, self->group_name);
-    OBT_PROP_SETS(self->window, OB_APP_GROUP_CLASS, self->group_class);
-    OBT_PROP_SETS(self->window, OB_APP_TITLE, self->original_title);
 
     switch (self->type) {
     case OB_CLIENT_TYPE_NORMAL:
@@ -2490,7 +2480,23 @@ static void client_save_app_rule_values(ObClient *self)
     case OB_CLIENT_TYPE_DOCK:
         type = "dock"; break;
     }
-    OBT_PROP_SETS(self->window, OB_APP_TYPE, type);
+
+    return type;
+}
+
+/*! Save the properties used for app matching rules, as seen by Openbox when
+  the window mapped, so that users can still access them later if the app
+  changes them */
+static void client_save_app_rule_values(ObClient *self)
+{
+    OBT_PROP_SETS(self->window, OB_APP_ROLE, self->role);
+    OBT_PROP_SETS(self->window, OB_APP_NAME, self->name);
+    OBT_PROP_SETS(self->window, OB_APP_CLASS, self->class);
+    OBT_PROP_SETS(self->window, OB_APP_GROUP_NAME, self->group_name);
+    OBT_PROP_SETS(self->window, OB_APP_GROUP_CLASS, self->group_class);
+    OBT_PROP_SETS(self->window, OB_APP_TITLE, self->original_title);
+
+    OBT_PROP_SETS(self->window, OB_APP_TYPE, client_type_to_string(self));
 }
 
 static void client_change_wm_state(ObClient *self)

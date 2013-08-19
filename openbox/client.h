@@ -645,6 +645,9 @@ void client_update_icons(ObClient *self);
 /*! Updates the window's icon geometry (where to iconify to/from) */
 void client_update_icon_geometry(ObClient *self);
 
+/*! Helper function to convert the ->type member to string representation */
+const gchar *client_type_to_string(ObClient *self);
+
 /*! Set up what decor should be shown on the window and what functions should
   be allowed (ObClient::decorations and ObClient::functions).
   This also updates the NET_WM_ALLOWED_ACTIONS hint.

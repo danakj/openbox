@@ -211,7 +211,8 @@ typedef void ((*expand_method)(Rect*, int));
    order to save pushing the same parameters twice. */
 typedef struct _expand_info {
     const Point* top_left;
-    const Size* orig_size;
+    int orig_width;
+    int orig_height;
     const Rect* monitor;
     const Rect* client_rects;
     int n_client_rects;
@@ -227,8 +228,8 @@ static int expand_field(int orig_edge_index,
     RECT_SET(field,
              i->top_left->x,
              i->top_left->y,
-             i->orig_size->width,
-             i->orig_size->height);
+             i->orig_width,
+             i->orig_height);
     int edge_index = orig_edge_index;
     while (edge_index < i->max_edges - 1) {
         int next_edge_index = edge_index + 1;
@@ -265,13 +266,10 @@ static void center_in_field(Point* top_left,
         grid_position(top_left->x + req_size->width, x_edges, max_edges);
     int orig_bottom_edge_index =
         grid_position(top_left->y + req_size->height, y_edges, max_edges);
-    Size orig_size;
-    SIZE_SET(orig_size,
-             x_edges[orig_right_edge_index] - top_left->x,
-             y_edges[orig_bottom_edge_index] - top_left->y);
     expand_info i = {
         .top_left = top_left,
-        .orig_size = &orig_size,
+        .orig_width = x_edges[orig_right_edge_index] - top_left->x,
+        .orig_height = y_edges[orig_bottom_edge_index] - top_left->y,
         .monitor = monitor,
         .client_rects = client_rects,
         .n_client_rects = n_client_rects,
@@ -291,10 +289,8 @@ static void center_in_field(Point* top_left,
              && bottom_edge_index == orig_bottom_edge_index)
         final_width = x_edges[right_edge_index] - top_left->x;
     /* Now center the given rectangle within the field */
-    int dx = (final_width - req_size->width) / 2;
-    int dy = (final_height - req_size->height) / 2;
-    top_left->x += dx;
-    top_left->y += dy;
+    top_left->x += (final_width - req_size->width) / 2;
+    top_left->y += (final_height - req_size->height) / 2;
 }
 
 /* Given a list of Rect RECTS, a Point PT and a Size size, determine the

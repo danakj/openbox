@@ -1242,9 +1242,9 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
         if (self->selected->entry->type == OB_MENU_ENTRY_TYPE_SUBMENU) {
             /* only show if the submenu isn't already showing */
             if (oldchild_entry != self->selected) {
-                if (immediate || config_submenu_hide_delay == 0)
+                if (immediate || config_submenu_show_delay == 0)
                     menu_entry_frame_show_submenu(self->selected);
-                else if (config_submenu_hide_delay > 0) {
+                else if (config_submenu_show_delay > 0) {
                     if (submenu_show_timer)
                         g_source_remove(submenu_show_timer);
                     submenu_show_timer =

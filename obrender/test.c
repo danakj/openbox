@@ -46,7 +46,6 @@ gint main()
     RrAppearance *look;
     int done;
 
-    Window root;
     XEvent report;
     gint h = 500, w = 500;
 
@@ -64,7 +63,6 @@ gint main()
                       0);                    /* attributes */
     XMapWindow(ob_display, win);
     XSelectInput(ob_display, win, ExposureMask | StructureNotifyMask);
-    root = RootWindow (ob_display, DefaultScreen (ob_display));
     inst = RrInstanceNew(ob_display, ob_screen);
 
     look = RrAppearanceNew(inst, 0);

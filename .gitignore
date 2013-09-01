@@ -5,6 +5,7 @@ Makefile.in
 aclocal.m4
 autom4te.cache
 compile
+config.cache
 config.guess
 config.log
 config.rpath
@@ -107,3 +108,4 @@ obt/tests/bstest
 obt/tests/ddtest
 obt/tests/linktest
 obt/tests/watchtest
+obt/obt_unittests

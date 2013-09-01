@@ -10,6 +10,13 @@ help() {
   exit 1
 }
 
+build_and_test() {
+  style=$1
+  make >/dev/null 2>/dev/null || error "make failed ($style)"
+  ./obt/obt_unittests > /dev/null || error "unittest failed ($style)"
+  make distclean >/dev/null || error "make distclean failed"
+}
+
 REV="$1"
 test -z "$REV" && help
 VERSION="$2"
@@ -33,84 +40,76 @@ test "$a" = "y" || error "aborted"
 BAD_PO="$(grep Project-Id-Version po/en*.po|grep -v "openbox $VERSION\\\\n")"
 test -z "$BAD_PO" || error "wrong version in po files" "$BAD_PO"
 
-#### TEST COMPILATION ####
+#### RESET THE REPO TO A CLEAN STATE ####
 
-# check that it builds
-./bootstrap >/dev/null || "bootstrap failed"
-#CFLAGS="-Werror -isystem /usr/lib/glib-2.0" \
-./configure -C --enable-debug >/dev/null || \
-  error "configure (with debug) failed"
-make || error "make (with debug and Werror) failed"
 git clean -f -x -d -q
 
-# check that it builds with each optional featureset
-./bootstrap >/dev/null || "bootstrap failed"
+#### TEST ALL OPTIONAL COMPILATION FLAGS ####
 
+# check that it builds
+echo Bootstrapping
+./bootstrap >/dev/null 2>/dev/null || "bootstrap failed"
+
+echo Check compile with debug and all options enabled
+CFLAGS="-Werror -isystem /usr/lib/glib-2.0" \
+./configure -C --enable-debug >/dev/null || \
+  error "configure (with debug) failed"
+build_and_test "with debug and Werror"
+
+# check that it builds with each optional featureset
 echo Check compile with all options enabled
 ./configure -C >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make failed"
 grep "XKB 1" config.log >/dev/null || error "missing xkb extension"
 grep "XRANDR 1" config.log >/dev/null || error "missing xrandr extension"
 grep "XINERAMA 1" config.log >/dev/null || error "missing xinerama extension"
 grep "SYNC 1" config.log >/dev/null || error "missing sync extension"
-make clean >/dev/null || error "make clean failed"
+grep "USE_XCURSOR 1" config.log >/dev/null || error "missing xcursor extension"
+grep "USE_IMLIB2 1" config.log >/dev/null || error "missing imlib2 library"
+grep "USE_LIBRSVG 1" config.log >/dev/null || error "missing librsvg library"
+grep "USE_SM 1" config.log >/dev/null || error "missing session management extension"
+build_and_test
 
 echo Check compile with startup notification disabled
 ./configure -C --disable-startup-notification >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make (with --disable-startup-notification) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-startup-notification"
 
 echo Check compile with xcursor disabled
 ./configure -C --disable-xcursor >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make (with --disable-xcursor) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-xcursor"
 
 echo Check compile with imlib2 disabled
 ./configure -C --disable-imlib2 >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make (with --disable-imlib2) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-imlib2"
 
 echo Check compile with librsvg disabled
-./configure -C --disable-imlib2 >/dev/null || \
+./configure -C --disable-librsvg >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make (with --disable-librsvg) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-librsvg"
 
 echo Check compile with session management disabled
 ./configure -C --disable-session-management >/dev/null || \
   error "configure failed"
-make >/dev/null 2>/dev/null || \
-  error "make (with --disable-session-management) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-session-management"
 
 echo Check compile with xkb disabled
 ./configure -C --disable-xkb >/dev/null || error "configure failed"
-make >/dev/null 2>/dev/null || error "make (with --disable-xkb) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-xkb"
 
 echo Check compile with xrandr disabled
 ./configure -C --disable-xrandr >/dev/null || error "configure failed"
-make >/dev/null 2>/dev/null || error "make (with --disable-xrandr) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test "with --disable-xrandr"
 
 echo Check compile with xinerama disabled
 ./configure -C --disable-xinerama >/dev/null || error "configure failed"
-make >/dev/null 2>/dev/null || error "make (with --disable-xinerama) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test("with --disable-xinerama")
 
 echo Check compile with xsync disabled
 ./configure -C --disable-xsync >/dev/null || error "configure failed"
-make >/dev/null 2>/dev/null || error "make (with --disable-xsync) failed"
-make clean >/dev/null || error "make clean failed"
+build_and_test("with --disable-xsync")
 
 # check that it installs sanely
 echo Check installation correctness

@@ -36,6 +36,9 @@ bin_PROGRAMS = \
 	tools/gnome-panel-control/gnome-panel-control \
 	tools/obxprop/obxprop
 
+noinst_PROGRAMS = \
+	obt/obt_unittests
+
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
 	data/xsession/openbox-gnome-session \
@@ -308,6 +311,21 @@ openbox_openbox_SOURCES = \
 	openbox/window.c \
 	openbox/window.h
 
+## obt_unittests ##
+
+obt_obt_unittests_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	-DLOCALEDIR=\"$(localedir)\" \
+	-DDATADIR=\"$(datadir)\" \
+	-DCONFIGDIR=\"$(configdir)\" \
+	-DG_LOG_DOMAIN=\"Obt-Unittests\"
+obt_obt_unittests_LDADD = \
+	$(GLIB_LIBS) \
+	obt/libobt.la
+obt_obt_unittests_LDFLAGS = -export-dynamic
+obt_obt_unittests_SOURCES = \
+	obt/unittest_base.c \
+	obt/bsearch_unittest.c
 
 ## gnome-panel-control ##
 

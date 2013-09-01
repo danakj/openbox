@@ -496,14 +496,11 @@ typedef enum {
     CLIENT_RESIZE_SHRINK,
 } ObClientDirectionalResizeType;
 
-/*! Moves the client area passed in to grow/shrink the given edge.
-  @return TRUE if any change was made to the client area.
-*/
-gboolean client_find_resize_directional(
-    ObClient *self,
-    ObDirection side,
-    ObClientDirectionalResizeType resize_type,
-    gint *x, gint *y, gint *w, gint *h);
+/*! Moves the client area passed in to grow/shrink the given edge. */
+void client_find_resize_directional(ObClient *self,
+                                    ObDirection side,
+                                    ObClientDirectionalResizeType resize_type,
+                                    gint *x, gint *y, gint *w, gint *h);
 
 /*! Fullscreen's or unfullscreen's the client window
   @param fs true if the window should be made fullscreen; false if it should

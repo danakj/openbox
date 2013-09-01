@@ -4535,18 +4535,15 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
     frame_frame_gravity(self->frame, x, y);
 }
 
-gboolean client_find_resize_directional(
-    ObClient *self,
-    ObDirection side,
-    ObClientDirectionalResizeType resize_type,
-    gint *x, gint *y, gint *w, gint *h)
+void client_find_resize_directional(ObClient *self,
+                                    ObDirection side,
+                                    ObClientDirectionalResizeType resize_type,
+                                    gint *x, gint *y, gint *w, gint *h)
 {
     gint head;
     gint e, e_start, e_size, delta;
     gboolean near;
     ObDirection dir;
-
-    gboolean changed = FALSE;
 
     gboolean grow;
     switch (resize_type) {
@@ -4647,27 +4644,23 @@ gboolean client_find_resize_directional(
         if (grow == near) --e;
         delta = e - RECT_RIGHT(self->frame->area);
         *w += delta;
-        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_WEST:
         if (grow == near) ++e;
         delta = RECT_LEFT(self->frame->area) - e;
         *x -= delta;
         *w += delta;
-        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_NORTH:
         if (grow == near) ++e;
         delta = RECT_TOP(self->frame->area) - e;
         *y -= delta;
         *h += delta;
-        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_SOUTH:
         if (grow == near) --e;
         delta = e - RECT_BOTTOM(self->frame->area);
         *h += delta;
-        changed = delta ? TRUE : changed;
        break;
     default:
         g_assert_not_reached();
@@ -4675,7 +4668,6 @@ gboolean client_find_resize_directional(
     frame_frame_gravity(self->frame, x, y);
     *w -= self->frame->size.left + self->frame->size.right;
     *h -= self->frame->size.top + self->frame->size.bottom;
-    return changed;
 }
 
 ObClient* client_under_pointer(void)

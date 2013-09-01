@@ -11,7 +11,8 @@ typedef struct {
     gboolean fill;
 } Options;
 
-static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_grow_func(xmlNodePtr node);
+static gpointer setup_fill_func(xmlNodePtr node);
 static gpointer setup_shrink_func(xmlNodePtr node);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
@@ -20,11 +21,12 @@ static gpointer setup_north_func(xmlNodePtr node);
 static gpointer setup_south_func(xmlNodePtr node);
 static gpointer setup_east_func(xmlNodePtr node);
 static gpointer setup_west_func(xmlNodePtr node);
-static gpointer setup_fill_func(xmlNodePtr node);
 
 void action_growtoedge_startup(void)
 {
-    actions_register("GrowToEdge", setup_func,
+    actions_register("GrowToEdge", setup_grow_func,
+                     free_func, run_func);
+    actions_register("GrowToFill", setup_fill_func,
                      free_func, run_func);
     actions_register("ShrinkToEdge", setup_shrink_func,
                      free_func, run_func);
@@ -33,7 +35,6 @@ void action_growtoedge_startup(void)
     actions_register("GrowToEdgeSouth", setup_south_func, free_func, run_func);
     actions_register("GrowToEdgeEast", setup_east_func, free_func, run_func);
     actions_register("GrowToEdgeWest", setup_west_func, free_func, run_func);
-    actions_register("GrowToFill", setup_fill_func, free_func, run_func);
 }
 
 static gpointer setup_func(xmlNodePtr node)
@@ -43,8 +44,6 @@ static gpointer setup_func(xmlNodePtr node)
 
     o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
-    o->shrink = FALSE;
-    o->fill = FALSE;
 
     if ((n = obt_xml_find_node(node, "direction"))) {
         gchar *s = obt_xml_node_string(n);
@@ -66,16 +65,27 @@ static gpointer setup_func(xmlNodePtr node)
     return o;
 }
 
+static gpointer setup_grow_func(xmlNodePtr node)
+{
+    Options *o;
+
+    o = setup_func(node);
+    o->shrink = FALSE;
+    o->fill = FALSE;
+
+    return o;
+}
+
 static gpointer setup_fill_func(xmlNodePtr node)
 {
     Options *o;
 
     o = setup_func(node);
+    o->shrink = FALSE;
     o->fill = TRUE;
 
     return o;
 }
-
 
 static gpointer setup_shrink_func(xmlNodePtr node)
 {
@@ -83,6 +93,7 @@ static gpointer setup_shrink_func(xmlNodePtr node)
 
     o = setup_func(node);
     o->shrink = TRUE;
+    o->fill = FALSE;
 
     return o;
 }
@@ -123,7 +134,6 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     Options *o = options;
     gint x, y, w, h;
 
-    ObDirection opp;
     gint half;
 
     if (!data->client)
@@ -144,78 +154,57 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             return FALSE;
         }
 
-        gint head, size;
-        gint e_start, e_size;
-        gboolean near;
+        ObClientDirectionalResizeType grow = CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE;
 
-        gint north_edge;
-        head = RECT_TOP(data->client->frame->area)+1;
-        size = data->client->frame->area.height;
-        e_start = RECT_LEFT(data->client->frame->area);
-        e_size = data->client->frame->area.width;
+        gint temp_x;
+        gint temp_y;
+        gint temp_w;
+        gint temp_h;
 
-        client_find_edge_directional(data->client, OB_DIRECTION_NORTH,
-                                     head, size, e_start, e_size,
-                                     &north_edge, &near);
+        client_find_resize_directional(data->client,
+                                       OB_DIRECTION_NORTH,
+                                       grow,
+                                       &temp_x, &temp_y, &temp_w, &temp_h);
+        y = temp_y;
+        h = temp_h;
 
-        gint south_edge;
-        head = RECT_BOTTOM(data->client->frame->area)-1;
-        size = data->client->frame->area.height;
-        e_start = RECT_LEFT(data->client->frame->area);
-        e_size = data->client->frame->area.width;
+        client_find_resize_directional(data->client,
+                                       OB_DIRECTION_SOUTH,
+                                       grow,
+                                       &temp_x, &temp_y, &temp_w, &temp_h);
+        h += temp_h - data->client->area.height;
 
-        client_find_edge_directional(data->client, OB_DIRECTION_SOUTH,
-                                     head, size, e_start, e_size,
-                                     &south_edge, &near);
 
-        gint east_edge;
-        head = RECT_RIGHT(data->client->frame->area)-1;
-        size = data->client->frame->area.width;
-        e_start = RECT_TOP(data->client->frame->area);
-        e_size = data->client->frame->area.height;
+        client_find_resize_directional(data->client,
+                                       OB_DIRECTION_WEST,
+                                       grow,
+                                       &temp_x, &temp_y, &temp_w, &temp_h);
+        x = temp_x;
+        w = temp_w;
 
-        client_find_edge_directional(data->client, OB_DIRECTION_EAST,
-                                     head, size, e_start, e_size,
-                                     &east_edge, &near);
+        client_find_resize_directional(data->client,
+                                       OB_DIRECTION_EAST,
+                                       grow,
+                                       &temp_x, &temp_y, &temp_w, &temp_h);
+        w += temp_w - data->client->area.width;
 
-        gint west_edge;
-        head = RECT_LEFT(data->client->frame->area)+1;
-        size = data->client->frame->area.width;
-        e_start = RECT_TOP(data->client->frame->area);
-        e_size = data->client->frame->area.height;
-
-        client_find_edge_directional(data->client, OB_DIRECTION_WEST,
-                                     head, size, e_start, e_size,
-                                     &west_edge, &near);
-
-        /* Calculate the client pos and size, based on frame pos and size.
-         */
-
-        gint w_client_delta =
-            data->client->frame->area.width - data->client->area.width;
-        gint h_client_delta =
-            data->client->frame->area.height - data->client->area.height;
-
-        gint x_client_delta =
-            data->client->area.x - data->client->frame->area.x;
-        gint y_client_delta =
-            data->client->area.y - data->client->frame->area.y;
-
-        x = west_edge + x_client_delta + 1;
-        y = north_edge + y_client_delta + 1;
-
-        w = east_edge - west_edge - w_client_delta - 1;
-        h = south_edge - north_edge - h_client_delta - 1;
-
-        /* grow passing client pos and size */
-
-        do_grow(data, x, y, w, h);
+        /* When filling, we allow the window to move to an arbitrary x/y
+           position, since we'll be growing the other edge as well. */
+        if (x != data->client->area.x || y != data->client->area.y ||
+            w != data->client->area.width || h != data->client->area.height)
+        {
+            actions_client_move(data, TRUE);
+            client_move_resize(data->client, x, y, w, h);
+            actions_client_move(data, FALSE);
+        }
         return FALSE;
     }
 
     if (!o->shrink) {
         /* Try grow. */
-        client_find_resize_directional(data->client, o->dir, TRUE,
+        client_find_resize_directional(data->client,
+                                       o->dir,
+                                       CLIENT_RESIZE_GROW,
                                        &x, &y, &w, &h);
 
         if (do_grow(data, x, y, w, h))
@@ -223,13 +212,16 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     }
 
     /* We couldn't grow, so try shrink! */
-    opp = (o->dir == OB_DIRECTION_NORTH ? OB_DIRECTION_SOUTH :
-           (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :
-            (o->dir == OB_DIRECTION_EAST ? OB_DIRECTION_WEST :
-             OB_DIRECTION_EAST)));
-    client_find_resize_directional(data->client, opp, FALSE,
+    ObDirection opposite =
+        (o->dir == OB_DIRECTION_NORTH ? OB_DIRECTION_SOUTH :
+         (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :
+          (o->dir == OB_DIRECTION_EAST ? OB_DIRECTION_WEST :
+           OB_DIRECTION_EAST)));
+    client_find_resize_directional(data->client,
+                                   opposite,
+                                   CLIENT_RESIZE_SHRINK,
                                    &x, &y, &w, &h);
-    switch (opp) {
+    switch (opposite) {
     case OB_DIRECTION_NORTH:
         half = data->client->area.y + data->client->area.height / 2;
         if (y > half) {

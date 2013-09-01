@@ -795,8 +795,13 @@ static void resize_with_keys(KeySym sym, guint state)
         else /* if (sym == XK_Up)) */
             dir = OB_DIRECTION_NORTH;
 
-        client_find_resize_directional(moveresize_client, key_resize_edge,
-                                       key_resize_edge == dir,
+        ObClientDirectionalResizeType resize_type =
+            key_resize_edge == dir ? CLIENT_RESIZE_GROW
+                                   : CLIENT_RESIZE_SHRINK;
+
+        client_find_resize_directional(moveresize_client,
+                                       key_resize_edge,
+                                       resize_type,
                                        &x, &y, &w, &h);
         dw = w - moveresize_client->area.width;
         dh = h - moveresize_client->area.height;

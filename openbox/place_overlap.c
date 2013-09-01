@@ -205,11 +205,11 @@ static void expand_height(Rect* r, int by)
     r->height += by;
 }
 
-typedef void ((*expand_method)(Rect*, int));
+typedef void ((*ExpandByMethod)(Rect*, int));
 
 /* This structure packs most of the parametars for expand_field() in
    order to save pushing the same parameters twice. */
-typedef struct _expand_info {
+typedef struct _ExpandInfo {
     const Point* top_left;
     int orig_width;
     int orig_height;
@@ -217,12 +217,12 @@ typedef struct _expand_info {
     const Rect* client_rects;
     int n_client_rects;
     int max_edges;
-} expand_info;
+} ExpandInfo;
 
 static int expand_field(int orig_edge_index,
                         const int* edges,
-                        expand_method exp,
-                        const expand_info* i)
+                        ExpandByMethod expand_by,
+                        const ExpandInfo* i)
 {
     Rect field;
     RECT_SET(field,
@@ -233,7 +233,7 @@ static int expand_field(int orig_edge_index,
     int edge_index = orig_edge_index;
     while (edge_index < i->max_edges - 1) {
         int next_edge_index = edge_index + 1;
-        (*exp)(&field, edges[next_edge_index] - edges[edge_index]);
+        (*expand_by)(&field, edges[next_edge_index] - edges[edge_index]);
         int overlap = total_overlap(i->client_rects, i->n_client_rects, &field);
         if (overlap != 0 || !RECT_CONTAINS_RECT(*(i->monitor), field))
             break;
@@ -261,12 +261,12 @@ static void center_in_field(Point* top_left,
                             const int* y_edges,
                             int max_edges)
 {
-    /* find minimal rectangle */
+    /* Find minimal rectangle. */
     int orig_right_edge_index =
         grid_position(top_left->x + req_size->width, x_edges, max_edges);
     int orig_bottom_edge_index =
         grid_position(top_left->y + req_size->height, y_edges, max_edges);
-    expand_info i = {
+    ExpandInfo i = {
         .top_left = top_left,
         .orig_width = x_edges[orig_right_edge_index] - top_left->x,
         .orig_height = y_edges[orig_bottom_edge_index] - top_left->y,
@@ -274,20 +274,22 @@ static void center_in_field(Point* top_left,
         .client_rects = client_rects,
         .n_client_rects = n_client_rects,
         .max_edges = max_edges};
-    /* try extending width */
+    /* Try extending width. */
     int right_edge_index =
         expand_field(orig_right_edge_index, x_edges, expand_width, &i);
-    /* try extending height */
+    /* Try extending height. */
     int bottom_edge_index =
         expand_field(orig_bottom_edge_index, y_edges, expand_height, &i);
+
     int final_width = x_edges[orig_right_edge_index] - top_left->x;
     int final_height = y_edges[orig_bottom_edge_index] - top_left->y;
-    if (right_edge_index == orig_right_edge_index
-        && bottom_edge_index != orig_bottom_edge_index)
+    if (right_edge_index == orig_right_edge_index &&
+        bottom_edge_index != orig_bottom_edge_index)
         final_height = y_edges[bottom_edge_index] - top_left->y;
-    else if (right_edge_index != orig_right_edge_index
-             && bottom_edge_index == orig_bottom_edge_index)
+    else if (right_edge_index != orig_right_edge_index &&
+             bottom_edge_index == orig_bottom_edge_index)
         final_width = x_edges[right_edge_index] - top_left->x;
+
     /* Now center the given rectangle within the field */
     top_left->x += (final_width - req_size->width) / 2;
     top_left->y += (final_height - req_size->height) / 2;

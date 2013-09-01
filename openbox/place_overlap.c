@@ -19,6 +19,7 @@
 #include "config.h"
 #include "geom.h"
 #include "place_overlap.h"
+#include "obt/bsearch.h"
 
 #include <stdlib.h>
 
@@ -175,24 +176,23 @@ static int total_overlap(const Rect* client_rects,
    provide a binary search function at all.  So, tricky as it is, if we
    want to avoid linear scan of the edge array, we have to roll our
    own. */
-static int grid_position(int value,
-                         const int* edges,
-                         int max_edges)
+static int find_first_grid_position_greater_or_equal(int search_value,
+                                                     const int* edges,
+                                                     int max_edges)
 {
-    int low = 0;
-    int high = max_edges - 1;
-    int mid = low + (high - low) / 2;
-    while (low != mid) {
-        if (value < edges[mid])
-            high = mid;
-        else if (value > edges[mid])
-            low = mid;
-        else                    /* value == edges[mid] */
-            return mid;
-        mid = low + (high - low) / 2;
-    }
-    /* we get here when low == mid.  can have low == high or low == high - 1 */
-    return (value <= edges[low] ? low : high);
+    g_assert(max_edges >= 2);
+    g_assert(search_value >= edges[0]);
+    g_assert(search_value <= edges[max_edges - 1]);
+
+    BSEARCH_SETUP();
+    BSEARCH(int, edges, 0, max_edges, search_value);
+
+    if (BSEARCH_FOUND())
+        return BSEARCH_AT();
+
+    g_assert(BSEARCH_FOUND_NEAREST_SMALLER());
+    /* Get the nearest larger instead. */
+    return BSEARCH_AT() + 1;
 }                         
 
 static void expand_width(Rect* r, int by)
@@ -263,9 +263,11 @@ static void center_in_field(Point* top_left,
 {
     /* Find minimal rectangle. */
     int orig_right_edge_index =
-        grid_position(top_left->x + req_size->width, x_edges, max_edges);
+        find_first_grid_position_greater_or_equal(
+            top_left->x + req_size->width, x_edges, max_edges);
     int orig_bottom_edge_index =
-        grid_position(top_left->y + req_size->height, y_edges, max_edges);
+        find_first_grid_position_greater_or_equal(
+            top_left->y + req_size->height, y_edges, max_edges);
     ExpandInfo i = {
         .top_left = top_left,
         .orig_width = x_edges[orig_right_edge_index] - top_left->x,

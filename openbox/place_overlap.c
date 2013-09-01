@@ -171,11 +171,6 @@ static int total_overlap(const Rect* client_rects,
     return overlap;
 }
 
-/* Unfortunately, the libc bsearch() function cannot be used to find the
-   position of a value that is not in the array, and glib doesn't
-   provide a binary search function at all.  So, tricky as it is, if we
-   want to avoid linear scan of the edge array, we have to roll our
-   own. */
 static int find_first_grid_position_greater_or_equal(int search_value,
                                                      const int* edges,
                                                      int max_edges)

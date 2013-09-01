@@ -4535,40 +4535,97 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
     frame_frame_gravity(self->frame, x, y);
 }
 
-void client_find_resize_directional(ObClient *self, ObDirection side,
-                                    gboolean grow,
-                                    gint *x, gint *y, gint *w, gint *h)
+gboolean client_find_resize_directional(
+    ObClient *self,
+    ObDirection side,
+    ObClientDirectionalResizeType resize_type,
+    gint *x, gint *y, gint *w, gint *h)
 {
     gint head;
     gint e, e_start, e_size, delta;
     gboolean near;
     ObDirection dir;
 
+    gboolean changed = FALSE;
+
+    gboolean grow;
+    switch (resize_type) {
+    case CLIENT_RESIZE_GROW:
+        grow = TRUE;
+        break;
+    case CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE:
+        grow = TRUE;
+        break;
+    case CLIENT_RESIZE_SHRINK:
+        grow = FALSE;
+        break;
+    }
+
     switch (side) {
     case OB_DIRECTION_EAST:
-        head = RECT_RIGHT(self->frame->area) +
-            (self->size_inc.width - 1) * (grow ? 1 : 0);
+        head = RECT_RIGHT(self->frame->area);
+        switch (resize_type) {
+        case CLIENT_RESIZE_GROW:
+            head += self->size_inc.width - 1;
+            break;
+        case CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE:
+            head -= 1;
+            break;
+        case CLIENT_RESIZE_SHRINK:
+            break;
+        }
+
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_EAST : OB_DIRECTION_WEST;
         break;
     case OB_DIRECTION_WEST:
-        head = RECT_LEFT(self->frame->area) -
-            (self->size_inc.width - 1) * (grow ? 1 : 0);
+        head = RECT_LEFT(self->frame->area);
+        switch (resize_type) {
+        case CLIENT_RESIZE_GROW:
+            head -= self->size_inc.width - 1;
+            break;
+        case CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE:
+            head += 1;
+            break;
+        case CLIENT_RESIZE_SHRINK:
+            break;
+        }
+
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         dir = grow ? OB_DIRECTION_WEST : OB_DIRECTION_EAST;
         break;
     case OB_DIRECTION_NORTH:
-        head = RECT_TOP(self->frame->area) -
-            (self->size_inc.height - 1) * (grow ? 1 : 0);
+        head = RECT_TOP(self->frame->area);
+        switch (resize_type) {
+        case CLIENT_RESIZE_GROW:
+            head -= self->size_inc.height - 1;
+            break;
+        case CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE:
+            head += 1;
+            break;
+        case CLIENT_RESIZE_SHRINK:
+            break;
+        }
+
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_NORTH : OB_DIRECTION_SOUTH;
         break;
     case OB_DIRECTION_SOUTH:
-        head = RECT_BOTTOM(self->frame->area) +
-            (self->size_inc.height - 1) * (grow ? 1 : 0);
+        head = RECT_BOTTOM(self->frame->area);
+        switch (resize_type) {
+        case CLIENT_RESIZE_GROW:
+            head += self->size_inc.height - 1;
+            break;
+        case CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE:
+            head -= 1;
+            break;
+        case CLIENT_RESIZE_SHRINK:
+            break;
+        }
+
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         dir = grow ? OB_DIRECTION_SOUTH : OB_DIRECTION_NORTH;
@@ -4590,30 +4647,35 @@ void client_find_resize_directional(ObClient *self, ObDirection side,
         if (grow == near) --e;
         delta = e - RECT_RIGHT(self->frame->area);
         *w += delta;
+        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_WEST:
         if (grow == near) ++e;
         delta = RECT_LEFT(self->frame->area) - e;
         *x -= delta;
         *w += delta;
+        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_NORTH:
         if (grow == near) ++e;
         delta = RECT_TOP(self->frame->area) - e;
         *y -= delta;
         *h += delta;
+        changed = delta ? TRUE : changed;
         break;
     case OB_DIRECTION_SOUTH:
         if (grow == near) --e;
         delta = e - RECT_BOTTOM(self->frame->area);
         *h += delta;
-        break;
+        changed = delta ? TRUE : changed;
+       break;
     default:
         g_assert_not_reached();
     }
     frame_frame_gravity(self->frame, x, y);
     *w -= self->frame->size.left + self->frame->size.right;
     *h -= self->frame->size.top + self->frame->size.bottom;
+    return changed;
 }
 
 ObClient* client_under_pointer(void)

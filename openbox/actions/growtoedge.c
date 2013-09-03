@@ -63,6 +63,9 @@ static gpointer setup_func(xmlNodePtr node)
         g_free(s);
     }
 
+    if ((n = obt_xml_find_node(node, "once")))
+        o->once = obt_xml_node_bool(n);
+
     return o;
 }
 
@@ -70,14 +73,9 @@ static gpointer setup_grow_func(xmlNodePtr node)
 {
     Options *o;
 
-    xmlNodePtr n;
-
     o = setup_func(node);
     o->shrink = FALSE;
     o->fill = FALSE;
-
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
 
     return o;
 }
@@ -86,15 +84,9 @@ static gpointer setup_fill_func(xmlNodePtr node)
 {
     Options *o;
 
-    xmlNodePtr n;
-
     o = setup_func(node);
     o->shrink = FALSE;
     o->fill = TRUE;
-    o->once = FALSE;
-
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
 
     return o;
 }
@@ -103,15 +95,9 @@ static gpointer setup_shrink_func(xmlNodePtr node)
 {
     Options *o;
 
-    xmlNodePtr n;
-
     o = setup_func(node);
     o->shrink = TRUE;
     o->fill = FALSE;
-    o->once = FALSE;
-
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
 
     return o;
 }
@@ -225,9 +211,8 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         /* If all the edges are blocked, then allow them to jump past their
            current block points. */
-        if (!o->once) {
+        if (!o->once)
             do_grow_all_edges(data, CLIENT_RESIZE_GROW);
-        } 
 
         return FALSE;
     }
@@ -236,17 +221,16 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         gint x, y, w, h;
 
         /* Try grow. */
-        if (o->once) {
+        if (o->once)
             client_find_resize_directional(data->client,
                                        o->dir,
                                        CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE,
                                        &x, &y, &w, &h);
-        } else {
+        else
             client_find_resize_directional(data->client,
                                        o->dir,
                                        CLIENT_RESIZE_GROW,
                                        &x, &y, &w, &h);
-        }
 
         if (do_grow(data, x, y, w, h))
             return FALSE;
@@ -308,10 +292,6 @@ static gpointer setup_north_func(xmlNodePtr node)
     o->dir = OB_DIRECTION_NORTH;
     o->once = FALSE;
 
-    xmlNodePtr n;
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
-
     return o;
 }
 
@@ -321,10 +301,6 @@ static gpointer setup_south_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_SOUTH;
     o->once = FALSE;
-
-    xmlNodePtr n;
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
 
     return o;
 }
@@ -336,10 +312,6 @@ static gpointer setup_east_func(xmlNodePtr node)
     o->dir = OB_DIRECTION_EAST;
     o->once = FALSE;
 
-    xmlNodePtr n;
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
-
     return o;
 }
 
@@ -349,10 +321,6 @@ static gpointer setup_west_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_WEST;
     o->once = FALSE;
-
-    xmlNodePtr n;
-    if ((n = obt_xml_find_node(node, "once")))
-        o->once = obt_xml_node_bool(n);
 
     return o;
 }

@@ -91,28 +91,6 @@ static gpointer setup_fill_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_grow_func(xmlNodePtr node)
-{
-    Options *o;
-
-    o = setup_func(node);
-    o->shrink = FALSE;
-    o->fill = FALSE;
-
-    return o;
-}
-
-static gpointer setup_fill_func(xmlNodePtr node)
-{
-    Options *o;
-
-    o = setup_func(node);
-    o->shrink = FALSE;
-    o->fill = TRUE;
-
-    return o;
-}
-
 static gpointer setup_shrink_func(xmlNodePtr node)
 {
     Options *o;

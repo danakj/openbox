@@ -241,7 +241,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     }
 
     /* We couldn't grow, so try shrink!
-       Except when on script mode. */
+       Except when on strict mode. */
     if (o->strict)
         return FALSE;
 

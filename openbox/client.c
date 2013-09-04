@@ -4468,7 +4468,7 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     g_slice_free(Rect, a);
 }
 
-void client_find_move_directional(ObClient *self, ObDirection dir,
+void client_find_move_directional(ObClient *self, ObDirection dir,  ObClientDirectionalMoveType move_type,
                                   gint *x, gint *y)
 {
     gint head, size;
@@ -4478,24 +4478,52 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
     switch (dir) {
     case OB_DIRECTION_EAST:
         head = RECT_RIGHT(self->frame->area);
+        switch (move_type) {
+        case CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE:
+            head -= 1;
+            break;
+        case CLIENT_MOVE_MOVE:
+            break;
+        }
         size = self->frame->area.width;
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         break;
     case OB_DIRECTION_WEST:
         head = RECT_LEFT(self->frame->area);
+        switch (move_type) {
+        case CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE:
+            head += 1;
+            break;
+        case CLIENT_MOVE_MOVE:
+            break;
+        }
         size = self->frame->area.width;
         e_start = RECT_TOP(self->frame->area);
         e_size = self->frame->area.height;
         break;
     case OB_DIRECTION_NORTH:
         head = RECT_TOP(self->frame->area);
+        switch (move_type) {
+        case CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE:
+            head += 1;
+            break;
+        case CLIENT_MOVE_MOVE:
+            break;
+        }
         size = self->frame->area.height;
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
         break;
     case OB_DIRECTION_SOUTH:
         head = RECT_BOTTOM(self->frame->area);
+        switch (move_type) {
+        case CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE:
+            head -= 1;
+            break;
+        case CLIENT_MOVE_MOVE:
+            break;
+        }
         size = self->frame->area.height;
         e_start = RECT_LEFT(self->frame->area);
         e_size = self->frame->area.width;
@@ -4506,6 +4534,7 @@ void client_find_move_directional(ObClient *self, ObDirection dir,
 
     client_find_edge_directional(self, dir, head, size,
                                  e_start, e_size, &e, &near);
+
     *x = self->frame->area.x;
     *y = self->frame->area.y;
     switch (dir) {

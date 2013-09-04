@@ -175,11 +175,11 @@ static void self_execute(ObMenuEntry *self, ObMenuFrame *f,
                          ObClient *c, guint state, gpointer data)
 {
     if (self->id == ADD_DESKTOP) {
-        screen_add_desktop(FALSE);
+        screen_add_desktop(screen_desktop+2, FALSE);
         menu_frame_hide_all();
     }
     else if (self->id == REMOVE_DESKTOP) {
-        screen_remove_desktop(FALSE);
+        screen_remove_desktop(screen_desktop+1);
         menu_frame_hide_all();
     }
 }

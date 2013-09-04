@@ -740,90 +740,131 @@ void screen_set_desktop(guint num, gboolean dofocus)
         screen_desktop_user_time = event_source_time();
 }
 
-void screen_add_desktop(gboolean current)
+void screen_add_desktop(guint index, gboolean follow)
 {
     gulong ignore_start;
 
     /* ignore enter events caused by this */
     ignore_start = event_start_ignore_all_enters();
 
-    screen_set_num_desktops(screen_num_desktops+1);
-
-    /* move all the clients over */
-    if (current) {
+    if (index > screen_num_desktops - 1) {
+        /* simply append extra desktops to the end of current array.
+           index is 0-indexed */
+        screen_set_num_desktops(index + 1);
+    }
+    else {
+        /* insert a desktop between two existing desktops */
+        /* add one desktop to the end */
+        screen_set_num_desktops(screen_num_desktops + 1);
         GList *it;
 
+        /* in all desktops of index >= param index, move their clients over
+           one desktop */
         for (it = client_list; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            if (c->desktop != DESKTOP_ALL && c->desktop >= screen_desktop &&
-                /* don't move direct children, they'll be moved with their
-                   parent - which will have to be on the same desktop */
-                !client_direct_parent(c))
-            {
+
+            /* don't move direct children, they'll be moved with their
+               parent - which will have to be on the same desktop.
+               c->desktop is 0-indexed */
+            gboolean client_displaced = c->desktop != DESKTOP_ALL &&
+                                        c->desktop >= index &&
+                                        !client_direct_parent(c);
+
+            if (client_displaced) {
                 ob_debug("moving window %s", c->title);
-                client_set_desktop(c, c->desktop+1, FALSE, TRUE);
+                if (follow)
+                    client_set_desktop(c, c->desktop+1, FALSE, FALSE);
+                else
+                    client_set_desktop(c, c->desktop+1, TRUE, TRUE);
             }
         }
+        /* if desktop inserted before current desktop, move screen_desktop one
+           over. No need to re-raise the clients. screen_desktop is 0-indexed */
+        if (follow) {
+            screen_set_desktop(index, TRUE);
+        }
+        else if (index <= screen_desktop) {
+            screen_set_desktop(screen_desktop+1, TRUE);
+        }
+        else {
+            screen_fallback_focus();
+            ob_debug("fake desktop change");
+        }
     }
+
+    /* Show desktop switcher popup */
+    if (ob_state() == OB_STATE_RUNNING)
+        screen_show_desktop_popup(screen_desktop, FALSE);
 
     event_end_ignore_all_enters(ignore_start);
 }
 
-void screen_remove_desktop(gboolean current)
+void screen_remove_desktop(guint index)
 {
-    guint rmdesktop, movedesktop;
     GList *it, *stacking_copy;
     gulong ignore_start;
 
-    if (screen_num_desktops <= 1) return;
+    gboolean merge_screen_desktop = screen_desktop == index - 1 ||
+                                    screen_desktop == index ||
+                                    screen_desktop == index + 1 &&
+                                    index == screen_num_desktops - 1;
+
+    if (screen_num_desktops <= 1 || index >= screen_num_desktops)
+        return;
 
     /* ignore enter events caused by this */
     ignore_start = event_start_ignore_all_enters();
-
-    /* what desktop are we removing and moving to? */
-    if (current)
-        rmdesktop = screen_desktop;
-    else
-        rmdesktop = screen_num_desktops - 1;
-    if (rmdesktop < screen_num_desktops - 1)
-        movedesktop = rmdesktop + 1;
-    else
-        movedesktop = rmdesktop;
 
     /* make a copy of the list cuz we're changing it */
     stacking_copy = g_list_copy(stacking_list);
     for (it = g_list_last(stacking_copy); it; it = g_list_previous(it)) {
         if (WINDOW_IS_CLIENT(it->data)) {
             ObClient *c = it->data;
-            guint d = c->desktop;
-            if (d != DESKTOP_ALL && d >= movedesktop &&
-                /* don't move direct children, they'll be moved with their
-                   parent - which will have to be on the same desktop */
-                !client_direct_parent(c))
-            {
+
+            /* don't move direct children, they'll be moved with their
+               parent - which will have to be on the same desktop.
+               c->desktop is 0-indexed */
+            gboolean client_displaced = c->desktop != DESKTOP_ALL &&
+                                        c->desktop > index &&
+                                        !client_direct_parent(c);
+
+            if (client_displaced) {
+                gboolean client_on_screen_desktop;
+                /* for clients on desktops past the one being removed,
+                   move the client to the desktop before its current one. */
                 ob_debug("moving window %s", c->title);
                 client_set_desktop(c, c->desktop - 1, TRUE, TRUE);
-            }
-            /* raise all the windows that are on the current desktop which
-               is being merged */
-            if ((screen_desktop == rmdesktop - 1 ||
-                 screen_desktop == rmdesktop) &&
-                (d == DESKTOP_ALL || d == screen_desktop))
-            {
-                stacking_raise(CLIENT_AS_WINDOW(c));
-                ob_debug("raising window %s", c->title);
+
+                /* c->desktop is 0-indexed */
+                client_on_screen_desktop = c->desktop == DESKTOP_ALL ||
+                                           c->desktop == screen_desktop;
+
+                /* raise all the windows that are being merged and 
+                   are not already on screen */
+                if (merge_screen_desktop && client_on_screen_desktop) {
+                    stacking_raise(CLIENT_AS_WINDOW(c));
+                    ob_debug("raising displaced window %s", c->title);
+                }
             }
         }
     }
     g_list_free(stacking_copy);
 
     /* fallback focus like we're changing desktops */
-    if (screen_desktop < screen_num_desktops - 1) {
+    if (merge_screen_desktop) {
         screen_fallback_focus();
         ob_debug("fake desktop change");
     }
+    else if (screen_desktop >= index) {
+        screen_set_desktop(screen_desktop-1, TRUE);
+    }
 
+    /* trim off last desktop */
     screen_set_num_desktops(screen_num_desktops-1);
+
+    /* Show desktop switcher popup */
+    if (ob_state() == OB_STATE_RUNNING)
+        screen_show_desktop_popup(screen_desktop, FALSE);
 
     event_end_ignore_all_enters(ignore_start);
 }

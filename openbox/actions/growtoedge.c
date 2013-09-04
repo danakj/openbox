@@ -299,6 +299,7 @@ static gpointer setup_north_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_NORTH;
     o->once = FALSE;
+    o->strict = FALSE;
 
     return o;
 }
@@ -309,6 +310,7 @@ static gpointer setup_south_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_SOUTH;
     o->once = FALSE;
+    o->strict = FALSE;
 
     return o;
 }
@@ -319,6 +321,7 @@ static gpointer setup_east_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_EAST;
     o->once = FALSE;
+    o->strict = FALSE;
 
     return o;
 }
@@ -329,6 +332,7 @@ static gpointer setup_west_func(xmlNodePtr node)
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_WEST;
     o->once = FALSE;
+    o->strict = FALSE;
 
     return o;
 }

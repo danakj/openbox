@@ -176,6 +176,8 @@
             <xsd:element minOccurs="0" name="here" type="ob:bool"/>
             <xsd:element minOccurs="0" name="linear" type="ob:bool"/>
             <xsd:element minOccurs="0" name="group" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="once" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="strict" type="ob:bool"/>
         </xsd:all>
         <xsd:attribute name="name" type="ob:actionname" use="required"/>
     </xsd:complexType>

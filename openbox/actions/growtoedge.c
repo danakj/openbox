@@ -9,6 +9,8 @@ typedef struct {
     ObDirection dir;
     gboolean shrink;
     gboolean fill;
+    gboolean once;
+    gboolean strict;
 } Options;
 
 static gpointer setup_grow_func(xmlNodePtr node);
@@ -61,6 +63,12 @@ static gpointer setup_func(xmlNodePtr node)
             o->dir = OB_DIRECTION_EAST;
         g_free(s);
     }
+
+    if ((n = obt_xml_find_node(node, "once")))
+        o->once = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(node, "strict")))
+        o->strict = obt_xml_node_bool(n);
 
     return o;
 }
@@ -207,7 +215,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         /* If all the edges are blocked, then allow them to jump past their
            current block points. */
-        do_grow_all_edges(data, CLIENT_RESIZE_GROW);
+        if (!o->once)
+            do_grow_all_edges(data, CLIENT_RESIZE_GROW);
+
         return FALSE;
     }
 
@@ -215,7 +225,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         gint x, y, w, h;
 
         /* Try grow. */
-        client_find_resize_directional(data->client,
+        if (o->once)
+            client_find_resize_directional(data->client,
+                                       o->dir,
+                                       CLIENT_RESIZE_GROW_IF_NOT_ON_EDGE,
+                                       &x, &y, &w, &h);
+        else
+            client_find_resize_directional(data->client,
                                        o->dir,
                                        CLIENT_RESIZE_GROW,
                                        &x, &y, &w, &h);
@@ -224,7 +240,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             return FALSE;
     }
 
-    /* We couldn't grow, so try shrink! */
+    /* We couldn't grow, so try shrink!
+       Except when on strict mode. */
+    if (o->strict)
+        return FALSE;
+
     ObDirection opposite =
         (o->dir == OB_DIRECTION_NORTH ? OB_DIRECTION_SOUTH :
          (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :
@@ -278,6 +298,8 @@ static gpointer setup_north_func(xmlNodePtr node)
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_NORTH;
+    o->once = FALSE;
+    o->strict = FALSE;
     return o;
 }
 
@@ -286,6 +308,8 @@ static gpointer setup_south_func(xmlNodePtr node)
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_SOUTH;
+    o->once = FALSE;
+    o->strict = FALSE;
     return o;
 }
 
@@ -294,6 +318,8 @@ static gpointer setup_east_func(xmlNodePtr node)
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_EAST;
+    o->once = FALSE;
+    o->strict = FALSE;
     return o;
 }
 
@@ -302,5 +328,7 @@ static gpointer setup_west_func(xmlNodePtr node)
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
     o->dir = OB_DIRECTION_WEST;
+    o->once = FALSE;
+    o->strict = FALSE;
     return o;
 }

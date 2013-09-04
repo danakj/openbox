@@ -10,6 +10,7 @@ typedef struct {
     gboolean shrink;
     gboolean fill;
     gboolean once;
+    gboolean strict;
 } Options;
 
 static gpointer setup_grow_func(xmlNodePtr node);
@@ -65,6 +66,9 @@ static gpointer setup_func(xmlNodePtr node)
 
     if ((n = obt_xml_find_node(node, "once")))
         o->once = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(node, "strict")))
+        o->strict = obt_xml_node_bool(n);
 
     return o;
 }
@@ -236,7 +240,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
             return FALSE;
     }
 
-    /* We couldn't grow, so try shrink! */
+    /* We couldn't grow, so try shrink!
+       Except when on script mode. */
+    if (o->strict)
+        return FALSE;
+
     ObDirection opposite =
         (o->dir == OB_DIRECTION_NORTH ? OB_DIRECTION_SOUTH :
          (o->dir == OB_DIRECTION_SOUTH ? OB_DIRECTION_NORTH :

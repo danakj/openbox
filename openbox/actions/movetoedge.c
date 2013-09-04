@@ -93,6 +93,7 @@ static gpointer setup_north_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_NORTH;
+    o->once = FALSE;
     return o;
 }
 
@@ -100,6 +101,7 @@ static gpointer setup_south_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_SOUTH;
+    o->once = FALSE;
     return o;
 }
 
@@ -107,6 +109,7 @@ static gpointer setup_east_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_EAST;
+    o->once = FALSE;
     return o;
 }
 
@@ -114,6 +117,7 @@ static gpointer setup_west_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = OB_DIRECTION_WEST;
+    o->once = FALSE;
     return o;
 }
 

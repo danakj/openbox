@@ -7,6 +7,7 @@
 
 typedef struct {
     ObDirection dir;
+    gboolean once;
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
@@ -53,6 +54,9 @@ static gpointer setup_func(xmlNodePtr node)
         g_free(s);
     }
 
+    if ((n = obt_xml_find_node(node, "once")))
+        o->once = obt_xml_node_bool(n);
+
     return o;
 }
 
@@ -69,7 +73,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (data->client) {
         gint x, y;
 
-        client_find_move_directional(data->client, o->dir, &x, &y);
+        if (o->once)
+            client_find_move_directional(data->client, o->dir, CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE, &x, &y);
+        else
+            client_find_move_directional(data->client, o->dir, CLIENT_MOVE_MOVE, &x, &y);
+
         if (x != data->client->area.x || y != data->client->area.y) {
             actions_client_move(data, TRUE);
             client_move(data->client, x, y);

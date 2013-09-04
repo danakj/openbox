@@ -694,7 +694,7 @@ static void move_with_keys(KeySym sym, guint state)
         else /* sym == XK_Up */
             dir = OB_DIRECTION_NORTH;
 
-        client_find_move_directional(moveresize_client, dir, &x, &y);
+        client_find_move_directional(moveresize_client, dir, CLIENT_MOVE_MOVE, &x, &y);
         dx = x - moveresize_client->area.x;
         dy = y - moveresize_client->area.y;
     } else {

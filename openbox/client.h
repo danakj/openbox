@@ -487,7 +487,13 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
                                   gint my_head, gint my_tail,
                                   gint my_edge_start, gint my_edge_size,
                                   gint *dest, gboolean *near_edge);
-void client_find_move_directional(ObClient *self, ObDirection dir,
+
+typedef enum {
+    CLIENT_MOVE_MOVE,
+    CLIENT_MOVE_MOVE_IF_NOT_ON_EDGE,
+} ObClientDirectionalMoveType;
+
+void client_find_move_directional(ObClient *self, ObDirection dir, ObClientDirectionalMoveType move_type,
                                   gint *x, gint *y);
 
 typedef enum {

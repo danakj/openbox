@@ -21,6 +21,7 @@
 #include "place_overlap.h"
 #include "obt/bsearch.h"
 
+#include <glib.h>
 #include <stdlib.h>
 
 static void make_grid(const Rect* client_rects,

@@ -2734,7 +2734,7 @@ gboolean client_should_show(ObClient *self)
 {
     if (self->iconic)
         return FALSE;
-    if (client_normal(self) && screen_showing_desktop)
+    if (client_normal(self) && screen_showing_desktop())
         return FALSE;
     if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
         return TRUE;
@@ -4080,7 +4080,7 @@ gboolean client_focus(ObClient *self)
 static void client_present(ObClient *self, gboolean here, gboolean raise,
                            gboolean unshade)
 {
-    if (client_normal(self) && screen_showing_desktop)
+    if (client_normal(self) && screen_showing_desktop())
         screen_show_desktop(FALSE, self);
     if (self->iconic)
         client_iconify(self, FALSE, here, FALSE);

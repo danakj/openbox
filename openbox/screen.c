@@ -57,15 +57,15 @@ static gboolean replace_wm(void);
 static void     screen_tell_ksplash(void);
 static void     screen_fallback_focus(void);
 
-guint           screen_num_desktops;
-guint           screen_num_monitors;
-guint           screen_desktop;
-guint           screen_last_desktop;
-gboolean        screen_showing_desktop;
-ObDesktopLayout screen_desktop_layout;
-gchar         **screen_desktop_names;
-Window          screen_support_win;
-Time            screen_desktop_user_time = CurrentTime;
+guint                  screen_num_desktops;
+guint                  screen_num_monitors;
+guint                  screen_desktop;
+guint                  screen_last_desktop;
+ObScreenShowDestopMode screen_show_desktop_mode;
+ObDesktopLayout        screen_desktop_layout;
+gchar                **screen_desktop_names;
+Window                 screen_support_win;
+Time                   screen_desktop_user_time = CurrentTime;
 
 static Size     screen_physical_size;
 static guint    screen_old_desktop;
@@ -445,9 +445,9 @@ void screen_startup(gboolean reconfig)
     screen_last_desktop = screen_desktop;
 
     /* don't start in showing-desktop mode */
-    screen_showing_desktop = FALSE;
+    screen_show_desktop_mode = SCREEN_SHOW_DESKTOP_NO;
     OBT_PROP_SET32(obt_root(ob_screen),
-                   NET_SHOWING_DESKTOP, CARDINAL, screen_showing_desktop);
+                   NET_SHOWING_DESKTOP, CARDINAL, screen_showing_desktop());
 
     if (session_desktop_layout_present &&
         screen_validate_layout(&session_desktop_layout))
@@ -1218,15 +1218,33 @@ void screen_update_desktop_names(void)
                                       screen_num_desktops);
 }
 
-void screen_show_desktop(gboolean show, ObClient *show_only)
+void screen_show_desktop(ObScreenShowDestopMode show_mode, ObClient *show_only)
 {
     GList *it;
 
-    if (show == screen_showing_desktop) return; /* no change */
+    ObScreenShowDestopMode before_mode = screen_show_desktop_mode;
 
-    screen_showing_desktop = show;
+    gboolean showing_before = screen_showing_desktop();
+    screen_show_desktop_mode = show_mode;
+    gboolean showing_after = screen_showing_desktop();
 
-    if (show) {
+    if (showing_before == showing_after) {
+        /* No change. */
+        screen_show_desktop_mode = before_mode;
+        return;
+    }
+
+    if (screen_show_desktop_mode == SCREEN_SHOW_DESKTOP_UNTIL_TOGGLE &&
+        show_only != NULL)
+    {
+        /* If we're showing the desktop until the show-mode is toggled, we
+           don't allow breaking out of showing-desktop mode unless we're
+           showing all the windows again. */
+        screen_show_desktop_mode = before_mode;
+        return;
+    }
+
+    if (showing_after) {
         /* hide windows bottom to top */
         for (it = g_list_last(stacking_list); it; it = g_list_previous(it)) {
             if (WINDOW_IS_CLIENT(it->data)) {
@@ -1250,7 +1268,7 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
         }
     }
 
-    if (show) {
+    if (showing_after) {
         /* focus the desktop */
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
@@ -1275,8 +1293,23 @@ void screen_show_desktop(gboolean show, ObClient *show_only)
         }
     }
 
-    show = !!show; /* make it boolean */
-    OBT_PROP_SET32(obt_root(ob_screen), NET_SHOWING_DESKTOP, CARDINAL, show);
+    OBT_PROP_SET32(obt_root(ob_screen),
+                   NET_SHOWING_DESKTOP,
+                   CARDINAL,
+                   !!showing_after);
+}
+
+gboolean screen_showing_desktop()
+{
+    switch (screen_show_desktop_mode) {
+    case SCREEN_SHOW_DESKTOP_NO:
+        return FALSE;
+    case SCREEN_SHOW_DESKTOP_UNTIL_WINDOW:
+    case SCREEN_SHOW_DESKTOP_UNTIL_TOGGLE:
+        return TRUE;
+    }
+    g_assert_not_reached();
+    return FALSE;
 }
 
 void screen_install_colormap(ObClient *client, gboolean install)

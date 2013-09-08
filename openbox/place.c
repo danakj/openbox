@@ -406,8 +406,19 @@ static gboolean place_least_overlap(ObClient *c, Rect *head, int *x, int *y,
     GSList* potential_overlap_clients = NULL;
     gint n_client_rects = config_dock_hide ? 0 : 1;
 
-    /* if we're "showing desktop", ignore all existing windows */
-    if (!screen_showing_desktop) {
+    /* If we're "showing desktop", and going to allow this window to
+       be shown now, then ignore all existing windows */
+    gboolean ignore_windows = FALSE;
+    switch (screen_show_desktop_mode) {
+    case SCREEN_SHOW_DESKTOP_NO:
+    case SCREEN_SHOW_DESKTOP_UNTIL_WINDOW:
+        break;
+    case SCREEN_SHOW_DESKTOP_UNTIL_TOGGLE:
+        ignore_windows = TRUE;
+        break;
+    }
+
+    if (!ignore_windows) {
         GList* it;
         for (it = client_list; it != NULL; it = g_list_next(it)) {
             ObClient* maybe_client = (ObClient*)it->data;

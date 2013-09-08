@@ -772,7 +772,12 @@ static void event_handle_root(XEvent *e)
             if (d > 0 && d <= 1000)
                 screen_set_num_desktops(d);
         } else if (msgtype == OBT_PROP_ATOM(NET_SHOWING_DESKTOP)) {
-            screen_show_desktop(e->xclient.data.l[0] != 0, NULL);
+            ObScreenShowDestopMode show_mode;
+            if (e->xclient.data.l[0] != 0)
+                show_mode = SCREEN_SHOW_DESKTOP_UNTIL_WINDOW;
+            else
+                show_mode = SCREEN_SHOW_DESKTOP_NO;
+            screen_show_desktop(show_mode, NULL);
         } else if (msgtype == OBT_PROP_ATOM(OB_CONTROL)) {
             ob_debug("OB_CONTROL: %d", e->xclient.data.l[0]);
             if (e->xclient.data.l[0] == 1)

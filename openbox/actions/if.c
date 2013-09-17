@@ -327,7 +327,10 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         }
 
         /* If there's no client to query, then false. */
-        is_true &= query_target != NULL;
+        if (!query_target) {
+            is_true = FALSE;
+            break;
+        }
 
         if (q->shaded_on)
             is_true &= query_target->shaded;

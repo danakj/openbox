@@ -313,7 +313,7 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
     gboolean is_true = TRUE;
 
     guint i;
-    for (i = 0; i < o->queries->len; ++i) {
+    for (i = 0; is_true && i < o->queries->len; ++i) {
         Query *q = g_array_index(o->queries, Query*, i);
         ObClient *query_target = NULL;
 

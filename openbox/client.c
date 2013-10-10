@@ -71,6 +71,13 @@ typedef struct
 
 GList          *client_list             = NULL;
 
+
+// Albert - Boolean variable to tell us if we need to 
+// disable the desktop icons as input events start to be dispatched.
+// see startupnotify.c
+extern gboolean bDisableDesktop;
+
+
 static GSList  *client_destroy_notifies = NULL;
 static RrImage *client_default_icon     = NULL;
 
@@ -890,6 +897,15 @@ static gboolean client_can_steal_focus(ObClient *self,
                          "another desktop and no relatives are focused ");
             }
         }
+    }
+
+
+    // Albert - At this point we can decide wether a graphic object
+    // is allowed to acquire focus. Are we starting an app
+    // and the mouse hourglass is active?
+
+    if (bDisableDesktop == TRUE) {
+        ob_debug(">>> Mouse hourglass is active - DISABLING DESKTOP ICONS");
     }
 
     if (!steal)

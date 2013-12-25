@@ -53,7 +53,7 @@ msgstr "Quitter"
 
 #: openbox/actions/exit.c:74
 msgid "Are you sure you want to log out?"
-msgstr "Etes vous certain de vouloir vous déconnecter ?"
+msgstr "Êtes-vous certain de vouloir vous déconnecter ?"
 
 #: openbox/actions/exit.c:75
 msgid "Log Out"
@@ -61,7 +61,7 @@ msgstr "Déconnexion"
 
 #: openbox/actions/exit.c:78
 msgid "Are you sure you want to exit Openbox?"
-msgstr "Etes vous certain de vouloir quitter Openbox ?"
+msgstr "Êtes-vous certain de vouloir quitter Openbox ?"
 
 #: openbox/actions/exit.c:79
 msgid "Exit Openbox"
@@ -85,7 +85,7 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"La fenêtre \"%s\" semble ne pas répondre. Voulez vous la forcer à se "
+"La fenêtre \"%s\" semble ne pas répondre. Voulez-vous la forcer à se "
 "terminer en envoyant un signal %s ?"
 
 #: openbox/client.c:3650
@@ -98,7 +98,7 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr ""
-"La fenêtre \"%s\" semble ne pas répondre. Voulez vous la déconnecter du "
+"La fenêtre \"%s\" semble ne pas répondre. Voulez-vous la déconnecter du "
 "serveur X ?"
 
 #: openbox/client.c:3656

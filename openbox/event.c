@@ -206,6 +206,7 @@ static Window event_get_window(XEvent *e)
             switch (((XkbAnyEvent*)e)->xkb_type) {
             case XkbBellNotify:
                 window = ((XkbBellNotifyEvent*)e)->window;
+                break;
             default:
                 window = None;
             }

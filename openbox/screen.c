@@ -1648,7 +1648,7 @@ guint screen_find_monitor(const Rect *search)
 {
     guint i;
     guint mostpx_index = screen_num_monitors;
-    guint mostpx = 0;
+    glong mostpx = 0;
     guint closest_distance_index = screen_num_monitors;
     guint closest_distance = G_MAXUINT;
     GSList *counted = NULL;

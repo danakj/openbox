@@ -34,7 +34,8 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control \
-	tools/obxprop/obxprop
+	tools/obxprop/obxprop \
+    tools/openbox-xdg-autostart/openbox-xdg-autostart
 
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
@@ -328,6 +329,15 @@ tools_obxprop_obxprop_LDADD = \
 	$(X_LIBS)
 tools_obxprop_obxprop_SOURCES = \
 	tools/obxprop/obxprop.c
+
+## openbox-xdg-autostart ##
+
+tools_openbox_xdg_autostart_openbox_xdg_autostart_CPPFLAGS = \
+	$(GLIB_CFLAGS) 
+tools_openbox_xdg_autostart_openbox_xdg_autostart_LDADD = \
+	$(GLIB_LIBS) 
+tools_openbox_xdg_autostart_openbox_xdg_autostart_SOURCES = \
+	tools/openbox-xdg-autostart/openbox-xdg-autostart.c
 
 ## gdm-control ##
 

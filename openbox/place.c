@@ -444,7 +444,7 @@ static gboolean place_least_overlap(ObClient *c, Rect *head, int *x, int *y,
         }
     }
 
-    {
+    if (n_client_rects) {
         Rect client_rects[n_client_rects];
         GSList* it;
         Point result;

@@ -637,11 +637,13 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (e->type == MappingNotify) {
         /* keyboard layout changes for modifier mapping changes. reload the
            modifier map, and rebind all the key bindings as appropriate */
-        ob_debug("Keyboard map changed. Reloading keyboard bindings.");
-        ob_set_state(OB_STATE_RECONFIGURING);
-        obt_keyboard_reload();
-        keyboard_rebind();
-        ob_set_state(OB_STATE_RUNNING);
+        if (config_keyboard_rebind_on_mapping_notify) {
+            ob_debug("Keyboard map changed. Reloading keyboard bindings.");
+            ob_set_state(OB_STATE_RECONFIGURING);
+            obt_keyboard_reload();
+            keyboard_rebind();
+            ob_set_state(OB_STATE_RUNNING);
+        }
     }
     else if (e->type == ClientMessage) {
         /* This is for _NET_WM_REQUEST_FRAME_EXTENTS messages. They come for

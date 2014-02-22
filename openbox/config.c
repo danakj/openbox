@@ -83,8 +83,9 @@ guint           config_dock_show_delay;
 guint           config_dock_app_move_button;
 guint           config_dock_app_move_modifiers;
 
-guint config_keyboard_reset_keycode;
-guint config_keyboard_reset_state;
+guint    config_keyboard_reset_keycode;
+guint    config_keyboard_reset_state;
+gboolean config_keyboard_rebind_on_mapping_notify;
 
 gint     config_mouse_threshold;
 gint     config_mouse_dclicktime;
@@ -503,6 +504,9 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
             parse_key(n, NULL);
             n = obt_xml_find_node(n->next, "keybind");
         }
+
+    if ((n = obt_xml_find_node(node->children, "rebindOnMappingNotify")))
+        config_keyboard_rebind_on_mapping_notify = obt_xml_node_bool(n);
 }
 
 /*
@@ -1120,6 +1124,7 @@ void config_startup(ObtXmlInst *i)
 
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
+    config_keyboard_rebind_on_mapping_notify = TRUE;
 
     bind_default_keyboard();
 

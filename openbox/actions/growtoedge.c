@@ -188,11 +188,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
     if (!data->client)
         return FALSE;
 
-    gboolean doing_verical_resize =
+    gboolean doing_vertical_resize =
         o->dir == OB_DIRECTION_NORTH ||
         o->dir == OB_DIRECTION_SOUTH ||
         o->fill;
-    if (data->client->shaded && doing_verical_resize)
+    if (data->client->shaded && doing_vertical_resize)
             return FALSE;
 
     if (o->fill) {

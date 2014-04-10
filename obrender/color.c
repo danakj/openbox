@@ -126,22 +126,26 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
 {
     gint r, g, b;
     gint x,y;
+    gint ro = RrRedOffset(inst);
+    gint bo = RrBlueOffset(inst);
+    gint go = RrGreenOffset(inst);
+    gint rs = RrRedShift(inst);
+    gint bs = RrBlueShift(inst);
+    gint gs = RrGreenShift(inst);
     RrPixel32 *p32 = (RrPixel32 *) im->data;
     RrPixel16 *p16 = (RrPixel16 *) im->data;
     RrPixel8  *p8  = (RrPixel8 *)  im->data;
     switch (im->bits_per_pixel) {
     case 32:
-        if ((RrRedOffset(inst) != RrDefaultRedOffset) ||
-            (RrBlueOffset(inst) != RrDefaultBlueOffset) ||
-            (RrGreenOffset(inst) != RrDefaultGreenOffset)) {
+        if ((ro != RrDefaultRedOffset) ||
+            (bo != RrDefaultBlueOffset) ||
+            (go != RrDefaultGreenOffset)) {
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;
                     g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
                     b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
-                    p32[x] = (r << RrRedOffset(inst))
-                           + (g << RrGreenOffset(inst))
-                           + (b << RrBlueOffset(inst));
+                    p32[x] = (r << ro) + (g << go) + (b << bo);
                 }
                 data += im->width;
                 p32 += im->width;
@@ -152,9 +156,9 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
     {
         /* reverse the ordering, shifting left 16bit should be the first byte
            out of three, etc */
-        const guint roff = (16 - RrRedOffset(inst)) / 8;
-        const guint goff = (16 - RrGreenOffset(inst)) / 8;
-        const guint boff = (16 - RrBlueOffset(inst)) / 8;
+        const guint roff = (16 - ro) / 8;
+        const guint goff = (16 - go) / 8;
+        const guint boff = (16 - bo) / 8;
         gint outx;
         for (y = 0; y < im->height; y++) {
             for (x = 0, outx = 0; x < im->width; x++, outx += 3) {
@@ -174,14 +178,12 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
         for (y = 0; y < im->height; y++) {
             for (x = 0; x < im->width; x++) {
                 r = (data[x] >> RrDefaultRedOffset) & 0xFF;
-                r = r >> RrRedShift(inst);
+                r = r >> rs;
                 g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
-                g = g >> RrGreenShift(inst);
+                g = g >> gs;
                 b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
-                b = b >> RrBlueShift(inst);
-                p16[x] = (r << RrRedOffset(inst))
-                       + (g << RrGreenOffset(inst))
-                       + (b << RrBlueOffset(inst));
+                b = b >> bs;
+                p16[x] = (r << ro) + (g << go) + (b << bo);
             }
             data += im->width;
             p16 += im->bytes_per_line/2;
@@ -192,14 +194,12 @@ void RrReduceDepth(const RrInstance *inst, RrPixel32 *data, XImage *im)
             for (y = 0; y < im->height; y++) {
                 for (x = 0; x < im->width; x++) {
                     r = (data[x] >> RrDefaultRedOffset) & 0xFF;
-                    r = r >> RrRedShift(inst);
+                    r = r >> rs;
                     g = (data[x] >> RrDefaultGreenOffset) & 0xFF;
-                    g = g >> RrGreenShift(inst);
+                    g = g >> gs;
                     b = (data[x] >> RrDefaultBlueOffset) & 0xFF;
-                    b = b >> RrBlueShift(inst);
-                    p8[x] = (r << RrRedOffset(inst))
-                        + (g << RrGreenOffset(inst))
-                        + (b << RrBlueOffset(inst));
+                    b = b >> bs;
+                    p8[x] = (r << ro) + (g << go) + (b << bo);
                 }
                 data += im->width;
                 p8 += im->bytes_per_line;

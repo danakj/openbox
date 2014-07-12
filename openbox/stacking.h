@@ -71,7 +71,7 @@ void stacking_below(struct _ObWindow *window, struct _ObWindow *below);
 
 /*! Restack a window based upon a sibling (or all windows) in various ways.
   @param client The client to be restacked
-  @param sibling Another client to compare to, or NULL to compare to all
+  @param sibling A window to compare to, or NULL to compare to all
                  windows
   @param detail One of Above, Below, TopIf, BottomIf, Opposite
   @return TRUE if the client was restacked
@@ -79,7 +79,7 @@ void stacking_below(struct _ObWindow *window, struct _ObWindow *below);
   how each detail works with and without a sibling.
 */
 gboolean stacking_restack_request(struct _ObClient *client,
-                                  struct _ObClient *sibling,
+                                  struct _ObWindow *sibling_win,
                                   gint detail);
 
 #endif

@@ -26,6 +26,8 @@
 #include "window.h"
 #include "event.h"
 #include "debug.h"
+#include "dock.h"
+#include "config.h"
 #include "obt/prop.h"
 
 GList  *stacking_list = NULL;
@@ -567,14 +569,18 @@ void stacking_add_nonintrusive(ObWindow *win)
 /*! Returns TRUE if client is occluded by the sibling. If sibling is NULL it
   tries against all other clients.
 */
-static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
+static gboolean stacking_occluded(ObClient *client, ObWindow *sibling_win)
 {
     GList *it;
     gboolean occluded = FALSE;
+    ObClient *sibling = NULL;
+
+    if (sibling_win && WINDOW_IS_CLIENT(sibling_win))
+        sibling = WINDOW_AS_CLIENT(sibling_win);
 
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
-        return occluded;
+        return FALSE;
 
     for (it = g_list_previous(g_list_find(stacking_list, client)); it;
          it = g_list_previous(it))
@@ -601,6 +607,21 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
                         break; /* we past its layer */
                 }
             }
+        } else if (WINDOW_IS_DOCK(it->data)) {
+            ObDock *dock = it->data;
+            if (RECT_INTERSECTS_RECT(dock->area, client->frame->area))
+            {
+                if (sibling_win != NULL) {
+                    if (DOCK_AS_WINDOW(dock) == sibling_win) {
+                        occluded = TRUE;
+                        break;
+                    }
+                }
+                else if (config_dock_layer == client->layer) {
+                    occluded = TRUE;
+                    break;
+                }
+            }
         }
     return occluded;
 }
@@ -608,14 +629,18 @@ static gboolean stacking_occluded(ObClient *client, ObClient *sibling)
 /*! Returns TRUE if client occludes the sibling. If sibling is NULL it tries
   against all other clients.
 */
-static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
+static gboolean stacking_occludes(ObClient *client, ObWindow *sibling_win)
 {
     GList *it;
     gboolean occludes = FALSE;
+    ObClient *sibling = NULL;
+
+    if (sibling_win && WINDOW_IS_CLIENT(sibling_win))
+        sibling = WINDOW_AS_CLIENT(sibling_win);
 
     /* no need for any looping in this case */
     if (sibling && client->layer != sibling->layer)
-        return occludes;
+        return FALSE;
 
     for (it = g_list_next(g_list_find(stacking_list, client));
          it; it = g_list_next(it))
@@ -643,13 +668,34 @@ static gboolean stacking_occludes(ObClient *client, ObClient *sibling)
                 }
             }
         }
+        else if (WINDOW_IS_DOCK(it->data)) {
+            ObDock *dock = it->data;
+            if (RECT_INTERSECTS_RECT(dock->area, client->frame->area))
+            {
+                if (sibling_win != NULL) {
+                    if (DOCK_AS_WINDOW(dock) == sibling_win) {
+                        occludes = TRUE;
+                        break;
+                    }
+                }
+                else if (config_dock_layer == client->layer) {
+                    occludes = TRUE;
+                    break;
+                }
+            }
+        }
     return occludes;
 }
 
-gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
+gboolean stacking_restack_request(ObClient *client, ObWindow *sibling_win,
                                   gint detail)
 {
     gboolean ret = FALSE;
+
+    ObClient *sibling = NULL;
+
+    if (sibling_win && WINDOW_IS_CLIENT(sibling_win))
+        sibling = WINDOW_AS_CLIENT(sibling_win);
 
     if (sibling && ((client->desktop != sibling->desktop &&
                      client->desktop != DESKTOP_ALL &&
@@ -674,7 +720,7 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
                  client->title, sibling ? sibling->title : "(all)");
         /* if this client occludes sibling (or anything if NULL), then
            lower it to the bottom */
-        if (stacking_occludes(client, sibling)) {
+        if (stacking_occludes(client, sibling_win)) {
             stacking_lower(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }
@@ -688,7 +734,7 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
     case TopIf:
         ob_debug("Restack request TopIf for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
-        if (stacking_occluded(client, sibling)) {
+        if (stacking_occluded(client, sibling_win)) {
             stacking_raise(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }
@@ -696,11 +742,11 @@ gboolean stacking_restack_request(ObClient *client, ObClient *sibling,
     case Opposite:
         ob_debug("Restack request Opposite for client %s sibling %s",
                  client->title, sibling ? sibling->title : "(all)");
-        if (stacking_occluded(client, sibling)) {
+        if (stacking_occluded(client, sibling_win)) {
             stacking_raise(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }
-        else if (stacking_occludes(client, sibling)) {
+        else if (stacking_occludes(client, sibling_win)) {
             stacking_lower(CLIENT_AS_WINDOW(client));
             ret = TRUE;
         }

@@ -295,28 +295,8 @@ static gboolean place_per_app_setting_position(ObClient *client, Rect *screen,
 
     ob_debug("placing by per-app settings");
 
-    if (settings->position.x.center)
-        *x = screen->width / 2 - client->area.width / 2;
-    else {
-        *x = settings->position.x.pos;
-        if (settings->position.x.denom)
-            *x = (*x * screen->width) / settings->position.x.denom;
-        if (settings->position.x.opposite)
-            *x = screen->width - frame_size.width - *x;
-    }
-
-    if (settings->position.y.center)
-        *y = screen->height / 2 - client->area.height / 2;
-    else {
-        *y = settings->position.y.pos;
-        if (settings->position.y.denom)
-            *y = (*y * screen->height) / settings->position.y.denom;
-        if (settings->position.y.opposite)
-            *y = screen->height - frame_size.height - *y;
-    }
-
-    *x += screen->x;
-    *y += screen->y;
+    screen_apply_gravity_point(x, y, frame_size.width, frame_size.height,
+                               &settings->position, screen);
 
     return TRUE;
 }

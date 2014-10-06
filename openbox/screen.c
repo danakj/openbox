@@ -1928,3 +1928,30 @@ gboolean screen_compare_desktops(guint a, guint b)
         b = screen_desktop;
     return a == b;
 }
+
+void screen_apply_gravity_point(gint *x, gint *y, gint width, gint height,
+                                GravityPoint *position, const Rect *area)
+{
+    if (position->x.center)
+        *x = area->width / 2 - width / 2;
+    else {
+        *x = position->x.pos;
+        if (position->x.denom)
+            *x = (*x * area->width) / position->x.denom;
+        if (position->x.opposite)
+            *x = area->width - width - *x;
+    }
+
+    if (position->y.center)
+        *y = area->height / 2 - height / 2;
+    else {
+        *y = position->y.pos;
+        if (position->y.denom)
+            *y = (*y * area->height) / position->y.denom;
+        if (position->y.opposite)
+            *y = area->height - height - *y;
+    }
+
+    *x += area->x;
+    *y += area->y;
+}

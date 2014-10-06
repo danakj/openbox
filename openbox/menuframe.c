@@ -232,41 +232,13 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
     XMoveWindow(obt_display, self->window, self->area.x, self->area.y);
 }
 
-static void calc_position(ObMenuFrame *self, GravityPoint *position,
-                          gint *x, gint *y, gint monitor)
-{
-    const Rect *area = screen_physical_area_monitor(monitor);
-
-    if (position->x.center)
-        *x = area->width / 2 - self->area.width / 2;
-    else {
-        *x = position->x.pos;
-        if (position->x.denom)
-            *x = (*x * area->width) / position->x.denom;
-        if (position->x.opposite)
-            *x = area->width - self->area.width - *x;
-    }
-
-    if (position->y.center)
-        *y = area->height / 2 - self->area.height / 2;
-    else {
-        *y = position->y.pos;
-        if (position->y.denom)
-            *y = (*y * area->height) / position->y.denom;
-        if (position->y.opposite)
-            *y = area->height - self->area.height - *y;
-    }
-
-    *x += area->x;
-    *y += area->y;
-}
-
 static void menu_frame_place_topmenu(ObMenuFrame *self, GravityPoint *pos,
                                      gint *x, gint *y, gint monitor)
 {
     gint dx, dy;
 
-    calc_position(self, pos, x, y, monitor);
+    screen_apply_gravity_point(x, y, self->area.width, self->area.height,
+                               pos, screen_physical_area_monitor(monitor));
 
     if (config_menu_middle) {
         gint myx;

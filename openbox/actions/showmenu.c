@@ -7,7 +7,7 @@
 
 typedef struct {
     gchar         *name;
-    GravityCoord   x, y;
+    GravityPoint   position;
     ObPlaceMonitor monitor_type;
     gint           monitor;
     gboolean       use_position;
@@ -37,14 +37,14 @@ static gpointer setup_func(xmlNodePtr node)
     if ((n = obt_xml_find_node(node, "position"))) {
         if ((c = obt_xml_find_node(n->children, "x"))) {
             if (!obt_xml_node_contains(c, "default")) {
-                config_parse_gravity_coord(c, &o->x);
+                config_parse_gravity_coord(c, &o->position.x);
                 x_pos_given = TRUE;
             }
         }
 
         if (x_pos_given && (c = obt_xml_find_node(n->children, "y"))) {
             if (!obt_xml_node_contains(c, "default")) {
-                config_parse_gravity_coord(c, &o->y);
+                config_parse_gravity_coord(c, &o->position.y);
                 o->use_position = TRUE;
             }
         }
@@ -78,71 +78,44 @@ static void free_func(gpointer options)
     g_slice_free(Options, o);
 }
 
-static void calc_position(Options *o, gint *x, gint *y)
-{
-    gint monitor = -1;
-    const Rect *area;
-    if (o->monitor >= 0)
-        monitor = o->monitor;
-    else switch (o->monitor_type) {
-        case OB_PLACE_MONITOR_ANY:
-        case OB_PLACE_MONITOR_PRIMARY:
-            monitor = screen_monitor_primary(FALSE);
-            break;
-        case OB_PLACE_MONITOR_MOUSE:
-            monitor = screen_monitor_pointer();
-            break;
-        case OB_PLACE_MONITOR_ACTIVE:
-            monitor = screen_monitor_active();
-            break;
-        case OB_PLACE_MONITOR_ALL:
-            monitor = screen_num_monitors;
-            break;
-        default:
-            g_assert_not_reached();
-    }
-    area = screen_physical_area_monitor(monitor);
-
-    if (o->x.center)
-        *x = area->width / 2; /* - client->area.width / 2; */
-    else {
-        *x = o->x.pos;
-        if (o->x.denom)
-            *x = (*x * area->width) / o->x.denom;
-        if (o->x.opposite)
-            *x = area->width /* - frame_size.width */ - *x;
-    }
-
-    if (o->y.center)
-        *y = area->height / 2; /* - client->area.height / 2; */
-    else {
-        *y = o->y.pos;
-        if (o->y.denom)
-            *y = (*y * area->height) / o->y.denom;
-        if (o->y.opposite)
-            *y = area->height /* - frame_size.height */ - *y;
-    }
-
-    *x += area->x;
-    *y += area->y;
-}
-
 /* Always return FALSE because its not interactive */
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
-    gint x, y;
+    GravityPoint position = { 0, };
+    gint monitor = -1;
 
     if (o->use_position) {
-        calc_position(o, &x, &y);
+        if (o->monitor >= 0)
+            monitor = o->monitor;
+        else switch (o->monitor_type) {
+            case OB_PLACE_MONITOR_ANY:
+            case OB_PLACE_MONITOR_PRIMARY:
+                monitor = screen_monitor_primary(FALSE);
+                break;
+            case OB_PLACE_MONITOR_MOUSE:
+                monitor = screen_monitor_pointer();
+                break;
+            case OB_PLACE_MONITOR_ACTIVE:
+                monitor = screen_monitor_active();
+                break;
+            case OB_PLACE_MONITOR_ALL:
+                monitor = screen_num_monitors;
+                break;
+            default:
+                g_assert_not_reached();
+        }
+
+        position = o->position;
     } else {
-        x = data->x;
-        y = data->y;
+        monitor = screen_num_monitors;
+        position.x.pos = data->x;
+        position.y.pos = data->y;
     }
 
     /* you cannot call ShowMenu from inside a menu */
     if (data->uact != OB_USER_ACTION_MENU_SELECTION && o->name)
-        menu_show(o->name, x, y, data->button != 0, data->client);
+        menu_show(o->name, position, monitor, data->button != 0, data->client);
 
     return FALSE;
 }

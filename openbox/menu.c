@@ -457,7 +457,8 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
+void menu_show(gchar *name, GravityPoint pos, gint monitor,
+               gboolean mouse, ObClient *client)
 {
     ObMenu *self;
     ObMenuFrame *frame;
@@ -479,7 +480,7 @@ void menu_show(gchar *name, gint x, gint y, gboolean mouse, ObClient *client)
     menu_clear_pipe_caches();
 
     frame = menu_frame_new(self, 0, client);
-    if (!menu_frame_show_topmenu(frame, x, y, mouse))
+    if (!menu_frame_show_topmenu(frame, pos, monitor, mouse))
         menu_frame_free(frame);
     else {
         if (!mouse) {

@@ -181,8 +181,8 @@ void menu_clear_pipe_caches(void);
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
-void menu_show(gchar *name, gint x, gint y, gboolean mouse,
-               struct _ObClient *client);
+void menu_show(gchar *name, GravityPoint pos, gint monitor,
+               gboolean mouse, struct _ObClient *client);
 gboolean menu_hide_delay_reached(void);
 
 /*! The show function is called right after a menu is shown */

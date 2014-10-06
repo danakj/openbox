@@ -120,7 +120,7 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y);
 void menu_frame_move_on_screen(ObMenuFrame *self, gint x, gint y,
                                gint *dx, gint *dy);
 
-gboolean menu_frame_show_topmenu(ObMenuFrame *self, GravityPoint pos,
+gboolean menu_frame_show_topmenu(ObMenuFrame *self, const GravityPoint *pos,
                                  gint monitor, gboolean mouse,
                                  gboolean user_positioned);
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,

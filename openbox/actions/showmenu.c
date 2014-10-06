@@ -115,7 +115,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
     /* you cannot call ShowMenu from inside a menu */
     if (data->uact != OB_USER_ACTION_MENU_SELECTION && o->name)
-        menu_show(o->name, position, monitor,
+        menu_show(o->name, &position, monitor,
                   data->button != 0, o->use_position, data->client);
 
     return FALSE;

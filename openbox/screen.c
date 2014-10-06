@@ -1930,7 +1930,7 @@ gboolean screen_compare_desktops(guint a, guint b)
 }
 
 void screen_apply_gravity_point(gint *x, gint *y, gint width, gint height,
-                                GravityPoint *position, const Rect *area)
+                                const GravityPoint *position, const Rect *area)
 {
     if (position->x.center)
         *x = area->width / 2 - width / 2;

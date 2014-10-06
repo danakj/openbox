@@ -457,7 +457,7 @@ static gboolean menu_hide_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-void menu_show(gchar *name, GravityPoint pos, gint monitor,
+void menu_show(gchar *name, const GravityPoint *pos, gint monitor,
                gboolean mouse, gboolean user_positioned, ObClient *client)
 {
     ObMenu *self;

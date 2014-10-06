@@ -232,7 +232,7 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
     XMoveWindow(obt_display, self->window, self->area.x, self->area.y);
 }
 
-static void menu_frame_place_topmenu(ObMenuFrame *self, GravityPoint *pos,
+static void menu_frame_place_topmenu(ObMenuFrame *self, const GravityPoint *pos,
                                      gint *x, gint *y, gint monitor,
                                      gboolean user_positioned)
 {
@@ -997,7 +997,7 @@ static gboolean menu_frame_show(ObMenuFrame *self)
     return TRUE;
 }
 
-gboolean menu_frame_show_topmenu(ObMenuFrame *self, GravityPoint pos,
+gboolean menu_frame_show_topmenu(ObMenuFrame *self, const GravityPoint *pos,
                                  gint monitor, gboolean mouse,
                                  gboolean user_positioned)
 {
@@ -1010,11 +1010,11 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, GravityPoint pos,
         return FALSE;
 
     if (self->menu->place_func) {
-        x = pos.x.pos;
-        y = pos.y.pos;
+        x = pos->x.pos;
+        y = pos->y.pos;
         self->menu->place_func(self, &x, &y, mouse, self->menu->data);
     } else {
-        menu_frame_place_topmenu(self, &pos, &x, &y, monitor,
+        menu_frame_place_topmenu(self, pos, &x, &y, monitor,
                                  user_positioned);
     }
 

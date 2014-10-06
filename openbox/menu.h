@@ -181,7 +181,7 @@ void menu_clear_pipe_caches(void);
 
 void menu_show_all_shortcuts(ObMenu *self, gboolean show);
 
-void menu_show(gchar *name, GravityPoint pos, gint monitor,
+void menu_show(gchar *name, const GravityPoint *pos, gint monitor,
                gboolean mouse, gboolean user_positioned,
                struct _ObClient *client);
 gboolean menu_hide_delay_reached(void);

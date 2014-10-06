@@ -233,12 +233,16 @@ void menu_frame_move(ObMenuFrame *self, gint x, gint y)
 }
 
 static void menu_frame_place_topmenu(ObMenuFrame *self, GravityPoint *pos,
-                                     gint *x, gint *y, gint monitor)
+                                     gint *x, gint *y, gint monitor,
+                                     gboolean user_positioned)
 {
     gint dx, dy;
 
     screen_apply_gravity_point(x, y, self->area.width, self->area.height,
                                pos, screen_physical_area_monitor(monitor));
+
+    if (user_positioned)
+        return;
 
     if (config_menu_middle) {
         gint myx;
@@ -994,7 +998,8 @@ static gboolean menu_frame_show(ObMenuFrame *self)
 }
 
 gboolean menu_frame_show_topmenu(ObMenuFrame *self, GravityPoint pos,
-                                 gint monitor, gboolean mouse)
+                                 gint monitor, gboolean mouse,
+                                 gboolean user_positioned)
 {
     gint px, py;
     gint x, y;
@@ -1009,7 +1014,8 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, GravityPoint pos,
         y = pos.y.pos;
         self->menu->place_func(self, &x, &y, mouse, self->menu->data);
     } else {
-        menu_frame_place_topmenu(self, &pos, &x, &y, monitor);
+        menu_frame_place_topmenu(self, &pos, &x, &y, monitor,
+                                 user_positioned);
     }
 
     menu_frame_move(self, x, y);

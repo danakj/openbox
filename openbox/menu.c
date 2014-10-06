@@ -277,7 +277,7 @@ static gunichar parse_shortcut(const gchar *label, gboolean allow_shortcut,
     return shortcut;
 }
 
-static void parse_menu_item(xmlNodePtr node,  gpointer data)
+static void parse_menu_item(xmlNodePtr node, gpointer data)
 {
     ObMenuParseState *state = data;
     gchar *label;

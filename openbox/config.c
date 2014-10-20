@@ -567,6 +567,8 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
 
             nbut = obt_xml_find_node(n->children, "mousebind");
             while (nbut) {
+                gchar **button, **buttons;
+
                 if (!obt_xml_attr_string(nbut, "button", &buttonstr))
                     goto next_nbut;
                 if (obt_xml_attr_contains(nbut, "action", "press"))
@@ -582,17 +584,26 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
                 else
                     goto next_nbut;
 
+                buttons = g_strsplit(buttonstr, " ", 0);
                 nact = obt_xml_find_node(nbut->children, "action");
                 while (nact) {
                     ObActionsAct *action;
 
-                    if ((action = actions_parse(nact)))
-                        mouse_bind(buttonstr, cx, mact, action);
+                    /* actions_parse() creates one ref to the action, but we need
+                     * exactly one ref per binding we use it for. */
+                    if ((action = actions_parse(nact))) {
+                        for (button = buttons; *button; ++button) {
+                            actions_act_ref(action);
+                            mouse_bind(*button, cx, mact, action);
+                        }
+                        actions_act_unref(action);
+                    }
                     nact = obt_xml_find_node(nact->next, "action");
                 }
-            g_free(buttonstr);
+                g_strfreev(buttons);
+                g_free(buttonstr);
             next_nbut:
-            nbut = obt_xml_find_node(nbut->next, "mousebind");
+                nbut = obt_xml_find_node(nbut->next, "mousebind");
             }
         }
         g_free(modcxstr);

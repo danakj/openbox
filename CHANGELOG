@@ -1,3 +1,26 @@
+3.6:
+  * Added various new abilities to If action, including the <query> tag,
+    matching class, name, role and window type.
+  * Added ForEach action.
+  * Restore the <center> option for window placement.
+  * New GrowToFill action.
+  * Updated Portuguese translation.
+  * Added strict option to ToggleShowDesktop action.
+  * Speed optimization in rendering code.
+  * New <position> tag for ShowMenu action allows placing menus other
+    than at the mouse cursor.
+  * Fix some corner cases of relative position to work correctly.
+  * Allow specifying multiple mousebinds in one tag as we already do
+    for keybinds (separated by spaces, as "W-Return M-S-F3" for example).
+  * Added option rebindOnMappingNotify option, on by default, which
+    controls if we update binds when the keyboard layout changes at runtime.
+  * The resize action now only considers the part of the client that is onscreen
+    for purposes of picking an action to perform.
+  * Make desktop actions non-interactive (means you can have more actions bound
+    to a key after them, and the dialog disappears on a timer instead of when
+    releasing the modifier keys).
+  * Various small bugfixes.
+
 3.5.2:
   * Fix crash in theme rendering code, and in theme parsing code.
   * Maximize windows without borders to fill the whole screen, don't leave

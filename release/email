@@ -20,7 +20,6 @@ LAST="$3"
 
 SUBJECT="[RELEASE] Openbox $VERSION"
 MAILINGLIST=openbox@icculus.org
-MIKACHU=mikachu@icculus.org
 
 cat <<EOF > $WORKDIR/.email
 Hello,
@@ -52,12 +51,6 @@ fi
 test -e $WORKDIR/.email || error "email file disappeared"
 cat $WORKDIR/.email | mail -s "$SUBJECT" "$MAILINGLIST" || \
     error "mail to $MAILINGLIST failed"
-
-echo "Hi Mikachu,
-
-Please update the freshmeat.net Openbox stuff for $VERSION. Thanks!" | \
-mail -s "Freshmeat.net for Openbox $VERSION" "$MIKACHU" || \
-    error "mail to $MIKACHU failed"
 
 clean
 exit 0

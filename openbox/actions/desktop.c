@@ -26,131 +26,62 @@ typedef struct {
     } u;
     gboolean send;
     gboolean follow;
-    gboolean interactive;
 } Options;
 
-static gpointer setup_go_func(xmlNodePtr node,
-                              ObActionsIPreFunc *pre,
-                              ObActionsIInputFunc *input,
-                              ObActionsICancelFunc *cancel,
-                              ObActionsIPostFunc *post);
-static gpointer setup_send_func(xmlNodePtr node,
-                                ObActionsIPreFunc *pre,
-                                ObActionsIInputFunc *input,
-                                ObActionsICancelFunc *cancel,
-                                ObActionsIPostFunc *post);
+static gpointer setup_func(xmlNodePtr node);
+static gpointer setup_send_func(xmlNodePtr node);
 static void free_func(gpointer o);
 static gboolean run_func(ObActionsData *data, gpointer options);
-
-static gboolean i_pre_func(guint state, gpointer options);
-static gboolean i_input_func(guint initial_state,
-                             XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used);
-static void i_post_func(gpointer options);
 
 /* 3.4-compatibility */
 static gpointer setup_go_last_func(xmlNodePtr node);
 static gpointer setup_send_last_func(xmlNodePtr node);
 static gpointer setup_go_abs_func(xmlNodePtr node);
-static gpointer setup_go_next_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post);
-static gpointer setup_send_next_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post);
-static gpointer setup_go_prev_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post);
-static gpointer setup_send_prev_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post);
-static gpointer setup_go_left_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post);
-static gpointer setup_send_left_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post);
-static gpointer setup_go_right_func(xmlNodePtr node,
-                                    ObActionsIPreFunc *pre,
-                                    ObActionsIInputFunc *input,
-                                    ObActionsICancelFunc *cancel,
-                                    ObActionsIPostFunc *post);
-static gpointer setup_send_right_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
-                                      ObActionsIInputFunc *input,
-                                      ObActionsICancelFunc *cancel,
-                                      ObActionsIPostFunc *post);
-static gpointer setup_go_up_func(xmlNodePtr node,
-                                 ObActionsIPreFunc *pre,
-                                 ObActionsIInputFunc *input,
-                                 ObActionsICancelFunc *cancel,
-                                 ObActionsIPostFunc *post);
-static gpointer setup_send_up_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post);
-static gpointer setup_go_down_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post);
-static gpointer setup_send_down_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post);
+static gpointer setup_go_next_func(xmlNodePtr node);
+static gpointer setup_send_next_func(xmlNodePtr node);
+static gpointer setup_go_prev_func(xmlNodePtr node);
+static gpointer setup_send_prev_func(xmlNodePtr node);
+static gpointer setup_go_left_func(xmlNodePtr node);
+static gpointer setup_send_left_func(xmlNodePtr node);
+static gpointer setup_go_right_func(xmlNodePtr node);
+static gpointer setup_send_right_func(xmlNodePtr node);
+static gpointer setup_go_up_func(xmlNodePtr node);
+static gpointer setup_send_up_func(xmlNodePtr node);
+static gpointer setup_go_down_func(xmlNodePtr node);
+static gpointer setup_send_down_func(xmlNodePtr node);
 
 void action_desktop_startup(void)
 {
-    actions_register_i("GoToDesktop", setup_go_func, free_func, run_func);
-    actions_register_i("SendToDesktop", setup_send_func, free_func, run_func);
+    actions_register("GoToDesktop", setup_func, free_func, run_func);
+    actions_register("SendToDesktop", setup_send_func, free_func, run_func);
     /* 3.4-compatibility */
     actions_register("DesktopLast", setup_go_last_func, free_func, run_func);
     actions_register("SendToDesktopLast", setup_send_last_func,
                      free_func, run_func);
     actions_register("Desktop", setup_go_abs_func, free_func, run_func);
-    actions_register_i("DesktopNext", setup_go_next_func, free_func, run_func);
-    actions_register_i("SendToDesktopNext", setup_send_next_func,
-                       free_func, run_func);
-    actions_register_i("DesktopPrevious", setup_go_prev_func,
-                       free_func, run_func);
-    actions_register_i("SendToDesktopPrevious", setup_send_prev_func,
-                       free_func, run_func);
-    actions_register_i("DesktopLeft", setup_go_left_func, free_func, run_func);
-    actions_register_i("SendToDesktopLeft", setup_send_left_func,
-                       free_func, run_func);
-    actions_register_i("DesktopRight", setup_go_right_func,
-                       free_func, run_func);
-    actions_register_i("SendToDesktopRight", setup_send_right_func,
-                       free_func, run_func);
-    actions_register_i("DesktopUp", setup_go_up_func, free_func, run_func);
-    actions_register_i("SendToDesktopUp", setup_send_up_func,
-                       free_func, run_func);
-    actions_register_i("DesktopDown", setup_go_down_func, free_func, run_func);
-    actions_register_i("SendToDesktopDown", setup_send_down_func,
-                       free_func, run_func);
+    actions_register("DesktopNext", setup_go_next_func, free_func, run_func);
+    actions_register("SendToDesktopNext", setup_send_next_func,
+                     free_func, run_func);
+    actions_register("DesktopPrevious", setup_go_prev_func,
+                     free_func, run_func);
+    actions_register("SendToDesktopPrevious", setup_send_prev_func,
+                     free_func, run_func);
+    actions_register("DesktopLeft", setup_go_left_func, free_func, run_func);
+    actions_register("SendToDesktopLeft", setup_send_left_func,
+                     free_func, run_func);
+    actions_register("DesktopRight", setup_go_right_func,
+                     free_func, run_func);
+    actions_register("SendToDesktopRight", setup_send_right_func,
+                     free_func, run_func);
+    actions_register("DesktopUp", setup_go_up_func, free_func, run_func);
+    actions_register("SendToDesktopUp", setup_send_up_func,
+                     free_func, run_func);
+    actions_register("DesktopDown", setup_go_down_func, free_func, run_func);
+    actions_register("SendToDesktopDown", setup_send_down_func,
+                     free_func, run_func);
 }
 
-static gpointer setup_func(xmlNodePtr node,
-                           ObActionsIPreFunc *pre,
-                           ObActionsIInputFunc *input,
-                           ObActionsICancelFunc *cancel,
-                           ObActionsIPostFunc *post)
+static gpointer setup_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
@@ -211,36 +142,12 @@ static gpointer setup_func(xmlNodePtr node,
     return o;
 }
 
-
-static gpointer setup_go_func(xmlNodePtr node,
-                              ObActionsIPreFunc *pre,
-                              ObActionsIInputFunc *input,
-                              ObActionsICancelFunc *cancel,
-                              ObActionsIPostFunc *post)
-{
-    Options *o;
-
-    o = setup_func(node, pre, input, cancel, post);
-    if (o->type == RELATIVE) {
-        o->interactive = TRUE;
-        *pre = i_pre_func;
-        *input = i_input_func;
-        *post = i_post_func;
-    }
-
-    return o;
-}
-
-static gpointer setup_send_func(xmlNodePtr node,
-                                ObActionsIPreFunc *pre,
-                                ObActionsIInputFunc *input,
-                                ObActionsICancelFunc *cancel,
-                                ObActionsIPostFunc *post)
+static gpointer setup_send_func(xmlNodePtr node)
 {
     xmlNodePtr n;
     Options *o;
 
-    o = setup_func(node, pre, input, cancel, post);
+    o = setup_func(node);
     if ((n = obt_xml_find_node(node, "desktop"))) {
         /* 3.4 compatibility */
         o->u.abs.desktop = obt_xml_node_int(n) - 1;
@@ -251,13 +158,6 @@ static gpointer setup_send_func(xmlNodePtr node,
 
     if ((n = obt_xml_find_node(node, "follow")))
         o->follow = obt_xml_node_bool(n);
-
-    if (o->type == RELATIVE && o->follow) {
-        o->interactive = TRUE;
-        *pre = i_pre_func;
-        *input = i_input_func;
-        *post = i_post_func;
-    }
 
     return o;
 }
@@ -310,62 +210,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         actions_client_move(data, FALSE);
     }
 
-    return o->interactive;
-}
-
-static gboolean i_input_func(guint initial_state,
-                             XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used)
-{
-    guint mods, initial_mods;
-
-    initial_mods = obt_keyboard_only_modmasks(initial_state);
-    mods = obt_keyboard_only_modmasks(e->xkey.state);
-    if (e->type == KeyRelease) {
-        /* remove from the state the mask of the modifier key being
-           released, if it is a modifier key being released that is */
-        mods &= ~obt_keyboard_keyevent_to_modmask(e);
-    }
-
-    if (e->type == KeyPress) {
-        KeySym sym = obt_keyboard_keypress_to_keysym(e);
-
-        /* Escape cancels no matter what */
-        if (sym == XK_Escape)
-            return FALSE;
-
-        /* There were no modifiers and they pressed enter */
-        else if ((sym == XK_Return || sym == XK_KP_Enter) && !initial_mods)
-            return FALSE;
-    }
-    /* They released the modifiers */
-    else if (e->type == KeyRelease && initial_mods && !(mods & initial_mods))
-    {
-        return FALSE;
-    }
-
-    return TRUE;
-}
-
-static gboolean i_pre_func(guint initial_state, gpointer options)
-{
-    guint initial_mods = obt_keyboard_only_modmasks(initial_state);
-    if (!initial_mods) {
-        Options *o = options;
-        o->interactive = FALSE;
-        return FALSE;
-    }
-    else {
-        screen_show_desktop_popup(screen_desktop, TRUE);
-        return TRUE;
-    }
-}
-
-static void i_post_func(gpointer options)
-{
-    screen_hide_desktop_popup();
+    return FALSE;
 }
 
 /* 3.4-compatilibity */
@@ -407,10 +252,7 @@ static gpointer setup_go_abs_func(xmlNodePtr node)
 }
 
 static void setup_rel(Options *o, xmlNodePtr node, gboolean lin,
-                      ObDirection dir,
-                      ObActionsIPreFunc *pre,
-                      ObActionsIInputFunc *input,
-                      ObActionsIPostFunc *post)
+                      ObDirection dir)
 {
     xmlNodePtr n;
 
@@ -421,149 +263,88 @@ static void setup_rel(Options *o, xmlNodePtr node, gboolean lin,
 
     if ((n = obt_xml_find_node(node, "wrap")))
         o->u.rel.wrap = obt_xml_node_bool(n);
-
-    if (input) {
-        o->interactive = TRUE;
-        *pre = i_pre_func;
-        *input = i_input_func;
-        *post = i_post_func;
-    }
 }
 
-static gpointer setup_go_next_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+static gpointer setup_go_next_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, TRUE, OB_DIRECTION_EAST, pre, input, post);
+    setup_rel(o, node, TRUE, OB_DIRECTION_EAST);
     return o;
 }
 
-static gpointer setup_send_next_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post)
+static gpointer setup_send_next_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, TRUE, OB_DIRECTION_EAST,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, TRUE, OB_DIRECTION_EAST);
     return o;
 }
 
-static gpointer setup_go_prev_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+static gpointer setup_go_prev_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, TRUE, OB_DIRECTION_WEST, pre, input, post);
+    setup_rel(o, node, TRUE, OB_DIRECTION_WEST);
     return o;
 }
 
-static gpointer setup_send_prev_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post)
+static gpointer setup_send_prev_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, TRUE, OB_DIRECTION_WEST,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, TRUE, OB_DIRECTION_WEST);
     return o;
 }
 
-static gpointer setup_go_left_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+static gpointer setup_go_left_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, FALSE, OB_DIRECTION_WEST, pre, input, post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_WEST);
     return o;
 }
 
-static gpointer setup_send_left_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post)
+static gpointer setup_send_left_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, FALSE, OB_DIRECTION_WEST,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_WEST);
     return o;
 }
 
-static gpointer setup_go_right_func(xmlNodePtr node,
-                                    ObActionsIPreFunc *pre,
-                                    ObActionsIInputFunc *input,
-                                    ObActionsICancelFunc *cancel,
-                                    ObActionsIPostFunc *post)
+static gpointer setup_go_right_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, FALSE, OB_DIRECTION_EAST, pre, input, post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_EAST);
     return o;
 }
 
-static gpointer setup_send_right_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
-                                      ObActionsIInputFunc *input,
-                                      ObActionsICancelFunc *cancel,
-                                      ObActionsIPostFunc *post)
+static gpointer setup_send_right_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, FALSE, OB_DIRECTION_EAST,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_EAST);
     return o;
 }
 
-static gpointer setup_go_up_func(xmlNodePtr node,
-                                 ObActionsIPreFunc *pre,
-                                 ObActionsIInputFunc *input,
-                                 ObActionsICancelFunc *cancel,
-                                 ObActionsIPostFunc *post)
+static gpointer setup_go_up_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, FALSE, OB_DIRECTION_NORTH, pre, input, post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_NORTH);
     return o;
 }
 
-static gpointer setup_send_up_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+static gpointer setup_send_up_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, FALSE, OB_DIRECTION_NORTH,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_NORTH);
     return o;
 }
 
-static gpointer setup_go_down_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
-                                   ObActionsIInputFunc *input,
-                                   ObActionsICancelFunc *cancel,
-                                   ObActionsIPostFunc *post)
+static gpointer setup_go_down_func(xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
-    setup_rel(o, node, FALSE, OB_DIRECTION_SOUTH, pre, input, post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_SOUTH);
     return o;
 }
 
-static gpointer setup_send_down_func(xmlNodePtr node,
-                                     ObActionsIPreFunc *pre,
-                                     ObActionsIInputFunc *input,
-                                     ObActionsICancelFunc *cancel,
-                                     ObActionsIPostFunc *post)
+static gpointer setup_send_down_func(xmlNodePtr node)
 {
     Options *o = setup_follow(node);
-    setup_rel(o, node, FALSE, OB_DIRECTION_SOUTH,
-              pre, (o->follow ? input : NULL), post);
+    setup_rel(o, node, FALSE, OB_DIRECTION_SOUTH);
     return o;
 }

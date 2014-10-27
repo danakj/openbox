@@ -2,6 +2,7 @@
 #include "openbox/moveresize.h"
 #include "openbox/client.h"
 #include "openbox/frame.h"
+#include "openbox/screen.h"
 #include "obt/prop.h"
 
 typedef struct {
@@ -95,6 +96,12 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 static guint32 pick_corner(gint x, gint y, gint cx, gint cy, gint cw, gint ch,
                            gboolean shaded)
 {
+    const Rect *full = screen_physical_area_all_monitors();
+    if (cx < full->x) { cw = cw + cx - full->x; cx = full->x; }
+    if (cy < full->y) { ch = ch + cy - full->y; cy = full->y; }
+    if (cx + cw > full->x + full->width) cw = full->x + full->width - cx;
+    if (cy + ch > full->y + full->height) ch = full->y + full->height - cy;
+
     /* let's make x and y client relative instead of screen relative */
     x = x - cx;
     y = ch - (y - cy); /* y is inverted, 0 is at the bottom of the window */

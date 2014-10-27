@@ -239,7 +239,7 @@ static void swap_byte_order(XImage *im)
 
     di = 0;
     for (y = 0; y < im->height; ++y) {
-        for (x = 0; x < im->height; ++x) {
+        for (x = 0; x < im->width; ++x) {
             gchar *c = &im->data[di + x * im->bits_per_pixel / 8];
             gchar t;
 

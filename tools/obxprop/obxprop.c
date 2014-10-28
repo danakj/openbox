@@ -106,33 +106,30 @@ static gboolean get_all(Display *d, Window win, Atom prop,
     return ret;
 }
 
-gchar *append_string(gchar *before, gchar *after, gboolean quote)
+GString *append_string(GString *before, gchar *after, gboolean quote)
 {
-    gchar *tmp;
     const gchar *q = quote ? "\"" : "";
     if (before)
-        tmp = g_strdup_printf("%s, %s%s%s", before, q, after, q);
+        g_string_append_printf(before, ", %s%s%s", q, after, q);
     else
-        tmp = g_strdup_printf("%s%s%s", q, after, q);
-    g_free(before);
-    return tmp;
+        g_string_append_printf(before = g_string_new(NULL), "%s%s%s", q, after, q);
+    return before;
 }
 
-gchar *append_int(gchar *before, guint after)
+GString *append_int(GString *before, guint after)
 {
-    gchar *tmp;
     if (before)
-        tmp = g_strdup_printf("%s, %u", before, after);
+        g_string_append_printf(before, ", %u", after);
     else
-        tmp = g_strdup_printf("%u", after);
-    g_free(before);
-    return tmp;
+        g_string_append_printf(before = g_string_new(NULL), "%u", after);
+    return before;
 }
 
 gchar* read_strings(gchar *val, guint n, gboolean utf8)
 {
     GSList *strs = NULL, *it;
-    gchar *ret, *p;
+    GString *ret;
+    gchar *p;
     guint i;
 
     p = val;
@@ -162,23 +159,27 @@ gchar* read_strings(gchar *val, guint n, gboolean utf8)
         g_free(strs->data);
         strs = g_slist_delete_link(strs, strs);
     }
-    return ret;
+    if (ret)
+        return g_string_free(ret, FALSE);
+    return NULL;
 }
 
 gchar* read_atoms(Display *d, guchar *val, guint n)
 {
-    gchar *ret;
+    GString *ret;
     guint i;
 
     ret = NULL;
     for (i = 0; i < n; ++i)
         ret = append_string(ret, XGetAtomName(d, ((guint32*)val)[i]), FALSE);
-    return ret;
+    if (ret)
+        return g_string_free(ret, FALSE);
+    return NULL;
 }
 
 gchar* read_numbers(guchar *val, guint n, guint size)
 {
-    gchar *ret;
+    GString *ret;
     guint i;
 
     ret = NULL;
@@ -197,7 +198,9 @@ gchar* read_numbers(guchar *val, guint n, guint size)
             g_assert_not_reached(); /* unhandled size */
         }
 
-    return ret;
+    if (ret)
+        return g_string_free(ret, FALSE);
+    return NULL;
 }
 
 gboolean read_prop(Display *d, Window w, Atom prop, const gchar **type, gchar **val)

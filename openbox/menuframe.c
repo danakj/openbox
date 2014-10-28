@@ -203,8 +203,6 @@ static ObMenuEntryFrame* menu_entry_frame_new(ObMenuEntry *entry,
 static void menu_entry_frame_free(ObMenuEntryFrame *self)
 {
     if (self) {
-        menu_entry_unref(self->entry);
-
         window_remove(self->window);
 
         XDestroyWindow(obt_display, self->text);
@@ -221,6 +219,7 @@ static void menu_entry_frame_free(ObMenuEntryFrame *self)
             g_hash_table_remove(menu_frame_map, &self->bullet);
         }
 
+        menu_entry_unref(self->entry);
         g_slice_free(ObMenuEntryFrame, self);
     }
 }

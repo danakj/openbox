@@ -360,11 +360,11 @@ static gboolean place_transient_splash(ObClient *client, Rect *area,
                     b = MAX(b, RECT_BOTTOM(m->frame->area));
                 }
             }
-            if (!first) {
-                *x = ((r + 1 - l) - frame_size.width) / 2 + l;
-                *y = ((b + 1 - t) - frame_size.height) / 2 + t;
-                return TRUE;
-            }
+        }
+        if (!first) {
+            *x = ((r + 1 - l) - frame_size.width) / 2 + l;
+            *y = ((b + 1 - t) - frame_size.height) / 2 + t;
+            return TRUE;
         }
     }
 

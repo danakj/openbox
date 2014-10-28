@@ -73,7 +73,7 @@ RrFont *RrFontOpen(const RrInstance *inst, const gchar *name, gint size,
     out->ref = 1;
     out->font_desc = pango_font_description_new();
     out->layout = pango_layout_new(inst->pango);
-    out->shortcut_underline = pango_attr_underline_new(PANGO_UNDERLINE_LOW);
+    out->shortcut_underline = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
     out->shortcut_underline->start_index = 0;
     out->shortcut_underline->end_index = 0;
 

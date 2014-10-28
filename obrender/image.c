@@ -243,7 +243,7 @@ RrImageSet* RrImageSetMergeSets(RrImageSet *b, RrImageSet *a)
     gint n_original, n_resized, tmp;
     GSList *it;
 
-    const gint max_resized = a->cache->max_resized_saved;
+    gint max_resized;
 
     if (!a)
         return b;
@@ -251,7 +251,6 @@ RrImageSet* RrImageSetMergeSets(RrImageSet *b, RrImageSet *a)
         return a;
     if (a == b)
         return b;
-
     /* the original and resized picture lists in an RrImageSet are kept ordered
        as newest to oldest.  we don't have timestamps for them, so we cannot
        preserve this in the merged RrImageSet exactly.  a decent approximation,
@@ -263,6 +262,8 @@ RrImageSet* RrImageSetMergeSets(RrImageSet *b, RrImageSet *a)
     */
 
     g_assert(b->cache == a->cache);
+
+    max_resized = a->cache->max_resized_saved;
 
     a_i = b_i = merged_i = 0;
     n_original = a->n_original + b->n_original;

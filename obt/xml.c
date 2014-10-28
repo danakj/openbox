@@ -281,7 +281,7 @@ gboolean obt_xml_load_mem(ObtXmlInst *i,
     xmlResetLastError();
 
     i->doc = xmlParseMemory(data, len);
-    if (i) {
+    if (i->doc) {
         i->root = xmlDocGetRootElement(i->doc);
         if (!i->root) {
             xmlFreeDoc(i->doc);

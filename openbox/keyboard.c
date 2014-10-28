@@ -270,8 +270,8 @@ gboolean keyboard_event(ObClient *client, const XEvent *e)
                                  e->xkey.state, e->xkey.x_root, e->xkey.y_root,
                                  0, OB_FRAME_CONTEXT_NONE, client);
             }
-            break;
             used = TRUE;
+            break;
         }
         p = p->next_sibling;
     }

@@ -329,7 +329,7 @@ gunichar obt_keyboard_keypress_to_unichar(ObtIC *ic, XEvent *ev)
 #ifndef X_HAVE_UTF8_STRING
                 /* convert to utf8 */
                 gchar *buf2 = buf;
-                buf = g_locale_to_utf8(buf2, r, NULL, NULL, NULL);
+                buf = g_locale_to_utf8(buf2, len, NULL, NULL, NULL);
                 g_free(buf2);
 #endif
 

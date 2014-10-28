@@ -372,7 +372,7 @@ gboolean mouse_event(ObClient *client, XEvent *e)
 gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
                     ObMouseAction mact, ObActionsAct *action)
 {
-    guint state, button;
+    guint state = 0, button = 0;
     ObMouseBinding *b;
     GSList *it;
 

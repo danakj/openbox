@@ -923,7 +923,7 @@ static void parse_dock(xmlNodePtr node, gpointer d)
         config_dock_show_delay = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "moveButton"))) {
         gchar *str = obt_xml_node_string(n);
-        guint b, s;
+        guint b = 0, s = 0;
         if (translate_button(str, &s, &b)) {
             config_dock_app_move_button = b;
             config_dock_app_move_modifiers = s;

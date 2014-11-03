@@ -265,7 +265,7 @@ void frame_flash_stop(ObFrame *self);
   will be called when the animation finishes. But if another animation is
   started in the meantime, the callback will never get called. */
 void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying);
-void frame_end_iconify_animation(ObFrame *self);
+void frame_end_iconify_animation(gpointer data);
 
 #define frame_iconify_animating(f) (f->iconify_animation_going != 0)
 

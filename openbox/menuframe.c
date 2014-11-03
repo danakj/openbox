@@ -1036,7 +1036,6 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, const GravityPoint *pos,
 static void remove_submenu_hide_timeout(ObMenuFrame *child)
 {
     if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
-    submenu_hide_timer = 0;
 }
 
 gboolean menu_frame_show_submenu(ObMenuFrame *self, ObMenuFrame *parent,
@@ -1134,11 +1133,9 @@ void menu_frame_hide_all(void)
 {
     GList *it;
 
-    if (config_submenu_show_delay) {
+    if (config_submenu_show_delay && submenu_show_timer)
         /* remove any submenu open requests */
-        if (submenu_show_timer) g_source_remove(submenu_show_timer);
-        submenu_show_timer = 0;
-    }
+        g_source_remove(submenu_show_timer);
     if ((it = g_list_last(menu_frame_visible)))
         menu_frame_hide(it->data);
 }
@@ -1188,11 +1185,21 @@ static gboolean submenu_show_timeout(gpointer data)
     return FALSE;
 }
 
+static void submenu_show_dest(gpointer data)
+{
+    submenu_show_timer = 0;
+}
+
 static gboolean submenu_hide_timeout(gpointer data)
 {
     g_assert(menu_frame_visible);
     menu_frame_hide((ObMenuFrame*)data);
     return FALSE;
+}
+
+static void submenu_hide_dest(gpointer data)
+{
+    submenu_hide_timer = 0;
 }
 
 void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
@@ -1216,11 +1223,9 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
     if (!entry && oldchild_entry)
         entry = oldchild_entry;
 
-    if (config_submenu_show_delay) {
+    if (config_submenu_show_delay && submenu_show_timer)
         /* remove any submenu open requests */
-        if (submenu_show_timer) g_source_remove(submenu_show_timer);
-        submenu_show_timer = 0;
-    }
+        g_source_remove(submenu_show_timer);
 
     self->selected = entry;
 
@@ -1244,7 +1249,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                 submenu_hide_timer =
                     g_timeout_add_full(G_PRIORITY_DEFAULT,
                                        config_submenu_hide_delay,
-                                       submenu_hide_timeout, oldchild, NULL);
+                                       submenu_hide_timeout, oldchild, submenu_hide_dest);
             }
         }
     }
@@ -1264,7 +1269,7 @@ void menu_frame_select(ObMenuFrame *self, ObMenuEntryFrame *entry,
                         g_timeout_add_full(G_PRIORITY_DEFAULT,
                                            config_submenu_show_delay,
                                            submenu_show_timeout,
-                                           self->selected, NULL);
+                                           self->selected, submenu_show_dest);
                 }
             }
             /* hide the grandchildren of this menu. and move the cursor to

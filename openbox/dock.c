@@ -632,8 +632,6 @@ static gboolean hide_timeout(gpointer data)
     dock->hidden = TRUE;
     dock_configure();
 
-    hide_timeout_id = 0;
-
     return FALSE; /* don't repeat */
 }
 
@@ -643,9 +641,13 @@ static gboolean show_timeout(gpointer data)
     dock->hidden = FALSE;
     dock_configure();
 
-    show_timeout_id = 0;
-
     return FALSE; /* don't repeat */
+}
+
+static void destroy_timeout(gpointer data)
+{
+    gint *id = data;
+    *id = 0;
 }
 
 void dock_hide(gboolean hide)
@@ -654,19 +656,17 @@ void dock_hide(gboolean hide)
         if (dock->hidden && config_dock_hide) {
             show_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
                                                  config_dock_show_delay,
-                                                 show_timeout, NULL, NULL);
+                                                 show_timeout, &show_timeout_id, destroy_timeout);
         } else if (!dock->hidden && config_dock_hide && hide_timeout_id) {
             if (hide_timeout_id) g_source_remove(hide_timeout_id);
-            hide_timeout_id = 0;
         }
     } else {
         if (!dock->hidden && config_dock_hide) {
             hide_timeout_id = g_timeout_add_full(G_PRIORITY_DEFAULT,
                                                  config_dock_hide_delay,
-                                                 hide_timeout, NULL, NULL);
+                                                 hide_timeout, &hide_timeout_id, destroy_timeout);
         } else if (dock->hidden && config_dock_hide && show_timeout_id) {
             if (show_timeout_id) g_source_remove(show_timeout_id);
-            show_timeout_id = 0;
         }
     }
 }

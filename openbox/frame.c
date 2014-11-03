@@ -1664,9 +1664,6 @@ static void flash_done(gpointer data)
 {
     ObFrame *self = data;
 
-    if (self->focused != self->flash_on)
-        frame_adjust_focus(self, self->focused);
-
     self->flash_timer = 0;
 }
 
@@ -1681,8 +1678,12 @@ static gboolean flash_timeout(gpointer data)
          now.tv_usec >= self->flash_end.tv_usec))
         self->flashing = FALSE;
 
-    if (!self->flashing)
+    if (!self->flashing) {
+        if (self->focused != self->flash_on)
+            frame_adjust_focus(self, self->focused);
+
         return FALSE; /* we are done */
+    }
 
     self->flash_on = !self->flash_on;
     if (!self->focused) {

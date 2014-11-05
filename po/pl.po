@@ -5,28 +5,27 @@
 # Paweł Rusinek <p.rusinek@gmail.com>, 2007.
 # Piotr Drąg <raven@pmail.pl>, 2007.
 # Jakub Łojewski <lojewski@ovi.com>, 2010.
+# Jakub Błażejczyk <kuboslawik@gmail.com>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.3\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
-"PO-Revision-Date: 2013-06-13 20:37+0100\n"
-"Last-Translator: Piotr Strębski <strebski@o2.pl>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"POT-Creation-Date: 2014-11-05 16:47+0100\n"
+"PO-Revision-Date: 2013-10-06 15:08+0200\n"
+"Last-Translator: Jakub Błażejczyk\n"
+"Language-Team: polski <kuboslawik@gmail.com>\n"
 "Language: Polish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.5.4\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr ""
-"Zażądano niepoprawnego polecenia \"%s\". Takowe polecenie nie istnieje."
+msgstr "Wywołana akcja \"%s\" nie istnieje."
 
 #: openbox/actions/execute.c:245
 msgid "No"
@@ -45,7 +44,7 @@ msgstr "Wykonaj"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nie można przekonwertować ścieżki \"%s\" z UTF-8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Anuluj"
 
@@ -81,7 +80,7 @@ msgstr "Kończenie..."
 msgid "Not Responding"
 msgstr "Nie odpowiada"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -90,18 +89,18 @@ msgstr ""
 "Okno \"%s\" nie odpowiada. Czy wymusić zakończenie poprzez wysłanie sygnału "
 "%s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Zakończ proces"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Okno \"%s\" nie odpowiada. Odłączyć je od serwera X?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Odłącz"
 
@@ -189,17 +188,17 @@ msgstr "Wyświetl/ukryj _dekoracje"
 msgid "_Close"
 msgstr "Z_amknij"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Nieprawidłowy kontekst \"%s\" w skrócie myszy"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Nieprawidłowy przycisk \"%s\" określony w pliku konfiguracyjnym"
+msgstr "Nieprawidłowy klawisz \"%s\" określony w pliku konfiguracyjnym"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
@@ -208,7 +207,7 @@ msgstr ""
 #: openbox/debug.c:57
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr ""
+msgstr "Nie można utworzyć katalogu \"%s\": %s"
 
 #: openbox/debug.c:195 openbox/openbox.c:377
 msgid "Close"
@@ -271,8 +270,8 @@ msgstr "Nie można ustawić modyfikatorów lokalnych dla serwera X."
 #: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Nie można znaleźć prawidłowego pliku konfiguracyjnego, używanie domyślnych "
-"wartości."
+"Nie można znaleźć prawidłowego pliku konfiguracyjnego, używanie "
+"domyślnychwartości"
 
 #: openbox/openbox.c:270
 #, c-format
@@ -281,10 +280,10 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
-"Podczas sprawdzania plików konfiguracyjnych Openboksa zostało znalezionych "
-"jeden lub więcej błędów składniowych XML.  Zobacz stdout, aby uzyskać więcej "
-"informacji.  Ostatnio błąd znaleziono w pliku \"%s\", linia %d, z "
-"wiadomością: %s"
+"Jeden lub więcej błędów składniowych XML zostało znalezionych podczas "
+"sprawdzania plików konfiguracyjnych. Zobacz stdout aby uzyskać więcej "
+"informacji. Ostatnio błąd znaleziono w pliku \"%s\" linia %d, z wiadomością: "
+"%s"
 
 #: openbox/openbox.c:295
 msgid "Unable to load a theme."
@@ -298,12 +297,12 @@ msgstr "Błąd składniowy Openboksa"
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
 msgstr ""
-"Wykonanie nowego pliku wykonywalnego \"%s\" podczas ponownego uruchomienia "
-"nie powiodło się: %s"
+"Wykonanie nowego pliku wykonywalnego \"%s\" podczas ponownego "
+"uruchomienianie powiodło się: %s"
 
 #: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
-msgstr "Prawa autorskie (c)"
+msgstr "Copyright (c)"
 
 #: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
@@ -334,11 +333,11 @@ msgstr "  --replace           Zastępuje aktualnie działający menedżer okien\
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr "  --config-file PLIK  Podaj ścieżkę do pliku konfiguracji\n"
+msgstr "  --config-file FILE  Podaj ścieżkę do pliku konfiguracji\n"
 
 #: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Wyłączenie połączenia z menedżerem sesji\n"
+msgstr "  --sm-disable        Nie tworzy połączenia z menedżerem sesji\n"
 
 #: openbox/openbox.c:542
 msgid ""
@@ -358,7 +357,7 @@ msgstr "  --restart           Ponownie uruchamia Openboksa\n"
 
 #: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
-msgstr "  --exit              Zakończa Openbox\n"
+msgstr "  --exit              Opuść Openbox\n"
 
 #: openbox/openbox.c:546
 msgid ""
@@ -366,7 +365,7 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Opcje odnajdywania błędów:\n"
+"Opcje debugowania:\n"
 
 #: openbox/openbox.c:547
 msgid "  --sync              Run in synchronous mode\n"
@@ -378,13 +377,12 @@ msgstr ""
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Wyświetla informacje o odnajdywaniu błędów\n"
+msgstr "  --debug             Wyświetla informacje o debugowaniu\n"
 
 #: openbox/openbox.c:550
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug-focus       Wyświetla wyjście odnajdywania błędów dla obsługi "
-"aktywacji\n"
+"  --debug-focus       Wyświetla wyjście debugowania obsługi aktywacji\n"
 
 #: openbox/openbox.c:551
 msgid "  --debug-session     Display debugging output for session management\n"
@@ -406,7 +404,7 @@ msgstr ""
 #: openbox/openbox.c:636 openbox/openbox.c:670
 #, c-format
 msgid "%s requires an argument\n"
-msgstr "%s wymaga argumentu\n"
+msgstr ""
 
 #: openbox/openbox.c:713
 #, c-format
@@ -441,14 +439,14 @@ msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr[0] ""
-"Openbox jest skonfigurowany dla %d pulpitu, ale obecna sesja posiada ich "
-"%d.  Odrzucenie konfigurcji Openboksa."
+"Openbox jest skonfigurowany dla %d pulpitu, ale bieżąca sesja ma %d. "
+"Nadpisywanie konfiguracji Openboksa."
 msgstr[1] ""
-"Openbox jest skonfigurowany dla %d pulpitów, ale obecna sesja posiada ich "
-"%d.  Odrzucenie konfigurcji Openboksa."
+"Openbox jest skonfigurowany dla %d pulpitu, ale bieżąca sesja ma %d. "
+"Nadpisywanie konfiguracji Openboksa."
 msgstr[2] ""
-"Openbox jest skonfigurowany dla %d pulpitów, ale obecna sesja posiada ich "
-"%d.  Odrzucenie konfigurcji Openboksa."
+"Openbox jest skonfigurowany dla %d pulpitu, ale bieżąca sesja ma %d. "
+"Nadpisywanie konfiguracji Openboksa."
 
 #: openbox/screen.c:1204
 #, c-format
@@ -464,7 +462,7 @@ msgstr "Uruchamianie %s"
 #, c-format
 msgid "Invalid modifier key \"%s\" in key/mouse binding"
 msgstr ""
-"Nieprawidłowy przycisk modyfikatora \"%s\" w skrócie klawiszowym lub myszy"
+"Nieprawidłowy klawisz modyfikatora \"%s\" w skrócie klawiszowym lub myszy"
 
 #: openbox/translate.c:138
 #, c-format
@@ -479,8 +477,30 @@ msgstr "Nieprawidłowa nazwa \"%s\" w skrócie klawiszowym"
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr "Żądany przycisk \"%s\" nie istnieje na ekranie"
+msgstr "Żądany klawisz \"%s\" nie istnieje na ekranie"
 
 #: openbox/prompt.c:154
 msgid "OK"
 msgstr "OK"
+
+#~ msgid "Unable to save the session to \"%s\": %s"
+#~ msgstr "Nie można zapisać sesji do \"%s\": %s"
+
+#~ msgid "Error while saving the session to \"%s\": %s"
+#~ msgstr "Wystąpił błąd podczas zapisywania sesji do \"%s\": %s"
+
+#~ msgid "Not connected to a session manager"
+#~ msgstr "Nie podłączono do menedżera sesji"
+
+#~ msgid "X Error: %s"
+#~ msgstr "Błąd X: %s"
+
+#~ msgid ""
+#~ "The SessionLogout action is not available since Openbox was built without "
+#~ "session management support"
+#~ msgstr ""
+#~ "SessionLogout jest niedostępne, ponieważ Openbox został stworzony bez "
+#~ "wsparcia dla zarządzania sesją"
+
+#~ msgid "Failed to execute \"%s\": %s"
+#~ msgstr "Wykonanie \"%s\" nie powiodło się: %s"

@@ -329,11 +329,11 @@ gint main(gint argc, gchar **argv)
             menu_startup(reconfigure);
             prompt_startup(reconfigure);
 
-            /* do this after everything is started so no events will get
-               missed */
-            xqueue_listen();
-
             if (!reconfigure) {
+                /* do this after everything is started so no events will get
+                   missed */
+                xqueue_listen();
+
                 guint32 xid;
                 ObWindow *w;
 

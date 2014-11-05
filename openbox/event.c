@@ -1836,8 +1836,14 @@ static gboolean event_handle_menu_input(XEvent *ev)
             if ((e = menu_entry_frame_under(ev->xbutton.x_root,
                                             ev->xbutton.y_root)))
             {
-                if (ev->type == ButtonPress && e->frame->child)
-                    menu_frame_select(e->frame->child, NULL, TRUE);
+                if (ev->type == ButtonPress) {
+                    /* We know this is a new press, so we don't have to
+                     * block release events anymore */
+                    menu_hide_delay_reset();
+
+                    if (e->frame->child)
+                        menu_frame_select(e->frame->child, NULL, TRUE);
+                }
                 menu_frame_select(e->frame, e, TRUE);
                 if (ev->type == ButtonRelease)
                     menu_entry_frame_execute(e, ev->xbutton.state);

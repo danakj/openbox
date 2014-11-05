@@ -185,6 +185,7 @@ void menu_show(gchar *name, const GravityPoint *pos, gint monitor,
                gboolean mouse, gboolean user_positioned,
                struct _ObClient *client);
 gboolean menu_hide_delay_reached(void);
+void menu_hide_delay_reset(void);
 
 /*! The show function is called right after a menu is shown */
 void menu_set_show_func(ObMenu *menu, ObMenuShowFunc func);

@@ -454,6 +454,7 @@ static gboolean menu_hide_delay_func(gpointer data)
 {
     menu_can_hide = TRUE;
     menu_timeout_id = 0;
+
     return FALSE; /* no repeat */
 }
 
@@ -516,6 +517,12 @@ void menu_show(gchar *name, const GravityPoint *pos, gint monitor,
 gboolean menu_hide_delay_reached(void)
 {
     return menu_can_hide;
+}
+
+void menu_hide_delay_reset(void)
+{
+    if (menu_timeout_id) g_source_remove(menu_timeout_id);
+    menu_hide_delay_func(NULL);
 }
 
 static ObMenuEntry* menu_entry_new(ObMenu *menu, ObMenuEntryType type, gint id)

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.11.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2010-08-22 21:33+0200\n"
 "Last-Translator: Davide Truffa <davide@catoblepa.org>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "L'azione \"%s\" richiesta non è valida e non esiste."
@@ -42,7 +42,7 @@ msgstr "Esegui"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Impossibile convertire il percorso utf8 \"%s\""
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -78,7 +78,7 @@ msgstr "Termino..."
 msgid "Not Responding"
 msgstr "Non Risponde"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -87,11 +87,11 @@ msgstr ""
 "La finestra \"%s\" sembra non rispondere. Vuoi forzarne l'uscita inviando il "
 "segnale %s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Termina Processo"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -99,7 +99,7 @@ msgid ""
 msgstr ""
 "La finestra \"%s\" non sembra rispondere. Vuoi disconnetterla dal server X?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Disconnesso"
 
@@ -187,17 +187,17 @@ msgstr "Si/No _Decorazioni"
 msgid "_Close"
 msgstr "_Chiudi"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Il contesto \"%s\" indicato nelle associazioni mouse non è valido"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Il pulsante \"%s\" indicato nel file di configurazione non è valido"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

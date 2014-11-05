@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2011-09-03 16:09+0200\n"
 "Last-Translator: Laszlo Dvornik <rezuri@zoho.com>\n"
 "Language-Team: Hungarian\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Érvénytelen művelet \"%s\". Nem létezik ilyen művelet."
@@ -40,7 +40,7 @@ msgstr "Végrehajtás"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Az útvonalat nem sikerült átalakítani utf8-ból: \"%s\""
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Mégsem"
 
@@ -76,7 +76,7 @@ msgstr "Kilövés..."
 msgid "Not Responding"
 msgstr "Nem válaszol"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -84,18 +84,18 @@ msgid ""
 msgstr ""
 "A(z) \"%s\" ablak nem válaszol. Erőltessük a kilépést a %s jelzés küldésével?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Folyamat vége"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "A(z) \"%s\" ablak nem válaszol. Lekapcsoljuk az X kiszolgálóról?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Lekapcsolódás"
 
@@ -183,17 +183,17 @@ msgstr "_Dekoráció eltávolítása"
 msgid "_Close"
 msgstr "_Bezárás"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Érvénytelen környezet az egér hozzárendeléseknél: \"%s\""
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Érvénytelen gomb a konfigurációs fájlban \"%s\""
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

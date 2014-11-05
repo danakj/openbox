@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2013-01-09 13:17+0200\n"
 "Last-Translator: Algimantas Margevičius <margevicius.algimantas@gmail.com>\n"
 "Language-Team: Lietuvių <>\n"
@@ -21,7 +21,7 @@ msgstr ""
 "%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Generator: Gtranslator 2.91.5\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Pareikalauta netinkamo veiksmo „%s“. Toks veiksmas neegzistuoja."
@@ -43,7 +43,7 @@ msgstr "Vykdyti"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Nepavyko išversti kelio „%s“ iš utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Atšaukti"
 
@@ -79,7 +79,7 @@ msgstr "Nutraukiama..."
 msgid "Not Responding"
 msgstr "Neatsako"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -88,18 +88,18 @@ msgstr ""
 "Langas „%s“ neatsako.  Ar norite priverstinai nutraukti vykdymą nusiųsdami "
 "%s signalą?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Baigti procesą"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Langas „%s“ neatsako.  Ar norite atjungti jį nuo X serverio?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Atjungti"
 
@@ -187,17 +187,17 @@ msgstr "Ne/d_ekoruoti"
 msgid "_Close"
 msgstr "_Užverti"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Netinkamas kontekstas „%s“ pelės susiejime"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Nustatymų faile nurodytas netinkamas pelės klavišas „%s“"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

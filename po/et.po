@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.11.1\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2010-04-21 21:40+0300\n"
 "Last-Translator: mihkel <turakas@gmail.com>\n"
 "Language-Team: Estonian <et@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Taotleti kehtetut käsklust \"%s\". Sellist käsklust pole olemas."
@@ -41,7 +41,7 @@ msgstr "Käivita"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Raja \"%s\" ümberkodeerimine UTF8-st ebaõnnestus"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Katkesta"
 
@@ -77,7 +77,7 @@ msgstr "Tapan..."
 msgid "Not Responding"
 msgstr "Ei vasta"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -86,11 +86,11 @@ msgstr ""
 "Paistab, et aken \"%s\" ei vasta enam. Kas soovid teda jõuga väljuma sundida "
 "saates %s signaali?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Lõpeta protsess"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -99,7 +99,7 @@ msgstr ""
 "Paistab, et aken \"%s\" ei vasta enam. Kas soovid ta X serverist lahti "
 "ühendada?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Ühenda lahti"
 
@@ -187,17 +187,17 @@ msgstr "Äär_ed sisse/välja"
 msgid "_Close"
 msgstr "S_ulge"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Vigane kontekst \"%s\" hiire kiirklahvides"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Vigane nupp \"%s\" määratud seadistuste failis"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

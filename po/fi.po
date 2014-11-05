@@ -10,17 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.11\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2010-03-13 21:56+0100\n"
 "Last-Translator: Lauri Hakko <aperculum@gmail.com>\n"
 "Language-Team: None\n"
-"Language: \n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Pyydettiin virheellinen toiminto \"%s\". Toimintoa ei ole olemassa."
@@ -42,7 +42,7 @@ msgstr "Suorita"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Polun \"%s\" muuntaminen utf8:sta epäonnistui"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Peruuta"
 
@@ -78,7 +78,7 @@ msgstr "Tapetaan..."
 msgid "Not Responding"
 msgstr "Ei vastaa"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -87,11 +87,11 @@ msgstr ""
 "Ikkuna \"%s\" ei näytä vastaavan.  Haluatko sulkea sen lähettämällä sille "
 "singaalin %s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Lopeta prosessi"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -100,7 +100,7 @@ msgstr ""
 "Ikkuna \"%s\" ei näytä vastaavan.  Haluatko katkaista sen yhteyden X-"
 "palvelimeen?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Katkaise yhteys"
 
@@ -188,17 +188,17 @@ msgstr "(Epä)_reunusta"
 msgid "_Close"
 msgstr "_Sulje"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Virheellinen asiayhteys \"%s\" hiirisidonnoissa"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Asetustiedostossa määritelty painike \"%s\" on virheellinen"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

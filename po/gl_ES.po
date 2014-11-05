@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.5.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2014-11-05 10:30+0100\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2013-10-29 18:52+0100\n"
 "Last-Translator: Javier Mancebo <palleiros@yahoo.es>\n"
 "Language-Team: Galician\n"
-"Language: Galician\n"
+"Language: gl_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -201,7 +201,7 @@ msgid ""
 msgstr ""
 
 #: openbox/debug.c:57
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to make directory '%s': %s"
 msgstr "Imposible crea-lo directorio \"%s\": %s"
 
@@ -301,13 +301,12 @@ msgid "Syntax: openbox [options]\n"
 msgstr "Sintaxe: openbox [opcións]\n"
 
 #: openbox/openbox.c:533
-#, fuzzy
 msgid ""
 "\n"
 "Options:\n"
 msgstr ""
 "\n"
-"Opcións de depuración:\n"
+"Opcións:\n"
 
 #: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
@@ -366,9 +365,8 @@ msgid "  --sync              Run in synchronous mode\n"
 msgstr "  --sync              Executar en modo síncrono\n"
 
 #: openbox/openbox.c:548
-#, fuzzy
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr "  --restart           Reiniciar Openbox\n"
+msgstr ""
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
@@ -379,9 +377,8 @@ msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr "  --debug-focus       Amosa-la saída de depuración manualmente\n"
 
 #: openbox/openbox.c:551
-#, fuzzy
 msgid "  --debug-session     Display debugging output for session management\n"
-msgstr "  --debug-focus       Amosa-la saída de depuración manualmente\n"
+msgstr ""
 
 #: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
@@ -399,9 +396,9 @@ msgstr ""
 "Faga o favor de notificar bugs a %s\n"
 
 #: openbox/openbox.c:636 openbox/openbox.c:670
-#, fuzzy, c-format
+#, c-format
 msgid "%s requires an argument\n"
-msgstr "--config-file require un argumento\n"
+msgstr "%s require un argumento\n"
 
 #: openbox/openbox.c:713
 #, c-format

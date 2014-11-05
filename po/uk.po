@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2008-12-09 20:12+0200\n"
 "Last-Translator: Serhiy Lysovenko <lisovenko.s[at]gmail[dot]com>\n"
 "Language-Team: Ukrainian <linux.org.ua>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Здійснено запит на неіснуючу дію \"%s\"."
@@ -40,7 +40,7 @@ msgstr "Виконати"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Не вдалося конвертувати шлях \"%s\" з utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Скасувати"
 
@@ -76,7 +76,7 @@ msgstr "Знищення..."
 msgid "Not Responding"
 msgstr "Не відповідає"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -85,18 +85,18 @@ msgstr ""
 "Схоже, вікно \"%s\" не відповідає. Чи бажаєте примусово завершити програму, "
 "пославши сигнал \"%s\"?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Примусове завершення"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Вікно \"%s\" не відповідає. Чи бажаєте його від'єднати від X сервера?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Від'єднати"
 
@@ -184,17 +184,17 @@ msgstr "Перемкнути декорацію (_D)"
 msgid "_Close"
 msgstr "Закрити (_C)"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Некоректний контекст \"%s\" в прив'язці клавіш мишки"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Некоректна кнопка \"%s\" вказана у файлі конфігурації"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.5\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2012-12-11 18:47+0400\n"
 "Last-Translator: Nik Kalach <nikka@fedoraproject.org>\n"
 "Language-Team: Interlingua (International Auxiliary Language Association) "
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 2.91.5\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Le action requestate \"%s\" es invalide. Nulle tal action existe."
@@ -40,7 +40,7 @@ msgstr "Exequer"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Insuccesso al converter le percurso \"%s\" desde utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Annullar"
 
@@ -76,7 +76,7 @@ msgstr "Termination..."
 msgid "Not Responding"
 msgstr "Non es respondente"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -85,11 +85,11 @@ msgstr ""
 "Le fenestra \"%s\" non sembla esser respondente. Vole tu fortiar lo a sortir "
 "per inviar le signal %s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Finir processo"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -98,7 +98,7 @@ msgstr ""
 "Le fenestra \"%s\" non sembla esser respondente. Vole tu disconnecter lo del "
 "servitor X?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Disconnecter"
 
@@ -186,17 +186,17 @@ msgstr "_Decorar/Indecorar"
 msgid "_Close"
 msgstr "_Clauder"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Contexto \"%s\" incorrecte in le parametros del mouse"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Button invalide \"%s\" es specificate in le file de configuration"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

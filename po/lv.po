@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 3.4.10\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2010-01-08 21:11+0200\n"
 "Last-Translator: Einars Sprugis <einars8@gmail.com>\n"
 "Language-Team: Latvian <locale@laka.lv>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "2);\n"
 "X-Generator: Lokalize 1.0\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Prasīta neatļauta darbība \"%s\". Šāda darbība neeksistē."
@@ -41,7 +41,7 @@ msgstr "Izpildīt"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Neizdevās pārveidot ceļu \"%s\" no utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Atcelt"
 
@@ -77,7 +77,7 @@ msgstr "Nogalina..."
 msgid "Not Responding"
 msgstr "Neatbild"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -86,18 +86,18 @@ msgstr ""
 "Logs \"%s\" neatbild. Vai vēlieties to aizvērt piespiedu kārtā, nosūtot "
 "signālu %s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Nobeigt procesu"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "Logs \"%s\" neatbild. Vai vēlaties to atvienot no X servera?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Atvienot"
 
@@ -185,17 +185,17 @@ msgstr "Bez/Ar _dekorācijām"
 msgid "_Close"
 msgstr "Ai_zvērt"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Neatļauts konteksts \"%s\" peles saīsnē"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Konfigurācijas failā \"%s\" norādīts neatļauts taustiņš"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

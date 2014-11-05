@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2011-08-01 18:11+0100\n"
 "Last-Translator: Mikael Magnusson <mikachu@icculus.org>\n"
 "Language-Team: None\n"
-"Language: \n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Ogiltig action \"%s\" efterfrågades, men den finns inte."
@@ -39,7 +39,7 @@ msgstr "Kör"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Lyckades inte konvertera sökvägen \"%s\" från utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -75,7 +75,7 @@ msgstr "Dödar..."
 msgid "Not Responding"
 msgstr "Svarar inte"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -84,11 +84,11 @@ msgstr ""
 "Fönstret \"%s\" verkar inte svara.  Vill du tvinga det att avslutas genom "
 "att skicka signalen %s?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Avsluta process"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -97,7 +97,7 @@ msgstr ""
 "Fönstret \"%s\" verkar inte svara.  Vill du stänga dess anslutning till X-"
 "servern?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Stäng anslutning"
 
@@ -185,17 +185,17 @@ msgstr "_Dekorationer"
 msgid "_Close"
 msgstr "Stän_g"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Ogiltig kontext \"%s\" i musbindning"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Ogiltig knapp \"%s\" angiven i konfigurationsfilen"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

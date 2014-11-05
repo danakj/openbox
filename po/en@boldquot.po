@@ -1,7 +1,7 @@
 # English translations for openbox package.
-# Copyright (C) 2013 Dana Jansens
+# Copyright (C) 2014 Dana Jansens
 # This file is distributed under the same license as the openbox package.
-# Automatically generated, 2013.
+# Automatically generated, 2014.
 #
 # All this catalog "translates" are quotation characters.
 # The msgids must be ASCII and therefore cannot contain real quotation
@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openbox 3.5.2\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
-"PO-Revision-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
+"PO-Revision-Date: 2014-11-05 16:51+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en\n"
@@ -42,7 +42,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Invalid action “[1m%s[0m” requested. No such action exists."
@@ -64,7 +64,7 @@ msgstr "Execute"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Failed to convert the path “[1m%s[0m” from utf8"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -100,7 +100,7 @@ msgstr "Killing..."
 msgid "Not Responding"
 msgstr "Not Responding"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -109,11 +109,11 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to force "
 "it to exit by sending the %s signal?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "End Process"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -122,7 +122,7 @@ msgstr ""
 "The window “[1m%s[0m” does not seem to be responding.  Do you want to "
 "disconnect it from the X server?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Disconnect"
 
@@ -210,17 +210,17 @@ msgstr "Un/_Decorate"
 msgid "_Close"
 msgstr "_Close"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Invalid context “[1m%s[0m” in mouse binding"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Invalid button “[1m%s[0m” specified in config file"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

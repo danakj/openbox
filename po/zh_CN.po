@@ -9,17 +9,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2008-03-11 22:07+0800\n"
 "Last-Translator: zhou sf <sxzzsf@gmail.com>\n"
 "Language-Team: Simplified Chinese\n"
-"Language: \n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "请求的动作 \"%s\" 无效。该动作不存在。"
@@ -41,7 +41,7 @@ msgstr "执行"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "从 utf8 转换路径 \"%s\" 时失败"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "取消"
 
@@ -77,25 +77,25 @@ msgstr "杀死中..."
 msgid "Not Responding"
 msgstr "无响应"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr "窗口 \"%s\" 似乎失去了响应. 发送信号 %s 以强制退出吗?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "结束进程"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
 msgstr "窗口 \"%s\" 似乎失去了响应. 断开其与 X 服务器的连接?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "断开连接"
 
@@ -183,17 +183,17 @@ msgstr "去除装饰(_D)"
 msgid "_Close"
 msgstr "关闭(_C)"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "鼠标绑定中无效的上下文 \"%s\""
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "配置文件中指定的按钮 \"%s\" 无效"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

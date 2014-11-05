@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2012-02-20 11:26+0700\n"
 "Last-Translator: aspersieman <aspersieman@gmail.com>\n"
 "Language-Team: Afrikaans\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "Ongeldige aksie \"%s\" versoek. Daar is geen sodanige aksie nie."
@@ -40,7 +40,7 @@ msgstr "Voer uit"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "Versuim om die pad \"%s\" vanaf utf8 te omskep."
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "Kanselleer"
 
@@ -76,7 +76,7 @@ msgstr "Beëindig..."
 msgid "Not Responding"
 msgstr "Reageer Nie"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -85,11 +85,11 @@ msgstr ""
 "Die venster \"%s\" lyk nie asof dit reageer nie. Wil jy dit vorseer om te "
 "eindig deur dit die %s sein te stuur?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Beëindig Proses"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -98,7 +98,7 @@ msgstr ""
 "Die venster \"%s\" lyk nie asof dit reageer nie. Wil jy dit afsluitvan die X-"
 "bediener?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Sluit Af"
 
@@ -186,17 +186,17 @@ msgstr "Ve_rsier/Nie-versier"
 msgid "_Close"
 msgstr "_Sluit"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Ongeldige konteks \"%s\" in die muis binding"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Ongeldige knoppie \"%s\" is gespesifiseer in die konfigurasielêer"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

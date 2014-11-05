@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
-"POT-Creation-Date: 2013-08-11 13:47-0400\n"
+"POT-Creation-Date: 2014-11-05 16:51+0100\n"
 "PO-Revision-Date: 2011-04-28 00:23+0300\n"
 "Last-Translator: Muhammet Kara <muhammet.k@gmail.com>\n"
 "Language-Team: Turkish <gnome-turk@gnome.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n == 1 ? 0 : 1;\n"
 
-#: openbox/actions.c:216
+#: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
 msgstr "\"%s\" geçersiz eylem isteği. Böyle bir eylem yok."
@@ -40,7 +40,7 @@ msgstr "Çalıştır"
 msgid "Failed to convert the path \"%s\" from utf8"
 msgstr "\"%s\" yolu utf8'e çevrilmesi başarısız oldu"
 
-#: openbox/actions/exit.c:69 openbox/client.c:3659
+#: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
 msgstr "İptal"
 
@@ -76,7 +76,7 @@ msgstr "Sonlandırılıyor..."
 msgid "Not Responding"
 msgstr "Cevap Vermiyor"
 
-#: openbox/client.c:3648
+#: openbox/client.c:3654
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
@@ -85,11 +85,11 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. %s sinyali göndererek zorla "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3650
+#: openbox/client.c:3656
 msgid "End Process"
 msgstr "Süreci Sonlandır"
 
-#: openbox/client.c:3654
+#: openbox/client.c:3660
 #, c-format
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
@@ -98,7 +98,7 @@ msgstr ""
 "\"%s\" penceresi cevap veriyor gibi görünmüyor. X sunucusu ile bağlantısını "
 "sonlandırmak ister misiniz?"
 
-#: openbox/client.c:3656
+#: openbox/client.c:3662
 msgid "Disconnect"
 msgstr "Bağlantıyı Kes"
 
@@ -186,17 +186,17 @@ msgstr "Geri Al/Kapla"
 msgid "_Close"
 msgstr "_Kapat"
 
-#: openbox/config.c:556
+#: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
 msgstr "Fare bağında geçersinz \"%s\" içeriği"
 
-#: openbox/config.c:908
+#: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
 msgstr "Yapılandırılma dosyasında belirtilmiş geçersiz \"%s\" düğmesi"
 
-#: openbox/config.c:933
+#: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."

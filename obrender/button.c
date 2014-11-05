@@ -37,16 +37,16 @@ RrButton *RrButtonNew (const RrInstance *inst)
     out->unfocused_unpressed_color = NULL;
     out->focused_pressed_color = NULL;
     out->unfocused_pressed_color = NULL;
-    out->disabled_focused_color = NULL;
-    out->disabled_unfocused_color = NULL;
-    out->hover_focused_color = NULL;
-    out->hover_unfocused_color = NULL;
-    out->toggled_hover_focused_color = NULL;
-    out->toggled_hover_unfocused_color = NULL;
-    out->toggled_focused_pressed_color = NULL;
-    out->toggled_unfocused_pressed_color = NULL;
-    out->toggled_focused_unpressed_color = NULL;
-    out->toggled_unfocused_unpressed_color = NULL;
+    out->focused_disabled_color = NULL;
+    out->unfocused_disabled_color = NULL;
+    out->focused_hover_color = NULL;
+    out->unfocused_hover_color = NULL;
+    out->focused_hover_toggled_color = NULL;
+    out->unfocused_hover_toggled_color = NULL;
+    out->focused_pressed_toggled_color = NULL;
+    out->unfocused_pressed_toggled_color = NULL;
+    out->focused_unpressed_toggled_color = NULL;
+    out->unfocused_unpressed_toggled_color = NULL;
 
     /* same with masks */
     out->mask = NULL;
@@ -54,24 +54,24 @@ RrButton *RrButtonNew (const RrInstance *inst)
     out->disabled_mask = NULL;
     out->hover_mask = NULL;
     out->toggled_mask = NULL;
-    out->toggled_hover_mask = NULL;
-    out->toggled_pressed_mask = NULL;
+    out->hover_toggled_mask = NULL;
+    out->pressed_toggled_mask = NULL;
 
     /* allocate appearances */
     out->a_focused_unpressed = RrAppearanceNew(inst, 1);
     out->a_unfocused_unpressed = RrAppearanceNew(inst, 1);
     out->a_focused_pressed = RrAppearanceNew(inst, 1);
     out->a_unfocused_pressed = RrAppearanceNew(inst, 1);
-    out->a_disabled_focused = RrAppearanceNew(inst, 1);
-    out->a_disabled_unfocused = RrAppearanceNew(inst, 1);
-    out->a_hover_focused = RrAppearanceNew(inst, 1);
-    out->a_hover_unfocused = RrAppearanceNew(inst, 1);
-    out->a_toggled_focused_unpressed = RrAppearanceNew(inst, 1);
-    out->a_toggled_unfocused_unpressed = RrAppearanceNew(inst, 1);
-    out->a_toggled_focused_pressed = RrAppearanceNew(inst, 1);
-    out->a_toggled_unfocused_pressed = RrAppearanceNew(inst, 1);
-    out->a_toggled_hover_focused = RrAppearanceNew(inst, 1);
-    out->a_toggled_hover_unfocused = RrAppearanceNew(inst, 1);
+    out->a_focused_disabled = RrAppearanceNew(inst, 1);
+    out->a_unfocused_disabled = RrAppearanceNew(inst, 1);
+    out->a_focused_hover = RrAppearanceNew(inst, 1);
+    out->a_unfocused_hover = RrAppearanceNew(inst, 1);
+    out->a_focused_unpressed_toggled = RrAppearanceNew(inst, 1);
+    out->a_unfocused_unpressed_toggled = RrAppearanceNew(inst, 1);
+    out->a_focused_pressed_toggled = RrAppearanceNew(inst, 1);
+    out->a_unfocused_pressed_toggled = RrAppearanceNew(inst, 1);
+    out->a_focused_hover_toggled = RrAppearanceNew(inst, 1);
+    out->a_unfocused_hover_toggled = RrAppearanceNew(inst, 1);
 
     return out;
 }
@@ -87,26 +87,26 @@ void RrButtonFree(RrButton *b)
         RrColorFree(b->focused_pressed_color);
     if (b->unfocused_pressed_color) 
         RrColorFree(b->unfocused_pressed_color);
-    if (b->disabled_focused_color) 
-        RrColorFree(b->disabled_focused_color);
-    if (b->disabled_unfocused_color) 
-        RrColorFree(b->disabled_unfocused_color);
-    if (b->hover_focused_color) 
-        RrColorFree(b->hover_focused_color);
-    if (b->hover_unfocused_color) 
-        RrColorFree(b->hover_unfocused_color);
-    if (b->toggled_hover_focused_color) 
-        RrColorFree(b->toggled_hover_focused_color);
-    if (b->toggled_hover_unfocused_color) 
-        RrColorFree(b->toggled_hover_unfocused_color);
-    if (b->toggled_focused_pressed_color) 
-        RrColorFree(b->toggled_focused_pressed_color);
-    if (b->toggled_unfocused_pressed_color) 
-        RrColorFree(b->toggled_unfocused_pressed_color);
-    if (b->toggled_focused_unpressed_color) 
-        RrColorFree(b->toggled_focused_unpressed_color);
-    if (b->toggled_unfocused_unpressed_color) 
-        RrColorFree(b->toggled_unfocused_unpressed_color);
+    if (b->focused_disabled_color) 
+        RrColorFree(b->focused_disabled_color);
+    if (b->unfocused_disabled_color) 
+        RrColorFree(b->unfocused_disabled_color);
+    if (b->focused_hover_color) 
+        RrColorFree(b->focused_hover_color);
+    if (b->unfocused_hover_color) 
+        RrColorFree(b->unfocused_hover_color);
+    if (b->focused_hover_toggled_color) 
+        RrColorFree(b->focused_hover_toggled_color);
+    if (b->unfocused_hover_toggled_color) 
+        RrColorFree(b->unfocused_hover_toggled_color);
+    if (b->focused_pressed_toggled_color) 
+        RrColorFree(b->focused_pressed_toggled_color);
+    if (b->unfocused_pressed_toggled_color) 
+        RrColorFree(b->unfocused_pressed_toggled_color);
+    if (b->focused_unpressed_toggled_color) 
+        RrColorFree(b->focused_unpressed_toggled_color);
+    if (b->unfocused_unpressed_toggled_color) 
+        RrColorFree(b->unfocused_unpressed_toggled_color);
 
     /* masks */
     if (b->mask) RrPixmapMaskFree(b->mask);
@@ -114,22 +114,22 @@ void RrButtonFree(RrButton *b)
     if (b->disabled_mask) RrPixmapMaskFree(b->disabled_mask);
     if (b->hover_mask) RrPixmapMaskFree(b->hover_mask);
     if (b->toggled_mask) RrPixmapMaskFree(b->toggled_mask);
-    if (b->toggled_hover_mask) RrPixmapMaskFree(b->toggled_hover_mask);
-    if (b->toggled_pressed_mask) RrPixmapMaskFree(b->toggled_pressed_mask);
+    if (b->hover_toggled_mask) RrPixmapMaskFree(b->hover_toggled_mask);
+    if (b->pressed_toggled_mask) RrPixmapMaskFree(b->pressed_toggled_mask);
 
     /* appearances */
     RrAppearanceFree(b->a_focused_unpressed);
     RrAppearanceFree(b->a_unfocused_unpressed);
     RrAppearanceFree(b->a_focused_pressed);
     RrAppearanceFree(b->a_unfocused_pressed);
-    RrAppearanceFree(b->a_disabled_focused);
-    RrAppearanceFree(b->a_disabled_unfocused);
-    RrAppearanceFree(b->a_hover_focused);
-    RrAppearanceFree(b->a_hover_unfocused);
-    RrAppearanceFree(b->a_toggled_focused_unpressed);
-    RrAppearanceFree(b->a_toggled_unfocused_unpressed);
-    RrAppearanceFree(b->a_toggled_focused_pressed);
-    RrAppearanceFree(b->a_toggled_unfocused_pressed);
-    RrAppearanceFree(b->a_toggled_hover_focused);
-    RrAppearanceFree(b->a_toggled_hover_unfocused);
+    RrAppearanceFree(b->a_focused_disabled);
+    RrAppearanceFree(b->a_unfocused_disabled);
+    RrAppearanceFree(b->a_focused_hover);
+    RrAppearanceFree(b->a_unfocused_hover);
+    RrAppearanceFree(b->a_focused_unpressed_toggled);
+    RrAppearanceFree(b->a_unfocused_unpressed_toggled);
+    RrAppearanceFree(b->a_focused_pressed_toggled);
+    RrAppearanceFree(b->a_unfocused_pressed_toggled);
+    RrAppearanceFree(b->a_focused_hover_toggled);
+    RrAppearanceFree(b->a_unfocused_hover_toggled);
 }

@@ -295,16 +295,16 @@ struct _RrButton {
     RrColor *unfocused_unpressed_color;
     RrColor *focused_pressed_color;
     RrColor *unfocused_pressed_color;
-    RrColor *disabled_focused_color;
-    RrColor *disabled_unfocused_color;
-    RrColor *hover_focused_color;
-    RrColor *hover_unfocused_color;
-    RrColor *toggled_hover_focused_color;
-    RrColor *toggled_hover_unfocused_color;
-    RrColor *toggled_focused_pressed_color;
-    RrColor *toggled_unfocused_pressed_color;
-    RrColor *toggled_focused_unpressed_color;
-    RrColor *toggled_unfocused_unpressed_color;
+    RrColor *focused_disabled_color;
+    RrColor *unfocused_disabled_color;
+    RrColor *focused_hover_color;
+    RrColor *unfocused_hover_color;
+    RrColor *focused_hover_toggled_color;
+    RrColor *unfocused_hover_toggled_color;
+    RrColor *focused_pressed_toggled_color;
+    RrColor *unfocused_pressed_toggled_color;
+    RrColor *focused_unpressed_toggled_color;
+    RrColor *unfocused_unpressed_toggled_color;
     
     /* masks */
     RrPixmapMask *mask;
@@ -312,24 +312,24 @@ struct _RrButton {
     RrPixmapMask *disabled_mask;
     RrPixmapMask *hover_mask;
     RrPixmapMask *toggled_mask;
-    RrPixmapMask *toggled_hover_mask;
-    RrPixmapMask *toggled_pressed_mask;
+    RrPixmapMask *hover_toggled_mask;
+    RrPixmapMask *pressed_toggled_mask;
    
     /* textures */
     RrAppearance *a_focused_unpressed;
     RrAppearance *a_unfocused_unpressed;
     RrAppearance *a_focused_pressed;
     RrAppearance *a_unfocused_pressed;
-    RrAppearance *a_disabled_focused;
-    RrAppearance *a_disabled_unfocused;
-    RrAppearance *a_hover_focused;
-    RrAppearance *a_hover_unfocused;
-    RrAppearance *a_toggled_focused_unpressed;
-    RrAppearance *a_toggled_unfocused_unpressed;
-    RrAppearance *a_toggled_focused_pressed;
-    RrAppearance *a_toggled_unfocused_pressed;
-    RrAppearance *a_toggled_hover_focused;
-    RrAppearance *a_toggled_hover_unfocused;
+    RrAppearance *a_focused_disabled;
+    RrAppearance *a_unfocused_disabled;
+    RrAppearance *a_focused_hover;
+    RrAppearance *a_unfocused_hover;
+    RrAppearance *a_focused_unpressed_toggled;
+    RrAppearance *a_unfocused_unpressed_toggled;
+    RrAppearance *a_focused_pressed_toggled;
+    RrAppearance *a_unfocused_pressed_toggled;
+    RrAppearance *a_focused_hover_toggled;
+    RrAppearance *a_unfocused_hover_toggled;
 
 };
 

@@ -550,21 +550,6 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->def_win_icon_w = OB_DEFAULT_ICON_WIDTH;
     theme->def_win_icon_h = OB_DEFAULT_ICON_HEIGHT;
 
-    /* the toggled hover mask = the toggled unpressed mask (i.e. no change) */
-    theme->btn_max->toggled_hover_mask =
-        RrPixmapMaskCopy(theme->btn_max->toggled_mask);
-    theme->btn_desk->toggled_hover_mask =
-        RrPixmapMaskCopy(theme->btn_desk->toggled_mask);
-    theme->btn_shade->toggled_hover_mask =
-        RrPixmapMaskCopy(theme->btn_shade->toggled_mask);
-    /* the toggled pressed mask = the toggled unpressed mask (i.e. no change)*/
-    theme->btn_max->toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->btn_max->toggled_mask);
-    theme->btn_desk->toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->btn_desk->toggled_mask);
-    theme->btn_shade->toggled_pressed_mask =
-        RrPixmapMaskCopy(theme->btn_shade->toggled_mask);
-
     /* read the decoration textures */
     READ_APPEARANCE("window.active.title.bg", theme->a_focused_title, FALSE);
     READ_APPEARANCE("window.inactive.title.bg", theme->a_unfocused_title,

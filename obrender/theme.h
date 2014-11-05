@@ -114,15 +114,7 @@ struct _RrTheme {
     RrColor *osd_pressed_lineart;
     RrColor *osd_focused_lineart;
     RrColor *menu_title_shadow_color;
-    gchar    menu_title_shadow_alpha;
-    RrColor *menu_text_normal_shadow_color;
-    gchar    menu_text_normal_shadow_alpha;
-    RrColor *menu_text_selected_shadow_color;
-    gchar    menu_text_selected_shadow_alpha;
-    RrColor *menu_text_disabled_shadow_color;
-    gchar    menu_text_disabled_shadow_alpha;
-    RrColor *menu_text_disabled_selected_shadow_color;
-    gchar    menu_text_disabled_selected_shadow_alpha;
+    RrColor *menu_text_shadow_color;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* RGBA */

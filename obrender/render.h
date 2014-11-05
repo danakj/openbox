@@ -307,11 +307,11 @@ struct _RrButton {
     RrColor *unfocused_unpressed_toggled_color;
     
     /* masks */
-    RrPixmapMask *mask;
+    RrPixmapMask *unpressed_mask;
     RrPixmapMask *pressed_mask;
     RrPixmapMask *disabled_mask;
     RrPixmapMask *hover_mask;
-    RrPixmapMask *toggled_mask;
+    RrPixmapMask *unpressed_toggled_mask;
     RrPixmapMask *hover_toggled_mask;
     RrPixmapMask *pressed_toggled_mask;
    

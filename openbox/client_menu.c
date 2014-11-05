@@ -276,7 +276,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
         if ((desk == DESKTOP_ALL && c->desktop != DESKTOP_ALL) ||
             (c->desktop == DESKTOP_ALL && desk == screen_desktop))
         {
-            e->data.normal.mask = ob_rr_theme->btn_desk->mask;
+            e->data.normal.mask = ob_rr_theme->btn_desk->unpressed_mask;
             set_icon_color(e);
         } else
             e->data.normal.mask = NULL;
@@ -392,7 +392,7 @@ void client_menu_startup(void)
     menu_add_submenu(menu, CLIENT_LAYER, LAYER_MENU_NAME);
 
     e = menu_add_normal(menu, CLIENT_RESTORE, _("R_estore"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_max->toggled_mask;
+    e->data.normal.mask = ob_rr_theme->btn_max->unpressed_toggled_mask;
     set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_MOVE, _("_Move"), NULL, TRUE);
@@ -400,15 +400,15 @@ void client_menu_startup(void)
     menu_add_normal(menu, CLIENT_RESIZE, _("Resi_ze"), NULL, TRUE);
 
     e = menu_add_normal(menu, CLIENT_ICONIFY, _("Ico_nify"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_iconify->mask;
+    e->data.normal.mask = ob_rr_theme->btn_iconify->unpressed_mask;
     set_icon_color(e);
 
     e = menu_add_normal(menu, CLIENT_MAXIMIZE, _("Ma_ximize"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_max->mask;
+    e->data.normal.mask = ob_rr_theme->btn_max->unpressed_mask;
     set_icon_color(e);
 
     e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_shade->mask;
+    e->data.normal.mask = ob_rr_theme->btn_shade->unpressed_mask;
     set_icon_color(e);
 
     menu_add_normal(menu, CLIENT_DECORATE, _("Un/_Decorate"), NULL, TRUE);
@@ -416,6 +416,6 @@ void client_menu_startup(void)
     menu_add_separator(menu, -1, NULL);
 
     e = menu_add_normal(menu, CLIENT_CLOSE, _("_Close"), NULL, TRUE);
-    e->data.normal.mask = ob_rr_theme->btn_close->mask;
+    e->data.normal.mask = ob_rr_theme->btn_close->unpressed_mask;
     set_icon_color(e);
 }

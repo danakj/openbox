@@ -29,33 +29,9 @@ RrButton *RrButtonNew (const RrInstance *inst)
 {
     RrButton *out = NULL;
 
-    out = g_new(RrButton, 1);
+    /* no need to alloc colors and masks, set them null (for freeing later) */
+    out = g_new0(RrButton, 1);
     out->inst = inst;
-
-    /* no need to alloc colors, set them null (for freeing later) */
-    out->focused_unpressed_color = NULL;
-    out->unfocused_unpressed_color = NULL;
-    out->focused_pressed_color = NULL;
-    out->unfocused_pressed_color = NULL;
-    out->focused_disabled_color = NULL;
-    out->unfocused_disabled_color = NULL;
-    out->focused_hover_color = NULL;
-    out->unfocused_hover_color = NULL;
-    out->focused_hover_toggled_color = NULL;
-    out->unfocused_hover_toggled_color = NULL;
-    out->focused_pressed_toggled_color = NULL;
-    out->unfocused_pressed_toggled_color = NULL;
-    out->focused_unpressed_toggled_color = NULL;
-    out->unfocused_unpressed_toggled_color = NULL;
-
-    /* same with masks */
-    out->mask = NULL;
-    out->pressed_mask = NULL;
-    out->disabled_mask = NULL;
-    out->hover_mask = NULL;
-    out->toggled_mask = NULL;
-    out->hover_toggled_mask = NULL;
-    out->pressed_toggled_mask = NULL;
 
     /* allocate appearances */
     out->a_focused_unpressed = RrAppearanceNew(inst, 1);
@@ -79,43 +55,29 @@ RrButton *RrButtonNew (const RrInstance *inst)
 void RrButtonFree(RrButton *b)
 {
     /* colors */
-    if (b->focused_unpressed_color) 
-        RrColorFree(b->focused_unpressed_color);
-    if (b->unfocused_unpressed_color) 
-        RrColorFree(b->unfocused_unpressed_color);
-    if (b->focused_pressed_color) 
-        RrColorFree(b->focused_pressed_color);
-    if (b->unfocused_pressed_color) 
-        RrColorFree(b->unfocused_pressed_color);
-    if (b->focused_disabled_color) 
-        RrColorFree(b->focused_disabled_color);
-    if (b->unfocused_disabled_color) 
-        RrColorFree(b->unfocused_disabled_color);
-    if (b->focused_hover_color) 
-        RrColorFree(b->focused_hover_color);
-    if (b->unfocused_hover_color) 
-        RrColorFree(b->unfocused_hover_color);
-    if (b->focused_hover_toggled_color) 
-        RrColorFree(b->focused_hover_toggled_color);
-    if (b->unfocused_hover_toggled_color) 
-        RrColorFree(b->unfocused_hover_toggled_color);
-    if (b->focused_pressed_toggled_color) 
-        RrColorFree(b->focused_pressed_toggled_color);
-    if (b->unfocused_pressed_toggled_color) 
-        RrColorFree(b->unfocused_pressed_toggled_color);
-    if (b->focused_unpressed_toggled_color) 
-        RrColorFree(b->focused_unpressed_toggled_color);
-    if (b->unfocused_unpressed_toggled_color) 
-        RrColorFree(b->unfocused_unpressed_toggled_color);
+    RrColorFree(b->focused_unpressed_color);
+    RrColorFree(b->unfocused_unpressed_color);
+    RrColorFree(b->focused_pressed_color);
+    RrColorFree(b->unfocused_pressed_color);
+    RrColorFree(b->focused_disabled_color);
+    RrColorFree(b->unfocused_disabled_color);
+    RrColorFree(b->focused_hover_color);
+    RrColorFree(b->unfocused_hover_color);
+    RrColorFree(b->focused_hover_toggled_color);
+    RrColorFree(b->unfocused_hover_toggled_color);
+    RrColorFree(b->focused_pressed_toggled_color);
+    RrColorFree(b->unfocused_pressed_toggled_color);
+    RrColorFree(b->focused_unpressed_toggled_color);
+    RrColorFree(b->unfocused_unpressed_toggled_color);
 
     /* masks */
-    if (b->mask) RrPixmapMaskFree(b->mask);
-    if (b->pressed_mask) RrPixmapMaskFree(b->pressed_mask);
-    if (b->disabled_mask) RrPixmapMaskFree(b->disabled_mask);
-    if (b->hover_mask) RrPixmapMaskFree(b->hover_mask);
-    if (b->toggled_mask) RrPixmapMaskFree(b->toggled_mask);
-    if (b->hover_toggled_mask) RrPixmapMaskFree(b->hover_toggled_mask);
-    if (b->pressed_toggled_mask) RrPixmapMaskFree(b->pressed_toggled_mask);
+    RrPixmapMaskFree(b->unpressed_mask);
+    RrPixmapMaskFree(b->pressed_mask);
+    RrPixmapMaskFree(b->disabled_mask);
+    RrPixmapMaskFree(b->hover_mask);
+    RrPixmapMaskFree(b->unpressed_toggled_mask);
+    RrPixmapMaskFree(b->hover_toggled_mask);
+    RrPixmapMaskFree(b->pressed_toggled_mask);
 
     /* appearances */
     RrAppearanceFree(b->a_focused_unpressed);

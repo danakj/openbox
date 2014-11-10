@@ -4,7 +4,8 @@
   * Added ForEach action.
   * Restore the <center> option for window placement.
   * New GrowToFill action.
-  * Updated Portuguese translation.
+  * Updated Portuguese and Polish translations.
+  * New Galician translation.
   * Added strict option to ToggleShowDesktop action.
   * Speed optimization in rendering code.
   * New <position> tag for ShowMenu action allows placing menus other
@@ -19,6 +20,13 @@
   * Make desktop actions non-interactive (means you can have more actions bound
     to a key after them, and the dialog disappears on a timer instead of when
     releasing the modifier keys).
+  * obxprop is now not pathologically slow when printing very long arrays.
+  * Fix menu accelerator underlines sometimes not showing up.
+  * Fix so you can click menu entries before the menuHideDelay expires if it's
+    a new click.
+  * Don't readd the X event fd to the poll set every time we reconfigure.
+  * Fix some specialized button bitmaps not loading from the correct files.
+    (toggled + pressed or hover would just be the base toggled image).
   * Various small bugfixes.
 
 3.5.2:

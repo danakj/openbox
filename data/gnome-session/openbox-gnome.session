@@ -1,9 +1,4 @@
 [GNOME Session]
 Name=GNOME/Openbox
-RequiredComponents=gnome-settings-daemon;
-# Try load with the gnome-panel and use the fallback if we can't load a panel
-RequiredProviders=windowmanager;panel
-DefaultProvider-windowmanager=openbox
-DefaultProvider-panel=gnome-panel
-FallbackSession=openbox-gnome-fallback
+RequiredComponents=openbox;gnome-settings-daemon;gnome-panel;nautilus-classic;gnome-flashback-services
 DesktopName=GNOME

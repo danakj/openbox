@@ -109,9 +109,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
         position = o->position;
     } else {
+        const Rect *allmon;
         monitor = screen_num_monitors;
-        position.x.pos = data->x;
-        position.y.pos = data->y;
+        allmon = screen_physical_area_monitor(monitor);
+        position.x.pos = data->x - allmon->x;
+        position.y.pos = data->y - allmon->y;
     }
 
     /* you cannot call ShowMenu from inside a menu */

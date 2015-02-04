@@ -47,6 +47,7 @@ StrutPartial config_margins;
 
 gchar   *config_theme;
 gboolean config_theme_keepborder;
+gboolean config_theme_keepborder_maximized;
 guint    config_theme_window_list_icon_size;
 
 gchar   *config_title_layout;

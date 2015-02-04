@@ -1560,6 +1560,7 @@ void client_get_mwm_hints(ObClient *self)
             self->mwmhints.flags = hints[0];
             self->mwmhints.functions = hints[1];
             self->mwmhints.decorations = hints[2];
+            self->undecorated = hints[2] == 0;
         }
         g_free(hints);
     }

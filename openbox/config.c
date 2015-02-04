@@ -692,7 +692,9 @@ static void parse_theme(xmlNodePtr node, gpointer d)
                 if (*c == *d) *d = ' ';
     }
     if ((n = obt_xml_find_node(node, "keepBorder")))
-        config_theme_keepborder = obt_xml_node_bool(n);
+        config_theme_keepborder_maximized = config_theme_keepborder = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "keepBorderMaximized")))
+        config_theme_keepborder_maximized = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "animateIconify")))
         config_animate_iconify = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "windowListIconSize"))) {

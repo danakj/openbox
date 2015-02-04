@@ -1913,7 +1913,7 @@ static void client_setup_decor_undecorated(ObClient *self)
     /* If the user requested no decorations, then remove all the decorations,
        except the border.  But don't add a border if there wasn't one. */
     if (self->undecorated)
-        self->decorations &= (config_theme_keepborder ?
+        self->decorations &= (((self->max_vert && self->max_horz) ? config_theme_keepborder_maximized : config_theme_keepborder) ?
                               OB_FRAME_DECOR_BORDER : 0);
 }
 

@@ -324,6 +324,7 @@ obt_obt_unittests_LDADD = \
 	obt/libobt.la
 obt_obt_unittests_LDFLAGS = -export-dynamic
 obt_obt_unittests_SOURCES = \
+	obt/unittest_base.h \
 	obt/unittest_base.c \
 	obt/bsearch_unittest.c
 

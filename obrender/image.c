@@ -25,6 +25,7 @@
 #include <Imlib2.h>
 #endif
 #ifdef USE_LIBRSVG
+#include <cairo.h>
 #include <librsvg/rsvg.h>
 #endif
 

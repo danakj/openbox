@@ -463,6 +463,7 @@ void screen_startup(gboolean reconfig)
     screen_last_desktop = screen_desktop;
 
     /* don't start in showing-desktop mode */
+    screen_show_desktop_mode = SCREEN_SHOW_DESKTOP_NO;
     OBT_PROP_SET32(obt_root(ob_screen),
                    NET_SHOWING_DESKTOP, CARDINAL, screen_showing_desktop());
 
@@ -708,8 +709,8 @@ void screen_set_desktop(guint num, gboolean dofocus, gboolean force_no_greedy)
     g_assert(screen_desktop == screen_num_desktops || 
              g_slist_index(screen_visible_desktops, screen_desktop) > -1);
 
+
     previous = screen_desktop;
-    screen_desktop = num;
 
     if (!screen_store_desktop(num)) return;
 
@@ -882,6 +883,12 @@ void screen_set_desktop(guint num, gboolean dofocus, gboolean force_no_greedy)
         if (event_source_time() != CurrentTime)
             screen_desktop_user_time = event_source_time();
     }
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "number of desktops %d; switching to %d",
+            screen_num_desktops, num);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "current desktop %d", screen_desktop);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "index in visible list %d",
+            g_slist_index(screen_visible_desktops, screen_desktop));
 
     screen_set_visible_desktops();
 }

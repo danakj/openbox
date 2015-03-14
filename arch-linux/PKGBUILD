@@ -6,7 +6,7 @@
 # Contributor: tobias <tobias@archlinux.org>
 
 pkgname=openbox-multihead
-pkgver=3.5.2
+pkgver=3.6.0
 pkgrel=1
 pkgdesc='Highly configurable and lightweight X11 window manager'
 arch=('i686' 'x86_64')
@@ -20,7 +20,7 @@ optdepends=('kdebase-workspace: for the KDE/Openbox xsession'
 groups=('lxde')
 backup=('etc/xdg/openbox/menu.xml' 'etc/xdg/openbox/rc.xml'
         'etc/xdg/openbox/autostart' 'etc/xdg/openbox/environment')
-source=($pkgname::git+https://github.com/alaricljs/openbox-multihead.git
+source=("$pkgname::git+https://github.com/alaricljs/openbox.git#branch=multihead"
        )
 md5sums=('SKIP'
         )

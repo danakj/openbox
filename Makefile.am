@@ -35,6 +35,7 @@ bin_PROGRAMS = \
 	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control \
 	tools/obxprop/obxprop
+	tools/ob-visible-desks
 
 noinst_PROGRAMS = \
 	obt/obt_unittests
@@ -210,6 +211,7 @@ openbox_openbox_SOURCES = \
 	openbox/actions/execute.c \
 	openbox/actions/exit.c \
 	openbox/actions/focus.c \
+	openbox/actions/focusroot.c \
 	openbox/actions/focustobottom.c \
 	openbox/actions/fullscreen.c \
 	openbox/actions/growtoedge.c \
@@ -249,6 +251,8 @@ openbox_openbox_SOURCES = \
 	openbox/config.h \
 	openbox/debug.c \
 	openbox/debug.h \
+	openbox/desktop_list_menu.c \
+	openbox/desktop_list_menu.h \
 	openbox/dock.c \
 	openbox/dock.h \
 	openbox/event.c \
@@ -589,6 +593,7 @@ dist_noinst_DATA = \
 dist_doc_DATA = \
 	COMPLIANCE \
 	README \
+	README.MULTIHEAD \
 	AUTHORS \
 	CHANGELOG \
 	COPYING \

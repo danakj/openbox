@@ -85,6 +85,10 @@ extern gboolean config_focus_under_mouse;
 /*! Remove focus from windows when the mouse leaves them
  */
 extern gboolean config_unfocus_leave;
+/*! Set the opacity level of an unfocused window */
+extern guint    config_inactive_opacity;
+/*! The current monitor in focus follows the mouse */
+extern gboolean config_monitor_focus_follow;
 
 /*! The algorithm to use for placing new windows */
 extern ObPlacePolicy config_place_policy;
@@ -99,6 +103,8 @@ extern ObPlaceMonitor config_place_monitor;
 extern guint config_primary_monitor_index;
 /*! Where to place dialogs and stuff if it is not specified by index. */
 extern ObPlaceMonitor config_primary_monitor;
+/*! Whether to scale windows when moving from monitor to monitor. */
+extern gboolean config_scale_windows;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;
@@ -174,6 +180,10 @@ extern guint config_screen_firstdesk;
 extern GSList *config_desktops_names;
 /*! Amount of time to show the desktop switch dialog */
 extern guint config_desktop_popup_time;
+/*! Whether to replace the next desktop with the current one
+ *  if the next desktop is already visible
+ */
+extern gboolean config_desktop_greedy;
 
 /*! The keycode of the key combo which resets the keybaord chains */
 extern guint config_keyboard_reset_keycode;

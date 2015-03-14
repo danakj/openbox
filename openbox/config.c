@@ -35,6 +35,8 @@ gboolean config_focus_raise;
 gboolean config_focus_last;
 gboolean config_focus_under_mouse;
 gboolean config_unfocus_leave;
+guint    config_inactive_opacity;
+gboolean config_monitor_focus_follow;
 
 ObPlacePolicy  config_place_policy;
 gboolean       config_place_center;
@@ -42,6 +44,7 @@ ObPlaceMonitor config_place_monitor;
 
 guint          config_primary_monitor_index;
 ObPlaceMonitor config_primary_monitor;
+gboolean       config_scale_windows;
 
 StrutPartial config_margins;
 
@@ -60,10 +63,11 @@ RrFont *config_font_menutitle;
 RrFont *config_font_activeosd;
 RrFont *config_font_inactiveosd;
 
-guint   config_desktops_num;
-GSList *config_desktops_names;
-guint   config_screen_firstdesk;
-guint   config_desktop_popup_time;
+guint     config_desktops_num;
+GSList   *config_desktops_names;
+guint     config_screen_firstdesk;
+guint     config_desktop_popup_time;
+gboolean  config_desktop_greedy;
 
 gboolean         config_resize_redraw;
 gint             config_resize_popup_show;
@@ -635,6 +639,10 @@ static void parse_focus(xmlNodePtr node, gpointer d)
         config_focus_under_mouse = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "unfocusOnLeave")))
         config_unfocus_leave = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "inactiveOpacity")))
+        config_inactive_opacity = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "monitorFollowMouse")))
+        config_monitor_focus_follow = obt_xml_node_bool(n);
 }
 
 static void parse_placement(xmlNodePtr node, gpointer d)
@@ -665,6 +673,8 @@ static void parse_placement(xmlNodePtr node, gpointer d)
                 config_primary_monitor = OB_PLACE_MONITOR_MOUSE;
         }
     }
+    if ((n = obt_xml_find_node(node, "scaleWindows")))
+        config_scale_windows = obt_xml_node_bool(n);
 }
 
 static void parse_margins(xmlNodePtr node, gpointer d)
@@ -812,6 +822,8 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
     }
     if ((n = obt_xml_find_node(node, "popupTime")))
         config_desktop_popup_time = obt_xml_node_int(n);
+    if ((n = obt_xml_find_node(node, "greedy")))
+        config_desktop_greedy = obt_xml_node_bool(n);
 }
 
 static void parse_resize(xmlNodePtr node, gpointer d)
@@ -1076,6 +1088,8 @@ void config_startup(ObtXmlInst *i)
     config_focus_last = TRUE;
     config_focus_under_mouse = FALSE;
     config_unfocus_leave = FALSE;
+    config_inactive_opacity = 100;
+    config_monitor_focus_follow = TRUE;
 
     obt_xml_register(i, "focus", parse_focus, NULL);
 
@@ -1085,6 +1099,7 @@ void config_startup(ObtXmlInst *i)
 
     config_primary_monitor_index = 1;
     config_primary_monitor = OB_PLACE_MONITOR_ACTIVE;
+    config_scale_windows = TRUE;
 
     obt_xml_register(i, "placement", parse_placement, NULL);
 
@@ -1112,6 +1127,7 @@ void config_startup(ObtXmlInst *i)
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
+    config_desktop_greedy = 0;
 
     obt_xml_register(i, "desktops", parse_desktops, NULL);
 

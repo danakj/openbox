@@ -58,10 +58,10 @@
 
 /*! The event mask to grab on client windows */
 #define CLIENT_EVENTMASK (PropertyChangeMask | StructureNotifyMask | \
-                          ColormapChangeMask)
+                          ColormapChangeMask | PointerMotionMask)
 
 #define CLIENT_NOPROPAGATEMASK (ButtonPressMask | ButtonReleaseMask | \
-                                ButtonMotionMask)
+                                ButtonMotionMask | PointerMotionMask)
 
 typedef struct
 {
@@ -381,14 +381,28 @@ void client_manage(Window window, ObPrompt *prompt)
             !client_is_oldfullscreen(self, &place))
         {
             Rect *r;
+            gint cur_mon;
 
-            r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
+            if ((cur_mon = g_slist_index(screen_visible_desktops,
+                                         self->desktop)) > -1)
+                r = screen_area(self->desktop, cur_mon, NULL);
+            else
+                r = screen_area(self->desktop, SCREEN_AREA_ALL_MONITORS, NULL);
+
             if (r->x || r->y) {
                 place.x = r->x;
                 place.y = r->y;
                 ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
             }
             g_slice_free(Rect, r);
+        }
+
+        else if (!obplaced && client_normal(self)) {
+            gint cur_mon;
+            if ((cur_mon = g_slist_index(screen_visible_desktops,
+                                         self->desktop)) > -1)
+                place_client_onscreen(self, cur_mon, &place.x, &place.y,
+                                      &place.width, &place.height);
         }
 
         /* make sure the window is visible. */
@@ -825,7 +839,18 @@ static gboolean client_can_steal_focus(ObClient *self,
        focus, unless it was launched after we changed desktops and the request
        came from the user
      */
-    if (!screen_compare_desktops(screen_desktop, self->desktop)) {
+    /* if (!screen_desktop_is_visible(self->desktop, TRUE) && */
+        /* (!allow_other_desktop || */
+         /* (request_from_user && screen_desktop_user_time && */
+          /* !event_time_after(launch_time, screen_desktop_user_time)))) */
+    /* { */
+        /* steal = FALSE; */
+        /* ob_debug("Not focusing the window because its on another desktop\n"); */
+
+    /* if (!screen_compare_desktops(screen_desktop, self->desktop)) { */
+
+
+    if (!screen_desktop_is_visible(self->desktop, TRUE)) {
         /* must be allowed */
         if (!allow_other_desktop) {
             steal = FALSE;
@@ -941,7 +966,8 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
             match = FALSE;
-        else if (app->title &&
+        /* title matching patch, not sure what this fixes... */
+        else if (app->title && self->title &&
                  !g_pattern_match(app->title,
                                   strlen(self->title), self->title, NULL))
             match = FALSE;
@@ -2506,8 +2532,9 @@ static void client_change_wm_state(ObClient *self)
 
     old = self->wmstate;
 
-    if (self->shaded || self->iconic ||
-        (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop))
+    if (self->shaded || self->iconic || 
+        !screen_desktop_is_visible(self->desktop, TRUE))
+        /* (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop)) */
     {
         self->wmstate = IconicState;
     } else
@@ -2651,8 +2678,9 @@ static ObStackingLayer calc_layer(ObClient *self)
              /* you are fullscreen while you or your children are focused.. */
              (client_focused(self) || client_search_focus_tree(self) ||
               /* you can be fullscreen if you're on another desktop */
-              (self->desktop != screen_desktop &&
-               self->desktop != DESKTOP_ALL) ||
+              !screen_desktop_is_visible(self->desktop, TRUE) ||
+              /* (self->desktop != screen_desktop && */
+               /* self->desktop != DESKTOP_ALL) || */
               /* and you can also be fullscreen if the focused client is on
                  another monitor, or nothing else is focused */
               (!focus_client ||
@@ -2736,7 +2764,7 @@ gboolean client_should_show(ObClient *self)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop())
         return FALSE;
-    if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
+    if (screen_desktop_is_visible(self->desktop, TRUE))
         return TRUE;
 
     return FALSE;
@@ -2745,6 +2773,10 @@ gboolean client_should_show(ObClient *self)
 gboolean client_show(ObClient *self)
 {
     gboolean show = FALSE;
+    gint cur_mon;
+
+    if ((cur_mon = g_slist_index(screen_visible_desktops, self->desktop)) > -1)
+        client_set_monitor(self, cur_mon, FALSE);
 
     if (client_should_show(self)) {
         /* replay pending pointer event before showing the window, in case it
@@ -2908,7 +2940,7 @@ static void client_apply_startup_state(ObClient *self,
        not, so this needs to be called even if we have fullscreened/maxed
     */
     self->area = oldarea;
-    client_configure(self, x, y, w, h, FALSE, TRUE, FALSE);
+    client_configure(self, x, y, w, h, FALSE, TRUE, FALSE, FALSE);
 
     /* nothing to do for the other states:
        skip_taskbar
@@ -3163,7 +3195,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 }
 
 void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
-                      gboolean user, gboolean final, gboolean force_reply)
+                      gboolean user, gboolean final, gboolean force_reply,
+                      gboolean ignore_monitor)
 {
     Rect oldframe, oldclient;
     gboolean send_resize_client;
@@ -3304,16 +3337,31 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
        also if it changed to/from oldschool fullscreen then its layer may
        change
 
+       AG: With multihead, moving between monitors means changing desktops.
+           So we need to update the client desktop and store the new current
+           desktop.
+
        watch out tho, don't try change stacking stuff if the window is no
        longer being managed !
     */
-    if (self->managed &&
-        (screen_find_monitor(&self->frame->area) !=
-         screen_find_monitor(&oldframe) ||
-         (final && (client_is_oldfullscreen(self, &oldclient) !=
-                    client_is_oldfullscreen(self, &self->area)))))
-    {
-        client_calc_layer(self);
+    if (self->managed) {
+        guint oldm, newm, newdesk;
+
+        if(client_normal(self) && !ignore_monitor) {
+            oldm = screen_find_monitor(&oldframe);
+            newm = screen_find_monitor(&self->frame->area);
+
+            if (oldm != newm) {
+                newdesk = g_slist_nth(screen_visible_desktops, newm)->data;
+                client_set_desktop(self, newdesk, TRUE, TRUE);
+                screen_store_desktop(newdesk);
+            }
+        }
+        
+        if (oldm != newm || 
+            (final && (client_is_oldfullscreen(self, &oldclient) !=
+                       client_is_oldfullscreen(self, &self->area))))
+            client_calc_layer(self);
     }
 }
 
@@ -3419,8 +3467,9 @@ static void client_iconify_recursive(ObClient *self,
         } else {
             self->iconic = iconic;
 
-            if (curdesk && self->desktop != screen_desktop &&
-                self->desktop != DESKTOP_ALL)
+            /* if (curdesk && self->desktop != screen_desktop && */
+                /* self->desktop != DESKTOP_ALL) */
+            if (curdesk && !screen_desktop_is_visible(self->desktop, TRUE))
                 client_set_desktop(self, screen_desktop, FALSE, FALSE);
 
             /* this puts it after the current focused window, this will
@@ -3513,6 +3562,28 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
 
             RECT_SET(self->pre_max_area, self->pre_max_area.x, 0,
                      self->pre_max_area.width, 0);
+        }
+
+        {
+            Rect *area;
+            guint desk_mon;
+
+            area = g_slice_new(Rect);
+            RECT_SET(*area, x, y, w, h);
+            desk_mon = g_slist_index(screen_visible_desktops, self->desktop);
+
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "unmaximizing window %s", self->title);
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tit wants to go to monitor %d",
+                     screen_find_monitor(area));
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tbut it should be on monitor %d", 
+                     desk_mon);
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "\tmoreover, it claims it's on %d",
+                     client_monitor(self));
+
+            if (screen_find_monitor(area) != desk_mon)
+                place_onscreen(desk_mon, &x, &y, &w, &h);
+
+            g_slice_free(Rect, area);
         }
     }
 
@@ -3719,8 +3790,9 @@ void client_hilite(ObClient *self, gboolean hilite)
 
             /* if the window is on another desktop then raise it and make it
                the most recently used window */
-            if (self->desktop != screen_desktop &&
-                self->desktop != DESKTOP_ALL)
+            /* if (self->desktop != screen_desktop && */
+                /* self->desktop != DESKTOP_ALL) */
+            if (!screen_desktop_is_visible(self->desktop, TRUE))
             {
                 stacking_raise(CLIENT_AS_WINDOW(self));
                 focus_order_to_top(self);
@@ -3823,6 +3895,7 @@ static gboolean find_destroy_unmap(XEvent *e, gpointer data)
 gboolean client_validate(ObClient *self)
 {
     struct ObClientFindDestroyUnmap find;
+    if (self == NULL) return FALSE;
 
     XSync(obt_display, FALSE); /* get all events on the server */
 
@@ -4029,6 +4102,9 @@ gboolean client_focus(ObClient *self)
     /* choose the correct target */
     self = client_focus_target(self);
 
+    if (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop)
+        screen_store_desktop(self->desktop);
+
     if (!client_can_focus(self)) {
         ob_debug_type(OB_DEBUG_FOCUS,
                       "Client %s can't be focused", self->title);
@@ -4084,13 +4160,16 @@ static void client_present(ObClient *self, gboolean here, gboolean raise,
         screen_show_desktop(FALSE, self);
     if (self->iconic)
         client_iconify(self, FALSE, here, FALSE);
+    /* if (self->desktop != DESKTOP_ALL && */
+        /* self->desktop != screen_desktop) */
     if (self->desktop != DESKTOP_ALL &&
-        self->desktop != screen_desktop)
+        (!screen_desktop_is_visible(self->desktop, TRUE) ||
+         self->desktop != screen_desktop))
     {
         if (here)
             client_set_desktop(self, screen_desktop, FALSE, TRUE);
         else
-            screen_set_desktop(self->desktop, FALSE);
+            screen_set_desktop(self->desktop, FALSE, TRUE);
     } else if (!self->frame->visible)
         /* if its not visible for other reasons, then don't mess
            with it */
@@ -4130,7 +4209,7 @@ static void client_bring_windows_recursive(ObClient *self,
 
     if (((helpers && client_helper(self)) ||
          (modals && self->modal)) &&
-        (!screen_compare_desktops(self->desktop, desktop) ||
+        (!screen_desktop_is_visible(self->desktop, TRUE) ||
          (iconic && self->iconic)))
     {
         if (iconic && self->iconic)
@@ -4202,6 +4281,18 @@ void client_set_undecorated(ObClient *self, gboolean undecorated)
 guint client_monitor(ObClient *self)
 {
     return screen_find_monitor(&self->frame->area);
+}
+
+gboolean client_set_monitor(ObClient *self, guint new_mon, 
+                            gboolean ignore_monitor)
+{
+    guint x, y, w, h;
+    if(place_client_onscreen(self, new_mon, &x, &y, &w, &h)) {
+        client_configure(self, x, y, w, h, FALSE, TRUE, FALSE, ignore_monitor);
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 ObClient *client_direct_parent(ObClient *self)
@@ -4661,7 +4752,7 @@ void client_find_resize_directional(ObClient *self,
         if (grow == near) --e;
         delta = e - RECT_BOTTOM(self->frame->area);
         *h += delta;
-       break;
+        break;
     default:
         g_assert_not_reached();
     }
@@ -4684,8 +4775,9 @@ ObClient* client_under_pointer(void)
                     /* check the desktop, this is done during desktop
                        switching and windows are shown/hidden status is not
                        reliable */
-                    (c->desktop == screen_desktop ||
-                     c->desktop == DESKTOP_ALL) &&
+                    /* (c->desktop == screen_desktop || */
+                     /* c->desktop == DESKTOP_ALL) && */
+                    screen_desktop_is_visible(c->desktop, TRUE) &&
                     /* ignore all animating windows */
                     !frame_iconify_animating(c->frame) &&
                     RECT_CONTAINS(c->frame->area, x, y))

@@ -106,10 +106,10 @@ static void desk_menu_execute(ObMenuEntry *self, ObMenuFrame *f,
         /* if the window is omnipresent then we need to go to its
            desktop */
         if (!here && t->desktop == DESKTOP_ALL)
-            screen_set_desktop(self->id, FALSE);
+            screen_set_desktop(self->id, FALSE, FALSE);
     }
     else
-        screen_set_desktop(self->id, TRUE);
+        screen_set_desktop(self->id, TRUE, FALSE);
 }
 
 static void desk_menu_destroy(ObMenu *menu, gpointer data)

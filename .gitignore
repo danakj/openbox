@@ -1,5 +1,6 @@
 TAGS
 ABOUT-NLS
+CMakeLists.txt
 Makefile
 Makefile.in
 aclocal.m4
@@ -24,6 +25,7 @@ doc/openbox-kde-session.1
 doc/openbox-session.1
 doc/openbox.1
 doc/obxprop.1
+.idea
 libtool
 ltmain.sh
 m4/*.m4
@@ -101,6 +103,7 @@ tests/title
 tests/urgent
 tests/usertimewin
 tests/wmhints
+todo
 data/autostart/openbox-autostart
 data/autostart/autostart
 obrender/rendertest

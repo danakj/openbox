@@ -152,10 +152,11 @@ static inline void log_argv(ObDebugType type,
     if (!enabled_types[type]) return;
 
     switch (type) {
-    case OB_DEBUG_FOCUS:    prefix = "(FOCUS) ";           break;
-    case OB_DEBUG_APP_BUGS: prefix = "(APPLICATION BUG) "; break;
-    case OB_DEBUG_SM:       prefix = "(SESSION) ";         break;
-    default:                prefix = NULL;                 break;
+    case OB_DEBUG_FOCUS:     prefix = "(FOCUS) ";           break;
+    case OB_DEBUG_APP_BUGS:  prefix = "(APPLICATION BUG) "; break;
+    case OB_DEBUG_SM:        prefix = "(SESSION) ";         break;
+    case OB_DEBUG_MULTIHEAD: prefix = "(MULTIHEAD) ";       break;
+    default:                 prefix = NULL;                 break;
     }
 
     message = g_strdup_vprintf(format, args);

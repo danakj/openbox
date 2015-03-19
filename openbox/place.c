@@ -162,6 +162,21 @@ static Rect* choose_monitor(ObClient *c, gboolean client_to_be_foregrounded,
     guint i;
     ObClient *p;
     GSList *it;
+    gint cur_mon;
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "PICKING HEAD FOR %s...", c->title);
+
+    if((cur_mon = g_slist_index(screen_visible_desktops, c->desktop)) > -1) {
+        ob_debug_type(OB_DEBUG_MULTIHEAD, 
+                 "\tpicked %d monitor because of desktop %d",
+                 cur_mon, c->desktop);
+        area = screen_area(c->desktop, cur_mon, NULL);
+
+        return area;
+    }
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tusing original picking algorithm because"
+             " desktop %d is hidden...", c->desktop);
 
     choice = g_new(ObPlaceHead, screen_num_monitors);
     for (i = 0; i < screen_num_monitors; ++i) {
@@ -468,6 +483,112 @@ static gboolean should_set_client_position(ObClient *client,
     return TRUE;
 }
 
+/* Make the following function a special case of something more general.
+ * We need to be able to abstract the origin of where the client *is*.
+ * i.e., when a client is unmaximized we need to determine where it needs to
+ * go. Particularly, before it is actually moved. So we need a "here's where
+ * the client wants to go, is that right for the monitor i gave you? if not,
+ * adjust it please."
+ */
+gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width,
+                        gint *height)
+{
+    guint last_mon;
+    guint last_desk, new_desk;
+    float xrat, yrat;
+    Rect *last_area, *new_area, *cur_area;
+
+    cur_area = g_slice_new(Rect);
+    RECT_SET(*cur_area, *x, *y, *width, *height);
+
+    last_mon = screen_find_monitor(cur_area);
+    if (new_mon == last_mon) {
+        g_slice_free(Rect, cur_area);
+        return FALSE;
+    }
+
+    last_desk = g_slist_nth(screen_visible_desktops, last_mon)->data;
+    new_desk = g_slist_nth(screen_visible_desktops, new_mon)->data;
+
+    last_area = screen_area(last_desk, last_mon, NULL);
+    new_area = screen_area(new_desk, new_mon, NULL);
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\told monitor: (%d, %d) %dx%d",
+             last_area->x, last_area->y, last_area->width, last_area->height);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew monitor: (%d, %d) %dx%d",
+             new_area->x, new_area->y, new_area->width, new_area->height);
+
+    xrat = (float)new_area->width / (float)last_area->width;
+    yrat = (float)new_area->height / (float)last_area->height;
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tx ratio %.4f", xrat);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\ty ratio %.4f", yrat);
+
+    *x = new_area->x + (*x - last_area->x) * xrat;
+    *y = new_area->y + (*y - last_area->y) * yrat;
+
+    if (config_scale_windows) {
+        *width *= xrat;
+        *height *= yrat;
+    }
+    
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew x %d", *x);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew y %d", *y);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew width %d", *width);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tnew height %d", *height);
+
+    g_slice_free(Rect, cur_area);
+    g_slice_free(Rect, last_area);
+    g_slice_free(Rect, new_area);
+
+    return TRUE;
+}
+
+gboolean place_client_onscreen(ObClient *client, guint new_mon,
+                               gint *x, gint *y, gint *width, gint *height)
+{
+    Rect *client_area;
+
+    if (!client_normal(client))
+        return FALSE;
+
+    client_area = g_slice_new(Rect);
+    RECT_SET(*client_area, client->frame->area.x, client->frame->area.y,
+             client->frame->area.width, client->frame->area.height);
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, 
+             "Move client %s from %d monitor to %d monitor?", client->title, 
+             client_monitor(client), new_mon);
+    ob_debug_type(OB_DEBUG_MULTIHEAD, 
+             "\tOriginal client geometry (%d, %d) %dx%d",
+             client_area->x, client_area->y,
+             client_area->width, client_area->height);
+
+    if (!place_onscreen(new_mon, &client_area->x, &client_area->y,
+                        &client_area->width, &client_area->height)) {
+        ob_debug_type(OB_DEBUG_MULTIHEAD, "Skip set monitor for %s", client->title);
+        g_slice_free(Rect, client_area);
+        return FALSE;
+    }
+
+    /* Adjust the width/height for decorations */
+    client_area->width -= (client->frame->area.width - client->area.width);
+    client_area->height -= (client->frame->area.height - client->area.height);
+
+    ob_debug_type(OB_DEBUG_MULTIHEAD, "\tNew client geometry (%d, %d) %dx%d",
+             client_area->x, client_area->y,
+             client_area->width, client_area->height);
+
+    *x = client_area->x;
+    *y = client_area->y;
+    *width = client_area->width;
+    *height = client_area->height;
+
+    g_slice_free(Rect, client_area);
+
+    return TRUE;
+}
+
 gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
                       Rect* client_area, ObAppSettings *settings)
 {
@@ -506,3 +627,4 @@ gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
     frame_frame_gravity(client->frame, x, y);
     return TRUE;
 }
+

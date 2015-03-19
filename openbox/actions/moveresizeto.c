@@ -3,6 +3,7 @@
 #include "openbox/screen.h"
 #include "openbox/frame.h"
 #include "openbox/config.h"
+#include "openbox/stacking.h"
 
 enum {
     CURRENT_MONITOR = -1,
@@ -118,7 +119,9 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         case PREV_MONITOR:
             mon = (cmon == 0) ? (screen_num_monitors - 1) : (cmon - 1); break;
         default:
-            g_assert_not_reached();
+            /* g_assert_not_reached(); */
+            /* Why not? It's valid to use a monitor index... */
+            ;
         }
 
         area = screen_area(c->desktop, mon, NULL);
@@ -192,8 +195,11 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         client_find_onscreen(c, &x, &y, w, h, mon != cmon);
 
         actions_client_move(data, TRUE);
-        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE);
+        client_configure(c, x, y, w, h, TRUE, TRUE, FALSE, FALSE);
         actions_client_move(data, FALSE);
+
+        if (mon != cmon)
+            stacking_raise(CLIENT_AS_WINDOW(c));
 
         g_slice_free(Rect, area);
         g_slice_free(Rect, carea);

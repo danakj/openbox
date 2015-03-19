@@ -47,5 +47,9 @@ typedef enum
 gboolean place_client(struct _ObClient *client,
                       gboolean client_to_be_foregrounded,
                       Rect* client_area, struct _ObAppSettings *settings);
+gboolean place_onscreen(guint new_mon, gint *x, gint *y, gint *width, 
+                        gint *height);
+gboolean place_client_onscreen(struct _ObClient *client, guint new_mon,
+                               gint *x, gint *y, gint *width, gint *height);
 
 #endif

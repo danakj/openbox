@@ -330,6 +330,16 @@ void moveresize_end(gboolean cancel)
 #endif
     }
 
+    if (!moveresize_client) {
+        ob_debug("moveresize_end: moveresize_client is NULL!");
+        return;
+    }
+
+    if (!moveresize_in_progress) {
+        ob_debug("moveresize_end: moveresize_in_progress is FALSE!");
+        return;
+    }
+
     /* don't use client_move() here, use the same width/height as
        we've been using during the move, otherwise we get different results
        when moving maximized windows between monitors of different sizes !
@@ -339,7 +349,7 @@ void moveresize_end(gboolean cancel)
                      (cancel ? start_cy : cur_y),
                      (cancel ? start_cw : cur_w),
                      (cancel ? start_ch : cur_h),
-                     TRUE, TRUE, FALSE);
+                     TRUE, TRUE, FALSE, FALSE);
 
     /* restore the client's maximized state. do this after putting the window
        back in its original spot to minimize visible flicker */
@@ -381,7 +391,7 @@ static void do_move(gboolean keyboard, gint keydist)
     resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
 
     client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
-                     TRUE, FALSE, FALSE);
+                     TRUE, FALSE, FALSE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
         popup_coords(moveresize_client, "%d x %d",
                      moveresize_client->frame->area.x,
@@ -448,7 +458,7 @@ static void do_resize(void)
         /* force a ConfigureNotify, it is part of the spec for SYNC resizing
            and MUST follow the sync counter notification */
         client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
-                         TRUE, FALSE, TRUE);
+                         TRUE, FALSE, TRUE, FALSE);
     }
 
     /* this would be better with a fixed width font ... XXX can do it better
@@ -615,7 +625,7 @@ static gboolean edge_warp_delay_func(gpointer data)
         d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
         if (d != screen_desktop) {
             if (config_mouse_screenedgewarp) edge_warp_move_ptr();
-            screen_set_desktop(d, TRUE);
+            screen_set_desktop(d, TRUE, FALSE);
         }
     }
     edge_warp_odd = !edge_warp_odd;

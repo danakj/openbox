@@ -33,6 +33,7 @@
 #include "client_menu.h"
 #include "client_list_menu.h"
 #include "client_list_combined_menu.h"
+#include "desktop_list_menu.h"
 #include "gettext.h"
 #include "obt/xml.h"
 #include "obt/paths.h"
@@ -69,6 +70,7 @@ void menu_startup(gboolean reconfig)
 
     client_list_menu_startup(reconfig);
     client_list_combined_menu_startup(reconfig);
+    desktop_list_menu_startup(reconfig);
     client_menu_startup();
 
     menu_parse_inst = obt_xml_instance_new();

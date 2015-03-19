@@ -65,6 +65,13 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         if (o->stop_int)
             actions_interactive_cancel_act();
 
+        {
+            guint cur_mon, cur_desk;
+            cur_mon = screen_monitor_pointer();
+            cur_desk = g_slist_nth(screen_visible_desktops, cur_mon)->data;
+            screen_store_desktop(cur_desk);
+        }
+
         /* focus action on the root window. make keybindings work for this
            openbox instance, but don't focus any specific client */
         focus_nothing();

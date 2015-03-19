@@ -205,7 +205,11 @@ void window_manage(Window win)
 
     if (!no_manage) {
         if (attrib.override_redirect) {
+            gchar *data = NULL;
+            OBT_PROP_GETS(win, WM_NAME, &data);
             ob_debug("not managing override redirect window 0x%x", win);
+            ob_debug_type(OB_DEBUG_MULTIHEAD, "which is named %s", data);
+            g_free(data);
             grab_server(FALSE);
         }
         else if (is_dockapp) {

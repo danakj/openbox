@@ -38,6 +38,8 @@ extern guint screen_num_desktops;
 extern guint screen_num_monitors;
 /*! The current desktop */
 extern guint screen_desktop;
+/*! All visible desktops */
+extern GSList *screen_visible_desktops;
 /*! The desktop which was last visible */
 extern guint screen_last_desktop;
 /*! Are we in showing-desktop mode? */
@@ -71,8 +73,11 @@ void screen_resize(void);
 
 /*! Change the number of available desktops */
 void screen_set_num_desktops(guint num);
+/*! Store the current desktop (and update _NET_CURRENT_DESKTOP) */
+gboolean screen_store_desktop(guint num);
 /*! Change the current desktop */
-void screen_set_desktop(guint num, gboolean dofocus);
+void screen_set_desktop(guint num, gboolean dofocus,
+                        gboolean force_no_greedy);
 /*! Add a new desktop either at the end or inserted at the current desktop */
 void screen_add_desktop(gboolean current);
 /*! Remove a desktop, either at the end or the current desktop */
@@ -112,6 +117,7 @@ void screen_update_desktop_names(void);
   it handles the root colormap. */
 void screen_install_colormap(struct _ObClient *client, gboolean install);
 
+gboolean screen_desktop_is_visible(guint desktop, gboolean omnipresent);
 void screen_update_areas(void);
 
 const Rect* screen_physical_area_all_monitors(void);
@@ -145,6 +151,8 @@ const Rect* screen_physical_area_primary(gboolean fixed);
 #define SCREEN_AREA_ALL_MONITORS ((unsigned)-1)
 #define SCREEN_AREA_ONE_MONITOR  ((unsigned)-2)
 
+Rect* screen_monitor_area(guint head);
+
 /*! @param head is the number of the head or one of SCREEN_AREA_ALL_MONITORS,
            SCREEN_AREA_ONE_MONITOR
     @param search NULL or the whole monitor(s)
@@ -153,6 +161,8 @@ const Rect* screen_physical_area_primary(gboolean fixed);
 Rect* screen_area(guint desktop, guint head, Rect *search);
 
 gboolean screen_physical_area_monitor_contains(guint head, Rect *search);
+
+void screen_update_mouse_coords(guint x, guint y);
 
 /*! Determines which physical monitor a rectangle is on by calculating the
     area of the part of the rectable on each monitor.  The number of the

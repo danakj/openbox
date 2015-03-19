@@ -58,7 +58,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
         menu_add_separator(menu, SEPARATOR, screen_desktop_names[desktop]);
         for (it = focus_order; it; it = g_list_next(it)) {
             ObClient *c = it->data;
-            if (focus_valid_target(c, desktop,
+            if (c->desktop == desktop &&
+                focus_valid_target(c, desktop,
                                    TRUE, TRUE,
                                    FALSE, TRUE, FALSE, FALSE, FALSE))
             {
@@ -126,10 +127,10 @@ static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
             /* if the window is omnipresent then we need to go to its
                desktop */
             if (!here && t->desktop == DESKTOP_ALL)
-                screen_set_desktop(self->id, FALSE);
+                screen_set_desktop(self->id, FALSE, FALSE);
         }
         else
-            screen_set_desktop(self->id, TRUE);
+            screen_set_desktop(self->id, TRUE, FALSE);
     }
 }
 

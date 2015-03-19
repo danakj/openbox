@@ -19,10 +19,12 @@
 
 #include "frame.h"
 #include "openbox.h"
+#include "config.h"
 #include "screen.h"
 #include "client.h"
 #include "framerender.h"
 #include "obrender/theme.h"
+#include "obt/prop.h"
 
 static void framerender_label(ObFrame *self, RrAppearance *a);
 static void framerender_icon(ObFrame *self, RrAppearance *a);
@@ -41,6 +43,18 @@ void framerender_frame(ObFrame *self)
     if (!self->visible)
         return;
     self->need_render = FALSE;
+
+    if (config_inactive_opacity < 100 && client_normal(self->client)) {
+        if (self->focused) {
+            OBT_PROP_SET32(self->window, NET_WM_WINDOW_OPACITY, 
+                           CARDINAL, 0xffffffff);
+        }
+
+        else {
+            guint op = 0xffffffff * (config_inactive_opacity / 100.0);
+            OBT_PROP_SET32(self->window, NET_WM_WINDOW_OPACITY, CARDINAL, op);
+        }
+    }
 
     {
         gulong px;

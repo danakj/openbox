@@ -28,6 +28,12 @@
   <raiseOnFocus>no</raiseOnFocus>
   <!-- when followMouse is enabled, and a window is given focus by moving the
        mouse into it, also raise the window -->
+  <inactiveOpacity>80</inactiveOpacity>
+  <!-- when a window is not active, it's opacity level will be decreased to
+       the percentage specified here. set to 100 to disable. (0 will make
+       windows completely transparent) -->
+  <monitorFollowMouse>yes</monitorFollowMouse>
+  <!-- Move focus to another monitor when the mouse enters that monitor -->
 </focus>
 
 <placement>
@@ -36,16 +42,19 @@
   <center>yes</center>
   <!-- whether to place windows in the center of the free area found or
        the top left corner -->
-  <monitor>Primary</monitor>
+  <monitor>Active</monitor>
   <!-- with Smart placement on a multi-monitor system, try to place new windows
        on: 'Any' - any monitor, 'Mouse' - where the mouse is, 'Active' - where
        the active window is, 'Primary' - only on the primary monitor -->
-  <primaryMonitor>1</primaryMonitor>
+  <primaryMonitor>Active</primaryMonitor>
   <!-- The monitor where Openbox should place popup dialogs such as the
        focus cycling popup, or the desktop switch popup.  It can be an index
        from 1, specifying a particular monitor.  Or it can be one of the
        following: 'Mouse' - where the mouse is, or
                   'Active' - where the active window is -->
+  <scaleWindows>yes</scaleWindows>
+  <!-- This will scale window sizes and positions when moving a window
+       or workspace from monitor to monitor. -->
 </placement>
 
 <theme>
@@ -128,6 +137,7 @@
 
        use obconf if you want to change these without having to log out
        and back in -->
+  <!-- there must be at least N desktops where N is the number of monitors -->
   <number>4</number>
   <firstdesk>1</firstdesk>
   <names>
@@ -139,6 +149,9 @@
   <popupTime>875</popupTime>
   <!-- The number of milliseconds to show the popup for when switching
        desktops.  Set this to 0 to disable the popup. -->
+  <greedy>yes</greedy>
+  <!-- When enabled, switching to a desktop that is visible replaces the
+       current desktop -->
 </desktops>
 
 <resize>
@@ -276,6 +289,50 @@
     </action>
   </keybind>
 
+  <!-- Keybindings for monitor switching -->
+  <keybind key="A-w">
+    <action name="FocusRoot">
+      <monitor>1</monitor>
+      <pointer>
+        <x>0</x>
+        <y>0</y>
+      </pointer>
+    </action>
+  </keybind>
+  <keybind key="A-e">
+    <action name="FocusRoot">
+      <monitor>2</monitor>
+      <pointer>
+        <x>0</x>
+        <y>0</y>
+      </pointer>
+    </action>
+  </keybind>
+  <keybind key="A-r">
+    <action name="FocusRoot">
+      <monitor>3</monitor>
+      <pointer>
+        <x>0</x>
+        <y>0</y>
+      </pointer>
+    </action>
+  </keybind>
+  <keybind key="A-S-w">
+    <action name="MoveResizeTo">
+      <monitor>1</monitor>
+    </action>
+  </keybind>
+  <keybind key="A-S-e">
+    <action name="MoveResizeTo">
+      <monitor>2</monitor>
+    </action>
+  </keybind>
+  <keybind key="A-S-r">
+    <action name="MoveResizeTo">
+      <monitor>3</monitor>
+    </action>
+  </keybind>
+
   <!-- Keybindings for window switching with the arrow keys -->
   <keybind key="W-S-Right">
     <action name="DirectionalCycleWindows">
@@ -295,6 +352,13 @@
   <keybind key="W-S-Down">
     <action name="DirectionalCycleWindows">
       <direction>down</direction>
+    </action>
+  </keybind>
+
+  <!-- menus -->
+  <keybind key="W-Return">
+    <action name="ShowMenu">
+      <menu>desktop-list-menu</menu>
     </action>
   </keybind>
 

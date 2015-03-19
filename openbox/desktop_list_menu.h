@@ -1,6 +1,7 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   debug.h for the Openbox window manager
+   desktop_list_menu.h for the Openbox window manager
+   Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003-2007   Dana Jansens
 
    This program is free software; you can redistribute it and/or modify
@@ -16,29 +17,10 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __ob__debug_h
-#define __ob__debug_h
+#ifndef ob__desktop_list_menu_h
+#define ob__desktop_list_menu_h
 
-#include <glib.h>
-
-void ob_debug_startup(void);
-void ob_debug_shutdown(void);
-
-void ob_debug(const gchar *a, ...);
-
-typedef enum {
-    OB_DEBUG_NORMAL,
-    OB_DEBUG_MULTIHEAD,
-    OB_DEBUG_FOCUS,
-    OB_DEBUG_APP_BUGS,
-    OB_DEBUG_SM,
-    OB_DEBUG_TYPE_NUM
-} ObDebugType;
-
-void ob_debug_type(ObDebugType type, const gchar *a, ...);
-
-void ob_debug_enable(ObDebugType type, gboolean enable);
-
-void ob_debug_show_prompts(void);
+void desktop_list_menu_startup(gboolean reconfig);
+void desktop_list_menu_shutdown(gboolean reconfig);
 
 #endif

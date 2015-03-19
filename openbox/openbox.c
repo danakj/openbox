@@ -549,6 +549,7 @@ static void print_help(void)
     g_print(_("  --debug             Display debugging output\n"));
     g_print(_("  --debug-focus       Display debugging output for focus handling\n"));
     g_print(_("  --debug-session     Display debugging output for session management\n"));
+    g_print(_("  --debug-multihead   Display debugging output for multihead stuff\n"));
     g_print(_("  --debug-xinerama    Split the display into fake xinerama screens\n"));
     g_print(_("\nPlease report bugs at %s\n"), PACKAGE_BUGREPORT);
 }
@@ -652,6 +653,9 @@ static void parse_args(gint *argc, gchar **argv)
         }
         else if (!strcmp(argv[i], "--debug-session")) {
             ob_debug_enable(OB_DEBUG_SM, TRUE);
+        }
+        else if (!strcmp(argv[i], "--debug-multihead")) {
+            ob_debug_enable(OB_DEBUG_MULTIHEAD, TRUE);
         }
         else if (!strcmp(argv[i], "--debug-xinerama")) {
             ob_debug_xinerama = TRUE;

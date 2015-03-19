@@ -730,7 +730,6 @@ static void event_process(const XEvent *ec, gpointer data)
     {
         screen_update_mouse_coords(e->xbutton.x_root, e->xbutton.y_root);
         event_sourcetime = event_curtime;
-
         used = event_handle_user_input(client, e);
 
         if (prompt && !used)

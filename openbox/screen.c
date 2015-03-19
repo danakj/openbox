@@ -2239,3 +2239,4 @@ void screen_apply_gravity_point(gint *x, gint *y, gint width, gint height,
     *x += area->x;
     *y += area->y;
 }
+

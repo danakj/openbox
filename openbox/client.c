@@ -867,21 +867,25 @@ static gboolean client_can_steal_focus(ObClient *self,
     else if (focus_client) {
         /* If the user is working in another window right now, then don't
            steal focus */
-        if (!relative_focused &&
-            event_last_user_time &&
+        /* I think this rule is bogus. There are occasions when I open a
+         * Konsole window, and it doesn't get focus. I wasn't able to figure
+         * out why. - Andrew
+         */
+        /* if (!relative_focused && */
+            /* event_last_user_time && */
             /* last user time must be strictly > launch_time to block focus */
-            (event_time_after(event_last_user_time, launch_time) &&
-             event_last_user_time != launch_time) &&
-            event_time_after(event_last_user_time,
-                             steal_time - OB_EVENT_USER_TIME_DELAY))
-        {
-            steal = FALSE;
-            ob_debug("Not focusing the window because the user is "
-                     "working in another window that is not its relative");
-        }
+            /* (event_time_after(event_last_user_time, launch_time) && */
+             /* event_last_user_time != launch_time) && */
+            /* event_time_after(event_last_user_time, */
+                             /* steal_time - OB_EVENT_USER_TIME_DELAY)) */
+        /* { */
+            /* steal = FALSE; */
+            /* ob_debug("Not focusing the window because the user is " */
+                     /* "working in another window that is not its relative"); */
+        /* } */
         /* Don't move focus if it's not going to go to this window
            anyway */
-        else if (client_focus_target(self) != self) {
+        if (client_focus_target(self) != self) {
             steal = FALSE;
             ob_debug("Not focusing the window because another window "
                      "would get the focus anyway");
@@ -966,7 +970,6 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
                  !g_pattern_match(app->role,
                                   strlen(self->role), self->role, NULL))
             match = FALSE;
-        /* title matching patch, not sure what this fixes... */
         else if (app->title && self->title &&
                  !g_pattern_match(app->title,
                                   strlen(self->title), self->title, NULL))
@@ -1361,6 +1364,7 @@ static void client_get_desktop(ObClient *self)
         /* defaults to the current desktop */
         else {
             self->desktop = screen_desktop;
+
             ob_debug("client desktop set to the current desktop: %d",
                      self->desktop);
         }
@@ -2792,6 +2796,7 @@ gboolean client_show(ObClient *self)
         */
         client_change_wm_state(self);
     }
+
     return show;
 }
 
@@ -3595,6 +3600,7 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
     if (max) {
         /* make sure the window is on some monitor */
         client_find_onscreen(self, &x, &y, w, h, FALSE);
+
     }
 
     client_change_state(self); /* change the state hints on the client */
@@ -4093,6 +4099,7 @@ gboolean client_can_focus(ObClient *self)
 
 gboolean client_focus(ObClient *self)
 {
+    if (self == NULL) return FALSE;
     if (!client_validate(self)) return FALSE;
 
     /* we might not focus this window, so if we have modal children which would

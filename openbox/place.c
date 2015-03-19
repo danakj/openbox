@@ -627,3 +627,4 @@ gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
     frame_frame_gravity(client->frame, x, y);
     return TRUE;
 }
+

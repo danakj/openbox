@@ -764,6 +764,11 @@ void client_set_layer(ObClient *self, gint layer);
 
 guint client_monitor(ObClient *self);
 
+/*
+  Gets the client under the given point, factored out of the client_under_pointer code so it can be re-used
+ */
+ObClient* client_at_point(gint x, gint y);
+
 ObClient* client_under_pointer(void);
 
 gboolean client_has_group_siblings(ObClient *self);

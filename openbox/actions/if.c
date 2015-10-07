@@ -89,6 +89,8 @@ typedef struct {
     GArray *queries;
     GSList *thenacts;
     GSList *elseacts;
+    gboolean stacking_order_on;
+    gboolean stacking_order_reversed;
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
@@ -293,6 +295,8 @@ static gpointer setup_func(xmlNodePtr node)
         }
     }
 
+    set_bool(node, "stacking_order", &o->stacking_order_on, &o->stacking_order_reversed);
+
     return o;
 }
 
@@ -473,15 +477,23 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
 static gboolean run_func_foreach(ObActionsData *data, gpointer options)
 {
     GList *it;
+    Options *o = options;
 
     foreach_stop = FALSE;
+    it = client_list;
+    if (o->stacking_order_on)
+        it = stacking_list;
+    else if (o->stacking_order_reversed)
+        it = stacking_list_tail;
 
-    for (it = client_list; it; it = g_list_next(it)) {
-        data->client = it->data;
-        run_func_if(data, options);
-        if (foreach_stop) {
-            foreach_stop = FALSE;
-            break;
+    for (; it; it = g_list_next(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            data->client = it->data;
+            run_func_if(data, options);
+            if (foreach_stop) {
+                foreach_stop = FALSE;
+                break;
+            }
         }
     }
 

@@ -4670,31 +4670,38 @@ void client_find_resize_directional(ObClient *self,
     *h -= self->frame->size.top + self->frame->size.bottom;
 }
 
+ObClient* client_at_point(gint x, gint y)
+{
+    ObClient *ret = NULL;
+    GList *it;
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            ObClient *c = WINDOW_AS_CLIENT(it->data);
+            if (c->frame->visible &&
+                /* check the desktop, this is done during desktop
+                   switching and windows are shown/hidden status is not
+                   reliable */
+                (c->desktop == screen_desktop ||
+                 c->desktop == DESKTOP_ALL) &&
+                /* ignore all animating windows */
+                !frame_iconify_animating(c->frame) &&
+                RECT_CONTAINS(c->frame->area, x, y))
+            {
+                ret = c;
+                break;
+            }
+        }
+    }
+    return ret;
+}
+
 ObClient* client_under_pointer(void)
 {
     gint x, y;
-    GList *it;
     ObClient *ret = NULL;
 
     if (screen_pointer_pos(&x, &y)) {
-        for (it = stacking_list; it; it = g_list_next(it)) {
-            if (WINDOW_IS_CLIENT(it->data)) {
-                ObClient *c = WINDOW_AS_CLIENT(it->data);
-                if (c->frame->visible &&
-                    /* check the desktop, this is done during desktop
-                       switching and windows are shown/hidden status is not
-                       reliable */
-                    (c->desktop == screen_desktop ||
-                     c->desktop == DESKTOP_ALL) &&
-                    /* ignore all animating windows */
-                    !frame_iconify_animating(c->frame) &&
-                    RECT_CONTAINS(c->frame->area, x, y))
-                {
-                    ret = c;
-                    break;
-                }
-            }
-        }
+        ret = client_at_point(x, y);
     }
     return ret;
 }

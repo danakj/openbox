@@ -23,6 +23,7 @@
 #include "openbox/frame.h"
 #include "openbox/screen.h"
 #include "openbox/focus.h"
+#include "openbox/config.h"
 #include <glib.h>
 
 typedef enum {
@@ -68,9 +69,15 @@ typedef struct {
     gboolean omnipresent_off;
     gboolean desktop_current;
     gboolean desktop_other;
+    gboolean containsx_check;
+    gboolean containsy_check;
     guint    desktop_number;
     guint    screendesktop_number;
     guint    client_monitor;
+    guint    xpoint;
+    guint    xpoint_denom;
+    guint    ypoint;
+    guint    ypoint_denom;
     TypedMatch title;
     TypedMatch class;
     TypedMatch name;
@@ -82,6 +89,8 @@ typedef struct {
     GArray *queries;
     GSList *thenacts;
     GSList *elseacts;
+    gboolean stacking_order_on;
+    gboolean stacking_order_reversed;
 } Options;
 
 static gpointer setup_func(xmlNodePtr node);
@@ -174,6 +183,8 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     Query *q = g_slice_new0(Query);
     g_array_append_val(o->queries, q);
 
+    gchar *s;
+
     q->target = target;
 
     set_bool(node, "shaded", &q->shaded_on, &q->shaded_off);
@@ -188,7 +199,6 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
 
     xmlNodePtr n;
     if ((n = obt_xml_find_node(node, "desktop"))) {
-        gchar *s;
         if ((s = obt_xml_node_string(n))) {
             if (!g_ascii_strcasecmp(s, "current"))
                 q->desktop_current = TRUE;
@@ -219,6 +229,18 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     }
     if ((n = obt_xml_find_node(node, "monitor"))) {
         q->client_monitor = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "containsxpoint"))) {
+        s = obt_xml_node_string(n);
+        config_parse_relative_number(s, &q->xpoint, &q->xpoint_denom);
+        q->containsx_check = TRUE;
+        g_free(s);
+    }
+    if ((n = obt_xml_find_node(node, "containsypoint"))) {
+        s = obt_xml_node_string(n);
+        config_parse_relative_number(s, &q->ypoint, &q->ypoint_denom);
+        q->containsy_check = TRUE;
+        g_free(s);
     }
 }
 
@@ -272,6 +294,8 @@ static gpointer setup_func(xmlNodePtr node)
             query_node = obt_xml_find_node(query_node->next, "query");
         }
     }
+
+    set_bool(node, "stacking_order", &o->stacking_order_on, &o->stacking_order_reversed);
 
     return o;
 }
@@ -413,6 +437,28 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         if (q->client_monitor)
             is_true &= client_monitor(query_target) == q->client_monitor - 1;
 
+        // Since 0,0 is a valid pixel location we need to check separate boolean
+        if (q->containsx_check) {
+            gint xpoint = q->xpoint;
+            // Since the denominator cannot reasonably be zero, this is a valid check
+            if (q->xpoint_denom) {
+                const Rect *containing_area = screen_physical_area_monitor(client_monitor(query_target));
+                xpoint = (q->xpoint * containing_area->width) / q->xpoint_denom;
+            }
+            is_true &= xpoint >= RECT_LEFT(query_target->frame->area);
+            is_true &= xpoint <= RECT_RIGHT(query_target->frame->area);
+        }
+        // Since 0,0 is a valid pixel location we need to check separate boolean
+        if (q->containsy_check) {
+            gint ypoint = q->ypoint;
+            // Since the denominator cannot reasonably be zero, this is a valid check
+            if (q->ypoint_denom) {
+                const Rect *containing_area = screen_physical_area_monitor(client_monitor(query_target));
+                ypoint = (q->ypoint * containing_area->height) / q->ypoint_denom;
+            }
+            is_true &= ypoint >= RECT_TOP(query_target->frame->area);
+            is_true &= ypoint <= RECT_BOTTOM(query_target->frame->area);
+        }
     }
 
     GSList *acts;
@@ -431,15 +477,23 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
 static gboolean run_func_foreach(ObActionsData *data, gpointer options)
 {
     GList *it;
+    Options *o = options;
 
     foreach_stop = FALSE;
+    it = client_list;
+    if (o->stacking_order_on)
+        it = stacking_list;
+    else if (o->stacking_order_reversed)
+        it = stacking_list_tail;
 
-    for (it = client_list; it; it = g_list_next(it)) {
-        data->client = it->data;
-        run_func_if(data, options);
-        if (foreach_stop) {
-            foreach_stop = FALSE;
-            break;
+    for (; it; it = g_list_next(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            data->client = it->data;
+            run_func_if(data, options);
+            if (foreach_stop) {
+                foreach_stop = FALSE;
+                break;
+            }
         }
     }
 

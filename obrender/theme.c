@@ -17,6 +17,7 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
+#include "openbox/openbox.h"
 #include "render.h"
 #include "color.h"
 #include "font.h"
@@ -39,14 +40,16 @@ static gboolean read_color(XrmDatabase db, const RrInstance *inst,
 static gboolean read_mask(const RrInstance *inst, const gchar *path,
                           RrTheme *theme, const gchar *maskname,
                           RrPixmapMask **value);
+static RrImage* read_img(const gchar *path,
+                         const gchar *name);
 static gboolean read_appearance(XrmDatabase db, const RrInstance *inst,
                                 const gchar *rname, RrAppearance *value,
                                 gboolean allow_trans);
 static int parse_inline_number(const char *p);
 static RrPixel32* read_c_image(gint width, gint height, const guint8 *data);
 static void set_default_appearance(RrAppearance *a);
-static void read_button_colors(XrmDatabase db, const RrInstance *inst, 
-                               const RrTheme *theme, RrButton *btn, 
+static void read_button_colors(XrmDatabase db, const RrInstance *inst,
+                               const RrTheme *theme, RrButton *btn,
                                const gchar *btnname);
 
 static RrFont *get_font(RrFont *target, RrFont **default_font,
@@ -67,7 +70,7 @@ static RrFont *get_font(RrFont *target, RrFont **default_font,
 }
 
 #define READ_INT(x_resstr, x_var, x_min, x_max, x_def) \
-    if (!read_int(db, x_resstr, & x_var) || \
+    if (!read_int(db, x_resstr, & (x_var)) || \
             x_var < x_min || x_var > x_max) \
         x_var = x_def;
 
@@ -266,10 +269,17 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
              0, 100, 6);
     READ_INT("menu.separator.padding.height", theme->menu_sep_paddingy,
              0, 100, 3);
+    READ_INT("menu.padding.width", theme->menu_paddingx,
+             0, 100, theme->paddingx);
+    READ_INT("menu.padding.height", theme->menu_paddingy,
+             0, 100, theme->paddingy);
+    READ_INT("menu.spacing", theme->menu_spacing,
+             0, 100, theme->menu_paddingx);
     READ_INT("window.client.padding.width", theme->cbwidthx, 0, 100,
              theme->paddingx);
     READ_INT("window.client.padding.height", theme->cbwidthy, 0, 100,
              theme->cbwidthx);
+    READ_INT("window.button.spacing", theme->button_spacing, 0, 100, 0);
 
     /* load colors */
     READ_COLOR_("window.active.border.color", "border.color",
@@ -327,6 +337,26 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_COLOR_("osd.inactive.label.text.color",
                 "osd.label.text.color",
                 theme->osd_text_inactive_color, RrColorCopy(theme->title_unfocused_color));
+
+    if (!read_color(db, inst, "osd.focus.color", &theme->osd_focus_color))
+        theme->osd_focus_color = NULL;
+
+    if (!read_color(db, inst, "osd.focus.border.color", &theme->osd_focus_border_color))
+        theme->osd_focus_border_color = NULL;
+
+    READ_INT("osd.padding.width", theme->osd_paddingx,
+             0, 100, theme->paddingx);
+    READ_INT("osd.padding.height", theme->osd_paddingy,
+             0, 100, theme->paddingy);
+    READ_INT("osd.focus.border.width", theme->osd_focus_border_width, 0, 10, 2);
+    READ_INT("osd.focus.hiliteouter", theme->osd_focus_hilite_outer, 0, 100, 50);
+    theme->osd_focus_hilite_outer = theme->osd_focus_hilite_outer * 255 / 100;
+    READ_INT("osd.focus.hiliteinner", theme->osd_focus_hilite_inner, 0, 100, 15);
+    theme->osd_focus_hilite_inner = theme->osd_focus_hilite_inner * 255 / 100;
+    READ_INT("osd.focus.hilitemargin", theme->osd_focus_hilite_margin, 0, 100, 4);
+    READ_INT("osd.focus.textmargin", theme->osd_focus_text_margin, 0, 100, 2);
+    READ_INT("osd.focus.margin", theme->osd_focus_margin, 0, 100, 3);
+    READ_INT("osd.focus.marginicons", theme->osd_focus_margin_icons, 0, 100, theme->osd_focus_margin * 2);
 
     READ_COLOR("window.active.button.unpressed.image.color",
                theme->titlebut_focused_unpressed_color,
@@ -394,7 +424,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     READ_COLOR("menu.bullet.image.color", theme->menu_bullet_color,
                RrColorCopy(theme->menu_color));
-   
+
     READ_COLOR("menu.items.disabled.text.color", theme->menu_disabled_color,
                RrColorNew(inst, 0, 0, 0));
 
@@ -407,8 +437,8 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
 
     READ_COLOR("menu.separator.color", theme->menu_sep_color,
                RrColorCopy(theme->menu_color));
-    
-    READ_COLOR("menu.bullet.selected.image.color", 
+
+    READ_COLOR("menu.bullet.selected.image.color",
                theme->menu_bullet_selected_color,
                RrColorCopy(theme->menu_selected_color));
 
@@ -422,7 +452,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                RrColorCopy(theme->titlebut_focused_pressed_color));
     READ_COLOR("osd.button.focused.box.color", theme->osd_focused_lineart,
                RrColorCopy(theme->titlebut_hover_focused_color));
- 
+
     /* load the image masks */
 
     /* maximize button masks */
@@ -446,12 +476,12 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                    theme->btn_max->mask);
     READ_MASK_COPY("max_disabled.xbm", theme->btn_max->disabled_mask,
                    theme->btn_max->mask);
-    READ_MASK_COPY("max_hover.xbm", theme->btn_max->hover_mask, 
+    READ_MASK_COPY("max_hover.xbm", theme->btn_max->hover_mask,
                    theme->btn_max->mask);
-    READ_MASK_COPY("max_toggled_pressed.xbm", 
-                   theme->btn_max->toggled_pressed_mask, 
+    READ_MASK_COPY("max_toggled_pressed.xbm",
+                   theme->btn_max->toggled_pressed_mask,
                    theme->btn_max->toggled_mask);
-    READ_MASK_COPY("max_toggled_hover.xbm", 
+    READ_MASK_COPY("max_toggled_hover.xbm",
                    theme->btn_max->toggled_hover_mask,
                    theme->btn_max->toggled_mask);
 
@@ -511,7 +541,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
                    theme->btn_shade->toggled_pressed_mask,
                    theme->btn_shade->toggled_mask);
     READ_MASK_COPY("shade_toggled_hover.xbm",
-                   theme->btn_shade->toggled_hover_mask, 
+                   theme->btn_shade->toggled_hover_mask,
                    theme->btn_shade->toggled_mask);
 
     /* close button masks */
@@ -564,6 +594,413 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
         RrPixmapMaskCopy(theme->btn_desk->toggled_mask);
     theme->btn_shade->toggled_pressed_mask =
         RrPixmapMaskCopy(theme->btn_shade->toggled_mask);
+
+    /* read 32-bit RGBA button images (if available) */
+
+    /* max button */
+    theme->btn_max->img_focused_unpressed = read_img (path, "max_focused_unpressed.png");
+
+    theme->btn_max->img_unfocused_unpressed = read_img (path, "max_unfocused_unpressed.png");
+    if (theme->btn_max->img_unfocused_unpressed == NULL) if (theme->btn_max->img_focused_unpressed != NULL) {
+        theme->btn_max->img_unfocused_unpressed = theme->btn_max->img_focused_unpressed;
+        RrImageRef (theme->btn_max->img_focused_unpressed);
+    }
+
+    theme->btn_max->img_focused_pressed = read_img (path, "max_focused_pressed.png");
+    if (theme->btn_max->img_focused_pressed == NULL) if (theme->btn_max->img_focused_unpressed != NULL) {
+        theme->btn_max->img_focused_pressed = theme->btn_max->img_focused_unpressed;
+        RrImageRef (theme->btn_max->img_focused_unpressed);
+    }
+
+    theme->btn_max->img_unfocused_pressed = read_img (path, "max_unfocused_pressed.png");
+    if (theme->btn_max->img_unfocused_pressed == NULL) if (theme->btn_max->img_unfocused_unpressed != NULL) {
+        theme->btn_max->img_unfocused_pressed = theme->btn_max->img_unfocused_unpressed;
+        RrImageRef (theme->btn_max->img_unfocused_unpressed);
+    }
+
+    theme->btn_max->img_disabled_focused = read_img (path, "max_disabled_focused.png");
+    if (theme->btn_max->img_disabled_focused == NULL) if (theme->btn_max->img_focused_unpressed != NULL) {
+        theme->btn_max->img_disabled_focused = theme->btn_max->img_focused_unpressed;
+        RrImageRef (theme->btn_max->img_focused_unpressed);
+    }
+
+    theme->btn_max->img_disabled_unfocused = read_img (path, "max_disabled_unfocused.png");
+    if (theme->btn_max->img_disabled_unfocused == NULL) if (theme->btn_max->img_unfocused_unpressed != NULL) {
+        theme->btn_max->img_disabled_unfocused = theme->btn_max->img_unfocused_unpressed;
+        RrImageRef (theme->btn_max->img_unfocused_unpressed);
+    }
+
+    theme->btn_max->img_hover_focused = read_img (path, "max_hover_focused.png");
+    if (theme->btn_max->img_hover_focused == NULL) if (theme->btn_max->img_focused_unpressed != NULL) {
+        theme->btn_max->img_hover_focused = theme->btn_max->img_focused_unpressed;
+        RrImageRef (theme->btn_max->img_focused_unpressed);
+    }
+
+    theme->btn_max->img_hover_unfocused = read_img (path, "max_hover_unfocused.png");
+    if (theme->btn_max->img_hover_unfocused == NULL) if (theme->btn_max->img_unfocused_unpressed != NULL) {
+        theme->btn_max->img_hover_unfocused = theme->btn_max->img_unfocused_unpressed;
+        RrImageRef (theme->btn_max->img_unfocused_unpressed);
+    }
+
+    theme->btn_max->img_toggled_hover_focused = read_img (path, "max_toggled_hover_focused.png");
+    if (theme->btn_max->img_toggled_hover_focused == NULL) if (theme->btn_max->img_hover_focused != NULL) {
+        theme->btn_max->img_toggled_hover_focused = theme->btn_max->img_hover_focused;
+        RrImageRef (theme->btn_max->img_hover_focused);
+    }
+
+    theme->btn_max->img_toggled_hover_unfocused = read_img (path, "max_toggled_hover_unfocused.png");
+    if (theme->btn_max->img_toggled_hover_unfocused == NULL) if (theme->btn_max->img_hover_unfocused != NULL) {
+        theme->btn_max->img_toggled_hover_unfocused = theme->btn_max->img_hover_unfocused;
+        RrImageRef (theme->btn_max->img_hover_unfocused);
+    }
+
+    theme->btn_max->img_toggled_focused_unpressed = read_img (path, "max_toggled_focused_unpressed.png");
+    if (theme->btn_max->img_toggled_focused_unpressed == NULL) if (theme->btn_max->img_focused_unpressed != NULL) {
+        theme->btn_max->img_toggled_focused_unpressed = theme->btn_max->img_focused_unpressed;
+        RrImageRef (theme->btn_max->img_focused_unpressed);
+    }
+
+    theme->btn_max->img_toggled_unfocused_unpressed = read_img (path, "max_toggled_unfocused_unpressed.png");
+    if (theme->btn_max->img_toggled_unfocused_unpressed == NULL) if (theme->btn_max->img_unfocused_unpressed != NULL) {
+        theme->btn_max->img_toggled_unfocused_unpressed = theme->btn_max->img_unfocused_unpressed;
+        RrImageRef (theme->btn_max->img_unfocused_unpressed);
+    }
+
+    theme->btn_max->img_toggled_focused_pressed = read_img (path, "max_toggled_focused_pressed.png");
+    if (theme->btn_max->img_toggled_focused_pressed == NULL) if (theme->btn_max->img_toggled_focused_unpressed != NULL) {
+        theme->btn_max->img_toggled_focused_pressed = theme->btn_max->img_toggled_focused_unpressed;
+        RrImageRef (theme->btn_max->img_toggled_focused_unpressed);
+    }
+
+    theme->btn_max->img_toggled_unfocused_pressed = read_img (path, "max_toggled_unfocused_pressed.png");
+    if (theme->btn_max->img_toggled_unfocused_pressed == NULL) if (theme->btn_max->img_toggled_unfocused_unpressed != NULL) {
+        theme->btn_max->img_toggled_unfocused_pressed = theme->btn_max->img_toggled_unfocused_unpressed;
+        RrImageRef (theme->btn_max->img_toggled_unfocused_unpressed);
+    }
+
+    /* iconify button */
+    theme->btn_iconify->img_focused_unpressed = read_img (path, "iconify_focused_unpressed.png");
+
+    theme->btn_iconify->img_unfocused_unpressed = read_img (path, "iconify_unfocused_unpressed.png");
+    if (theme->btn_iconify->img_unfocused_unpressed == NULL) if (theme->btn_iconify->img_focused_unpressed != NULL) {
+        theme->btn_iconify->img_unfocused_unpressed = theme->btn_iconify->img_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_focused_pressed = read_img (path, "iconify_focused_pressed.png");
+    if (theme->btn_iconify->img_focused_pressed == NULL) if (theme->btn_iconify->img_focused_unpressed != NULL) {
+        theme->btn_iconify->img_focused_pressed = theme->btn_iconify->img_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_unfocused_pressed = read_img (path, "iconify_unfocused_pressed.png");
+    if (theme->btn_iconify->img_unfocused_pressed == NULL) if (theme->btn_iconify->img_unfocused_unpressed != NULL) {
+        theme->btn_iconify->img_unfocused_pressed = theme->btn_iconify->img_unfocused_unpressed;
+        RrImageRef (theme->btn_iconify->img_unfocused_unpressed);
+    }
+
+    theme->btn_iconify->img_disabled_focused = read_img (path, "iconify_disabled_focused.png");
+    if (theme->btn_iconify->img_disabled_focused == NULL) if (theme->btn_iconify->img_focused_unpressed != NULL) {
+        theme->btn_iconify->img_disabled_focused = theme->btn_iconify->img_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_disabled_unfocused = read_img (path, "iconify_disabled_unfocused.png");
+    if (theme->btn_iconify->img_disabled_unfocused == NULL) if (theme->btn_iconify->img_unfocused_unpressed != NULL) {
+        theme->btn_iconify->img_disabled_unfocused = theme->btn_iconify->img_unfocused_unpressed;
+        RrImageRef (theme->btn_iconify->img_unfocused_unpressed);
+    }
+
+    theme->btn_iconify->img_hover_focused = read_img (path, "iconify_hover_focused.png");
+    if (theme->btn_iconify->img_hover_focused == NULL) if (theme->btn_iconify->img_focused_unpressed != NULL) {
+        theme->btn_iconify->img_hover_focused = theme->btn_iconify->img_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_hover_unfocused = read_img (path, "iconify_hover_unfocused.png");
+    if (theme->btn_iconify->img_hover_unfocused == NULL) if (theme->btn_iconify->img_unfocused_unpressed != NULL) {
+        theme->btn_iconify->img_hover_unfocused = theme->btn_iconify->img_unfocused_unpressed;
+        RrImageRef (theme->btn_iconify->img_unfocused_unpressed);
+    }
+
+    theme->btn_iconify->img_toggled_hover_focused = read_img (path, "iconify_toggled_hover_focused.png");
+    if (theme->btn_iconify->img_toggled_hover_focused == NULL) if (theme->btn_iconify->img_hover_focused != NULL) {
+        theme->btn_iconify->img_toggled_hover_focused = theme->btn_iconify->img_hover_focused;
+        RrImageRef (theme->btn_iconify->img_hover_focused);
+    }
+
+    theme->btn_iconify->img_toggled_hover_unfocused = read_img (path, "iconify_toggled_hover_unfocused.png");
+    if (theme->btn_iconify->img_toggled_hover_unfocused == NULL) if (theme->btn_iconify->img_hover_unfocused != NULL) {
+        theme->btn_iconify->img_toggled_hover_unfocused = theme->btn_iconify->img_hover_unfocused;
+        RrImageRef (theme->btn_iconify->img_hover_unfocused);
+    }
+
+    theme->btn_iconify->img_toggled_focused_unpressed = read_img (path, "iconify_toggled_focused_unpressed.png");
+    if (theme->btn_iconify->img_toggled_focused_unpressed == NULL) if (theme->btn_iconify->img_focused_unpressed != NULL) {
+        theme->btn_iconify->img_toggled_focused_unpressed = theme->btn_iconify->img_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_toggled_unfocused_unpressed = read_img (path, "iconify_toggled_unfocused_unpressed.png");
+    if (theme->btn_iconify->img_toggled_unfocused_unpressed == NULL) if (theme->btn_iconify->img_unfocused_unpressed != NULL) {
+        theme->btn_iconify->img_toggled_unfocused_unpressed = theme->btn_iconify->img_unfocused_unpressed;
+        RrImageRef (theme->btn_iconify->img_unfocused_unpressed);
+    }
+
+    theme->btn_iconify->img_toggled_focused_pressed = read_img (path, "iconify_toggled_focused_pressed.png");
+    if (theme->btn_iconify->img_toggled_focused_pressed == NULL) if (theme->btn_iconify->img_toggled_focused_unpressed != NULL) {
+        theme->btn_iconify->img_toggled_focused_pressed = theme->btn_iconify->img_toggled_focused_unpressed;
+        RrImageRef (theme->btn_iconify->img_toggled_focused_unpressed);
+    }
+
+    theme->btn_iconify->img_toggled_unfocused_pressed = read_img (path, "iconify_toggled_unfocused_pressed.png");
+    if (theme->btn_iconify->img_toggled_unfocused_pressed == NULL) if (theme->btn_iconify->img_toggled_unfocused_unpressed != NULL) {
+        theme->btn_iconify->img_toggled_unfocused_pressed = theme->btn_iconify->img_toggled_unfocused_unpressed;
+        RrImageRef (theme->btn_iconify->img_toggled_unfocused_unpressed);
+    }
+
+    /* desk button */
+    theme->btn_desk->img_focused_unpressed = read_img (path, "desk_focused_unpressed.png");
+
+    theme->btn_desk->img_unfocused_unpressed = read_img (path, "desk_unfocused_unpressed.png");
+    if (theme->btn_desk->img_unfocused_unpressed == NULL) if (theme->btn_desk->img_focused_unpressed != NULL) {
+        theme->btn_desk->img_unfocused_unpressed = theme->btn_desk->img_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_focused_unpressed);
+    }
+
+    theme->btn_desk->img_focused_pressed = read_img (path, "desk_focused_pressed.png");
+    if (theme->btn_desk->img_focused_pressed == NULL) if (theme->btn_desk->img_focused_unpressed != NULL) {
+        theme->btn_desk->img_focused_pressed = theme->btn_desk->img_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_focused_unpressed);
+    }
+
+    theme->btn_desk->img_unfocused_pressed = read_img (path, "desk_unfocused_pressed.png");
+    if (theme->btn_desk->img_unfocused_pressed == NULL) if (theme->btn_desk->img_unfocused_unpressed != NULL) {
+        theme->btn_desk->img_unfocused_pressed = theme->btn_desk->img_unfocused_unpressed;
+        RrImageRef (theme->btn_desk->img_unfocused_unpressed);
+    }
+
+    theme->btn_desk->img_disabled_focused = read_img (path, "desk_disabled_focused.png");
+    if (theme->btn_desk->img_disabled_focused == NULL) if (theme->btn_desk->img_focused_unpressed != NULL) {
+        theme->btn_desk->img_disabled_focused = theme->btn_desk->img_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_focused_unpressed);
+    }
+
+    theme->btn_desk->img_disabled_unfocused = read_img (path, "desk_disabled_unfocused.png");
+    if (theme->btn_desk->img_disabled_unfocused == NULL) if (theme->btn_desk->img_unfocused_unpressed != NULL) {
+        theme->btn_desk->img_disabled_unfocused = theme->btn_desk->img_unfocused_unpressed;
+        RrImageRef (theme->btn_desk->img_unfocused_unpressed);
+    }
+
+    theme->btn_desk->img_hover_focused = read_img (path, "desk_hover_focused.png");
+    if (theme->btn_desk->img_hover_focused == NULL) if (theme->btn_desk->img_focused_unpressed != NULL) {
+        theme->btn_desk->img_hover_focused = theme->btn_desk->img_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_focused_unpressed);
+    }
+
+    theme->btn_desk->img_hover_unfocused = read_img (path, "desk_hover_unfocused.png");
+    if (theme->btn_desk->img_hover_unfocused == NULL) if (theme->btn_desk->img_unfocused_unpressed != NULL) {
+        theme->btn_desk->img_hover_unfocused = theme->btn_desk->img_unfocused_unpressed;
+        RrImageRef (theme->btn_desk->img_unfocused_unpressed);
+    }
+
+    theme->btn_desk->img_toggled_hover_focused = read_img (path, "desk_toggled_hover_focused.png");
+    if (theme->btn_desk->img_toggled_hover_focused == NULL) if (theme->btn_desk->img_hover_focused != NULL) {
+        theme->btn_desk->img_toggled_hover_focused = theme->btn_desk->img_hover_focused;
+        RrImageRef (theme->btn_desk->img_hover_focused);
+    }
+
+    theme->btn_desk->img_toggled_hover_unfocused = read_img (path, "desk_toggled_hover_unfocused.png");
+    if (theme->btn_desk->img_toggled_hover_unfocused == NULL) if (theme->btn_desk->img_hover_unfocused != NULL) {
+        theme->btn_desk->img_toggled_hover_unfocused = theme->btn_desk->img_hover_unfocused;
+        RrImageRef (theme->btn_desk->img_hover_unfocused);
+    }
+
+    theme->btn_desk->img_toggled_focused_unpressed = read_img (path, "desk_toggled_focused_unpressed.png");
+    if (theme->btn_desk->img_toggled_focused_unpressed == NULL) if (theme->btn_desk->img_focused_unpressed != NULL) {
+        theme->btn_desk->img_toggled_focused_unpressed = theme->btn_desk->img_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_focused_unpressed);
+    }
+
+    theme->btn_desk->img_toggled_unfocused_unpressed = read_img (path, "desk_toggled_unfocused_unpressed.png");
+    if (theme->btn_desk->img_toggled_unfocused_unpressed == NULL) if (theme->btn_desk->img_unfocused_unpressed != NULL) {
+        theme->btn_desk->img_toggled_unfocused_unpressed = theme->btn_desk->img_unfocused_unpressed;
+        RrImageRef (theme->btn_desk->img_unfocused_unpressed);
+    }
+
+    theme->btn_desk->img_toggled_focused_pressed = read_img (path, "desk_toggled_focused_pressed.png");
+    if (theme->btn_desk->img_toggled_focused_pressed == NULL) if (theme->btn_desk->img_toggled_focused_unpressed != NULL) {
+        theme->btn_desk->img_toggled_focused_pressed = theme->btn_desk->img_toggled_focused_unpressed;
+        RrImageRef (theme->btn_desk->img_toggled_focused_unpressed);
+    }
+
+    theme->btn_desk->img_toggled_unfocused_pressed = read_img (path, "desk_toggled_unfocused_pressed.png");
+    if (theme->btn_desk->img_toggled_unfocused_pressed == NULL) if (theme->btn_desk->img_toggled_unfocused_unpressed != NULL) {
+        theme->btn_desk->img_toggled_unfocused_pressed = theme->btn_desk->img_toggled_unfocused_unpressed;
+        RrImageRef (theme->btn_desk->img_toggled_unfocused_unpressed);
+    }
+
+    /* shade button */
+    theme->btn_shade->img_focused_unpressed = read_img (path, "shade_focused_unpressed.png");
+
+    theme->btn_shade->img_unfocused_unpressed = read_img (path, "shade_unfocused_unpressed.png");
+    if (theme->btn_shade->img_unfocused_unpressed == NULL) if (theme->btn_shade->img_focused_unpressed != NULL) {
+        theme->btn_shade->img_unfocused_unpressed = theme->btn_shade->img_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_focused_unpressed);
+    }
+
+    theme->btn_shade->img_focused_pressed = read_img (path, "shade_focused_pressed.png");
+    if (theme->btn_shade->img_focused_pressed == NULL) if (theme->btn_shade->img_focused_unpressed != NULL) {
+        theme->btn_shade->img_focused_pressed = theme->btn_shade->img_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_focused_unpressed);
+    }
+
+    theme->btn_shade->img_unfocused_pressed = read_img (path, "shade_unfocused_pressed.png");
+    if (theme->btn_shade->img_unfocused_pressed == NULL) if (theme->btn_shade->img_unfocused_unpressed != NULL) {
+        theme->btn_shade->img_unfocused_pressed = theme->btn_shade->img_unfocused_unpressed;
+        RrImageRef (theme->btn_shade->img_unfocused_unpressed);
+    }
+
+    theme->btn_shade->img_disabled_focused = read_img (path, "shade_disabled_focused.png");
+    if (theme->btn_shade->img_disabled_focused == NULL) if (theme->btn_shade->img_focused_unpressed != NULL) {
+        theme->btn_shade->img_disabled_focused = theme->btn_shade->img_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_focused_unpressed);
+    }
+
+    theme->btn_shade->img_disabled_unfocused = read_img (path, "shade_disabled_unfocused.png");
+    if (theme->btn_shade->img_disabled_unfocused == NULL) if (theme->btn_shade->img_unfocused_unpressed != NULL) {
+        theme->btn_shade->img_disabled_unfocused = theme->btn_shade->img_unfocused_unpressed;
+        RrImageRef (theme->btn_shade->img_unfocused_unpressed);
+    }
+
+    theme->btn_shade->img_hover_focused = read_img (path, "shade_hover_focused.png");
+    if (theme->btn_shade->img_hover_focused == NULL) if (theme->btn_shade->img_focused_unpressed != NULL) {
+        theme->btn_shade->img_hover_focused = theme->btn_shade->img_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_focused_unpressed);
+    }
+
+    theme->btn_shade->img_hover_unfocused = read_img (path, "shade_hover_unfocused.png");
+    if (theme->btn_shade->img_hover_unfocused == NULL) if (theme->btn_shade->img_unfocused_unpressed != NULL) {
+        theme->btn_shade->img_hover_unfocused = theme->btn_shade->img_unfocused_unpressed;
+        RrImageRef (theme->btn_shade->img_unfocused_unpressed);
+    }
+
+    theme->btn_shade->img_toggled_hover_focused = read_img (path, "shade_toggled_hover_focused.png");
+    if (theme->btn_shade->img_toggled_hover_focused == NULL) if (theme->btn_shade->img_hover_focused != NULL) {
+        theme->btn_shade->img_toggled_hover_focused = theme->btn_shade->img_hover_focused;
+        RrImageRef (theme->btn_shade->img_hover_focused);
+    }
+
+    theme->btn_shade->img_toggled_hover_unfocused = read_img (path, "shade_toggled_hover_unfocused.png");
+    if (theme->btn_shade->img_toggled_hover_unfocused == NULL) if (theme->btn_shade->img_hover_unfocused != NULL) {
+        theme->btn_shade->img_toggled_hover_unfocused = theme->btn_shade->img_hover_unfocused;
+        RrImageRef (theme->btn_shade->img_hover_unfocused);
+    }
+
+    theme->btn_shade->img_toggled_focused_unpressed = read_img (path, "shade_toggled_focused_unpressed.png");
+    if (theme->btn_shade->img_toggled_focused_unpressed == NULL) if (theme->btn_shade->img_focused_unpressed != NULL) {
+        theme->btn_shade->img_toggled_focused_unpressed = theme->btn_shade->img_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_focused_unpressed);
+    }
+
+    theme->btn_shade->img_toggled_unfocused_unpressed = read_img (path, "shade_toggled_unfocused_unpressed.png");
+    if (theme->btn_shade->img_toggled_unfocused_unpressed == NULL) if (theme->btn_shade->img_unfocused_unpressed != NULL) {
+        theme->btn_shade->img_toggled_unfocused_unpressed = theme->btn_shade->img_unfocused_unpressed;
+        RrImageRef (theme->btn_shade->img_unfocused_unpressed);
+    }
+
+    theme->btn_shade->img_toggled_focused_pressed = read_img (path, "shade_toggled_focused_pressed.png");
+    if (theme->btn_shade->img_toggled_focused_pressed == NULL) if (theme->btn_shade->img_toggled_focused_unpressed != NULL) {
+        theme->btn_shade->img_toggled_focused_pressed = theme->btn_shade->img_toggled_focused_unpressed;
+        RrImageRef (theme->btn_shade->img_toggled_focused_unpressed);
+    }
+
+    theme->btn_shade->img_toggled_unfocused_pressed = read_img (path, "shade_toggled_unfocused_pressed.png");
+    if (theme->btn_shade->img_toggled_unfocused_pressed == NULL) if (theme->btn_shade->img_toggled_unfocused_unpressed != NULL) {
+        theme->btn_shade->img_toggled_unfocused_pressed = theme->btn_shade->img_toggled_unfocused_unpressed;
+        RrImageRef (theme->btn_shade->img_toggled_unfocused_unpressed);
+    }
+
+    /* close button */
+    theme->btn_close->img_focused_unpressed = read_img (path, "close_focused_unpressed.png");
+
+    theme->btn_close->img_unfocused_unpressed = read_img (path, "close_unfocused_unpressed.png");
+    if (theme->btn_close->img_unfocused_unpressed == NULL) if (theme->btn_close->img_focused_unpressed != NULL) {
+        theme->btn_close->img_unfocused_unpressed = theme->btn_close->img_focused_unpressed;
+        RrImageRef (theme->btn_close->img_focused_unpressed);
+    }
+
+    theme->btn_close->img_focused_pressed = read_img (path, "close_focused_pressed.png");
+    if (theme->btn_close->img_focused_pressed == NULL) if (theme->btn_close->img_focused_unpressed != NULL) {
+        theme->btn_close->img_focused_pressed = theme->btn_close->img_focused_unpressed;
+        RrImageRef (theme->btn_close->img_focused_unpressed);
+    }
+
+    theme->btn_close->img_unfocused_pressed = read_img (path, "close_unfocused_pressed.png");
+    if (theme->btn_close->img_unfocused_pressed == NULL) if (theme->btn_close->img_unfocused_unpressed != NULL) {
+        theme->btn_close->img_unfocused_pressed = theme->btn_close->img_unfocused_unpressed;
+        RrImageRef (theme->btn_close->img_unfocused_unpressed);
+    }
+
+    theme->btn_close->img_disabled_focused = read_img (path, "close_disabled_focused.png");
+    if (theme->btn_close->img_disabled_focused == NULL) if (theme->btn_close->img_focused_unpressed != NULL) {
+        theme->btn_close->img_disabled_focused = theme->btn_close->img_focused_unpressed;
+        RrImageRef (theme->btn_close->img_focused_unpressed);
+    }
+
+    theme->btn_close->img_disabled_unfocused = read_img (path, "close_disabled_unfocused.png");
+    if (theme->btn_close->img_disabled_unfocused == NULL) if (theme->btn_close->img_unfocused_unpressed != NULL) {
+        theme->btn_close->img_disabled_unfocused = theme->btn_close->img_unfocused_unpressed;
+        RrImageRef (theme->btn_close->img_unfocused_unpressed);
+    }
+
+    theme->btn_close->img_hover_focused = read_img (path, "close_hover_focused.png");
+    if (theme->btn_close->img_hover_focused == NULL) if (theme->btn_close->img_focused_unpressed != NULL) {
+        theme->btn_close->img_hover_focused = theme->btn_close->img_focused_unpressed;
+        RrImageRef (theme->btn_close->img_focused_unpressed);
+    }
+
+    theme->btn_close->img_hover_unfocused = read_img (path, "close_hover_unfocused.png");
+    if (theme->btn_close->img_hover_unfocused == NULL) if (theme->btn_close->img_unfocused_unpressed != NULL) {
+        theme->btn_close->img_hover_unfocused = theme->btn_close->img_unfocused_unpressed;
+        RrImageRef (theme->btn_close->img_unfocused_unpressed);
+    }
+
+    theme->btn_close->img_toggled_hover_focused = read_img (path, "close_toggled_hover_focused.png");
+    if (theme->btn_close->img_toggled_hover_focused == NULL) if (theme->btn_close->img_hover_focused != NULL) {
+        theme->btn_close->img_toggled_hover_focused = theme->btn_close->img_hover_focused;
+        RrImageRef (theme->btn_close->img_hover_focused);
+    }
+
+    theme->btn_close->img_toggled_hover_unfocused = read_img (path, "close_toggled_hover_unfocused.png");
+    if (theme->btn_close->img_toggled_hover_unfocused == NULL) if (theme->btn_close->img_hover_unfocused != NULL) {
+        theme->btn_close->img_toggled_hover_unfocused = theme->btn_close->img_hover_unfocused;
+        RrImageRef (theme->btn_close->img_hover_unfocused);
+    }
+
+    theme->btn_close->img_toggled_focused_unpressed = read_img (path, "close_toggled_focused_unpressed.png");
+    if (theme->btn_close->img_toggled_focused_unpressed == NULL) if (theme->btn_close->img_focused_unpressed != NULL) {
+        theme->btn_close->img_toggled_focused_unpressed = theme->btn_close->img_focused_unpressed;
+        RrImageRef (theme->btn_close->img_focused_unpressed);
+    }
+
+    theme->btn_close->img_toggled_unfocused_unpressed = read_img (path, "close_toggled_unfocused_unpressed.png");
+    if (theme->btn_close->img_toggled_unfocused_unpressed == NULL) if (theme->btn_close->img_unfocused_unpressed != NULL) {
+        theme->btn_close->img_toggled_unfocused_unpressed = theme->btn_close->img_unfocused_unpressed;
+        RrImageRef (theme->btn_close->img_unfocused_unpressed);
+    }
+
+    theme->btn_close->img_toggled_focused_pressed = read_img (path, "close_toggled_focused_pressed.png");
+    if (theme->btn_close->img_toggled_focused_pressed == NULL) if (theme->btn_close->img_toggled_focused_unpressed != NULL) {
+        theme->btn_close->img_toggled_focused_pressed = theme->btn_close->img_toggled_focused_unpressed;
+        RrImageRef (theme->btn_close->img_toggled_focused_unpressed);
+    }
+
+    theme->btn_close->img_toggled_unfocused_pressed = read_img (path, "close_toggled_unfocused_pressed.png");
+    if (theme->btn_close->img_toggled_unfocused_pressed == NULL) if (theme->btn_close->img_toggled_unfocused_unpressed != NULL) {
+        theme->btn_close->img_toggled_unfocused_pressed = theme->btn_close->img_toggled_unfocused_unpressed;
+        RrImageRef (theme->btn_close->img_toggled_unfocused_unpressed);
+    }
 
     /* read the decoration textures */
     READ_APPEARANCE("window.active.title.bg", theme->a_focused_title, FALSE);
@@ -676,7 +1113,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     /* max button */
     read_button_colors(db, inst, theme, theme->btn_max, "max");
 
-    /* bases:  unpressed, pressed, disabled */
+    /* bases: unpressed, pressed, disabled */
     READ_APPEARANCE_COPY("window.active.button.max.unpressed.bg",
                          theme->btn_max->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
@@ -761,7 +1198,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     /* desk button */
     read_button_colors(db, inst, theme, theme->btn_desk, "desk");
 
-    /* bases:  unpressed, pressed, disabled */
+    /* bases: unpressed, pressed, disabled */
     READ_APPEARANCE_COPY("window.active.button.desk.unpressed.bg",
                          theme->btn_desk->a_focused_unpressed, TRUE,
                          a_focused_unpressed_tmp);
@@ -1133,6 +1570,13 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->osd_unhilite_label->texture[0].data.text.shadow_alpha =
         theme->osd_text_inactive_shadow_alpha;
 
+    READ_INT("osd.outline.width", theme->osd_outline_width, 0, 100, 2);
+    READ_COLOR("osd.outline.color", theme->osd_outline_color,
+        RrColorNew(inst, 0, 0, 0));
+    READ_INT("osd.outline.border.width", theme->osd_outline_border_width, 0, 100, 2);
+    READ_COLOR("osd.outline.border.color", theme->osd_outline_border_color,
+        RrColorNew(inst, 255, 255, 255));
+
     theme->a_menu_text_title->texture[0].type = RR_TEXTURE_TEXT;
     theme->a_menu_text_title->texture[0].data.text.justify = mtitlejust;
     theme->a_menu_text_title->texture[0].data.text.font =
@@ -1411,121 +1855,121 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     theme->a_menu_bullet_normal->texture[0].data.mask.mask =
     theme->a_menu_bullet_selected->texture[0].data.mask.mask =
         theme->menu_bullet_mask;
-    theme->btn_max->a_disabled_focused->texture[0].data.mask.color = 
+    theme->btn_max->a_disabled_focused->texture[0].data.mask.color =
         theme->btn_max->disabled_focused_color;
-    theme->btn_close->a_disabled_focused->texture[0].data.mask.color = 
+    theme->btn_close->a_disabled_focused->texture[0].data.mask.color =
         theme->btn_close->disabled_focused_color;
-    theme->btn_desk->a_disabled_focused->texture[0].data.mask.color = 
+    theme->btn_desk->a_disabled_focused->texture[0].data.mask.color =
         theme->btn_desk->disabled_focused_color;
-    theme->btn_shade->a_disabled_focused->texture[0].data.mask.color = 
+    theme->btn_shade->a_disabled_focused->texture[0].data.mask.color =
         theme->btn_shade->disabled_focused_color;
-    theme->btn_iconify->a_disabled_focused->texture[0].data.mask.color = 
+    theme->btn_iconify->a_disabled_focused->texture[0].data.mask.color =
         theme->btn_iconify->disabled_focused_color;
-    theme->btn_max->a_disabled_unfocused->texture[0].data.mask.color = 
+    theme->btn_max->a_disabled_unfocused->texture[0].data.mask.color =
         theme->btn_max->disabled_unfocused_color;
-    theme->btn_close->a_disabled_unfocused->texture[0].data.mask.color = 
+    theme->btn_close->a_disabled_unfocused->texture[0].data.mask.color =
         theme->btn_close->disabled_unfocused_color;
-    theme->btn_desk->a_disabled_unfocused->texture[0].data.mask.color = 
+    theme->btn_desk->a_disabled_unfocused->texture[0].data.mask.color =
         theme->btn_desk->disabled_unfocused_color;
-    theme->btn_shade->a_disabled_unfocused->texture[0].data.mask.color = 
+    theme->btn_shade->a_disabled_unfocused->texture[0].data.mask.color =
         theme->btn_shade->disabled_unfocused_color;
-    theme->btn_iconify->a_disabled_unfocused->texture[0].data.mask.color = 
+    theme->btn_iconify->a_disabled_unfocused->texture[0].data.mask.color =
         theme->btn_iconify->disabled_unfocused_color;
-    theme->btn_max->a_hover_focused->texture[0].data.mask.color = 
+    theme->btn_max->a_hover_focused->texture[0].data.mask.color =
         theme->btn_max->hover_focused_color;
-    theme->btn_close->a_hover_focused->texture[0].data.mask.color = 
+    theme->btn_close->a_hover_focused->texture[0].data.mask.color =
         theme->btn_close->hover_focused_color;
-    theme->btn_desk->a_hover_focused->texture[0].data.mask.color = 
+    theme->btn_desk->a_hover_focused->texture[0].data.mask.color =
         theme->btn_desk->hover_focused_color;
-    theme->btn_shade->a_hover_focused->texture[0].data.mask.color = 
+    theme->btn_shade->a_hover_focused->texture[0].data.mask.color =
         theme->btn_shade->hover_focused_color;
-    theme->btn_iconify->a_hover_focused->texture[0].data.mask.color = 
+    theme->btn_iconify->a_hover_focused->texture[0].data.mask.color =
         theme->btn_iconify->hover_focused_color;
-    theme->btn_max->a_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_max->a_hover_unfocused->texture[0].data.mask.color =
         theme->btn_max->hover_unfocused_color;
-    theme->btn_close->a_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_close->a_hover_unfocused->texture[0].data.mask.color =
         theme->btn_close->hover_unfocused_color;
-    theme->btn_desk->a_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_desk->a_hover_unfocused->texture[0].data.mask.color =
         theme->btn_desk->hover_unfocused_color;
-    theme->btn_shade->a_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_shade->a_hover_unfocused->texture[0].data.mask.color =
         theme->btn_shade->hover_unfocused_color;
-    theme->btn_iconify->a_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_iconify->a_hover_unfocused->texture[0].data.mask.color =
         theme->btn_iconify->hover_unfocused_color;
-    theme->btn_max->a_toggled_hover_focused->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_hover_focused->texture[0].data.mask.color =
         theme->btn_max->toggled_hover_focused_color;
-    theme->btn_desk->a_toggled_hover_focused->texture[0].data.mask.color = 
+    theme->btn_desk->a_toggled_hover_focused->texture[0].data.mask.color =
         theme->btn_desk->toggled_hover_focused_color;
-    theme->btn_shade->a_toggled_hover_focused->texture[0].data.mask.color = 
+    theme->btn_shade->a_toggled_hover_focused->texture[0].data.mask.color =
         theme->btn_shade->toggled_hover_focused_color;
-    theme->btn_max->a_toggled_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_hover_unfocused->texture[0].data.mask.color =
         theme->btn_max->toggled_hover_unfocused_color;
-    theme->btn_desk->a_toggled_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_desk->a_toggled_hover_unfocused->texture[0].data.mask.color =
         theme->btn_desk->toggled_hover_unfocused_color;
-    theme->btn_shade->a_toggled_hover_unfocused->texture[0].data.mask.color = 
+    theme->btn_shade->a_toggled_hover_unfocused->texture[0].data.mask.color =
         theme->btn_shade->toggled_hover_unfocused_color;
-    theme->btn_max->a_toggled_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_focused_unpressed->texture[0].data.mask.color =
         theme->btn_max->toggled_focused_unpressed_color;
-    theme->btn_desk->a_toggled_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_toggled_focused_unpressed->texture[0].data.mask.color =
         theme->btn_desk->toggled_focused_unpressed_color;
-    theme->btn_shade->a_toggled_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_toggled_focused_unpressed->texture[0].data.mask.color =
         theme->btn_shade->toggled_focused_unpressed_color;
-    theme->btn_max->a_toggled_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_max->toggled_unfocused_unpressed_color;
     theme->btn_desk->a_toggled_unfocused_unpressed->texture[0].data.mask.color
         = theme->btn_desk->toggled_unfocused_unpressed_color;
     theme->btn_shade->a_toggled_unfocused_unpressed->texture[0].data.mask.color
         = theme->btn_shade->toggled_unfocused_unpressed_color;
-    theme->btn_max->a_toggled_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_focused_pressed->texture[0].data.mask.color =
         theme->btn_max->toggled_focused_pressed_color;
-    theme->btn_desk->a_toggled_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_toggled_focused_pressed->texture[0].data.mask.color =
         theme->btn_desk->toggled_focused_pressed_color;
-    theme->btn_shade->a_toggled_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_toggled_focused_pressed->texture[0].data.mask.color =
         theme->btn_shade->toggled_focused_pressed_color;
-    theme->btn_max->a_toggled_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_max->a_toggled_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_max->toggled_unfocused_pressed_color;
-    theme->btn_desk->a_toggled_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_toggled_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_desk->toggled_unfocused_pressed_color;
-    theme->btn_shade->a_toggled_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_toggled_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_shade->toggled_unfocused_pressed_color;
-    theme->btn_max->a_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_max->a_focused_unpressed->texture[0].data.mask.color =
         theme->btn_max->focused_unpressed_color;
-    theme->btn_close->a_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_close->a_focused_unpressed->texture[0].data.mask.color =
         theme->btn_close->focused_unpressed_color;
-    theme->btn_desk->a_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_focused_unpressed->texture[0].data.mask.color =
         theme->btn_desk->focused_unpressed_color;
-    theme->btn_shade->a_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_focused_unpressed->texture[0].data.mask.color =
         theme->btn_shade->focused_unpressed_color;
-    theme->btn_iconify->a_focused_unpressed->texture[0].data.mask.color = 
+    theme->btn_iconify->a_focused_unpressed->texture[0].data.mask.color =
         theme->btn_iconify->focused_unpressed_color;
-    theme->btn_max->a_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_max->a_focused_pressed->texture[0].data.mask.color =
         theme->btn_max->focused_pressed_color;
-    theme->btn_close->a_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_close->a_focused_pressed->texture[0].data.mask.color =
         theme->btn_close->focused_pressed_color;
-    theme->btn_desk->a_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_focused_pressed->texture[0].data.mask.color =
         theme->btn_desk->focused_pressed_color;
-    theme->btn_shade->a_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_focused_pressed->texture[0].data.mask.color =
         theme->btn_shade->focused_pressed_color;
-    theme->btn_iconify->a_focused_pressed->texture[0].data.mask.color = 
+    theme->btn_iconify->a_focused_pressed->texture[0].data.mask.color =
         theme->btn_iconify->focused_pressed_color;
-    theme->btn_max->a_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_max->a_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_max->unfocused_unpressed_color;
-    theme->btn_close->a_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_close->a_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_close->unfocused_unpressed_color;
-    theme->btn_desk->a_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_desk->unfocused_unpressed_color;
-    theme->btn_shade->a_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_shade->unfocused_unpressed_color;
-    theme->btn_iconify->a_unfocused_unpressed->texture[0].data.mask.color = 
+    theme->btn_iconify->a_unfocused_unpressed->texture[0].data.mask.color =
         theme->btn_iconify->unfocused_unpressed_color;
-    theme->btn_max->a_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_max->a_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_max->unfocused_pressed_color;
-    theme->btn_close->a_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_close->a_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_close->unfocused_pressed_color;
-    theme->btn_desk->a_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_desk->a_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_desk->unfocused_pressed_color;
-    theme->btn_shade->a_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_shade->a_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_shade->unfocused_pressed_color;
-    theme->btn_iconify->a_unfocused_pressed->texture[0].data.mask.color = 
+    theme->btn_iconify->a_unfocused_pressed->texture[0].data.mask.color =
         theme->btn_iconify->unfocused_pressed_color;
     theme->a_menu_bullet_normal->texture[0].data.mask.color =
         theme->menu_bullet_color;
@@ -1622,6 +2066,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->cb_focused_color);
         RrColorFree(theme->title_focused_color);
         RrColorFree(theme->title_unfocused_color);
+        RrColorFree(theme->osd_focus_color);
+        RrColorFree(theme->osd_focus_border_color);
         RrColorFree(theme->titlebut_disabled_focused_color);
         RrColorFree(theme->titlebut_disabled_unfocused_color);
         RrColorFree(theme->titlebut_hover_focused_color);
@@ -1650,6 +2096,8 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->osd_text_inactive_color);
         RrColorFree(theme->osd_text_active_shadow_color);
         RrColorFree(theme->osd_text_inactive_shadow_color);
+        RrColorFree(theme->osd_outline_color);
+        RrColorFree(theme->osd_outline_border_color);
         RrColorFree(theme->osd_pressed_color);
         RrColorFree(theme->osd_unpressed_color);
         RrColorFree(theme->osd_focused_color);
@@ -1662,7 +2110,7 @@ void RrThemeFree(RrTheme *theme)
         RrColorFree(theme->menu_text_disabled_selected_shadow_color);
 
         g_free(theme->def_win_icon);
-        
+
         RrPixmapMaskFree(theme->menu_bullet_mask);
         RrPixmapMaskFree(theme->down_arrow_mask);
         RrPixmapMaskFree(theme->up_arrow_mask);
@@ -1854,6 +2302,19 @@ static gboolean read_mask(const RrInstance *inst, const gchar *path,
     return ret;
 }
 
+static RrImage* read_img(const gchar *path,
+                         const gchar *name)
+{
+    RrImage* ret;
+    gchar *s;
+
+    s = g_build_filename (path, name, NULL);
+    ret = RrImageNewFromName (ob_rr_icons, s);
+    g_free(s);
+
+    return ret;
+}
+
 static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
                              RrReliefType *relief, RrBevelType *bevel,
                              gboolean *interlaced, gboolean *border,
@@ -1903,7 +2364,11 @@ static void parse_appearance(gchar *tex, RrSurfaceColorType *grad,
         if (strstr(tex, "border") != NULL)
             *border = TRUE;
     } else {
-        if (strstr(tex, "bevel2") != NULL)
+        if (strstr(tex, "bevel4") != NULL)
+            *bevel = RR_BEVEL_4;
+        else if (strstr(tex, "bevel3") != NULL)
+            *bevel = RR_BEVEL_3;
+        else if (strstr(tex, "bevel2") != NULL)
             *bevel = RR_BEVEL_2;
         else
             *bevel = RR_BEVEL_1;
@@ -2061,8 +2526,8 @@ static RrPixel32* read_c_image(gint width, gint height, const guint8 *data)
     return im;
 }
 
-static void read_button_colors(XrmDatabase db, const RrInstance *inst, 
-                               const RrTheme *theme, RrButton *btn, 
+static void read_button_colors(XrmDatabase db, const RrInstance *inst,
+                               const RrTheme *theme, RrButton *btn,
                                const gchar *btnname)
 {
     gchar *name;
@@ -2112,7 +2577,7 @@ static void read_button_colors(XrmDatabase db, const RrInstance *inst,
     /* active hover */
     name = g_strdup_printf("window.active.button.%s.hover.image.color",
                            btnname);
-    READ_COLOR(name, btn->hover_focused_color, 
+    READ_COLOR(name, btn->hover_focused_color,
                RrColorCopy(theme->titlebut_hover_focused_color));
     g_free(name);
 
@@ -2155,10 +2620,10 @@ static void read_button_colors(XrmDatabase db, const RrInstance *inst,
     /* active toggled pressed */
     name = g_strdup_printf("window.active.button.%s.toggled.pressed."
                            "image.color", btnname);
-    READ_COLOR(name, btn->toggled_focused_pressed_color, 
+    READ_COLOR(name, btn->toggled_focused_pressed_color,
                RrColorCopy(theme->titlebut_toggled_focused_pressed_color));
     g_free(name);
-   
+
     /* inactive toggled pressed */
     name = g_strdup_printf("window.inactive.button.%s.toggled.pressed."
                            "image.color", btnname);
@@ -2166,5 +2631,3 @@ static void read_button_colors(XrmDatabase db, const RrInstance *inst,
                RrColorCopy(theme->titlebut_toggled_unfocused_pressed_color));
     g_free(name);
 }
-
-

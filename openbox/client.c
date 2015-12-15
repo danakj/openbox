@@ -388,6 +388,7 @@ void client_manage(Window window, ObPrompt *prompt)
                 place.y = r->y;
                 ob_debug("Moving buggy app from (0,0) to (%d,%d)", r->x, r->y);
             }
+
             g_slice_free(Rect, r);
         }
 
@@ -1873,6 +1874,8 @@ static void client_setup_default_decor_and_functions(ObClient *self)
         }
     }
 
+    self->decorations |= ((self->type == OB_CLIENT_TYPE_NORMAL) && config_theme_border_ethereal_force) ? OB_FRAME_DECOR_BORDER : 0;
+
     if (self->mwmhints.flags & OB_MWM_FLAG_FUNCTIONS) {
         if (! (self->mwmhints.functions & OB_MWM_FUNC_ALL)) {
             if (! (self->mwmhints.functions & OB_MWM_FUNC_RESIZE))
@@ -1890,6 +1893,8 @@ static void client_setup_default_decor_and_functions(ObClient *self)
                self->functions &= ~OB_CLIENT_FUNC_CLOSE; */
         }
     }
+
+    self->functions |= ((self->type == OB_CLIENT_TYPE_NORMAL) && config_theme_border_ethereal_force) ? OB_CLIENT_FUNC_RESIZE | OB_CLIENT_FUNC_MOVE : 0;
 
     if (!(self->functions & OB_CLIENT_FUNC_SHADE))
         self->decorations &= ~OB_FRAME_DECOR_SHADE;

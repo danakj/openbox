@@ -39,6 +39,8 @@ struct _ObGroup;
 struct _ObSessionState;
 struct _ObPrompt;
 
+#define HAS_ETHEREAL_EDGE(c) ((c)->frame->decorations & OB_FRAME_DECOR_BORDER)
+
 typedef struct _ObClient      ObClient;
 
 /*! Possible window types */

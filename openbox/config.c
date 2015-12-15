@@ -48,7 +48,11 @@ StrutPartial config_margins;
 gchar   *config_theme;
 gboolean config_theme_keepborder;
 gboolean config_theme_keepborder_maximized;
+gboolean config_theme_border_title;
+gint     config_theme_border_ethereal;
+gboolean config_theme_border_ethereal_force;
 guint    config_theme_window_list_icon_size;
+guint    config_theme_window_list_scroll_margin;
 
 gchar   *config_title_layout;
 
@@ -65,6 +69,10 @@ guint   config_desktops_num;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
+guint  config_desktops_layout;
+guint  config_desktops_layout_rows;
+guint  config_desktops_layout_cols;
+guint  config_desktops_layout_crnr;
 
 gboolean         config_resize_redraw;
 gint             config_resize_popup_show;
@@ -696,14 +704,32 @@ static void parse_theme(xmlNodePtr node, gpointer d)
         config_theme_keepborder_maximized = config_theme_keepborder = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "keepBorderMaximized")))
         config_theme_keepborder_maximized = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "borderTitle")))
+        config_theme_border_title = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "borderEthereal"))) {
+        config_theme_border_ethereal = obt_xml_node_int(n);
+        if (config_theme_border_ethereal < 0)
+            config_theme_border_ethereal = 0;
+        else if (config_theme_border_ethereal > 100)
+            config_theme_border_ethereal = 100;
+    }
+    if ((n = obt_xml_find_node(node, "borderForceCSD")))
+        config_theme_border_ethereal_force = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "animateIconify")))
         config_animate_iconify = obt_xml_node_bool(n);
     if ((n = obt_xml_find_node(node, "windowListIconSize"))) {
         config_theme_window_list_icon_size = obt_xml_node_int(n);
         if (config_theme_window_list_icon_size < 16)
             config_theme_window_list_icon_size = 16;
-        else if (config_theme_window_list_icon_size > 96)
-            config_theme_window_list_icon_size = 96;
+        else if (config_theme_window_list_icon_size > 256)
+            config_theme_window_list_icon_size = 256;
+    }
+    if ((n = obt_xml_find_node(node, "windowListScrollMargin"))) {
+        config_theme_window_list_scroll_margin = obt_xml_node_int(n);
+        if (config_theme_window_list_scroll_margin < 0)
+            config_theme_window_list_scroll_margin = 0;
+        else if (config_theme_window_list_scroll_margin > 100)
+            config_theme_window_list_scroll_margin = 100;
     }
 
     n = obt_xml_find_node(node, "font");
@@ -772,6 +798,27 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
         gint d = obt_xml_node_int(n);
         if (d > 0)
             config_desktops_num = (unsigned) d;
+    }
+    if ((n == obt_xml_find_node (node, "orientation"))) {
+        gchar *o = obt_xml_node_string(n);
+        config_desktops_layout = (g_strcmp0 (o, "horizontal") == 0) ? OB_ORIENTATION_HORZ : OB_ORIENTATION_VERT;
+    }
+    if ((n = obt_xml_find_node(node, "rows"))) {
+        gint d = obt_xml_node_int(n);
+        if (d > 0)
+            config_desktops_layout_rows = (unsigned) d;
+    }
+    if ((n = obt_xml_find_node(node, "columns"))) {
+        gint d = obt_xml_node_int(n);
+        if (d > 0)
+            config_desktops_layout_cols = (unsigned) d;
+    }
+    if ((n == obt_xml_find_node (node, "startingCorner"))) {
+        gchar *c = obt_xml_node_string(n);
+        if (g_strcmp0 (c, "topleft") == 0) config_desktops_layout_crnr = OB_CORNER_TOPLEFT;
+        if (g_strcmp0 (c, "topright") == 0) config_desktops_layout_crnr = OB_CORNER_TOPRIGHT;
+        if (g_strcmp0 (c, "bottomright") == 0) config_desktops_layout_crnr = OB_CORNER_BOTTOMRIGHT;
+        if (g_strcmp0 (c, "bottomleft") == 0) config_desktops_layout_crnr = OB_CORNER_BOTTOMLEFT;
     }
     if ((n = obt_xml_find_node(node, "firstdesk"))) {
         gint d = obt_xml_node_int(n);
@@ -1080,7 +1127,11 @@ void config_startup(ObtXmlInst *i)
     config_animate_iconify = TRUE;
     config_title_layout = g_strdup("NLIMC");
     config_theme_keepborder = TRUE;
+    config_theme_border_title = FALSE;
+    config_theme_border_ethereal = 0;
+    config_theme_border_ethereal_force = FALSE;
     config_theme_window_list_icon_size = 36;
+    config_theme_window_list_scroll_margin = 4;
 
     config_font_activewindow = NULL;
     config_font_inactivewindow = NULL;
@@ -1095,6 +1146,10 @@ void config_startup(ObtXmlInst *i)
     config_screen_firstdesk = 1;
     config_desktops_names = NULL;
     config_desktop_popup_time = 875;
+    config_desktops_layout = OB_ORIENTATION_HORZ;
+    config_desktops_layout_rows = 1;
+    config_desktops_layout_cols = config_desktops_num;
+    config_desktops_layout_crnr = OB_CORNER_TOPLEFT;
 
     obt_xml_register(i, "desktops", parse_desktops, NULL);
 

@@ -37,18 +37,18 @@
 /* Size of the hilite box around a window's icon */
 #define HILITE_SIZE (ICON_SIZE + 2*HILITE_OFFSET)
 /* Width of the outer ring around the hilite box */
-#define HILITE_WIDTH 2
+#define HILITE_WIDTH (ob_rr_theme->osd_focus_border_width)
 /* Space between the outer ring around the hilite box and the icon inside it */
-#define HILITE_MARGIN 1
+#define HILITE_MARGIN (ob_rr_theme->osd_focus_hilite_margin)
 /* Total distance from the edge of the hilite box to the icon inside it */
 #define HILITE_OFFSET (HILITE_WIDTH + HILITE_MARGIN)
 /* Margin area around the outside of the dialog */
-#define OUTSIDE_BORDER 3
+#define OUTSIDE_BORDER ((mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS) ? ob_rr_theme->osd_focus_margin_icons : ob_rr_theme->osd_focus_margin)
 /* Margin area around the text */
-#define TEXT_BORDER 2
+#define TEXT_BORDER (ob_rr_theme->osd_focus_text_margin)
 /* Scroll the list-mode list when the cursor gets within this many rows of the
    top or bottom */
-#define SCROLL_MARGIN 4
+#define SCROLL_MARGIN (gint)config_theme_window_list_scroll_margin
 
 typedef struct _ObFocusCyclePopup       ObFocusCyclePopup;
 typedef struct _ObFocusCyclePopupTarget ObFocusCyclePopupTarget;
@@ -133,9 +133,6 @@ void focus_cycle_popup_startup(gboolean reconfig)
     popup.a_text->surface.parent = popup.a_bg;
     popup.a_icon->surface.parent = popup.a_bg;
 
-    popup.a_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-    popup.a_hilite_text->texture[0].data.text.justify = RR_JUSTIFY_LEFT;
-
     /* 2 textures. texture[0] is the icon.  texture[1] is the hilight, and
        may or may not be used */
     RrAppearanceAddTextures(popup.a_icon, 2);
@@ -173,14 +170,19 @@ void focus_cycle_popup_startup(gboolean reconfig)
 
     /* create the hilite under the target icon */
     {
-        RrPixel32 color;
-        RrColor *tc;
+        RrPixel32 color, color2;
+        RrColor *tc, *tc2;
         gint x, y, o;
 
-        tc = ob_rr_theme->osd_text_active_color;
+        tc = (ob_rr_theme->osd_focus_color) ? ob_rr_theme->osd_focus_color : ob_rr_theme->osd_text_active_color;
         color = ((tc->r & 0xff) << RrDefaultRedOffset) +
             ((tc->g & 0xff) << RrDefaultGreenOffset) +
             ((tc->b & 0xff) << RrDefaultBlueOffset);
+
+        tc2 = (ob_rr_theme->osd_focus_border_color) ? ob_rr_theme->osd_focus_border_color : ob_rr_theme->osd_text_active_color;
+        color2 = ((tc2->r & 0xff) << RrDefaultRedOffset) +
+            ((tc2->g & 0xff) << RrDefaultGreenOffset) +
+            ((tc2->b & 0xff) << RrDefaultBlueOffset);
 
         o = 0;
         for (x = 0; x < HILITE_SIZE; x++)
@@ -193,13 +195,13 @@ void focus_cycle_popup_startup(gboolean reconfig)
                     y >= HILITE_SIZE - HILITE_WIDTH)
                 {
                     /* the border of the target */
-                    a = 0x88;
+                    a = ob_rr_theme->osd_focus_hilite_outer;
+                    p[o++] = color2 + (a << RrDefaultAlphaOffset);
                 } else {
                     /* the background of the target */
-                    a = 0x22;
+                    a = ob_rr_theme->osd_focus_hilite_inner;
+                    p[o++] = color + (a << RrDefaultAlphaOffset);
                 }
-
-                p[o++] = color + (a << RrDefaultAlphaOffset);
             }
     }
 
@@ -225,9 +227,6 @@ void focus_cycle_popup_shutdown(gboolean reconfig)
 
         popup.targets = g_list_delete_link(popup.targets, popup.targets);
     }
-
-    g_free(popup.a_icon->texture[1].data.rgba.data);
-    popup.a_icon->texture[1].data.rgba.data = NULL;
 
     XDestroyWindow(obt_display, popup.list_mode_up);
     XDestroyWindow(obt_display, popup.list_mode_down);
@@ -594,7 +593,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_arrow->surface.parent = p->a_bg;
         p->a_arrow->surface.parentx = up_arrow_x;
         p->a_arrow->surface.parenty = up_arrow_y;
-        RrPaint(p->a_arrow, p->list_mode_up, 
+        RrPaint(p->a_arrow, p->list_mode_up,
                 ob_rr_theme->up_arrow_mask->width,
                 ob_rr_theme->up_arrow_mask->height);
 
@@ -603,7 +602,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
         p->a_arrow->surface.parent = p->a_bg;
         p->a_arrow->surface.parentx = down_arrow_x;
         p->a_arrow->surface.parenty = down_arrow_y;
-        RrPaint(p->a_arrow, p->list_mode_down, 
+        RrPaint(p->a_arrow, p->list_mode_down,
                 ob_rr_theme->down_arrow_mask->width,
                 ob_rr_theme->down_arrow_mask->height);
     }
@@ -684,6 +683,8 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
                 target == newtarget)
             {
                 text = (target == newtarget) ? p->a_hilite_text : p->a_text;
+                text->texture[0].data.text.justify = (mode == OB_FOCUS_CYCLE_POPUP_MODE_LIST)
+                ? RR_JUSTIFY_LEFT : RR_JUSTIFY_CENTER;
                 text->texture[0].data.text.string = target->text;
                 text->surface.parentx =
                     mode == OB_FOCUS_CYCLE_POPUP_MODE_ICONS ?

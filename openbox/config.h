@@ -147,12 +147,16 @@ extern gchar *config_theme;
 /*! Show the one-pixel border after toggleDecor */
 extern gboolean config_theme_keepborder;
 extern gboolean config_theme_keepborder_maximized;
+extern gboolean config_theme_border_title;
+extern gint     config_theme_border_ethereal;
+extern gboolean config_theme_border_ethereal_force;
 /*! Titlebar button layout */
 extern gchar *config_title_layout;
 /*! Animate windows iconifying and restoring */
 extern gboolean config_animate_iconify;
 /*! Size of icons in focus switching dialogs */
 extern guint config_theme_window_list_icon_size;
+extern guint config_theme_window_list_scroll_margin;
 
 /*! The font for the active window's title */
 extern RrFont *config_font_activewindow;
@@ -175,6 +179,14 @@ extern guint config_screen_firstdesk;
 extern GSList *config_desktops_names;
 /*! Amount of time to show the desktop switch dialog */
 extern guint config_desktop_popup_time;
+/*! Screen desktop layout (horizontal/vertical) */
+extern guint config_desktops_layout;
+/*! Number of desktop rows */
+extern guint config_desktops_layout_rows;
+/*! Number of desktop columns */
+extern guint config_desktops_layout_cols;
+/*! Starting corner */
+extern guint config_desktops_layout_crnr;
 
 /*! The keycode of the key combo which resets the keybaord chains */
 extern guint config_keyboard_reset_keycode;

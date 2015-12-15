@@ -29,31 +29,36 @@
 
 static gboolean resist_move_window(Rect window,
                                    Rect target, gint resist,
-                                   gint *x, gint *y)
+                                   gint *x, gint *y,
+                                   gboolean cee, gboolean tee)
 {
     gint l, t, r, b; /* requested edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
     gint tl, tt, tr, tb; /* 1 past the target's edges on each side */
+    gint ce, te; /* Ethereal edge size */
     gboolean snapx = 0, snapy = 0;
 
-    w = window.width;
-    h = window.height;
+    ce = cee ? config_theme_border_ethereal : 0;
+    te = tee ? config_theme_border_ethereal : 0;
 
-    l = *x;
-    t = *y;
+    w = window.width - ce * 2;
+    h = window.height - ce * 2;
+
+    l = *x + ce;
+    t = *y + ce;
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = RECT_LEFT(window);
-    ct = RECT_TOP(window);
-    cr = RECT_RIGHT(window);
-    cb = RECT_BOTTOM(window);
+    cl = RECT_LEFT(window) + ce;
+    ct = RECT_TOP(window) + ce;
+    cr = RECT_RIGHT(window) - ce;
+    cb = RECT_BOTTOM(window) - ce;
 
-    tl = RECT_LEFT(target) - 1;
-    tt = RECT_TOP(target) - 1;
-    tr = RECT_RIGHT(target) + 1;
-    tb = RECT_BOTTOM(target) + 1;
+    tl = RECT_LEFT(target) + te - 1;
+    tt = RECT_TOP(target) + te - 1;
+    tr = RECT_RIGHT(target) - te + 1;
+    tb = RECT_BOTTOM(target) - te + 1;
 
     /* snapx and snapy ensure that the window snaps to the top-most
        window edge available, without going all the way from
@@ -62,36 +67,36 @@ static gboolean resist_move_window(Rect window,
     if (!snapx) {
         if (ct < tb && cb > tt) {
             if (cl >= tr && l < tr && l >= tr - resist)
-                *x = tr, snapx = TRUE;
+                *x = tr - ce, snapx = TRUE;
             else if (cr <= tl && r > tl &&
                      r <= tl + resist)
-                *x = tl - w + 1, snapx = TRUE;
+                *x = tl - ce - w + 1, snapx = TRUE;
             if (snapx) {
                 /* try to corner snap to the window */
                 if (ct > tt && t <= tt &&
                     t > tt - resist)
-                    *y = tt + 1, snapy = TRUE;
+                    *y = tt - ce + 1, snapy = TRUE;
                 else if (cb < tb && b >= tb &&
                          b < tb + resist)
-                    *y = tb - h, snapy = TRUE;
+                    *y = tb - ce - h, snapy = TRUE;
             }
         }
     }
     if (!snapy) {
         if (cl < tr && cr > tl) {
             if (ct >= tb && t < tb && t >= tb - resist)
-                *y = tb, snapy = TRUE;
+                *y = tb - ce, snapy = TRUE;
             else if (cb <= tt && b > tt &&
                      b <= tt + resist)
-                *y = tt - h + 1, snapy = TRUE;
+                *y = tt - ce - h + 1, snapy = TRUE;
             if (snapy) {
                 /* try to corner snap to the window */
                 if (cl > tl && l <= tl &&
                     l > tl - resist)
-                    *x = tl + 1, snapx = TRUE;
+                    *x = tl - ce + 1, snapx = TRUE;
                 else if (cr < tr && r >= tr &&
                          r < tr + resist)
-                    *x = tr - w, snapx = TRUE;
+                    *x = tr - ce - w, snapx = TRUE;
             }
         }
     }
@@ -124,11 +129,11 @@ void resist_move_windows(ObClient *c, gint resist, gint *x, gint *y)
             continue;
 
         if (resist_move_window(c->frame->area, target->frame->area,
-                               resist, x, y))
+                               resist, x, y, HAS_ETHEREAL_EDGE(c), HAS_ETHEREAL_EDGE(target)))
             break;
     }
     dock_get_area(&dock_area);
-    resist_move_window(c->frame->area, dock_area, resist, x, y);
+    resist_move_window(c->frame->area, dock_area, resist, x, y, HAS_ETHEREAL_EDGE(c), FALSE);
 
     frame_frame_gravity(c->frame, x, y);
 }
@@ -143,24 +148,27 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
     gint pl, pt, pr, pb; /* physical screen area edges */
     gint cl, ct, cr, cb; /* current edges */
     gint w, h; /* current size */
+    gint ce;
     Rect desired_area;
 
     if (!resist) return;
 
     frame_client_gravity(c->frame, x, y);
 
-    w = c->frame->area.width;
-    h = c->frame->area.height;
+    ce = HAS_ETHEREAL_EDGE(c) ? config_theme_border_ethereal : 0;
 
-    l = *x;
-    t = *y;
+    w = c->frame->area.width - ce * 2;
+    h = c->frame->area.height - ce * 2;
+
+    l = *x + ce;
+    t = *y + ce;
     r = l + w - 1;
     b = t + h - 1;
 
-    cl = RECT_LEFT(c->frame->area);
-    ct = RECT_TOP(c->frame->area);
-    cr = RECT_RIGHT(c->frame->area);
-    cb = RECT_BOTTOM(c->frame->area);
+    cl = RECT_LEFT(c->frame->area) + ce;
+    ct = RECT_TOP(c->frame->area) + ce;
+    cr = RECT_RIGHT(c->frame->area) - ce;
+    cb = RECT_BOTTOM(c->frame->area) - ce;
 
     RECT_SET(desired_area, c->frame->area.x, c->frame->area.y,
              c->frame->area.width, c->frame->area.height);
@@ -184,22 +192,22 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
         pb = RECT_BOTTOM(*parea);
 
         if (cl >= al && l < al && l >= al - resist)
-            *x = al;
+            *x = al - ce;
         else if (cr <= ar && r > ar && r <= ar + resist)
-            *x = ar - w + 1;
+            *x = ar - ce - w + 1;
         else if (cl >= pl && l < pl && l >= pl - resist)
-            *x = pl;
+            *x = pl - ce;
         else if (cr <= pr && r > pr && r <= pr + resist)
-            *x = pr - w + 1;
+            *x = pr - ce - w + 1;
 
         if (ct >= at && t < at && t >= at - resist)
-            *y = at;
+            *y = at - ce;
         else if (cb <= ab && b > ab && b < ab + resist)
-            *y = ab - h + 1;
+            *y = ab - ce - h + 1;
         else if (ct >= pt && t < pt && t >= pt - resist)
-            *y = pt;
+            *y = pt - ce;
         else if (cb <= pb && b > pb && b < pb + resist)
-            *y = pb - h + 1;
+            *y = pb - ce - h + 1;
 
         g_slice_free(Rect, area);
     }
@@ -208,26 +216,31 @@ void resist_move_monitors(ObClient *c, gint resist, gint *x, gint *y)
 }
 
 static gboolean resist_size_window(Rect window, Rect target, gint resist,
-                                   gint *w, gint *h, ObDirection dir)
+                                   gint *w, gint *h, ObDirection dir,
+                                   gboolean cee, gboolean tee)
 {
     gint l, t, r, b; /* my left, top, right and bottom sides */
     gint tl, tt, tr, tb; /* target's left, top, right and bottom bottom sides*/
     gint dlt, drb; /* my destination left/top and right/bottom sides */
     gboolean snapx = 0, snapy = 0;
     gint orgw, orgh;
+    gint ce, te;
 
-    l = RECT_LEFT(window);
-    t = RECT_TOP(window);
-    r = RECT_RIGHT(window);
-    b = RECT_BOTTOM(window);
+    ce = cee ? config_theme_border_ethereal : 0;
+    te = tee ? config_theme_border_ethereal : 0;
 
-    orgw = window.width;
-    orgh = window.height;
+    l = RECT_LEFT(window) + ce;
+    t = RECT_TOP(window) + ce;
+    r = RECT_RIGHT(window) - ce;
+    b = RECT_BOTTOM(window) - ce;
 
-    tl = RECT_LEFT(target);
-    tt = RECT_TOP(target);
-    tr = RECT_RIGHT(target);
-    tb = RECT_BOTTOM(target);
+    orgw = window.width - ce * 2;
+    orgh = window.height - ce * 2;
+
+    tl = RECT_LEFT(target) + te;
+    tt = RECT_TOP(target) + te;
+    tr = RECT_RIGHT(target) - te;
+    tb = RECT_BOTTOM(target) - te;
 
     if (!snapx) {
         /* horizontal snapping */
@@ -242,7 +255,7 @@ static gboolean resist_size_window(Rect window, Rect target, gint resist,
                 drb = r + *w - orgw;
                 if (r < tl && drb >= tl &&
                     drb < tl + resist)
-                    *w = tl - l, snapx = TRUE;
+                    *w = tl + ce * 2 - l, snapx = TRUE;
                 break;
             case OB_DIRECTION_WEST:
             case OB_DIRECTION_NORTHWEST:
@@ -251,7 +264,7 @@ static gboolean resist_size_window(Rect window, Rect target, gint resist,
                 drb = r;
                 if (l > tr && dlt <= tr &&
                     dlt > tr - resist)
-                    *w = r - tr, snapx = TRUE;
+                    *w = r + ce * 2 - tr, snapx = TRUE;
                 break;
             }
         }
@@ -270,7 +283,7 @@ static gboolean resist_size_window(Rect window, Rect target, gint resist,
                 drb = b + *h - orgh;
                 if (b < tt && drb >= tt &&
                     drb < tt + resist)
-                    *h = tt - t, snapy = TRUE;
+                    *h = tt + ce * 2 - t, snapy = TRUE;
                 break;
             case OB_DIRECTION_NORTH:
             case OB_DIRECTION_NORTHWEST:
@@ -279,7 +292,7 @@ static gboolean resist_size_window(Rect window, Rect target, gint resist,
                 drb = b;
                 if (t > tb && dlt <= tb &&
                     dlt > tb - resist)
-                    *h = b - tb, snapy = TRUE;
+                    *h = b + ce * 2 - tb, snapy = TRUE;
                 break;
             }
         }
@@ -311,12 +324,12 @@ void resist_size_windows(ObClient *c, gint resist, gint *w, gint *h,
             continue;
 
         if (resist_size_window(c->frame->area, target->frame->area,
-                               resist, w, h, dir))
+                               resist, w, h, dir, HAS_ETHEREAL_EDGE(c), HAS_ETHEREAL_EDGE(target)))
             break;
     }
     dock_get_area(&dock_area);
     resist_size_window(c->frame->area, dock_area,
-                       resist, w, h, dir);
+                       resist, w, h, dir, HAS_ETHEREAL_EDGE(c), FALSE);
 }
 
 void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
@@ -329,14 +342,17 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
     gint al, at, ar, ab; /* screen boundaries */
     gint pl, pt, pr, pb; /* physical screen boundaries */
     guint i;
+    gint ce;
     Rect desired_area;
 
     if (!resist) return;
 
-    l = RECT_LEFT(c->frame->area);
-    r = RECT_RIGHT(c->frame->area);
-    t = RECT_TOP(c->frame->area);
-    b = RECT_BOTTOM(c->frame->area);
+    ce = HAS_ETHEREAL_EDGE(c) ? config_theme_border_ethereal : 0;
+
+    l = RECT_LEFT(c->frame->area) + ce;
+    t = RECT_TOP(c->frame->area) + ce;
+    r = RECT_RIGHT(c->frame->area) - ce;
+    b = RECT_BOTTOM(c->frame->area) - ce;
 
     RECT_SET(desired_area, c->area.x, c->area.y, *w, *h);
 
@@ -369,9 +385,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             dlt = l;
             drb = r + *w - c->frame->area.width;
             if (r <= ar && drb > ar && drb <= ar + resist)
-                *w = ar - l + 1;
+                *w = ar + ce * 2 - l + 1;
             else if (r <= pr && drb > pr && drb <= pr + resist)
-                *w = pr - l + 1;
+                *w = pr + ce * 2 - l + 1;
             break;
         case OB_DIRECTION_WEST:
         case OB_DIRECTION_NORTHWEST:
@@ -379,9 +395,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             dlt = l - *w + c->frame->area.width;
             drb = r;
             if (l >= al && dlt < al && dlt >= al - resist)
-                *w = r - al + 1;
+                *w = r + ce * 2 - al + 1;
             else if (l >= pl && dlt < pl && dlt >= pl - resist)
-                *w = r - pl + 1;
+                *w = r + ce * 2 - pl + 1;
             break;
         }
 
@@ -395,9 +411,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             dlt = t;
             drb = b + *h - c->frame->area.height;
             if (b <= ab && drb > ab && drb <= ab + resist)
-                *h = ab - t + 1;
+                *h = ab + ce * 2 - t + 1;
             else if (b <= pb && drb > pb && drb <= pb + resist)
-                *h = pb - t + 1;
+                *h = pb + ce * 2 - t + 1;
             break;
         case OB_DIRECTION_NORTH:
         case OB_DIRECTION_NORTHWEST:
@@ -405,9 +421,9 @@ void resist_size_monitors(ObClient *c, gint resist, gint *w, gint *h,
             dlt = t - *h + c->frame->area.height;
             drb = b;
             if (t >= at && dlt < at && dlt >= at - resist)
-                *h = b - at + 1;
+                *h = b + ce * 2 - at + 1;
             else if (t >= pt && dlt < pt && dlt >= pt - resist)
-                *h = b - pt + 1;
+                *h = b + ce * 2 - pt + 1;
             break;
         }
 

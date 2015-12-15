@@ -25,6 +25,9 @@
 
 #include <glib.h>
 
+#define MAX_MENU_WIDTH 400
+extern guint max_menu_width;
+
 struct _ObClient;
 struct _ObMenuFrame;
 struct _ObMenuEntryFrame;
@@ -140,7 +143,7 @@ struct _ObSubmenuMenuEntry {
 
     gchar *name;
     ObMenu *submenu;
-    
+
     guint show_from;
 };
 

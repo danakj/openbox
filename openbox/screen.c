@@ -32,6 +32,7 @@
 #include "focus.h"
 #include "focus_cycle.h"
 #include "popup.h"
+#include "menu.h"
 #include "version.h"
 #include "obrender/render.h"
 #include "gettext.h"
@@ -371,31 +372,46 @@ void screen_startup(gboolean reconfig)
         pager_popup_text_width_to_strings(desktop_popup,
                                           screen_desktop_names,
                                           screen_num_desktops);
-        return;
+
+        /* Update _NET_DESKTOP_LAYOUT atom right after loading the config and before setting up Openbox screen.
+         * This makes X reflect configuration with which Openbox was started/reconfigured. */
+        {
+            gulong data[4];
+
+            if (config_desktops_num == (config_desktops_layout_rows * config_desktops_layout_cols)) {
+                data[0] = config_desktops_layout;
+                data[1] = config_desktops_layout_rows;
+                data[2] = config_desktops_layout_cols;
+                data[3] = config_desktops_layout_crnr;
+            }
+            else {
+                data[0] = OB_ORIENTATION_HORZ;
+                data[1] = 1;
+                data[2] = config_desktops_num;
+                data[3] = OB_CORNER_TOPLEFT;
+            }
+
+            OBT_PROP_SETA32(obt_root(ob_screen), NET_DESKTOP_LAYOUT, CARDINAL, data, 4);
+            XFlush(obt_display);
+        }
+
+        /* allow to reconfigure more stuff
+        return; */
     }
 
     /* get the initial size */
     screen_resize();
 
-    /* have names already been set for the desktops? */
-    if (OBT_PROP_GETSS_UTF8(obt_root(ob_screen), NET_DESKTOP_NAMES, &names)) {
-        g_strfreev(names);
-        namesexist = TRUE;
-    }
-
-    /* if names don't exist and we have session names, set those.
-       do this stuff BEFORE setting the number of desktops, because that
-       will create default names for them
-    */
-    if (!namesexist && session_desktop_names != NULL) {
+    /* Reconfigure desktop names */
+    if (reconfig && config_desktops_names != NULL) {
         guint i, numnames;
         GSList *it;
 
         /* get the desktop names */
-        numnames = g_slist_length(session_desktop_names);
+        numnames = g_slist_length(config_desktops_names);
         names = g_new(gchar*, numnames + 1);
         names[numnames] = NULL;
-        for (i = 0, it = session_desktop_names; it; ++i, it = g_slist_next(it))
+        for (i = 0, it = config_desktops_names; it; ++i, it = g_slist_next(it))
             names[i] = g_strdup(it->data);
 
         /* set the root window property */
@@ -404,24 +420,52 @@ void screen_startup(gboolean reconfig)
 
         g_strfreev(names);
     }
+    else {
+        /* have names already been set for the desktops? */
+        if (OBT_PROP_GETSS_UTF8(obt_root(ob_screen), NET_DESKTOP_NAMES, &names)) {
+            g_strfreev(names);
+            namesexist = TRUE;
+        }
+
+        /* if names don't exist and we have session names, set those.
+           do this stuff BEFORE setting the number of desktops, because that
+           will create default names for them
+        */
+        if (!namesexist && session_desktop_names != NULL) {
+            guint i, numnames;
+            GSList *it;
+
+            /* get the desktop names */
+            numnames = g_slist_length(session_desktop_names);
+            names = g_new(gchar*, numnames + 1);
+            names[numnames] = NULL;
+            for (i = 0, it = session_desktop_names; it; ++i, it = g_slist_next(it))
+                names[i] = g_strdup(it->data);
+
+            /* set the root window property */
+            OBT_PROP_SETSS(obt_root(ob_screen),
+                           NET_DESKTOP_NAMES, (const gchar*const*)names);
+
+            g_strfreev(names);
+        }
+    }
 
     /* set the number of desktops, if it's not already set.
 
        this will also set the default names from the config file up for
        desktops that don't have names yet */
     screen_num_desktops = 0;
-    if (OBT_PROP_GET32(obt_root(ob_screen),
-                       NET_NUMBER_OF_DESKTOPS, CARDINAL, &d))
+    if (reconfig || OBT_PROP_GET32(obt_root(ob_screen), NET_NUMBER_OF_DESKTOPS, CARDINAL, &d))
     {
-        if (d != config_desktops_num) {
+        //if (d != config_desktops_num) {
             /* TRANSLATORS: If you need to specify a different order of the
                arguments, you can use %1$d for the first one and %2$d for the
                second one. For example,
                "The current session has %2$d desktops, but Openbox is configured for %1$d ..." */
-            g_warning(ngettext("Openbox is configured for %d desktop, but the current session has %d.  Overriding the Openbox configuration.", "Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration.", config_desktops_num),
-                      config_desktops_num, d);
-        }
-        screen_set_num_desktops(d);
+            //g_warning(ngettext("Openbox is configured for %d desktop, but the current session has %d.  Overriding the Openbox configuration.", "Openbox is configured for %d desktops, but the current session has %d.  Overriding the Openbox configuration.", config_desktops_num),
+            //          config_desktops_num, d);
+        //}
+        screen_set_num_desktops(reconfig ? config_desktops_num : d);
     }
     /* restore from session if possible */
     else if (session_num_desktops)
@@ -494,6 +538,10 @@ void screen_resize(void)
     screen_physical_size.height = geometry[1] = h;
     OBT_PROP_SETA32(obt_root(ob_screen),
                     NET_DESKTOP_GEOMETRY, CARDINAL, geometry, 2);
+
+    /* Set the maximum menu width */
+    max_menu_width = w / 4;
+    max_menu_width = (max_menu_width < MAX_MENU_WIDTH) ? MAX_MENU_WIDTH : max_menu_width;
 
     if (ob_state() != OB_STATE_RUNNING)
         return;
@@ -1125,16 +1173,23 @@ static gboolean screen_validate_layout(ObDesktopLayout *l)
 }
 
 void screen_update_layout(void)
-
 {
     ObDesktopLayout l;
     guint32 *data;
     guint num;
 
-    screen_desktop_layout.orientation = OB_ORIENTATION_HORZ;
-    screen_desktop_layout.start_corner = OB_CORNER_TOPLEFT;
-    screen_desktop_layout.rows = 1;
-    screen_desktop_layout.columns = screen_num_desktops;
+    if (screen_num_desktops == (config_desktops_layout_rows * config_desktops_layout_cols)) {
+        screen_desktop_layout.orientation = config_desktops_layout;
+        screen_desktop_layout.start_corner = config_desktops_layout_crnr;
+        screen_desktop_layout.rows = config_desktops_layout_rows;
+        screen_desktop_layout.columns = config_desktops_layout_cols;
+    }
+    else {
+        screen_desktop_layout.orientation = OB_ORIENTATION_HORZ;
+        screen_desktop_layout.start_corner = OB_CORNER_TOPLEFT;
+        screen_desktop_layout.rows = 1;
+        screen_desktop_layout.columns = screen_num_desktops;
+    }
 
     if (OBT_PROP_GETA32(obt_root(ob_screen),
                         NET_DESKTOP_LAYOUT, CARDINAL, &data, &num)) {
@@ -1162,8 +1217,8 @@ void screen_update_layout(void)
                     return;
             }
 
-            l.columns = data[1];
-            l.rows = data[2];
+            l.rows = data[1];
+            l.columns = data[2];
 
             if (screen_validate_layout(&l))
                 screen_desktop_layout = l;
@@ -1181,11 +1236,12 @@ void screen_update_desktop_names(void)
     g_strfreev(screen_desktop_names);
     screen_desktop_names = NULL;
 
-    if (OBT_PROP_GETSS(obt_root(ob_screen),
+    if (OBT_PROP_GETSS_UTF8(obt_root(ob_screen),
                        NET_DESKTOP_NAMES, &screen_desktop_names))
         for (i = 0; screen_desktop_names[i] && i < screen_num_desktops; ++i);
     else
         i = 0;
+
     if (i < screen_num_desktops) {
         GSList *it;
 
@@ -1201,7 +1257,7 @@ void screen_update_desktop_names(void)
                 screen_desktop_names[i] = g_strdup(it->data);
             else
                 /* make up a nice name if it's not though */
-                screen_desktop_names[i] = g_strdup_printf(_("desktop %i"),
+                screen_desktop_names[i] = g_strdup_printf(_("Desktop %i"),
                                                           i + 1);
             if (it) it = g_slist_next(it);
         }

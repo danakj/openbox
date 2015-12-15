@@ -63,6 +63,8 @@ typedef enum {
 typedef enum {
     RR_BEVEL_1,
     RR_BEVEL_2,
+    RR_BEVEL_3,
+    RR_BEVEL_4,
     RR_BEVEL_NUM_TYPES
 } RrBevelType;
 
@@ -203,6 +205,7 @@ struct _RrTextureLineArt {
     gint y1;
     gint x2;
     gint y2;
+    guint width;
 };
 
 union _RrTextureData {
@@ -222,7 +225,7 @@ struct _RrTexture {
 
 struct _RrAppearance {
     const RrInstance *inst;
-    
+
     RrSurface surface;
     gint textures;
     RrTexture *texture;
@@ -305,7 +308,7 @@ struct _RrButton {
     RrColor *toggled_unfocused_pressed_color;
     RrColor *toggled_focused_unpressed_color;
     RrColor *toggled_unfocused_unpressed_color;
-    
+
     /* masks */
     RrPixmapMask *mask;
     RrPixmapMask *pressed_mask;
@@ -314,7 +317,7 @@ struct _RrButton {
     RrPixmapMask *toggled_mask;
     RrPixmapMask *toggled_hover_mask;
     RrPixmapMask *toggled_pressed_mask;
-   
+
     /* textures */
     RrAppearance *a_focused_unpressed;
     RrAppearance *a_unfocused_unpressed;
@@ -331,6 +334,23 @@ struct _RrButton {
     RrAppearance *a_toggled_hover_focused;
     RrAppearance *a_toggled_hover_unfocused;
 
+#if defined(USE_IMLIB2) && defined(USE_LIBRSVG)
+    /* 32-bit ARGB images */
+    RrImage* img_focused_unpressed;
+    RrImage* img_unfocused_unpressed;
+    RrImage* img_focused_pressed;
+    RrImage* img_unfocused_pressed;
+    RrImage* img_disabled_focused;
+    RrImage* img_disabled_unfocused;
+    RrImage* img_hover_focused;
+    RrImage* img_hover_unfocused;
+    RrImage* img_toggled_hover_focused;
+    RrImage* img_toggled_hover_unfocused;
+    RrImage* img_toggled_focused_pressed;
+    RrImage* img_toggled_unfocused_pressed;
+    RrImage* img_toggled_focused_unpressed;
+    RrImage* img_toggled_unfocused_unpressed;
+#endif
 };
 
 /* these are the same on all endian machines because it seems to be dependant
@@ -385,6 +405,9 @@ void          RrAppearanceClearTextures(RrAppearance *a);
 
 RrButton *RrButtonNew (const RrInstance *inst);
 void      RrButtonFree(RrButton *b);
+
+#define RrBtnIconWidth(icon) ((icon)->set->original[0]->width)
+#define RrBtnIconHeight(icon) ((icon)->set->original[0]->height)
 
 RrFont *RrFontOpen          (const RrInstance *inst, const gchar *name,
                              gint size, RrFontWeight weight, RrFontSlant slant);

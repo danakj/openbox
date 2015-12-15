@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Run after "make clean".
+# Clean the folder so that it looks like freshly pulled from git.
+
+rm autom4te.cache/*
+rmdir autom4te.cache
+rm ABOUT-NLS
+rm aclocal.m4
+rm compile
+rm config.guess
+rm config.log
+rm config.rpath
+rm config.status
+rm config.sub
+rm configure
+rm depcomp
+rm libtool
+rm ltmain.sh
+rm Makefile
+rm Makefile.in
+rm missing

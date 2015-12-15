@@ -114,6 +114,7 @@ Pixmap RrPaintPixmap(RrAppearance *a, gint w, gint h)
                     || (a->surface.interlaced))
                     pixel_data_to_pixmap(a, 0, 0, w, h);
             }
+            XSetLineAttributes(RrDisplay(a->inst), RrColorGC(a->texture[i].data.lineart.color), a->texture[i].data.lineart.width, LineSolid, CapButt, JoinBevel);
             XDrawLine(RrDisplay(a->inst), a->pixmap,
                       RrColorGC(a->texture[i].data.lineart.color),
                       a->texture[i].data.lineart.x1,
@@ -381,6 +382,12 @@ void RrMargins (RrAppearance *a, gint *l, gint *t, gint *r, gint *b)
                 break;
             case RR_BEVEL_2:
                 *l = *t = *r = *b = 2;
+                break;
+            case RR_BEVEL_3:
+                *t = *b = 1;
+                break;
+            case RR_BEVEL_4:
+                *t = *b = 2;
                 break;
             case RR_BEVEL_NUM_TYPES:
                 g_assert_not_reached();

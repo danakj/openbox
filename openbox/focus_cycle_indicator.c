@@ -24,11 +24,10 @@
 #include "frame.h"
 #include "event.h"
 #include "obrender/render.h"
+#include "obt/prop.h"
 
 #include <X11/Xlib.h>
 #include <glib.h>
-
-#define FOCUS_INDICATOR_WIDTH 6
 
 static struct
 {
@@ -39,7 +38,6 @@ static struct
 } focus_indicator;
 
 static RrAppearance *a_focus_indicator;
-static RrColor      *color_white;
 static gboolean      visible;
 
 static Window create_window(Window parent, gulong mask,
@@ -92,28 +90,36 @@ void focus_cycle_indicator_startup(gboolean reconfig)
     window_add(&focus_indicator.bottom.window,
                INTERNAL_AS_WINDOW(&focus_indicator.bottom));
 
-    color_white = RrColorNew(ob_rr_inst, 0xff, 0xff, 0xff);
+    OBT_PROP_SET32(focus_indicator.top.window, NET_WM_WINDOW_TYPE, CARDINAL, OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DND));
+    OBT_PROP_SET32(focus_indicator.left.window, NET_WM_WINDOW_TYPE, CARDINAL, OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DND));
+    OBT_PROP_SET32(focus_indicator.right.window, NET_WM_WINDOW_TYPE, CARDINAL, OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DND));
+    OBT_PROP_SET32(focus_indicator.bottom.window, NET_WM_WINDOW_TYPE, CARDINAL, OBT_PROP_ATOM(NET_WM_WINDOW_TYPE_DND));
 
-    a_focus_indicator = RrAppearanceNew(ob_rr_inst, 4);
+    a_focus_indicator = RrAppearanceNew(ob_rr_inst, ob_rr_theme->osd_outline_border_width ? 4 : 0);
     a_focus_indicator->surface.grad = RR_SURFACE_SOLID;
     a_focus_indicator->surface.relief = RR_RELIEF_FLAT;
-    a_focus_indicator->surface.primary = RrColorNew(ob_rr_inst,
-                                                    0, 0, 0);
-    a_focus_indicator->texture[0].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[0].data.lineart.color = color_white;
-    a_focus_indicator->texture[1].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[1].data.lineart.color = color_white;
-    a_focus_indicator->texture[2].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[2].data.lineart.color = color_white;
-    a_focus_indicator->texture[3].type = RR_TEXTURE_LINE_ART;
-    a_focus_indicator->texture[3].data.lineart.color = color_white;
+    a_focus_indicator->surface.primary = RrColorCopy(ob_rr_theme->osd_outline_color);
+
+    if (ob_rr_theme->osd_outline_border_width)
+    {
+        a_focus_indicator->texture[0].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[0].data.lineart.color = ob_rr_theme->osd_outline_border_color;
+        a_focus_indicator->texture[0].data.lineart.width = ob_rr_theme->osd_outline_border_width;
+        a_focus_indicator->texture[1].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[1].data.lineart.color = ob_rr_theme->osd_outline_border_color;
+        a_focus_indicator->texture[1].data.lineart.width = ob_rr_theme->osd_outline_border_width;
+        a_focus_indicator->texture[2].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[2].data.lineart.color = ob_rr_theme->osd_outline_border_color;
+        a_focus_indicator->texture[2].data.lineart.width = ob_rr_theme->osd_outline_border_width;
+        a_focus_indicator->texture[3].type = RR_TEXTURE_LINE_ART;
+        a_focus_indicator->texture[3].data.lineart.color = ob_rr_theme->osd_outline_border_color;
+        a_focus_indicator->texture[3].data.lineart.width = ob_rr_theme->osd_outline_border_width;
+    }
 }
 
 void focus_cycle_indicator_shutdown(gboolean reconfig)
 {
     if (reconfig) return;
-
-    RrColorFree(color_white);
 
     RrAppearanceFree(a_focus_indicator);
 
@@ -162,11 +168,14 @@ void focus_cycle_draw_indicator(ObClient *c)
               frame_adjust_focus(c->frame, FALSE);
           frame_adjust_focus(c->frame, TRUE);
         */
-        gint x, y, w, h;
-        gint wt, wl, wr, wb;
+        gint x, y, w, h, f;
+        gint wt, wl, wr, wb, ow, bw;
         gulong ignore_start;
 
-        wt = wl = wr = wb = FOCUS_INDICATOR_WIDTH;
+        ow = ob_rr_theme->osd_outline_width;
+        bw = ob_rr_theme->osd_outline_border_width;
+        wt = wl = wr = wb = ow + bw * 2;
+        f = bw >> 1;
 
         x = c->frame->area.x;
         y = c->frame->area.y;
@@ -178,22 +187,43 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         XMoveResizeWindow(obt_display, focus_indicator.top.window,
                           x, y, w, h);
-        a_focus_indicator->texture[0].data.lineart.x1 = 0;
-        a_focus_indicator->texture[0].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[0].data.lineart.x2 = 0;
-        a_focus_indicator->texture[0].data.lineart.y2 = 0;
-        a_focus_indicator->texture[1].data.lineart.x1 = 0;
-        a_focus_indicator->texture[1].data.lineart.y1 = 0;
-        a_focus_indicator->texture[1].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[1].data.lineart.y2 = 0;
-        a_focus_indicator->texture[2].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y1 = 0;
-        a_focus_indicator->texture[2].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[3].data.lineart.x1 = (wl-1);
-        a_focus_indicator->texture[3].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
-        a_focus_indicator->texture[3].data.lineart.y2 = h-1;
+
+        if (bw)
+        {
+            /*a_focus_indicator->texture[0].data.lineart.x1 = f;
+            a_focus_indicator->texture[0].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[0].data.lineart.x2 = f;
+            a_focus_indicator->texture[0].data.lineart.y2 = f;
+            a_focus_indicator->texture[1].data.lineart.x1 = f;
+            a_focus_indicator->texture[1].data.lineart.y1 = f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y2 = f;
+            a_focus_indicator->texture[2].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y1 = f;
+            a_focus_indicator->texture[2].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x1 = (wl-bw)+f;
+            a_focus_indicator->texture[3].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x2 = w-wr+f;
+            a_focus_indicator->texture[3].data.lineart.y2 = h-bw+f;*/
+            a_focus_indicator->texture[0].data.lineart.x1 = 0;
+            a_focus_indicator->texture[0].data.lineart.y1 = f;
+            a_focus_indicator->texture[0].data.lineart.x2 = w;
+            a_focus_indicator->texture[0].data.lineart.y2 = f;
+            a_focus_indicator->texture[1].data.lineart.x1 = 0;
+            a_focus_indicator->texture[1].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w;
+            a_focus_indicator->texture[1].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x1 = 0;
+            a_focus_indicator->texture[2].data.lineart.y1 = 0;
+            a_focus_indicator->texture[2].data.lineart.x2 = 0;
+            a_focus_indicator->texture[2].data.lineart.y2 = 0;
+            a_focus_indicator->texture[3].data.lineart.x1 = 0;
+            a_focus_indicator->texture[3].data.lineart.y1 = 0;
+            a_focus_indicator->texture[3].data.lineart.x2 = 0;
+            a_focus_indicator->texture[3].data.lineart.y2 = 0;
+        }
+
         RrPaint(a_focus_indicator, focus_indicator.top.window,
                 w, h);
 
@@ -204,48 +234,90 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         XMoveResizeWindow(obt_display, focus_indicator.left.window,
                           x, y, w, h);
-        a_focus_indicator->texture[0].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[0].data.lineart.y1 = 0;
-        a_focus_indicator->texture[0].data.lineart.x2 = 0;
-        a_focus_indicator->texture[0].data.lineart.y2 = 0;
-        a_focus_indicator->texture[1].data.lineart.x1 = 0;
-        a_focus_indicator->texture[1].data.lineart.y1 = 0;
-        a_focus_indicator->texture[1].data.lineart.x2 = 0;
-        a_focus_indicator->texture[1].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x1 = 0;
-        a_focus_indicator->texture[2].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[3].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
-        a_focus_indicator->texture[3].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
+
+        if (bw)
+        {
+            /*a_focus_indicator->texture[0].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[0].data.lineart.y1 = f;
+            a_focus_indicator->texture[0].data.lineart.x2 = f;
+            a_focus_indicator->texture[0].data.lineart.y2 = f;
+            a_focus_indicator->texture[1].data.lineart.x1 = f;
+            a_focus_indicator->texture[1].data.lineart.y1 = f;
+            a_focus_indicator->texture[1].data.lineart.x2 = f;
+            a_focus_indicator->texture[1].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x1 = f;
+            a_focus_indicator->texture[2].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[3].data.lineart.y1 = wt-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[3].data.lineart.y2 = h-wb+f;*/
+            a_focus_indicator->texture[0].data.lineart.x1 = f;
+            a_focus_indicator->texture[0].data.lineart.y1 = h;
+            a_focus_indicator->texture[0].data.lineart.x2 = f;
+            a_focus_indicator->texture[0].data.lineart.y2 = 0;
+            a_focus_indicator->texture[1].data.lineart.x1 = bw;
+            a_focus_indicator->texture[1].data.lineart.y1 = f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w;
+            a_focus_indicator->texture[1].data.lineart.y2 = f;
+            a_focus_indicator->texture[2].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y1 = h-wb;
+            a_focus_indicator->texture[2].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y2 = wt-bw;
+            a_focus_indicator->texture[3].data.lineart.x1 = 0;
+            a_focus_indicator->texture[3].data.lineart.y1 = 0;
+            a_focus_indicator->texture[3].data.lineart.x2 = 0;
+            a_focus_indicator->texture[3].data.lineart.y2 = 0;
+        }
+
         RrPaint(a_focus_indicator, focus_indicator.left.window,
                 w, h);
 
         x = c->frame->area.x + c->frame->area.width - wr;
         y = c->frame->area.y;
         w = wr;
-        h = c->frame->area.height ;
+        h = c->frame->area.height;
 
         XMoveResizeWindow(obt_display, focus_indicator.right.window,
                           x, y, w, h);
-        a_focus_indicator->texture[0].data.lineart.x1 = 0;
-        a_focus_indicator->texture[0].data.lineart.y1 = 0;
-        a_focus_indicator->texture[0].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[0].data.lineart.y2 = 0;
-        a_focus_indicator->texture[1].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[1].data.lineart.y1 = 0;
-        a_focus_indicator->texture[1].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[1].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x2 = 0;
-        a_focus_indicator->texture[2].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[3].data.lineart.x1 = 0;
-        a_focus_indicator->texture[3].data.lineart.y1 = wt-1;
-        a_focus_indicator->texture[3].data.lineart.x2 = 0;
-        a_focus_indicator->texture[3].data.lineart.y2 = h - wb;
+
+        if (bw)
+        {
+            /*a_focus_indicator->texture[0].data.lineart.x1 = f;
+            a_focus_indicator->texture[0].data.lineart.y1 = f;
+            a_focus_indicator->texture[0].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[0].data.lineart.y2 = f;
+            a_focus_indicator->texture[1].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y1 = f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x2 = f;
+            a_focus_indicator->texture[2].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x1 = f;
+            a_focus_indicator->texture[3].data.lineart.y1 = wt-bw+f;
+            a_focus_indicator->texture[3].data.lineart.x2 = f;
+            a_focus_indicator->texture[3].data.lineart.y2 = h-wb+f;*/
+            a_focus_indicator->texture[0].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[0].data.lineart.y1 = 0;
+            a_focus_indicator->texture[0].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[0].data.lineart.y2 = h;
+            a_focus_indicator->texture[1].data.lineart.x1 = 0;
+            a_focus_indicator->texture[1].data.lineart.y1 = f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w-bw;
+            a_focus_indicator->texture[1].data.lineart.y2 = f;
+            a_focus_indicator->texture[2].data.lineart.x1 = f;
+            a_focus_indicator->texture[2].data.lineart.y1 = wt-bw;
+            a_focus_indicator->texture[2].data.lineart.x2 = f;
+            a_focus_indicator->texture[2].data.lineart.y2 = h-bw;
+            a_focus_indicator->texture[3].data.lineart.x1 = 0;
+            a_focus_indicator->texture[3].data.lineart.y1 = 0;
+            a_focus_indicator->texture[3].data.lineart.x2 = 0;
+            a_focus_indicator->texture[3].data.lineart.y2 = 0;
+        }
+
         RrPaint(a_focus_indicator, focus_indicator.right.window,
                 w, h);
 
@@ -256,22 +328,43 @@ void focus_cycle_draw_indicator(ObClient *c)
 
         XMoveResizeWindow(obt_display, focus_indicator.bottom.window,
                           x, y, w, h);
-        a_focus_indicator->texture[0].data.lineart.x1 = 0;
-        a_focus_indicator->texture[0].data.lineart.y1 = 0;
-        a_focus_indicator->texture[0].data.lineart.x2 = 0;
-        a_focus_indicator->texture[0].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[1].data.lineart.x1 = 0;
-        a_focus_indicator->texture[1].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[1].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[1].data.lineart.y2 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x1 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y1 = h-1;
-        a_focus_indicator->texture[2].data.lineart.x2 = w-1;
-        a_focus_indicator->texture[2].data.lineart.y2 = 0;
-        a_focus_indicator->texture[3].data.lineart.x1 = wl-1;
-        a_focus_indicator->texture[3].data.lineart.y1 = 0;
-        a_focus_indicator->texture[3].data.lineart.x2 = w - wr;
-        a_focus_indicator->texture[3].data.lineart.y2 = 0;
+
+        if (bw)
+        {
+            /*a_focus_indicator->texture[0].data.lineart.x1 = f;
+            a_focus_indicator->texture[0].data.lineart.y1 = f;
+            a_focus_indicator->texture[0].data.lineart.x2 = f;
+            a_focus_indicator->texture[0].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[1].data.lineart.x1 = f;
+            a_focus_indicator->texture[1].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[1].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[2].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[2].data.lineart.y2 = f;
+            a_focus_indicator->texture[3].data.lineart.x1 = wl-bw+f;
+            a_focus_indicator->texture[3].data.lineart.y1 = f;
+            a_focus_indicator->texture[3].data.lineart.x2 = w-wr+f;
+            a_focus_indicator->texture[3].data.lineart.y2 = f;*/
+            a_focus_indicator->texture[0].data.lineart.x1 = w;
+            a_focus_indicator->texture[0].data.lineart.y1 = h-bw+f;
+            a_focus_indicator->texture[0].data.lineart.x2 = 0;
+            a_focus_indicator->texture[0].data.lineart.y2 = h-bw+f;
+            a_focus_indicator->texture[1].data.lineart.x1 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y1 = 0;
+            a_focus_indicator->texture[1].data.lineart.x2 = w-bw+f;
+            a_focus_indicator->texture[1].data.lineart.y2 = h;
+            a_focus_indicator->texture[2].data.lineart.x1 = f;
+            a_focus_indicator->texture[2].data.lineart.y1 = 0;
+            a_focus_indicator->texture[2].data.lineart.x2 = f;
+            a_focus_indicator->texture[2].data.lineart.y2 = h;
+            a_focus_indicator->texture[3].data.lineart.x1 = w-wr+bw;
+            a_focus_indicator->texture[3].data.lineart.y1 = f;
+            a_focus_indicator->texture[3].data.lineart.x2 = wl-bw;
+            a_focus_indicator->texture[3].data.lineart.y2 = f;
+        }
+
         RrPaint(a_focus_indicator, focus_indicator.bottom.window,
                 w, h);
 

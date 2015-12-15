@@ -1,11 +1,11 @@
 AC_PREREQ([2.54])
-AC_INIT([openbox], [3.5.2], [http://bugzilla.icculus.org])
+AC_INIT([openbox], [3.6.2], [https://github.com/garnetius/openbox])
 AC_CONFIG_SRCDIR([openbox/openbox.c])
 
 AM_INIT_AUTOMAKE([foreign])
 AM_SILENT_RULES([yes])
 
-OB_VERSION=$PACKAGE_VERSION
+OB_VERSION=3.6.2
 AC_SUBST(OB_VERSION)
 
 dnl Making releases:

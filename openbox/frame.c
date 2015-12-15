@@ -348,13 +348,13 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         self->shaded = self->client->shaded;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER)
-            self->bwidth = self->client->undecorated ?
+            self->bwidth = (self->client->undecorated && !config_theme_border_ethereal_force) ?
                 ob_rr_theme->ubwidth : ob_rr_theme->fbwidth;
         else
             self->bwidth = 0;
 
         if (self->decorations & OB_FRAME_DECOR_BORDER &&
-            !self->client->undecorated)
+            (!self->client->undecorated || config_theme_border_ethereal_force))
         {
             self->cbwidth_l = self->cbwidth_r = ob_rr_theme->cbwidthx;
             self->cbwidth_t = self->cbwidth_b = ob_rr_theme->cbwidthy;
@@ -385,12 +385,14 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                   (!self->max_horz || !self->max_vert ? self->bwidth : 0));
 
         if (self->decorations & OB_FRAME_DECOR_TITLEBAR)
-            self->size.top += ob_rr_theme->title_height + self->bwidth;
-        else if (self->max_horz && self->max_vert) {
+        {
+            self->size.top += ob_rr_theme->title_height + ((self->shaded || config_theme_border_title) ? self->bwidth : 0);
+        }
+        else if (self->max_horz && self->max_vert && !config_theme_keepborder_maximized) {
             /* A maximized and undecorated window needs a border on the
                top of the window to let the user still undecorate/unmaximize the
                window via the client menu. */
-            self->size.top += self->bwidth;
+            self->size.top += config_theme_border_title ? self->bwidth : 0;
         }
 
         if (self->decorations & OB_FRAME_DECOR_HANDLE &&
@@ -418,7 +420,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_l && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbll,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_l,
@@ -441,7 +443,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
             if (self->cbwidth_r && innercornerheight > 0) {
                 XMoveResizeWindow(obt_display, self->innerbrr,
                                   0,
-                                  self->client->area.height - 
+                                  self->client->area.height -
                                   (ob_rr_theme->grip_width -
                                    self->size.bottom),
                                   self->cbwidth_r,
@@ -539,16 +541,16 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
                 XMapWindow(obt_display, self->titletopleft);
                 XMapWindow(obt_display, self->titletopright);
 
-                if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
-                    XMoveResizeWindow(obt_display, self->titlebottom,
+                if (self->shaded || config_theme_border_title)
+                {
+                  XMoveResizeWindow(obt_display, self->titlebottom,
                                       (self->max_horz ? 0 : self->bwidth),
                                       ob_rr_theme->title_height + self->bwidth,
                                       self->width,
                                       self->bwidth);
-
-                    XMapWindow(obt_display, self->titlebottom);
-                } else
-                    XUnmapWindow(obt_display, self->titlebottom);
+                  XMapWindow(obt_display, self->titlebottom);
+                }
+                else XUnmapWindow(obt_display, self->titlebottom);
             } else {
                 XUnmapWindow(obt_display, self->titlebottom);
 
@@ -1181,8 +1183,10 @@ static void layout_title(ObFrame *self)
 {
     gchar *lc;
     gint i;
+    gint mw, mh, iw, ih, dw, dh, sw, sh, cw, ch;
+    RrImage* icon;
 
-    const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
+    const gint bwidth = ob_rr_theme->button_size + (ob_rr_theme->paddingx + 1);
     /* position of the leftmost button */
     const gint left = ob_rr_theme->paddingx + 1;
     /* position of the rightmost button */
@@ -1228,19 +1232,49 @@ static void layout_title(ObFrame *self)
                 place_button(self, lc, bwidth + 2, left, i, &x, &self->icon_on, &self->icon_x);
             } else if (*lc == 'D') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ALLDESKTOPS;
-                place_button(self, lc, bwidth, left, i, &x, &self->desk_on, &self->desk_x);
+                icon = ob_rr_theme->btn_desk->img_focused_unpressed;
+                if (icon == NULL) place_button(self, lc, bwidth, left, i, &x, &self->desk_on, &self->desk_x);
+                else {
+                    dh = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+                    dw = ((dh == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - dh) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon)));
+                    place_button(self, lc, dw + ((x == right) ? (ob_rr_theme->paddingx + 1) : ob_rr_theme->button_spacing), left, i, &x, &self->desk_on, &self->desk_x);
+                }
             } else if (*lc == 'S') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_SHADE;
-                place_button(self, lc, bwidth, left, i, &x, &self->shade_on, &self->shade_x);
+                icon = ob_rr_theme->btn_shade->img_focused_unpressed;
+                if (icon == NULL) place_button(self, lc, bwidth, left, i, &x, &self->shade_on, &self->shade_x);
+                else {
+                    sh = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+                    sw = ((sh == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - sh) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon)));
+                    place_button(self, lc, sw + ((x == right) ? (ob_rr_theme->paddingx + 1) : ob_rr_theme->button_spacing), left, i, &x, &self->shade_on, &self->shade_x);
+                }
             } else if (*lc == 'I') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_ICONIFY;
-                place_button(self, lc, bwidth, left, i, &x, &self->iconify_on, &self->iconify_x);
+                icon = ob_rr_theme->btn_iconify->img_focused_unpressed;
+                if (icon == NULL) place_button(self, lc, bwidth, left, i, &x, &self->iconify_on, &self->iconify_x);
+                else {
+                    ih = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+                    iw = ((ih == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - ih) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon)));
+                    place_button(self, lc, iw + ((x == right) ? (ob_rr_theme->paddingx + 1) : ob_rr_theme->button_spacing), left, i, &x, &self->iconify_on, &self->iconify_x);
+                }
             } else if (*lc == 'M') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_MAXIMIZE;
-                place_button(self, lc, bwidth, left, i, &x, &self->max_on, &self->max_x);
+                icon = ob_rr_theme->btn_max->img_focused_unpressed;
+                if (icon == NULL) place_button(self, lc, bwidth, left, i, &x, &self->max_on, &self->max_x);
+                else {
+                    mh = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+                    mw = ((mh == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - mh) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon)));
+                    place_button(self, lc, mw + ((x == right) ? (ob_rr_theme->paddingx + 1) : ob_rr_theme->button_spacing), left, i, &x, &self->max_on, &self->max_x);
+                }
             } else if (*lc == 'C') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
-                place_button(self, lc, bwidth, left, i, &x, &self->close_on, &self->close_x);
+                icon = ob_rr_theme->btn_close->img_focused_unpressed;
+                if (icon == NULL) place_button(self, lc, bwidth, left, i, &x, &self->close_on, &self->close_x);
+                else {
+                    ch = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+                    cw = ((ch == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - ch) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon)));
+                    place_button(self, lc, cw + ((x == right) ? (ob_rr_theme->paddingx + 1) : ob_rr_theme->button_spacing), left, i, &x, &self->close_on, &self->close_x);
+                }
             } else
                 continue; /* don't set firstcon */
             firstcon = NULL;
@@ -1257,36 +1291,46 @@ static void layout_title(ObFrame *self)
 
     if (self->desk_on) {
         XMapWindow(obt_display, self->desk);
-        XMoveWindow(obt_display, self->desk, self->desk_x,
-                    ob_rr_theme->paddingy + 1);
+        if (ob_rr_theme->btn_desk->img_focused_unpressed == NULL) XMoveWindow(obt_display,
+            self->desk, self->desk_x, ob_rr_theme->paddingy + 1);
+        else XMoveResizeWindow(obt_display, self->desk, self->desk_x,
+            ((ob_rr_theme->title_height - ch) / 2), dw, dh);
     } else
         XUnmapWindow(obt_display, self->desk);
 
     if (self->shade_on) {
         XMapWindow(obt_display, self->shade);
-        XMoveWindow(obt_display, self->shade, self->shade_x,
-                    ob_rr_theme->paddingy + 1);
+        if (ob_rr_theme->btn_shade->img_focused_unpressed == NULL) XMoveWindow(obt_display,
+            self->shade, self->shade_x, ob_rr_theme->paddingy + 1);
+        else XMoveResizeWindow(obt_display, self->shade, self->shade_x,
+            ((ob_rr_theme->title_height - ch) / 2), sw, sh);
     } else
         XUnmapWindow(obt_display, self->shade);
 
     if (self->iconify_on) {
         XMapWindow(obt_display, self->iconify);
-        XMoveWindow(obt_display, self->iconify, self->iconify_x,
-                    ob_rr_theme->paddingy + 1);
+        if (ob_rr_theme->btn_iconify->img_focused_unpressed == NULL) XMoveWindow(obt_display,
+            self->iconify, self->iconify_x, ob_rr_theme->paddingy + 1);
+        else XMoveResizeWindow(obt_display, self->iconify, self->iconify_x,
+            ((ob_rr_theme->title_height - ch) / 2), iw, ih);
     } else
         XUnmapWindow(obt_display, self->iconify);
 
     if (self->max_on) {
         XMapWindow(obt_display, self->max);
-        XMoveWindow(obt_display, self->max, self->max_x,
-                    ob_rr_theme->paddingy + 1);
+        if (ob_rr_theme->btn_max->img_focused_unpressed == NULL) XMoveWindow(obt_display,
+            self->max, self->max_x, ob_rr_theme->paddingy + 1);
+        else XMoveResizeWindow(obt_display, self->max, self->max_x,
+            ((ob_rr_theme->title_height - ch) / 2), mw, mh);
     } else
         XUnmapWindow(obt_display, self->max);
 
     if (self->close_on) {
         XMapWindow(obt_display, self->close);
-        XMoveWindow(obt_display, self->close, self->close_x,
-                    ob_rr_theme->paddingy + 1);
+        if (ob_rr_theme->btn_close->img_focused_unpressed == NULL) XMoveWindow(obt_display,
+            self->close, self->close_x, ob_rr_theme->paddingy + 1);
+        else XMoveResizeWindow(obt_display, self->close, self->close_x,
+            ((ob_rr_theme->title_height - ch) / 2), cw, ch);
     } else
         XUnmapWindow(obt_display, self->close);
 
@@ -1862,7 +1906,7 @@ void frame_begin_iconify_animation(ObFrame *self, gboolean iconifying)
             g_timeout_add_full(G_PRIORITY_DEFAULT,
                                FRAME_ANIMATE_ICONIFY_STEP_TIME,
                                frame_animate_iconify, self, NULL);
-                               
+
 
         /* do the first step */
         frame_animate_iconify(self);

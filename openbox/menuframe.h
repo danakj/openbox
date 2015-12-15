@@ -70,6 +70,8 @@ struct _ObMenuFrame
     gint text_x;  /* offset at which the text appears in the items */
     gint text_w;  /* width of the text area in the items */
     gint text_h;  /* height of the items */
+    gint icon_w;
+    gint icon_h;
 
     gint monitor; /* monitor on which to show the menu in xinerama */
 

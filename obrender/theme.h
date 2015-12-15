@@ -47,11 +47,15 @@ struct _RrTheme {
     gint ubwidth; /*!< undecorated frame border width */
     gint cbwidthx;
     gint cbwidthy;
+    gint button_spacing;
     gint menu_overlap_x;
     gint menu_overlap_y;
     gint menu_sep_width;
     gint menu_sep_paddingx;
     gint menu_sep_paddingy;
+    gint menu_paddingx;
+    gint menu_paddingy;
+    gint menu_spacing;
     /* these ones are calculated, not set directly by the theme file */
     gint win_font_height;
     gint menu_title_font_height;
@@ -62,10 +66,21 @@ struct _RrTheme {
     gint grip_width;
     gint menu_title_label_height;
     gint menu_title_height;
+    gint osd_paddingx;
+    gint osd_paddingy;
+    gint osd_focus_border_width;
+    gint osd_focus_hilite_outer;
+    gint osd_focus_hilite_inner;
+    gint osd_focus_hilite_margin;
+    gint osd_focus_text_margin;
+    gint osd_focus_margin_icons;
+    gint osd_focus_margin;
 
     /* style settings - colors */
     RrColor *menu_border_color;
     RrColor *osd_border_color;
+    RrColor *osd_focus_border_color;
+    RrColor *osd_focus_color;
     RrColor *frame_focused_border_color;
     RrColor *frame_undecorated_focused_border_color;
     RrColor *frame_unfocused_border_color;
@@ -106,6 +121,10 @@ struct _RrTheme {
     RrColor *osd_text_inactive_color;
     RrColor *osd_text_active_shadow_color;
     RrColor *osd_text_inactive_shadow_color;
+    RrColor *osd_outline_color;
+    RrColor *osd_outline_border_color;
+    gint     osd_outline_width;
+    gint     osd_outline_border_width;
     gchar    osd_text_active_shadow_alpha;
     gchar    osd_text_inactive_shadow_alpha;
     RrColor *osd_pressed_color;
@@ -138,7 +157,7 @@ struct _RrTheme {
     RrPixmapMask *down_arrow_mask;
     RrPixmapMask *up_arrow_mask;
 
-    /* buttons */
+    /* buttons (X bitmaps) */
     RrButton *btn_max;
     RrButton *btn_close;
     RrButton *btn_desk;

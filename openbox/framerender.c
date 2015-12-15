@@ -26,11 +26,11 @@
 
 static void framerender_label(ObFrame *self, RrAppearance *a);
 static void framerender_icon(ObFrame *self, RrAppearance *a);
-static void framerender_max(ObFrame *self, RrAppearance *a);
-static void framerender_iconify(ObFrame *self, RrAppearance *a);
-static void framerender_desk(ObFrame *self, RrAppearance *a);
-static void framerender_shade(ObFrame *self, RrAppearance *a);
-static void framerender_close(ObFrame *self, RrAppearance *a);
+static void framerender_max(ObFrame *self, RrAppearance *a, RrImage* icon);
+static void framerender_iconify(ObFrame *self, RrAppearance *a, RrImage* icon);
+static void framerender_desk(ObFrame *self, RrAppearance *a, RrImage* icon);
+static void framerender_shade(ObFrame *self, RrAppearance *a, RrImage* icon);
+static void framerender_close(ObFrame *self, RrAppearance *a, RrImage* icon);
 
 void framerender_frame(ObFrame *self)
 {
@@ -127,6 +127,7 @@ void framerender_frame(ObFrame *self)
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
         RrAppearance *t, *l, *m, *n, *i, *d, *s, *c, *clear;
+        RrImage *mi, *ii, *di, *si, *ci;
         if (self->focused) {
             t = ob_rr_theme->a_focused_title;
             l = ob_rr_theme->a_focused_label;
@@ -143,6 +144,19 @@ void framerender_frame(ObFrame *self)
                    (self->max_hover ?
                     ob_rr_theme->btn_max->a_hover_focused :
                     ob_rr_theme->btn_max->a_focused_unpressed))));
+            mi = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
+                 ob_rr_theme->btn_max->img_disabled_focused :
+                 (self->client->max_vert || self->client->max_horz ?
+                  (self->max_press ?
+                   ob_rr_theme->btn_max->img_toggled_focused_pressed :
+                   (self->max_hover ?
+                    ob_rr_theme->btn_max->img_toggled_hover_focused :
+                    ob_rr_theme->btn_max->img_toggled_focused_unpressed)) :
+                  (self->max_press ?
+                   ob_rr_theme->btn_max->img_focused_pressed :
+                   (self->max_hover ?
+                    ob_rr_theme->btn_max->img_hover_focused :
+                    ob_rr_theme->btn_max->img_focused_unpressed))));
             n = ob_rr_theme->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
                  ob_rr_theme->btn_iconify->a_disabled_focused :
@@ -151,6 +165,13 @@ void framerender_frame(ObFrame *self)
                   (self->iconify_hover ?
                    ob_rr_theme->btn_iconify->a_hover_focused :
                    ob_rr_theme->btn_iconify->a_focused_unpressed)));
+            ii = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
+                 ob_rr_theme->btn_iconify->img_disabled_focused :
+                 (self->iconify_press ?
+                  ob_rr_theme->btn_iconify->img_focused_pressed :
+                  (self->iconify_hover ?
+                   ob_rr_theme->btn_iconify->img_hover_focused :
+                   ob_rr_theme->btn_iconify->img_focused_unpressed)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                  ob_rr_theme->btn_desk->a_disabled_focused :
                  (self->client->desktop == DESKTOP_ALL ?
@@ -164,6 +185,19 @@ void framerender_frame(ObFrame *self)
                    (self->desk_hover ?
                     ob_rr_theme->btn_desk->a_hover_focused :
                     ob_rr_theme->btn_desk->a_focused_unpressed))));
+            di = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
+                 ob_rr_theme->btn_desk->img_disabled_focused :
+                 (self->client->desktop == DESKTOP_ALL ?
+                  (self->desk_press ?
+                   ob_rr_theme->btn_desk->img_toggled_focused_pressed :
+                   (self->desk_hover ?
+                    ob_rr_theme->btn_desk->img_toggled_hover_focused :
+                    ob_rr_theme->btn_desk->img_toggled_focused_unpressed)) :
+                  (self->desk_press ?
+                   ob_rr_theme->btn_desk->img_focused_pressed :
+                   (self->desk_hover ?
+                    ob_rr_theme->btn_desk->img_hover_focused :
+                    ob_rr_theme->btn_desk->img_focused_unpressed))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
                  ob_rr_theme->btn_shade->a_disabled_focused :
                  (self->client->shaded ?
@@ -177,6 +211,19 @@ void framerender_frame(ObFrame *self)
                    (self->shade_hover ?
                     ob_rr_theme->btn_shade->a_hover_focused :
                     ob_rr_theme->btn_shade->a_focused_unpressed))));
+            si = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
+                 ob_rr_theme->btn_shade->img_disabled_focused :
+                 (self->client->shaded ?
+                  (self->shade_press ?
+                   ob_rr_theme->btn_shade->img_toggled_focused_pressed :
+                   (self->shade_hover ?
+                    ob_rr_theme->btn_shade->img_toggled_hover_focused :
+                    ob_rr_theme->btn_shade->img_toggled_focused_unpressed)) :
+                  (self->shade_press ?
+                   ob_rr_theme->btn_shade->img_focused_pressed :
+                   (self->shade_hover ?
+                    ob_rr_theme->btn_shade->img_hover_focused :
+                    ob_rr_theme->btn_shade->img_focused_unpressed))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
                  ob_rr_theme->btn_close->a_disabled_focused :
                  (self->close_press ?
@@ -184,6 +231,13 @@ void framerender_frame(ObFrame *self)
                   (self->close_hover ?
                    ob_rr_theme->btn_close->a_hover_focused :
                    ob_rr_theme->btn_close->a_focused_unpressed)));
+            ci = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
+                 ob_rr_theme->btn_close->img_disabled_focused :
+                 (self->close_press ?
+                  ob_rr_theme->btn_close->img_focused_pressed :
+                  (self->close_hover ?
+                   ob_rr_theme->btn_close->img_hover_focused :
+                   ob_rr_theme->btn_close->img_focused_unpressed)));
         } else {
             t = ob_rr_theme->a_unfocused_title;
             l = ob_rr_theme->a_unfocused_label;
@@ -200,6 +254,19 @@ void framerender_frame(ObFrame *self)
                    (self->max_hover ?
                     ob_rr_theme->btn_max->a_hover_unfocused :
                     ob_rr_theme->btn_max->a_unfocused_unpressed))));
+            mi = (!(self->decorations & OB_FRAME_DECOR_MAXIMIZE) ?
+                 ob_rr_theme->btn_max->img_disabled_unfocused :
+                 (self->client->max_vert || self->client->max_horz ?
+                  (self->max_press ?
+                   ob_rr_theme->btn_max->img_toggled_unfocused_pressed :
+                   (self->max_hover ?
+                    ob_rr_theme->btn_max->img_toggled_hover_unfocused :
+                    ob_rr_theme->btn_max->img_toggled_unfocused_unpressed)) :
+                  (self->max_press ?
+                   ob_rr_theme->btn_max->img_unfocused_pressed :
+                   (self->max_hover ?
+                    ob_rr_theme->btn_max->img_hover_unfocused :
+                    ob_rr_theme->btn_max->img_unfocused_unpressed))));
             n = ob_rr_theme->a_icon;
             i = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
                  ob_rr_theme->btn_iconify->a_disabled_unfocused :
@@ -208,6 +275,13 @@ void framerender_frame(ObFrame *self)
                   (self->iconify_hover ?
                    ob_rr_theme->btn_iconify->a_hover_unfocused :
                    ob_rr_theme->btn_iconify->a_unfocused_unpressed)));
+            ii = (!(self->decorations & OB_FRAME_DECOR_ICONIFY) ?
+                 ob_rr_theme->btn_iconify->img_disabled_unfocused :
+                 (self->iconify_press ?
+                  ob_rr_theme->btn_iconify->img_unfocused_pressed :
+                  (self->iconify_hover ?
+                   ob_rr_theme->btn_iconify->img_hover_unfocused :
+                   ob_rr_theme->btn_iconify->img_unfocused_unpressed)));
             d = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
                  ob_rr_theme->btn_desk->a_disabled_unfocused :
                  (self->client->desktop == DESKTOP_ALL ?
@@ -221,6 +295,19 @@ void framerender_frame(ObFrame *self)
                    (self->desk_hover ?
                     ob_rr_theme->btn_desk->a_hover_unfocused :
                     ob_rr_theme->btn_desk->a_unfocused_unpressed))));
+            di = (!(self->decorations & OB_FRAME_DECOR_ALLDESKTOPS) ?
+                 ob_rr_theme->btn_desk->img_disabled_unfocused :
+                 (self->client->desktop == DESKTOP_ALL ?
+                  (self->desk_press ?
+                   ob_rr_theme->btn_desk->img_toggled_unfocused_pressed :
+                   (self->desk_hover ?
+                    ob_rr_theme->btn_desk->img_toggled_hover_unfocused :
+                    ob_rr_theme->btn_desk->img_toggled_unfocused_unpressed)) :
+                  (self->desk_press ?
+                   ob_rr_theme->btn_desk->img_unfocused_pressed :
+                   (self->desk_hover ?
+                    ob_rr_theme->btn_desk->img_hover_unfocused :
+                    ob_rr_theme->btn_desk->img_unfocused_unpressed))));
             s = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
                  ob_rr_theme->btn_shade->a_disabled_unfocused :
                  (self->client->shaded ?
@@ -234,6 +321,19 @@ void framerender_frame(ObFrame *self)
                    (self->shade_hover ?
                     ob_rr_theme->btn_shade->a_hover_unfocused :
                     ob_rr_theme->btn_shade->a_unfocused_unpressed))));
+            si = (!(self->decorations & OB_FRAME_DECOR_SHADE) ?
+                 ob_rr_theme->btn_shade->img_disabled_unfocused :
+                 (self->client->shaded ?
+                  (self->shade_press ?
+                   ob_rr_theme->btn_shade->img_toggled_unfocused_pressed :
+                   (self->shade_hover ?
+                    ob_rr_theme->btn_shade->img_toggled_hover_unfocused :
+                    ob_rr_theme->btn_shade->img_toggled_unfocused_unpressed)) :
+                  (self->shade_press ?
+                   ob_rr_theme->btn_shade->img_unfocused_pressed :
+                   (self->shade_hover ?
+                    ob_rr_theme->btn_shade->img_hover_unfocused :
+                    ob_rr_theme->btn_shade->img_unfocused_unpressed))));
             c = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
                  ob_rr_theme->btn_close->a_disabled_unfocused :
                  (self->close_press ?
@@ -241,6 +341,13 @@ void framerender_frame(ObFrame *self)
                   (self->close_hover ?
                    ob_rr_theme->btn_close->a_hover_unfocused :
                    ob_rr_theme->btn_close->a_unfocused_unpressed)));
+            ci = (!(self->decorations & OB_FRAME_DECOR_CLOSE) ?
+                 ob_rr_theme->btn_close->img_disabled_unfocused :
+                 (self->close_press ?
+                  ob_rr_theme->btn_close->img_unfocused_pressed :
+                  (self->close_hover ?
+                   ob_rr_theme->btn_close->img_hover_unfocused :
+                   ob_rr_theme->btn_close->img_unfocused_unpressed)));
         }
         clear = ob_rr_theme->a_clear;
 
@@ -283,7 +390,7 @@ void framerender_frame(ObFrame *self)
 
         m->surface.parent = t;
         m->surface.parentx = self->max_x;
-        m->surface.parenty = ob_rr_theme->paddingy + 1;
+        m->surface.parenty = ob_rr_theme->paddingy + ((mi == NULL) ? 1 : 0);
 
         n->surface.parent = t;
         n->surface.parentx = self->icon_x;
@@ -291,27 +398,27 @@ void framerender_frame(ObFrame *self)
 
         i->surface.parent = t;
         i->surface.parentx = self->iconify_x;
-        i->surface.parenty = ob_rr_theme->paddingy + 1;
+        i->surface.parenty = ob_rr_theme->paddingy + ((ii == NULL) ? 1 : 0);
 
         d->surface.parent = t;
         d->surface.parentx = self->desk_x;
-        d->surface.parenty = ob_rr_theme->paddingy + 1;
+        d->surface.parenty = ob_rr_theme->paddingy + ((di == NULL) ? 1 : 0);
 
         s->surface.parent = t;
         s->surface.parentx = self->shade_x;
-        s->surface.parenty = ob_rr_theme->paddingy + 1;
+        s->surface.parenty = ob_rr_theme->paddingy + ((si == NULL) ? 1 : 0);
 
         c->surface.parent = t;
         c->surface.parentx = self->close_x;
-        c->surface.parenty = ob_rr_theme->paddingy + 1;
+        c->surface.parenty = ob_rr_theme->paddingy + ((ci == NULL) ? 1 : 0);
 
         framerender_label(self, l);
-        framerender_max(self, m);
+        framerender_max(self, m, mi);
         framerender_icon(self, n);
-        framerender_iconify(self, i);
-        framerender_desk(self, d);
-        framerender_shade(self, s);
-        framerender_close(self, c);
+        framerender_iconify(self, i, ii);
+        framerender_desk(self, d, di);
+        framerender_shade(self, s, si);
+        framerender_close(self, c, ci);
     }
 
     if (self->decorations & OB_FRAME_DECOR_HANDLE &&
@@ -378,35 +485,51 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
             ob_rr_theme->button_size + 2, ob_rr_theme->button_size + 2);
 }
 
-static void framerender_max(ObFrame *self, RrAppearance *a)
+static void framerender_btn_icon(Window btn, RrAppearance *a, RrImage* icon)
+{
+    RrAppearanceClearTextures(a);
+    a->texture[0].type = RR_TEXTURE_IMAGE;
+    a->texture[0].data.image.alpha = 0xff;
+    a->texture[0].data.image.image = icon;
+
+    int w, h;
+    h = (RrBtnIconHeight(icon) > ob_rr_theme->title_height) ? ob_rr_theme->title_height : RrBtnIconHeight(icon);
+    w = (h == RrBtnIconHeight(icon)) ? RrBtnIconWidth(icon) : (((RrBtnIconHeight(icon) - h) / RrBtnIconHeight(icon)) * RrBtnIconWidth(icon));
+
+    RrPaint(a, btn, w, h);
+}
+
+static void framerender_max(ObFrame *self, RrAppearance *a, RrImage* icon)
 {
     if (!self->max_on) return;
-    RrPaint(a, self->max, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    if (icon == NULL) RrPaint(a, self->max, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    else framerender_btn_icon(self->max, a, icon);
 }
 
-static void framerender_iconify(ObFrame *self, RrAppearance *a)
+static void framerender_iconify(ObFrame *self, RrAppearance *a, RrImage* icon)
 {
     if (!self->iconify_on) return;
-    RrPaint(a, self->iconify,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+    if (icon == NULL) RrPaint(a, self->iconify, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    else framerender_btn_icon(self->iconify, a, icon);
 }
 
-static void framerender_desk(ObFrame *self, RrAppearance *a)
+static void framerender_desk(ObFrame *self, RrAppearance *a, RrImage* icon)
 {
     if (!self->desk_on) return;
-    RrPaint(a, self->desk, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    if (icon == NULL) RrPaint(a, self->desk, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    else framerender_btn_icon(self->desk, a, icon);
 }
 
-static void framerender_shade(ObFrame *self, RrAppearance *a)
+static void framerender_shade(ObFrame *self, RrAppearance *a, RrImage* icon)
 {
     if (!self->shade_on) return;
-    RrPaint(a, self->shade,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+    if (icon == NULL) RrPaint(a, self->shade, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    else framerender_btn_icon(self->shade, a, icon);
 }
 
-static void framerender_close(ObFrame *self, RrAppearance *a)
+static void framerender_close(ObFrame *self, RrAppearance *a, RrImage* icon)
 {
     if (!self->close_on) return;
-    RrPaint(a, self->close,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+    if (icon == NULL) RrPaint(a, self->close, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    else framerender_btn_icon(self->close, a, icon);
 }

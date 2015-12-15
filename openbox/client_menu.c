@@ -256,7 +256,7 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
                 menu_add_separator(menu, -1, NULL);
 
                 desk = DESKTOP_ALL;
-                name = _("All desktops");
+                name = _("All Desktops");
             } else {
                 desk = i;
                 name = screen_desktop_names[i];
@@ -373,15 +373,15 @@ void client_menu_startup(void)
     menu_set_update_func(menu, layer_menu_update);
     menu_set_execute_func(menu, layer_menu_execute);
 
-    menu_add_normal(menu, LAYER_TOP, _("Always on _top"), NULL, TRUE);
+    menu_add_normal(menu, LAYER_TOP, _("Always on _Top"), NULL, TRUE);
     menu_add_normal(menu, LAYER_NORMAL, _("_Normal"), NULL, TRUE);
-    menu_add_normal(menu, LAYER_BOTTOM, _("Always on _bottom"),NULL, TRUE);
+    menu_add_normal(menu, LAYER_BOTTOM, _("Always on _Bottom"),NULL, TRUE);
 
-    menu = menu_new(SEND_TO_MENU_NAME, _("_Send to desktop"), TRUE, NULL);
+    menu = menu_new(SEND_TO_MENU_NAME, _("_Send to Desktop"), TRUE, NULL);
     menu_set_update_func(menu, send_to_menu_update);
     menu_set_execute_func(menu, send_to_menu_execute);
 
-    menu = menu_new(CLIENT_MENU_NAME, _("Client menu"), TRUE, NULL);
+    menu = menu_new(CLIENT_MENU_NAME, _("Client Menu"), TRUE, NULL);
     menu_show_all_shortcuts(menu, TRUE);
     menu_set_update_func(menu, client_menu_update);
     menu_set_place_func(menu, client_menu_place);
@@ -407,7 +407,7 @@ void client_menu_startup(void)
     e->data.normal.mask = ob_rr_theme->btn_max->mask;
     set_icon_color(e);
 
-    e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll up/down"), NULL, TRUE);
+    e = menu_add_normal(menu, CLIENT_SHADE, _("_Roll Up/Down"), NULL, TRUE);
     e->data.normal.mask = ob_rr_theme->btn_shade->mask;
     set_icon_color(e);
 

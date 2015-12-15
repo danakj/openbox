@@ -383,7 +383,7 @@ static void do_move(gboolean keyboard, gint keydist)
     client_configure(moveresize_client, cur_x, cur_y, cur_w, cur_h,
                      TRUE, FALSE, FALSE);
     if (config_resize_popup_show == 2) /* == "Always" */
-        popup_coords(moveresize_client, "%d x %d",
+        popup_coords(moveresize_client, "%d × %d",
                      moveresize_client->frame->area.x,
                      moveresize_client->frame->area.y);
 }
@@ -457,7 +457,7 @@ static void do_resize(void)
             (config_resize_popup_show == 1 && /* == "Nonpixel" */
              moveresize_client->size_inc.width > 1 &&
              moveresize_client->size_inc.height > 1))
-        popup_coords(moveresize_client, "%d x %d", lw, lh);
+        popup_coords(moveresize_client, "%d × %d", lw, lh);
 }
 
 #ifdef SYNC

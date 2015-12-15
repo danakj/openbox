@@ -300,7 +300,7 @@ static void parse_menu_item(xmlNodePtr node,  gpointer data)
                 c = obt_xml_find_node(c->next, "action");
             }
             e = menu_add_normal(state->parent, -1, label, acts, TRUE);
-            
+
             if (config_menu_show_icons &&
                 obt_xml_attr_string(node, "icon", &icon))
             {

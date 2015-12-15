@@ -73,39 +73,55 @@ RrButton *RrButtonNew (const RrInstance *inst)
     out->a_toggled_hover_focused = RrAppearanceNew(inst, 1);
     out->a_toggled_hover_unfocused = RrAppearanceNew(inst, 1);
 
+    /* images */
+    out->img_focused_unpressed = NULL;
+    out->img_unfocused_unpressed = NULL;
+    out->img_focused_pressed = NULL;
+    out->img_unfocused_pressed = NULL;
+    out->img_disabled_focused = NULL;
+    out->img_disabled_unfocused = NULL;
+    out->img_hover_focused = NULL;
+    out->img_hover_unfocused = NULL;
+    out->img_toggled_hover_focused = NULL;
+    out->img_toggled_hover_unfocused = NULL;
+    out->img_toggled_focused_unpressed = NULL;
+    out->img_toggled_unfocused_unpressed = NULL;
+    out->img_toggled_focused_pressed = NULL;
+    out->img_toggled_unfocused_pressed = NULL;
+
     return out;
 }
 
 void RrButtonFree(RrButton *b)
 {
     /* colors */
-    if (b->focused_unpressed_color) 
+    if (b->focused_unpressed_color)
         RrColorFree(b->focused_unpressed_color);
-    if (b->unfocused_unpressed_color) 
+    if (b->unfocused_unpressed_color)
         RrColorFree(b->unfocused_unpressed_color);
-    if (b->focused_pressed_color) 
+    if (b->focused_pressed_color)
         RrColorFree(b->focused_pressed_color);
-    if (b->unfocused_pressed_color) 
+    if (b->unfocused_pressed_color)
         RrColorFree(b->unfocused_pressed_color);
-    if (b->disabled_focused_color) 
+    if (b->disabled_focused_color)
         RrColorFree(b->disabled_focused_color);
-    if (b->disabled_unfocused_color) 
+    if (b->disabled_unfocused_color)
         RrColorFree(b->disabled_unfocused_color);
-    if (b->hover_focused_color) 
+    if (b->hover_focused_color)
         RrColorFree(b->hover_focused_color);
-    if (b->hover_unfocused_color) 
+    if (b->hover_unfocused_color)
         RrColorFree(b->hover_unfocused_color);
-    if (b->toggled_hover_focused_color) 
+    if (b->toggled_hover_focused_color)
         RrColorFree(b->toggled_hover_focused_color);
-    if (b->toggled_hover_unfocused_color) 
+    if (b->toggled_hover_unfocused_color)
         RrColorFree(b->toggled_hover_unfocused_color);
-    if (b->toggled_focused_pressed_color) 
+    if (b->toggled_focused_pressed_color)
         RrColorFree(b->toggled_focused_pressed_color);
-    if (b->toggled_unfocused_pressed_color) 
+    if (b->toggled_unfocused_pressed_color)
         RrColorFree(b->toggled_unfocused_pressed_color);
-    if (b->toggled_focused_unpressed_color) 
+    if (b->toggled_focused_unpressed_color)
         RrColorFree(b->toggled_focused_unpressed_color);
-    if (b->toggled_unfocused_unpressed_color) 
+    if (b->toggled_unfocused_unpressed_color)
         RrColorFree(b->toggled_unfocused_unpressed_color);
 
     /* masks */
@@ -132,4 +148,20 @@ void RrButtonFree(RrButton *b)
     RrAppearanceFree(b->a_toggled_unfocused_pressed);
     RrAppearanceFree(b->a_toggled_hover_focused);
     RrAppearanceFree(b->a_toggled_hover_unfocused);
+
+    /* images */
+    if (b->img_focused_unpressed != NULL) RrImageUnref (b->img_focused_unpressed);
+    if (b->img_unfocused_unpressed != NULL) RrImageUnref (b->img_unfocused_unpressed);
+    if (b->img_focused_pressed != NULL) RrImageUnref (b->img_focused_pressed);
+    if (b->img_unfocused_pressed != NULL) RrImageUnref (b->img_unfocused_pressed);
+    if (b->img_disabled_focused != NULL) RrImageUnref (b->img_disabled_focused);
+    if (b->img_disabled_unfocused != NULL) RrImageUnref (b->img_disabled_unfocused);
+    if (b->img_hover_focused != NULL) RrImageUnref (b->img_hover_focused);
+    if (b->img_hover_unfocused != NULL) RrImageUnref (b->img_hover_unfocused);
+    if (b->img_toggled_hover_focused != NULL) RrImageUnref (b->img_toggled_hover_focused);
+    if (b->img_toggled_hover_unfocused != NULL) RrImageUnref (b->img_toggled_hover_unfocused);
+    if (b->img_toggled_focused_unpressed != NULL) RrImageUnref (b->img_toggled_focused_unpressed);
+    if (b->img_toggled_unfocused_unpressed != NULL) RrImageUnref (b->img_toggled_unfocused_unpressed);
+    if (b->img_toggled_focused_pressed != NULL) RrImageUnref (b->img_toggled_focused_pressed);
+    if (b->img_toggled_unfocused_pressed != NULL) RrImageUnref (b->img_toggled_unfocused_pressed);
 }

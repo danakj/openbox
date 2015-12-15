@@ -87,7 +87,7 @@ static gboolean desk_menu_update(ObMenuFrame *frame, gpointer data)
         if (!empty)
             menu_add_separator(menu, SEPARATOR, NULL);
 
-        e = menu_add_normal(menu, d->desktop, _("Go there..."), NULL, TRUE);
+        e = menu_add_normal(menu, d->desktop, _("Go There"), NULL, TRUE);
         if (d->desktop == screen_desktop)
             e->data.normal.enabled = FALSE;
     }
@@ -163,8 +163,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
 
     if (config_menu_manage_desktops) {
         menu_add_separator(menu, SEPARATOR, NULL);
-        menu_add_normal(menu, ADD_DESKTOP, _("_Add new desktop"), NULL, TRUE);
-        menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove last desktop"),
+        menu_add_normal(menu, ADD_DESKTOP, _("_Add New Desktop"), NULL, TRUE);
+        menu_add_normal(menu, REMOVE_DESKTOP, _("_Remove Last Desktop"),
                         NULL, TRUE);
     }
 

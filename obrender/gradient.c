@@ -131,6 +131,20 @@ void RrRender(RrAppearance *a, gint w, gint h)
                           data + off * w + w - 2,
                           a->surface.relief==RR_RELIEF_RAISED);
         }
+
+        if (a->surface.bevel == RR_BEVEL_3) {
+            for (off = 0, x = 0; x < w; ++x, off++)
+                highlight(&a->surface, data + off,
+                          data + off + (h-1) * w,
+                          a->surface.relief==RR_RELIEF_RAISED);
+        }
+
+        if (a->surface.bevel == RR_BEVEL_4) {
+            for (off = 1, x = 1; x < w - 1; ++x, off++)
+                highlight(&a->surface, data + off + w,
+                          data + off + (h-2) * w,
+                          a->surface.relief==RR_RELIEF_RAISED);
+        }
     }
 }
 
@@ -246,8 +260,8 @@ static inline void repeat_pixel(RrPixel32 *start, gint w)
            getting by doing this (splitvertical3 switches from doing
            "*(data++) = color" n times to doing this memcpy thing log n times:
 
-           %   cumulative   self              self     total           
-           time   seconds   seconds    calls  ms/call  ms/call  name    
+           %   cumulative   self              self     total
+           time   seconds   seconds    calls  ms/call  ms/call  name
            49.44      0.88     0.88     1063     0.83     0.83  splitvertical1
            47.19      1.72     0.84     1063     0.79     0.79  splitvertical2
             2.81      1.77     0.05     1063     0.05     0.05  splitvertical3
@@ -366,6 +380,20 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
             XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
                       left + 1, bottom - 1, left + 1, top + 1);
             break;
+        case RR_BEVEL_3:
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
+                      left, bottom, right, bottom);
+
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
+                      left, top, right, top);
+            break;
+        case RR_BEVEL_4:
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
+                      left + 2, bottom - 1, right - 2, bottom - 1);
+
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
+                      left + 2, top + 1, right - 2, top + 1);
+            break;
         default:
             g_assert_not_reached(); /* unhandled BevelType */
         }
@@ -396,6 +424,20 @@ static void gradient_solid(RrAppearance *l, gint w, gint h)
                       left + 2, top + 1, right - 2, top + 1);
             XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
                       left + 1, bottom - 1, left + 1, top + 1);
+            break;
+        case RR_BEVEL_3:
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
+                      left, bottom, right, bottom);
+
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
+                      left, top, right, top);
+            break;
+        case RR_BEVEL_4:
+            XDrawLine(RrDisplay(l->inst), l->pixmap,RrColorGC(sp->bevel_light),
+                      left + 2, bottom - 1, right - 2, bottom - 1);
+
+            XDrawLine(RrDisplay(l->inst), l->pixmap, RrColorGC(sp->bevel_dark),
+                      left + 2, top + 1, right - 2, top + 1);
             break;
         default:
             g_assert_not_reached(); /* unhandled BevelType */
@@ -826,7 +868,7 @@ static void gradient_pyramid(RrSurface *sf, gint w, gint h)
        this is the opposite, moving the read pointer forward and the write
        pointer backward
        42.27      4.40     1.86      504     3.69     3.69  gradient_pyramid2
-       
+
     */
     ldata = sf->pixel_data + (halfh - 1) * w;
     cp = ldata + (midy + 1) * w;

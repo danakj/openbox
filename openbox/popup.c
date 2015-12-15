@@ -103,7 +103,7 @@ void popup_height(ObPopup *self, gint h)
     gint texth;
 
     /* don't let the height be smaller than the text */
-    texth = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
+    texth = RrMinHeight(self->a_text) + ob_rr_theme->osd_paddingy * 2;
     self->h = MAX(h, texth);
 }
 
@@ -118,7 +118,7 @@ void popup_text_width_to_string(ObPopup *self, gchar *text)
 
 void popup_height_to_string(ObPopup *self, gchar *text)
 {
-    self->h = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
+    self->h = RrMinHeight(self->a_text) + ob_rr_theme->osd_paddingy * 2;
 }
 
 void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num)
@@ -183,7 +183,7 @@ void popup_delay_show(ObPopup *self, gulong msec, gchar *text)
     }
 
     /* get the height, which is also used for the icon width */
-    emptyy = t + b + ob_rr_theme->paddingy * 2;
+    emptyy = t + b + ob_rr_theme->osd_paddingy * 2;
     if (self->h)
         texth = self->h - emptyy;
     h = texth * self->iconhm + emptyy;
@@ -191,20 +191,20 @@ void popup_delay_show(ObPopup *self, gulong msec, gchar *text)
     if (self->textw)
         textw = self->textw;
 
-    iconx = textx = l + ob_rr_theme->paddingx;
+    iconx = textx = l + ob_rr_theme->osd_paddingx;
 
-    emptyx = l + r + ob_rr_theme->paddingx * 2;
+    emptyx = l + r + ob_rr_theme->osd_paddingx * 2;
     if (hasicon) {
         iconw = texth * self->iconwm;
         iconh = texth * self->iconhm;
-        textx += iconw + ob_rr_theme->paddingx;
+        textx += iconw + ob_rr_theme->osd_paddingx;
         if (textw)
-            emptyx += ob_rr_theme->paddingx; /* between the icon and text */
-        icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->paddingy;
+            emptyx += ob_rr_theme->osd_paddingx; /* between the icon and text */
+        icony = (h - iconh - emptyy) / 2 + t + ob_rr_theme->osd_paddingy;
     } else
         iconw = 0;
 
-    texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->paddingy;
+    texty = (h - texth - emptyy) / 2 + t + ob_rr_theme->osd_paddingy;
 
     /* when there is no icon, then fill the whole dialog with the text
        appearance

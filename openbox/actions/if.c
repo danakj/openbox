@@ -434,12 +434,14 @@ static gboolean run_func_foreach(ObActionsData *data, gpointer options)
 
     foreach_stop = FALSE;
 
-    for (it = client_list; it; it = g_list_next(it)) {
-        data->client = it->data;
-        run_func_if(data, options);
-        if (foreach_stop) {
-            foreach_stop = FALSE;
-            break;
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            data->client = it->data;
+            run_func_if(data, options);
+            if (foreach_stop) {
+                foreach_stop = FALSE;
+                break;
+            }
         }
     }
 

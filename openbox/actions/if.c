@@ -23,6 +23,7 @@
 #include "openbox/frame.h"
 #include "openbox/screen.h"
 #include "openbox/focus.h"
+#include "openbox/config.h"
 #include <glib.h>
 
 typedef enum {
@@ -68,9 +69,17 @@ typedef struct {
     gboolean omnipresent_off;
     gboolean desktop_current;
     gboolean desktop_other;
+    gboolean containsx_isglobal;
+    gboolean containsx_ismonitor;
+    gboolean containsy_isglobal;
+    gboolean containsy_ismonitor;
     guint    desktop_number;
     guint    screendesktop_number;
     guint    client_monitor;
+    guint    xpoint;
+    guint    xpoint_denom;
+    guint    ypoint;
+    guint    ypoint_denom;
     TypedMatch title;
     TypedMatch class;
     TypedMatch name;
@@ -219,6 +228,32 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     }
     if ((n = obt_xml_find_node(node, "monitor"))) {
         q->client_monitor = obt_xml_node_int(n);
+    }
+    if ((n = obt_xml_find_node(node, "containsxpoint"))) {
+        gchar *s;
+        if ((s = obt_xml_node_string(n))) {
+            gboolean isglobal;
+            if (!obt_xml_attr_bool(n, "global", &isglobal) ||
+                !isglobal)
+                q->containsx_ismonitor = TRUE;
+            else
+                q->containsx_isglobal = TRUE;
+            config_parse_relative_number(s, &q->xpoint, &q->xpoint_denom);
+            g_free(s);
+        }
+    }
+    if ((n = obt_xml_find_node(node, "containsypoint"))) {
+        gchar *s;
+        if ((s = obt_xml_node_string(n))) {
+            gboolean isglobal;
+            if (!obt_xml_attr_bool(n, "global", &isglobal) ||
+                !isglobal)
+                q->containsy_ismonitor = TRUE;
+            else
+                q->containsy_isglobal = TRUE;
+            config_parse_relative_number(s, &q->ypoint, &q->ypoint_denom);
+            g_free(s);
+        }
     }
 }
 
@@ -413,6 +448,47 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
         if (q->client_monitor)
             is_true &= client_monitor(query_target) == q->client_monitor - 1;
 
+        if (q->containsx_ismonitor) {
+            gint xpoint = q->xpoint;
+            // Use the active monitor area only
+            const Rect *area = screen_physical_area_active();
+            // Treat xpoint as absolute location if denominator is zero
+            if (q->xpoint_denom) {
+                // Use only the active monitor
+                xpoint = (q->xpoint * area->width) / q->xpoint_denom;
+            }
+            xpoint = xpoint + RECT_LEFT(*area);
+            is_true &= xpoint >= RECT_LEFT(query_target->frame->area);
+            is_true &= xpoint <= RECT_RIGHT(query_target->frame->area);
+        }
+        if (q->containsx_isglobal) {
+            gint xpoint = q->xpoint;
+            if (q->xpoint_denom) {
+                const Rect *area = screen_physical_area_all_monitors();
+                xpoint = (q->xpoint * area->width) / q->xpoint_denom;
+            }
+            is_true &= xpoint >= RECT_LEFT(query_target->frame->area);
+            is_true &= xpoint <= RECT_RIGHT(query_target->frame->area);
+        }
+        if (q->containsy_ismonitor) {
+            gint ypoint = q->ypoint;
+            const Rect *area = screen_physical_area_active();
+            if (q->ypoint_denom) {
+                ypoint = (q->ypoint * area->height) / q->ypoint_denom;
+            }
+            ypoint = ypoint + RECT_TOP(*area);
+            is_true &= ypoint >= RECT_TOP(query_target->frame->area);
+            is_true &= ypoint <= RECT_BOTTOM(query_target->frame->area);
+        }
+        if (q->containsy_isglobal) {
+            gint ypoint = q->ypoint;
+            if (q->ypoint_denom) {
+                const Rect *area = screen_physical_area_all_monitors();
+                ypoint = (q->ypoint * area->height) / q->ypoint_denom;
+            }
+            is_true &= ypoint >= RECT_TOP(query_target->frame->area);
+            is_true &= ypoint <= RECT_BOTTOM(query_target->frame->area);
+        }
     }
 
     GSList *acts;
@@ -434,12 +510,14 @@ static gboolean run_func_foreach(ObActionsData *data, gpointer options)
 
     foreach_stop = FALSE;
 
-    for (it = client_list; it; it = g_list_next(it)) {
-        data->client = it->data;
-        run_func_if(data, options);
-        if (foreach_stop) {
-            foreach_stop = FALSE;
-            break;
+    for (it = stacking_list; it; it = g_list_next(it)) {
+        if (WINDOW_IS_CLIENT(it->data)) {
+            data->client = it->data;
+            run_func_if(data, options);
+            if (foreach_stop) {
+                foreach_stop = FALSE;
+                break;
+            }
         }
     }
 

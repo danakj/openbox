@@ -61,6 +61,8 @@ RrFont *config_font_activeosd;
 RrFont *config_font_inactiveosd;
 
 guint   config_desktops_num;
+guint   config_desktops_rows;
+guint   config_desktops_cols;
 GSList *config_desktops_names;
 guint   config_screen_firstdesk;
 guint   config_desktop_popup_time;
@@ -784,8 +786,26 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
 
     if ((n = obt_xml_find_node(node, "number"))) {
         gint d = obt_xml_node_int(n);
-        if (d > 0)
+        if (d > 0) {
             config_desktops_num = (unsigned) d;
+            config_desktops_rows = 1;
+            config_desktops_cols = (unsigned) d;
+        }
+    }
+    if ((n = obt_xml_find_node(node, "rows"))) {
+        gint d = obt_xml_node_int(n);
+        if (d > 0) {
+            config_desktops_rows = (unsigned) d;
+            config_desktops_num = (unsigned) d;
+            config_desktops_cols = 1;
+        }
+    }
+    if ((n = obt_xml_find_node(node, "cols"))) {
+        gint d = obt_xml_node_int(n);
+        if (d > 0) {
+            config_desktops_cols = (unsigned) d;
+            config_desktops_num = config_desktops_cols * config_desktops_rows;
+        }
     }
     if ((n = obt_xml_find_node(node, "firstdesk"))) {
         gint d = obt_xml_node_int(n);

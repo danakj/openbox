@@ -168,6 +168,10 @@ extern RrFont *config_font_inactiveosd;
 
 /*! The number of desktops */
 extern guint config_desktops_num;
+/*! The number of desktops rows */
+extern guint config_desktops_rows;
+/*! The number of desktops columns */
+extern guint config_desktops_cols;
 /*! Desktop to start on, put 5 to start in the center of a 3x3 grid */
 extern guint config_screen_firstdesk;
 /*! Names for the desktops */

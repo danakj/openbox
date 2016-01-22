@@ -129,6 +129,12 @@
        use obconf if you want to change these without having to log out
        and back in -->
   <number>4</number>
+  <!--
+       alternately, you can specify a row by colunm config.  This will
+       override <number/>, so you can remove that setting or ignore it.
+       <rows>X</rows>
+       <cols>Y</cols>
+       -->
   <firstdesk>1</firstdesk>
   <names>
     <!-- set names up here if you want to, like this:

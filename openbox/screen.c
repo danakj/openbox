@@ -1133,8 +1133,8 @@ void screen_update_layout(void)
 
     screen_desktop_layout.orientation = OB_ORIENTATION_HORZ;
     screen_desktop_layout.start_corner = OB_CORNER_TOPLEFT;
-    screen_desktop_layout.rows = 1;
-    screen_desktop_layout.columns = screen_num_desktops;
+    screen_desktop_layout.rows = config_desktops_rows;
+    screen_desktop_layout.columns = config_desktops_cols;
 
     if (OBT_PROP_GETA32(obt_root(ob_screen),
                         NET_DESKTOP_LAYOUT, CARDINAL, &data, &num)) {
@@ -1169,6 +1169,19 @@ void screen_update_layout(void)
                 screen_desktop_layout = l;
 
             g_free(data);
+        }
+    } else {
+        gulong data[4];
+        num = 4;
+        data[0] = l.orientation = OB_ORIENTATION_HORZ;
+        data[1] = l.columns = config_desktops_cols;
+        data[2] = l.rows = config_desktops_rows;
+        data[3] = l.start_corner = OB_CORNER_TOPLEFT;
+
+        if (screen_validate_layout(&l)) {
+            screen_desktop_layout = l;
+            OBT_PROP_SETA32(obt_root(ob_screen), NET_DESKTOP_LAYOUT,
+                            CARDINAL, data, num);
         }
     }
 }

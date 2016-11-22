@@ -1,0 +1,19 @@
+##Openbox 3.5.2 for KanuxOS
+
+This fork is used in Kanux to fix:
+
+ * Fix the hourglass mouse cursor - originally fixed by openbox project
+ * Disable desktop icons when starting an application.
+
+###Debugging openbox
+
+Debug events are emitted with the prefix ">>>" to dissipate original openbox messages.
+To test functionality manually, with LXDE running:
+
+ * pkill openbox
+
+Taskbar, desktop icons and window frames should visually disappear.
+
+ 2. openbox --debug
+
+User interaction event messages are emitted to the console.

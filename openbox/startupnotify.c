@@ -59,6 +59,9 @@ static SnStartupSequence* sequence_find(const gchar *id);
 static void sn_handler(const XEvent *e, gpointer data);
 static void sn_event_func(SnMonitorEvent *event, gpointer data);
 
+// Albert - This global boolean controls if the hourglass is active or not
+gboolean bDisableDesktop=FALSE;
+
 void sn_startup(gboolean reconfig)
 {
     if (reconfig) return;
@@ -136,6 +139,14 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
 
     switch (sn_monitor_event_get_type(ev)) {
     case SN_MONITOR_EVENT_INITIATED:
+
+        // Albert - at this point the mouse cursor becomes an hourglass
+        // because an application is being started with the
+        // flag "startupNotify = True" either through an icon shortcut file
+        // or via the xml file application settings.
+        ob_debug(">>>SN_MONITOR_EVENT_INITIATED - setting mouse hourglass cursor");
+        bDisableDesktop = TRUE;
+
         sn_startup_sequence_ref(seq);
         sn_waits = g_slist_prepend(sn_waits, seq);
         /* 20 second timeout for apps to start if the launcher doesn't
@@ -150,6 +161,12 @@ static void sn_event_func(SnMonitorEvent *ev, gpointer data)
         change = TRUE;
         break;
     case SN_MONITOR_EVENT_COMPLETED:
+        // Albert - at this point the mouse cursor becomes a regular cursor.
+        // because the started application becomes active and responsive,
+        // OR because the waiting timeout has expired (20 secs hardcoded)
+        ob_debug(">>>SN_MONITOR_EVENT_COMPLETED - removing mouse hourglass cursor");
+        bDisableDesktop = FALSE;
+
     case SN_MONITOR_EVENT_CANCELED:
         if ((seq = sequence_find(sn_startup_sequence_get_id(seq)))) {
             sn_waits = g_slist_remove(sn_waits, seq);

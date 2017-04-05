@@ -1215,7 +1215,7 @@ static void layout_title(ObFrame *self)
         }
 
         /* stop at the end of the string (or the label, which calls break) */
-        for (; *lc != '\0' && lc >= config_title_layout; lc+=i) {
+        for (; lc >= config_title_layout && *lc != '\0'; lc+=i) {
             if (*lc == 'L') {
                 if (i > 0) {
                     self->label_on = TRUE;

@@ -7,6 +7,7 @@
 # Elián Hanisch <lambdae2@gmail.com>, 2008.
 # Nicolás de la Torre <ndelatorre@gmail.com>, 2008.
 # Gerardo Seguin (aka galux) >galux at esdebian dot org>, 2010.
+# Manuel Domínguez López <mdomlop@gmail.com>, 2017.
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7.2\n"
@@ -85,7 +86,7 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"La ventana \"%s\" parce que no responde.  ¿Desea forzar el cierre enviándole "
+"La ventana \"%s\" parece que no responde.  ¿Desea cerrarla a la fuerza enviándole "
 "la señal %s?"
 
 #: openbox/client.c:3656
@@ -203,12 +204,13 @@ msgstr "Botón inválido \"%s\" especificado en el archivo de configuración"
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
-msgstr ""
+msgstr "Openbox ha sido compilado sin soporte para imágenes. Los iconos de "
+"los menús no serán cargados."
 
 #: openbox/debug.c:57
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr ""
+msgstr "No es posible crear el directorio '%s': %s"
 
 #: openbox/debug.c:195 openbox/openbox.c:377
 msgid "Close"
@@ -226,7 +228,7 @@ msgstr "No es posible encontrar un archivo de menú \"%s\" válido"
 #: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "No se pudo ejecutar el comando para el pipe-menu \"%s\": \"%s\""
+msgstr "Falló la ejecución del comando para el pipe-menu \"%s\": \"%s\""
 
 #: openbox/menu.c:182
 #, c-format
@@ -254,11 +256,11 @@ msgstr "No es posible cambiar al directorio home \"%s\": %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "No se pudo abrir la pantalla desde la variable de entorno DISPLAY"
+msgstr "Falló el acceso a la pantalla desde la variable de entorno DISPLAY."
 
 #: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
-msgstr "Falló la inicialización de la librería obrender"
+msgstr "Falló la inicialización de la librería obrender."
 
 #: openbox/openbox.c:193
 msgid "X server does not support locale."
@@ -266,14 +268,13 @@ msgstr "El servidor X no soporta localizaciones."
 
 #: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
-msgstr ""
-"No se puede establecer los modificadores de localización para el servidor X."
+msgstr "No se puede establecer los modificadores de localización "
+"para el servidor X."
 
 #: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
-"No es posible encontrar un archivo de configuración válido, usando algunos "
-"valores por defecto"
+msgstr "No es posible encontrar un archivo de configuración válido, "
+"usando algunos valores por defecto"
 
 #: openbox/openbox.c:270
 #, c-format
@@ -283,8 +284,8 @@ msgid ""
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
 "Uno o más errores de sintaxis XML fueron encontrados leyendo los archivos de "
-"configuración de Openbox. Ver salida (stdout) para mas información. El "
-"último error viste estaba en el archivo \"%s\" linea %d, con el mensaje: %s"
+"configuración de Openbox. Vea la salida (stdout) para mas información. El "
+"último error visto estaba en el archivo \"%s\" línea %d, con el mensaje: %s"
 
 #: openbox/openbox.c:295
 msgid "Unable to load a theme."
@@ -292,12 +293,12 @@ msgstr "No es posible cargar el tema."
 
 #: openbox/openbox.c:376
 msgid "Openbox Syntax Error"
-msgstr "Error de Sintaxis de Openbox"
+msgstr "Error de sintaxis de Openbox"
 
 #: openbox/openbox.c:442
 #, c-format
 msgid "Restart failed to execute new executable \"%s\": %s"
-msgstr "El reinicio impidió iniciar el nuevo ejecutable \"%s\": %s"
+msgstr "El reinicio falló al iniciar el nuevo ejecutable \"%s\": %s"
 
 #: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
@@ -326,7 +327,7 @@ msgstr "  --version           Muestra la versión y sale\n"
 #: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
 msgstr ""
-"  --replace            Remplaza el gestor de ventanas actual actualmente\n"
+"  --replace            Reemplaza el gestor de ventanas en ejecución\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
@@ -335,7 +336,7 @@ msgstr ""
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
 "  --config-file ARCHIVO\n"
-"                      Especifique la ruta del archivo de configuración a "
+"                      Especifica la ruta del archivo de configuración a "
 "usar\n"
 
 #: openbox/openbox.c:541
@@ -349,7 +350,7 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"enviando mensajes a la instancia que se está ejecutando de Openbox:\n"
+"Enviando mensajes a la instancia de Openbox en ejecución:\n"
 
 #: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
@@ -377,7 +378,7 @@ msgstr "  --sync              Ejecutar en modo sincrónico\n"
 
 #: openbox/openbox.c:548
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr ""
+msgstr "  --startup CMD       Ejecuta CMD después del inicio\n"
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
@@ -385,17 +386,18 @@ msgstr "  --debug             Mostrar salida del depurador\n"
 
 #: openbox/openbox.c:550
 msgid "  --debug-focus       Display debugging output for focus handling\n"
-msgstr ""
-"  --debug-focus       Mostrar salida del depurador para el manejo del foco\n"
+msgstr "  --debug-focus       Mostrar la salida de depuración para el "
+"manejo del foco\n"
 
 #: openbox/openbox.c:551
 msgid "  --debug-session     Display debugging output for session management\n"
-msgstr ""
+msgstr "  --debug-session     Mostrar la salida de depuración para "
+"la gestión de la sesión\n"
 
 #: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
-"  --debug-xinerama    Separar la visualización en pantallas de xinerama "
+"  --debug-xinerama    Dividir la visualización en pantallas de xinerama "
 "falsas\n"
 
 #: openbox/openbox.c:553
@@ -405,7 +407,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Por favor, enviar los errores a %s\n"
+"Por favor, informe de los errores en %s\n"
 
 #: openbox/openbox.c:636 openbox/openbox.c:670
 #, c-format
@@ -415,7 +417,7 @@ msgstr "%s requiere un argumento\n"
 #: openbox/openbox.c:713
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "Argumento de la línea de comando inválido \"%s\"\n"
+msgstr "Argumento de la línea de comandos inválido \"%s\"\n"
 
 #: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
@@ -425,7 +427,8 @@ msgstr "Un gestor de ventanas ya se está ejecutando en la pantalla %d"
 #: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "No se pudo obtener la selección del gestor de ventanas en pantalla %d"
+msgstr "No se pudo obtener la selección del gestor de ventanas en la "
+"pantalla %d"
 
 #: openbox/screen.c:150
 #, c-format

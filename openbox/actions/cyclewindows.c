@@ -207,6 +207,22 @@ static gboolean i_input_func(guint initial_state,
             o->state = e->xkey.state;
             return FALSE;
         }
+        
+        /* Cycle through the windows with the arrow keys */
+        else if (sym == XK_Down || sym == XK_Right) {
+            gboolean forward = o->forward;
+            o->forward = TRUE;
+            run_func(NULL, o);
+            o->forward = forward;
+            return TRUE;
+        }
+        else if (sym == XK_Up || sym == XK_Left) {
+            gboolean forward = o->forward;
+            o->forward = FALSE;
+            run_func(NULL, o);
+            o->forward = forward;
+            return TRUE;
+        }
 
         /* There were no modifiers and they pressed enter */
         else if ((sym == XK_Return || sym == XK_KP_Enter) && !initial_mods) {

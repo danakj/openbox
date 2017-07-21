@@ -4,27 +4,28 @@
 # Vytautas (GODhack) <vytautas1987@yahoo.com>, 2008.
 # Kiprianas Spiridonovas <k.spiridonovas@gmail.com>, 2012.
 # Algimantas Margevičius <margevicius.algimantas@gmail.com>, 2012, 2013.
+# Moo, 2017
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.5.0\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2014-11-05 16:51+0100\n"
-"PO-Revision-Date: 2013-01-09 13:17+0200\n"
-"Last-Translator: Algimantas Margevičius <margevicius.algimantas@gmail.com>\n"
+"PO-Revision-Date: 2017-07-21 15:53+0300\n"
+"Last-Translator: Moo\n"
 "Language-Team: Lietuvių <>\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2)\n"
-"X-Generator: Gtranslator 2.91.5\n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
 #: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr "Pareikalauta netinkamo veiksmo „%s“. Toks veiksmas neegzistuoja."
+msgstr "Užklausta neteisingo veiksmo „%s“. Tokio veiksmo nėra."
 
 #: openbox/actions/execute.c:245
 msgid "No"
@@ -41,11 +42,11 @@ msgstr "Vykdyti"
 #: openbox/actions/execute.c:259
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Nepavyko išversti kelio „%s“ iš utf8"
+msgstr "Nepavyko konvertuoti kelio „%s“ iš utf8"
 
 #: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
-msgstr "Atšaukti"
+msgstr "Atsisakyti"
 
 #: openbox/actions/exit.c:70
 msgid "Exit"
@@ -61,11 +62,11 @@ msgstr "Atsijungti"
 
 #: openbox/actions/exit.c:78
 msgid "Are you sure you want to exit Openbox?"
-msgstr "Ar tikrai norite baigti darbą su Openbox?"
+msgstr "Ar tikrai norite išeiti iš Openbox?"
 
 #: openbox/actions/exit.c:79
 msgid "Exit Openbox"
-msgstr "Baigti darbą su Openbox"
+msgstr "Išeiti iš Openbox"
 
 #: openbox/client.c:2115
 msgid "Unnamed Window"
@@ -85,8 +86,8 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"Langas „%s“ neatsako.  Ar norite priverstinai nutraukti vykdymą nusiųsdami "
-"%s signalą?"
+"Atrodo, kad langas „%s“ neatsako.  Ar norite priverstinai nutraukti jo "
+"darbą, nusiunčiant %s signalą?"
 
 #: openbox/client.c:3656
 msgid "End Process"
@@ -97,7 +98,8 @@ msgstr "Baigti procesą"
 msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to disconnect "
 "it from the X server?"
-msgstr "Langas „%s“ neatsako.  Ar norite atjungti jį nuo X serverio?"
+msgstr ""
+"Atrodo, kad langas „%s“ neatsako.  Ar norite atjungti jį nuo X serverio?"
 
 #: openbox/client.c:3662
 msgid "Disconnect"
@@ -109,15 +111,15 @@ msgstr "Eiti ten..."
 
 #: openbox/client_list_combined_menu.c:100
 msgid "Manage desktops"
-msgstr "Tvarkyti darbastalius"
+msgstr "Tvarkyti darbalaukius"
 
 #: openbox/client_list_combined_menu.c:101 openbox/client_list_menu.c:166
 msgid "_Add new desktop"
-msgstr "_Pridėti darbastalį"
+msgstr "_Pridėti naują darbalaukį"
 
 #: openbox/client_list_combined_menu.c:102 openbox/client_list_menu.c:167
 msgid "_Remove last desktop"
-msgstr "P_ašalinti paskutinį darbastalį"
+msgstr "Š_alinti paskutinį darbalaukį"
 
 #: openbox/client_list_combined_menu.c:157
 msgid "Windows"
@@ -125,11 +127,11 @@ msgstr "Langai"
 
 #: openbox/client_list_menu.c:214
 msgid "Desktops"
-msgstr "Darbastaliai"
+msgstr "Darbalaukiai"
 
 #: openbox/client_menu.c:259
 msgid "All desktops"
-msgstr "Visi darbastaliai"
+msgstr "Visi darbalaukiai"
 
 #: openbox/client_menu.c:371
 msgid "_Layer"
@@ -149,7 +151,7 @@ msgstr "Visada _apačioje"
 
 #: openbox/client_menu.c:380
 msgid "_Send to desktop"
-msgstr "Siųsti į _darbastalį"
+msgstr "Siųsti į _darbalaukį"
 
 #: openbox/client_menu.c:384
 msgid "Client menu"
@@ -157,7 +159,7 @@ msgstr "Kliento meniu"
 
 #: openbox/client_menu.c:394
 msgid "R_estore"
-msgstr "_Atstatyti"
+msgstr "_Atkurti"
 
 #: openbox/client_menu.c:398
 msgid "_Move"
@@ -169,15 +171,15 @@ msgstr "_Keisti dydį"
 
 #: openbox/client_menu.c:402
 msgid "Ico_nify"
-msgstr "_Mažinti"
+msgstr "_Suskleisti"
 
 #: openbox/client_menu.c:406
 msgid "Ma_ximize"
-msgstr "D_idinti"
+msgstr "_Išskleisti"
 
 #: openbox/client_menu.c:410
 msgid "_Roll up/down"
-msgstr "Suskleis_ti/išskleisti"
+msgstr "_Užraityti/nuraityti"
 
 #: openbox/client_menu.c:414
 msgid "Un/_Decorate"
@@ -190,18 +192,20 @@ msgstr "_Užverti"
 #: openbox/config.c:563
 #, c-format
 msgid "Invalid context \"%s\" in mouse binding"
-msgstr "Netinkamas kontekstas „%s“ pelės susiejime"
+msgstr "Neteisingas kontekstas „%s“ pelės susiejime"
 
 #: openbox/config.c:931
 #, c-format
 msgid "Invalid button \"%s\" specified in config file"
-msgstr "Nustatymų faile nurodytas netinkamas pelės klavišas „%s“"
+msgstr "Konfigūracijos faile nurodytas neteisingas mygtukas „%s“"
 
 #: openbox/config.c:956
 msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
-msgstr "Openbox sukompiliuota be bibliotekos. Meniu piktogramos nebus įkeltos."
+msgstr ""
+"Openbox buvo sukompiliuota be paveikslų įkėlimo palaikymo. Meniu piktogramos "
+"nebus įkeltos."
 
 #: openbox/debug.c:57
 #, c-format
@@ -214,27 +218,27 @@ msgstr "Užverti"
 
 #: openbox/keyboard.c:161
 msgid "Conflict with key binding in config file"
-msgstr "Konfliktas tarp klavišų susiejimų nustatymų faile"
+msgstr "Konfigūracijos faile yra konfliktas tarp klavišų susiejimų"
 
 #: openbox/menu.c:103 openbox/menu.c:115
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr "Nepavyko rasti tinkamo meniu failo „%s“"
+msgstr "Nepavyko rasti teisingo meniu failo „%s“"
 
 #: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Nepavyko įvykdyti pipe-meniu komandos „%s“: %s"
+msgstr "Nepavyko įvykdyti komandos hierarchiniam meniu „%s“: %s"
 
 #: openbox/menu.c:182
 #, c-format
 msgid "Invalid output from pipe-menu \"%s\""
-msgstr "Netinkama išvestis iš pipe-meniu „%s“"
+msgstr "Neteisinga išvestis iš hierarchinio meniu „%s“"
 
 #: openbox/menu.c:195
 #, c-format
 msgid "Attempted to access menu \"%s\" but it does not exist"
-msgstr "Bandoma prieiti prie meniu „%s“, bet jis neegzistuoja"
+msgstr "Buvo bandoma gauti prieiga prie meniu „%s“, tačiau jo nėra"
 
 #: openbox/menu.c:411 openbox/menu.c:412
 msgid "More..."
@@ -243,16 +247,16 @@ msgstr "Daugiau..."
 #: openbox/mouse.c:382
 #, c-format
 msgid "Invalid button \"%s\" in mouse binding"
-msgstr "Netinkamas klavišas „%s“ pelės susiejime"
+msgstr "Netinkamas mygtukas „%s“ pelės susiejime"
 
 #: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr "Nepavyko pakeisti namų katalogo į „%s“: %s"
+msgstr "Nepavyko pakeisti į namų katalogą „%s“: %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Nepavyko atverti ekrano nurodyto DISPLAY aplinkos kintamąjame."
+msgstr "Nepavyko atverti ekrano nurodyto DISPLAY aplinkos kintamajame."
 
 #: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
@@ -264,12 +268,13 @@ msgstr "X serveris nepalaiko lokalės."
 
 #: openbox/openbox.c:195
 msgid "Cannot set locale modifiers for the X server."
-msgstr "Nepavyko nustatyti lokalės keitinių X serveriui."
+msgstr "Nepavyksta nustatyti lokalės modifikatorių, skirtų  X serveriui."
 
 #: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
 msgstr ""
-"Nepavyko rasti tinkamo nustatymų failo, naudojami numatytieji nustatymai."
+"Nepavyko rasti teisingo konfigūracijos failo, naudojami numatytieji "
+"nustatymai."
 
 #: openbox/openbox.c:270
 #, c-format
@@ -278,9 +283,9 @@ msgid ""
 "configuration files.  See stdout for more information.  The last error seen "
 "was in file \"%s\" line %d, with message: %s"
 msgstr ""
-"Openbox nustatymų failuose rasta sintaksės klaidų. Išsami informacija "
-"pateikta stdout. Paskutinė rasta klaida yra failo „%s“ %d eilutėje, su "
-"pranešimu: %s"
+"Apdorojant Openbox konfigūracijos failus, juose buvo rasta viena ar daugiau "
+"sintaksės klaidų. Išsamesnei informacijai žiūrėkite stdout. Paskutinė rasta "
+"klaida yra failo „%s“ %d eilutėje, su pranešimu: %s"
 
 #: openbox/openbox.c:295
 msgid "Unable to load a theme."
@@ -297,11 +302,11 @@ msgstr "Paleidžiant iš naujo nepavyko įvykdyti naujo vykdomojo failo „%s“
 
 #: openbox/openbox.c:521 openbox/openbox.c:523
 msgid "Copyright (c)"
-msgstr "Autorinės teisės (c)"
+msgstr "Autorių teisės (c)"
 
 #: openbox/openbox.c:532
 msgid "Syntax: openbox [options]\n"
-msgstr "Sintaksė: openbox [parinktys]\n"
+msgstr "Sintaksė: openbox [parametrai]\n"
 
 #: openbox/openbox.c:533
 msgid ""
@@ -309,7 +314,7 @@ msgid ""
 "Options:\n"
 msgstr ""
 "\n"
-"Parinktys:\n"
+"Parametrai:\n"
 
 #: openbox/openbox.c:534
 msgid "  --help              Display this help and exit\n"
@@ -328,11 +333,11 @@ msgstr "  --replace           Pakeisti jau veikiančią langų tvarkytuvę\n"
 #. fine to leave it as FILE though.
 #: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
-msgstr "  --config-file FILE  Naudoti nurodytą nustatymų failą\n"
+msgstr "  --config-file FAILAS  Naudoti nurodytą nustatymų failą\n"
 
 #: openbox/openbox.c:541
 msgid "  --sm-disable        Disable connection to the session manager\n"
-msgstr "  --sm-disable        Nenaudoti sesijų tvarkytuvės\n"
+msgstr "  --sm-disable        Nenaudoti seansų tvarkytuvės\n"
 
 #: openbox/openbox.c:542
 msgid ""
@@ -340,11 +345,11 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"Žinučių perdavimas veikiančiai Openbox:\n"
+"Žinučių perdavimas veikiančiam Openbox egzemplioriui:\n"
 
 #: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
-msgstr "  --reconfigure       Iš naujo įkelti Openbox nustatymus\n"
+msgstr "  --reconfigure       Iš naujo įkelti Openbox konfigūraciją\n"
 
 #: openbox/openbox.c:544
 msgid "  --restart           Restart Openbox\n"
@@ -352,7 +357,7 @@ msgstr "  --restart           Iš naujo paleisti Openbox\n"
 
 #: openbox/openbox.c:545
 msgid "  --exit              Exit Openbox\n"
-msgstr "  --exit              Baigti darbą su Openbox\n"
+msgstr "  --exit              Išeiti iš Openbox\n"
 
 #: openbox/openbox.c:546
 msgid ""
@@ -360,15 +365,15 @@ msgid ""
 "Debugging options:\n"
 msgstr ""
 "\n"
-"Derinimo parinktys:\n"
+"Derinimo parametrai:\n"
 
 #: openbox/openbox.c:547
 msgid "  --sync              Run in synchronous mode\n"
-msgstr "  --sync              Paleisti sinchroniniame režime\n"
+msgstr "  --sync              Paleisti sinchroninėje veiksenoje\n"
 
 #: openbox/openbox.c:548
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr "  --startup CMD       Vykdyti komandą CMD po paleidimo\n"
+msgstr "  --startup CMD       Po paleidimo, vykdyti komandų eilutę\n"
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
@@ -382,11 +387,11 @@ msgstr ""
 #: openbox/openbox.c:551
 msgid "  --debug-session     Display debugging output for session management\n"
 msgstr ""
-"  --debug-session     Rodyti derinimo išvestį susijusią su sesijų tvarkymu\n"
+"  --debug-session     Rodyti derinimo išvestį susijusią su seansų tvarkymu\n"
 
 #: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
-msgstr "  --debug-xinerama    Suskirstyti ekraną į netikrus Xinerama ekranus\n"
+msgstr "  --debug-xinerama    Padalinti ekraną į netikrus Xinerama ekranus\n"
 
 #: openbox/openbox.c:553
 #, c-format
@@ -395,7 +400,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Praneškite apie klaidas %s\n"
+"Prašome apie klaidas pranešti %s\n"
 
 #: openbox/openbox.c:636 openbox/openbox.c:670
 #, c-format
@@ -405,12 +410,12 @@ msgstr "%s reikalauja argumento\n"
 #: openbox/openbox.c:713
 #, c-format
 msgid "Invalid command line argument \"%s\"\n"
-msgstr "Netinkamas komandinės eilutės argumentas „%s“\n"
+msgstr "Neteisingas komandų eilutės argumentas „%s“\n"
 
 #: openbox/screen.c:106 openbox/screen.c:191
 #, c-format
 msgid "A window manager is already running on screen %d"
-msgstr "Ekrane %d jau veikia langų tvarkytuvė"
+msgstr "Langų tvarkytuvė jau veikia ekrane %d"
 
 #: openbox/screen.c:127
 #, c-format
@@ -420,7 +425,7 @@ msgstr "Nepavyko gauti langų tvarkytuvės pasirinkimo ekrane %d"
 #: openbox/screen.c:150
 #, c-format
 msgid "The WM on screen %d is not exiting"
-msgstr "Langų tvarkytuvė ekrane %d nebaigia darbo"
+msgstr "Langų tvarkytuvė ekrane %d nebaigia savo darbo"
 
 #. TRANSLATORS: If you need to specify a different order of the
 #. arguments, you can use %1$d for the first one and %2$d for the
@@ -435,19 +440,19 @@ msgid_plural ""
 "Openbox is configured for %d desktops, but the current session has %d.  "
 "Overriding the Openbox configuration."
 msgstr[0] ""
-"Openbox yra suderinta %d darbastaliui, bet dabartinė sesija turi %d. "
-"Nepaisoma Openbox konfiguracijos."
+"Openbox yra sukonfigūruota %d darbalaukiui, tačiau dabartiniame seanse yra "
+"%d. Openbox konfigūracija nustelbiama."
 msgstr[1] ""
-"Openbox yra suderinta %d darbastaliams, bet dabartinė sesija turi %d. "
-"Nepaisoma Openbox konfiguracijos."
+"Openbox yra sukonfigūruota %d darbalaukiams, tačiau dabartiniame seanse yra "
+"%d. Openbox konfigūracija nustelbiama."
 msgstr[2] ""
-"Openbox yra suderinta %d darbastalių, bet dabartinė sesija turi %d. "
-"Nepaisoma Openbox konfiguracijos."
+"Openbox yra sukonfigūruota %d darbalaukių, tačiau dabartiniame seanse yra "
+"%d. Openbox konfigūracija nustelbiama."
 
 #: openbox/screen.c:1204
 #, c-format
 msgid "desktop %i"
-msgstr "darbastalis %i"
+msgstr "darbalaukis %i"
 
 #: openbox/startupnotify.c:241
 #, c-format
@@ -457,22 +462,22 @@ msgstr "Paleidžiama %s"
 #: openbox/translate.c:59
 #, c-format
 msgid "Invalid modifier key \"%s\" in key/mouse binding"
-msgstr "Netinkamas modifikavimo klavišas „%s“ susiejime"
+msgstr "Neteisingas modifikavimo klavišas „%s“ klavišų/pelės susiejime"
 
 #: openbox/translate.c:138
 #, c-format
 msgid "Invalid key code \"%s\" in key binding"
-msgstr "Netinkamas klavišo kodas „%s“ susiejime"
+msgstr "Neteisingas klavišo kodas „%s“ klavišų susiejime"
 
 #: openbox/translate.c:145
 #, c-format
 msgid "Invalid key name \"%s\" in key binding"
-msgstr "Netinkamas klavišo vardas „%s“ susiejime"
+msgstr "Neteisingas klavišo pavadinimas „%s“ klavišų susiejime"
 
 #: openbox/translate.c:151
 #, c-format
 msgid "Requested key \"%s\" does not exist on the display"
-msgstr "Norimas klavišas „%s“ ekrane neegzistuoja"
+msgstr "Užklausto klavišo „%s“ ekrane nėra"
 
 #: openbox/prompt.c:154
 msgid "OK"

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Openbox
 Comment=Log in using the Openbox window manager (without a session manager)
+Comment[lt]=Prisijungti, naudojant Openbox langų tvarkytuvę (be seansų tvarkytuvės)
 Exec=@bindir@/openbox-session
 TryExec=@bindir@/openbox-session
 Icon=openbox

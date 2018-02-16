@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2015-07-01 11:26+0200\n"
-"PO-Revision-Date: 2017-03-11 00:50+0100\n"
-"Last-Translator: Michael Siegel <micha@malbolge.net>\n"
+"PO-Revision-Date: 2018-02-16 19:25+0100\n"
+"Last-Translator: Michael Siegel <msi@malbolge.net>\n"
 "Language-Team:  <de@li.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -88,12 +88,12 @@ msgid ""
 "The window \"%s\" does not seem to be responding.  Do you want to force it "
 "to exit by sending the %s signal?"
 msgstr ""
-"Das Fenster \"%s\" reagiert anscheinend nicht. Wollen Sie das Schließen "
-"durch Senden des %s-Signals erzwingen?"
+"Das Fenster \"%s\" reagiert anscheinend nicht. Wollen Sie es durch Senden "
+"des %s-Signals trotzdem schließen?"
 
 #: openbox/client.c:3660
 msgid "End Process"
-msgstr "Schließen erzwingen"
+msgstr "Fenster schließen"
 
 #: openbox/client.c:3664
 #, c-format

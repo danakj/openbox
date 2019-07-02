@@ -74,11 +74,11 @@ GList          *client_list             = NULL;
 static GSList  *client_destroy_notifies = NULL;
 static RrImage *client_default_icon     = NULL;
 
-static void client_get_all(ObClient *self, gboolean real);
+static int client_get_all(ObClient *self, gboolean real);
 static void client_get_startup_id(ObClient *self);
 static void client_get_session_ids(ObClient *self);
 static void client_save_app_rule_values(ObClient *self);
-static void client_get_area(ObClient *self);
+static int client_get_area(ObClient *self);
 static void client_get_desktop(ObClient *self);
 static void client_get_state(ObClient *self);
 static void client_get_shaped(ObClient *self);
@@ -244,7 +244,10 @@ void client_manage(Window window, ObPrompt *prompt)
     self->desktop = screen_num_desktops; /* always an invalid value */
 
     /* get all the stuff off the window */
-    client_get_all(self, TRUE);
+    if(client_get_all(self, TRUE) != 0){
+	grab_server(FALSE);
+        return;
+    }
 
     ob_debug("Window type: %d", self->type);
     ob_debug("Window group: 0x%x", self->group?self->group->leader:0);
@@ -1202,10 +1205,13 @@ gboolean client_find_onscreen(ObClient *self, gint *x, gint *y, gint w, gint h,
     return ox != *x || oy != *y;
 }
 
-static void client_get_all(ObClient *self, gboolean real)
+static int client_get_all(ObClient *self, gboolean real)
 {
     /* this is needed for the frame to set itself up */
-    client_get_area(self);
+    if( (client_get_area(self) != 0) && real){
+        grab_server(FALSE);
+	return 1;
+    }
 
     /* these things can change the decor and functions of the window */
 
@@ -1230,7 +1236,7 @@ static void client_get_all(ObClient *self, gboolean real)
     /* now we got everything that can affect the decorations or app rule
        matching */
     if (!real)
-        return;
+        return 0;
 
     /* save the values of the variables used for app rule matching */
     client_save_app_rule_values(self);
@@ -1263,6 +1269,7 @@ static void client_get_all(ObClient *self, gboolean real)
     client_update_strut(self);
     client_update_icons(self);
     client_update_icon_geometry(self);
+    return 0;
 }
 
 static void client_get_startup_id(ObClient *self)
@@ -1273,13 +1280,16 @@ static void client_get_startup_id(ObClient *self)
                                &self->startup_id);
 }
 
-static void client_get_area(ObClient *self)
+static int client_get_area(ObClient *self)
 {
     XWindowAttributes wattrib;
     Status ret;
 
     ret = XGetWindowAttributes(obt_display, self->window, &wattrib);
-    g_assert(ret != BadWindow);
+    if( ret == 0){
+        ob_debug("client_get_area: Can't get window attributes for 0x%lx", self->window);
+        return 1;
+    }
 
     RECT_SET(self->area, wattrib.x, wattrib.y, wattrib.width, wattrib.height);
     POINT_SET(self->root_pos, wattrib.x, wattrib.y);
@@ -1287,6 +1297,7 @@ static void client_get_area(ObClient *self)
 
     ob_debug("client area: %d %d  %d %d  bw %d", wattrib.x, wattrib.y,
              wattrib.width, wattrib.height, wattrib.border_width);
+    return 0;
 }
 
 static void client_get_desktop(ObClient *self)

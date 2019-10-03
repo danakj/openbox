@@ -625,6 +625,9 @@ void client_unmanage(ObClient *self)
     prompt_unref(self->kill_prompt);
     self->kill_prompt = NULL;
 
+    /* if client was stopped, continue executing */
+    client_continue_hidden(self);
+
     client_list = g_list_remove(client_list, self);
     stacking_remove(self);
     window_remove(self->window);
@@ -968,6 +971,8 @@ static ObAppSettings *client_get_settings_state(ObClient *self)
         self->skip_pager = !!settings->skip_pager;
     if (settings->skip_taskbar != -1)
         self->skip_taskbar = !!settings->skip_taskbar;
+    if (settings->stop_hidden != OB_CLIENT_STOP_MODE_NONE)
+        self->stop_hidden = settings->stop_hidden;
 
     if (settings->max_vert != -1)
         self->max_vert = !!settings->max_vert;
@@ -1043,6 +1048,7 @@ static void client_restore_session_state(ObClient *self)
     self->max_horz = self->session->max_horz;
     self->max_vert = self->session->max_vert;
     self->undecorated = self->session->undecorated;
+    self->stop_hidden = self->session->stop_hidden;
 }
 
 static gboolean client_restore_session_stacking(ObClient *self)
@@ -2510,8 +2516,11 @@ static void client_change_wm_state(ObClient *self)
         (self->desktop != DESKTOP_ALL && self->desktop != screen_desktop))
     {
         self->wmstate = IconicState;
-    } else
+        client_stop_hidden(self);
+    } else {
         self->wmstate = NormalState;
+        client_continue_hidden(self);
+    }
 
     if (old != self->wmstate) {
         OBT_PROP_MSG(ob_screen, self->window, KDE_WM_CHANGE_STATE,
@@ -2606,6 +2615,24 @@ ObClient *client_search_focus_group_full(ObClient *self)
     } else
         if (client_focused(self)) return self;
     return NULL;
+}
+
+gboolean client_is_hidden(ObClient *self)
+{
+    return (self->wmstate == IconicState);
+}
+
+gboolean client_is_group_hidden(ObClient *self)
+{
+    GSList *it;
+
+    if (self->group) {
+        for (it = self->group->members; it; it = g_slist_next(it)) {
+            ObClient *c = it->data;
+            if (!client_is_hidden(c)) return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 gboolean client_has_parent(ObClient *self)
@@ -3703,6 +3730,68 @@ void client_kill(ObClient *self)
     else {
         /* running on a remote host */
         XKillClient(obt_display, self->window);
+    }
+}
+
+void client_stop_hidden(ObClient *self)
+{
+    if (self->stop_hidden == OB_CLIENT_STOP_MODE_NONE)
+        return;
+
+    if (client_on_localhost(self) && self->pid) {
+        /* running on the local host */
+
+        if (!client_is_group_hidden(self)) {
+            return;
+        }
+
+        if (self->stop_hidden == OB_CLIENT_STOP_MODE_PROCESS) {
+            ob_debug("client_stop_hidden is stopping process with pid %lu",
+                     self->pid);
+            kill(self->pid, SIGSTOP);
+        } else if (self->stop_hidden == OB_CLIENT_STOP_MODE_GROUP) {
+            ob_debug("client_stop_hidden is stopping group with pid %lu",
+                     self->pid);
+            pid_t pgid = getpgid(self->pid);
+            if (pgid != -1) {
+                killpg(self->pid, SIGSTOP);
+            }
+        } else {
+            ob_debug("client_stop_hidden: unknown value of stop_hidden");
+            return;
+        }
+    }
+    else {
+        /* do nothing, running on a remote host */
+    }
+}
+
+void client_continue_hidden(ObClient *self)
+{
+    if (self->stop_hidden == OB_CLIENT_STOP_MODE_NONE)
+        return;
+
+    if (client_on_localhost(self) && self->pid) {
+        /* running on the local host */
+        if (self->stop_hidden == OB_CLIENT_STOP_MODE_PROCESS) {
+            ob_debug("client_continue_hidden is continuing process with pid %lu",
+                      self->pid);
+            kill(self->pid, SIGCONT);
+        } else if (self->stop_hidden == OB_CLIENT_STOP_MODE_GROUP) {
+            ob_debug("client_continue_hidden is continuing group with pid %lu",
+                      self->pid);
+            pid_t pgid = getpgid(self->pid);
+            if (pgid != -1) {
+                killpg(self->pid, SIGCONT);
+            }
+        } else {
+            ob_debug("client_continue_hidden: unknown value"
+                     " of stop_hidden");
+            return;
+        }
+    }
+    else {
+        /* do nothing, running on a remote host */
     }
 }
 

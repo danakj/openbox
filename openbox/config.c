@@ -123,6 +123,7 @@ ObAppSettings* config_create_app_settings(void)
     settings->fullscreen = -1;
     settings->max_horz = -1;
     settings->max_vert = -1;
+    settings->stop_hidden = OB_CLIENT_STOP_MODE_NONE;
     return settings;
 }
 
@@ -148,6 +149,7 @@ void config_app_settings_copy_non_defaults(const ObAppSettings *src,
     copy_if(fullscreen, -1);
     copy_if(max_horz, -1);
     copy_if(max_vert, -1);
+    copy_if(stop_hidden, OB_CLIENT_STOP_MODE_NONE);
 
     if (src->pos_given) {
         dst->pos_given = TRUE;
@@ -327,6 +329,18 @@ static void parse_single_per_app_settings(xmlNodePtr app,
     if ((n = obt_xml_find_node(app->children, "fullscreen")))
         if (!obt_xml_node_contains(n, "default"))
             settings->fullscreen = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(app->children, "stop_hidden")))
+        if (!obt_xml_node_contains(n, "default")) {
+            gchar *s = obt_xml_node_string(n);
+            if (!g_ascii_strcasecmp(s, "no"))
+                settings->stop_hidden = OB_CLIENT_STOP_MODE_NONE;
+            else if (!g_ascii_strcasecmp(s, "process"))
+                settings->stop_hidden = OB_CLIENT_STOP_MODE_PROCESS;
+            else if (!g_ascii_strcasecmp(s, "group"))
+                settings->stop_hidden = OB_CLIENT_STOP_MODE_GROUP;
+            g_free(s);
+        }
 
     if ((n = obt_xml_find_node(app->children, "maximized"))) {
         if (!obt_xml_node_contains(n, "default")) {

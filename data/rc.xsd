@@ -254,6 +254,7 @@
             <xsd:element minOccurs="0" name="skip_pager" type="ob:bool"/>
             <xsd:element minOccurs="0" name="skip_taskbar" type="ob:bool"/>
             <xsd:element minOccurs="0" name="fullscreen" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="stop_hidden" type="ob:stop_mode"/>
             <xsd:element minOccurs="0" name="maximized" type="ob:maximization"/>
         </xsd:all>
         <!-- at least one of these must be present -->
@@ -483,6 +484,13 @@
             <xsd:enumeration value="BottomLeft"/>
             <xsd:enumeration value="Left"/>
             <xsd:enumeration value="Floating"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="stop_mode">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="no"/>
+            <xsd:enumeration value="process"/>
+            <xsd:enumeration value="group"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="keyname">

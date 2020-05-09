@@ -115,6 +115,8 @@ struct _RrTheme {
     RrColor *osd_focused_lineart;
     RrColor *menu_title_shadow_color;
     RrColor *menu_text_shadow_color;
+    RrColor *focus_cycle_bg_color;
+    RrColor *focus_cycle_border_color;
 
     /* style settings - pics */
     RrPixel32 *def_win_icon; /* RGBA */

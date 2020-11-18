@@ -204,11 +204,13 @@ msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
 msgstr ""
+"Openbox se compiló sin compatibilidad para cargar imágenes. Los iconos de los "
+"menús no serán cargados."
 
 #: openbox/debug.c:57
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr ""
+msgstr "No se puede crear el directorio '%s': %s"
 
 #: openbox/debug.c:195 openbox/openbox.c:377
 msgid "Close"
@@ -284,7 +286,7 @@ msgid ""
 msgstr ""
 "Uno o más errores de sintaxis XML fueron encontrados leyendo los archivos de "
 "configuración de Openbox. Ver salida (stdout) para mas información. El "
-"último error viste estaba en el archivo \"%s\" linea %d, con el mensaje: %s"
+"último error encontrado estaba en el archivo \"%s\" linea %d, con el mensaje: %s"
 
 #: openbox/openbox.c:295
 msgid "Unable to load a theme."
@@ -325,8 +327,8 @@ msgstr "  --version           Muestra la versión y sale\n"
 
 #: openbox/openbox.c:536
 msgid "  --replace           Replace the currently running window manager\n"
-msgstr ""
-"  --replace            Remplaza el gestor de ventanas actual actualmente\n"
+msgstr "  --replace           Reemplaza el gestor de ventanas que se está "
+"                      ejecutando actualmente\n"
 
 #. TRANSLATORS: if you translate "FILE" here, make sure to keep the "Specify..."
 #. aligned still, if you have to, make a new line with \n and 22 spaces. It's
@@ -334,7 +336,7 @@ msgstr ""
 #: openbox/openbox.c:540
 msgid "  --config-file FILE  Specify the path to the config file to use\n"
 msgstr ""
-"  --config-file ARCHIVO\n"
+"  --config-file ARCHIVO"
 "                      Especifique la ruta del archivo de configuración a "
 "usar\n"
 
@@ -349,7 +351,7 @@ msgid ""
 "Passing messages to a running Openbox instance:\n"
 msgstr ""
 "\n"
-"enviando mensajes a la instancia que se está ejecutando de Openbox:\n"
+"Enviando mensajes a la instancia que se está ejecutando de Openbox:\n"
 
 #: openbox/openbox.c:543
 msgid "  --reconfigure       Reload Openbox's configuration\n"
@@ -377,26 +379,26 @@ msgstr "  --sync              Ejecutar en modo sincrónico\n"
 
 #: openbox/openbox.c:548
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr ""
+msgstr "  --startup CMD       Ejecutar CMD después de iniciar\n"
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
-msgstr "  --debug             Mostrar salida del depurador\n"
+msgstr "  --debug             Mostrar salida de depuración\n"
 
 #: openbox/openbox.c:550
 msgid "  --debug-focus       Display debugging output for focus handling\n"
 msgstr ""
-"  --debug-focus       Mostrar salida del depurador para el manejo del foco\n"
+"  --debug-focus       Mostrar la salida de depuración para el manejo del foco\n"
 
 #: openbox/openbox.c:551
 msgid "  --debug-session     Display debugging output for session management\n"
-msgstr ""
+msgstr "  --debug-session     Mostrar la salida de depuración para la gestión "
+"                      de sesiones\n"
 
 #: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
 msgstr ""
-"  --debug-xinerama    Separar la visualización en pantallas de xinerama "
-"falsas\n"
+"  --debug-xinerama    Dividir la pantalla en pantallas falsas de xinerama\n"
 
 #: openbox/openbox.c:553
 #, c-format
@@ -405,7 +407,7 @@ msgid ""
 "Please report bugs at %s\n"
 msgstr ""
 "\n"
-"Por favor, enviar los errores a %s\n"
+"Por favor, envie los errores a %s\n"
 
 #: openbox/openbox.c:636 openbox/openbox.c:670
 #, c-format
@@ -454,7 +456,7 @@ msgstr[1] ""
 #: openbox/screen.c:1204
 #, c-format
 msgid "desktop %i"
-msgstr "Escritorio %i"
+msgstr "escritorio %i"
 
 #: openbox/startupnotify.c:241
 #, c-format

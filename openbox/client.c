@@ -3320,6 +3320,10 @@ void client_configure(ObClient *self, gint x, gint y, gint w, gint h,
 void client_fullscreen(ObClient *self, gboolean fs)
 {
     gint x, y, w, h;
+    guint pre_fullscreen_monitor, current_monitor;
+    gint monitor_diff_x, monitor_diff_y;
+    const Rect* current_monitor_rect;
+    const Rect* pre_fullscreen_monitor_rect;
 
     if (!(self->functions & OB_CLIENT_FUNC_FULLSCREEN) || /* can't */
         self->fullscreen == fs) return;                   /* already done */
@@ -3352,6 +3356,29 @@ void client_fullscreen(ObClient *self, gboolean fs)
     } else {
         g_assert(self->pre_fullscreen_area.width > 0 &&
                  self->pre_fullscreen_area.height > 0);
+
+        // If the client is on a different monitor than when it was
+        //   fullscreened, keep it on the new monitor at the same offset
+        //   that it was on the old.
+        pre_fullscreen_monitor = screen_find_monitor(&self->pre_fullscreen_area);
+        current_monitor = client_monitor(self);
+        if (pre_fullscreen_monitor != current_monitor) {
+            // Find the offset between the current and pre_fullscreen monitors
+            current_monitor_rect = screen_physical_area_monitor(current_monitor);
+            pre_fullscreen_monitor_rect = screen_physical_area_monitor(pre_fullscreen_monitor);
+
+            monitor_diff_x = current_monitor_rect->x - pre_fullscreen_monitor_rect->x;
+            monitor_diff_y = current_monitor_rect->y - pre_fullscreen_monitor_rect->y;
+
+            // Offset pre_fullscreen_area to be on the new monitor
+            self->pre_fullscreen_area.x += monitor_diff_x;
+            self->pre_fullscreen_area.y += monitor_diff_y;
+            if(!RECT_INTERSECTS_RECT(*current_monitor_rect, self->pre_fullscreen_area)) {
+                // Ensure that the client is within the new screen
+                self->pre_fullscreen_area.x = current_monitor_rect->x;
+                self->pre_fullscreen_area.y = current_monitor_rect->y;
+            }
+        }
 
         self->max_horz = self->pre_fullscreen_max_horz;
         self->max_vert = self->pre_fullscreen_max_vert;
@@ -3462,6 +3489,10 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
 void client_maximize(ObClient *self, gboolean max, gint dir)
 {
     gint x, y, w, h;
+    guint pre_max_monitor, current_monitor;
+    gint monitor_diff_x, monitor_diff_y;
+    const Rect* current_monitor_rect;
+    const Rect* pre_max_monitor_rect;
 
     g_assert(dir == 0 || dir == 1 || dir == 2);
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && max) return;/* can't */
@@ -3496,6 +3527,30 @@ void client_maximize(ObClient *self, gboolean max, gint dir)
                      self->pre_max_area.width, self->area.height);
         }
     } else {
+        // If the client is on a different monitor than when it was
+        //   maximized, keep it on the new monitor at the same offset
+        //   that it was on the old.
+        pre_max_monitor = screen_find_monitor(&self->pre_max_area);
+        current_monitor = screen_find_monitor(&self->area);
+        if (pre_max_monitor != current_monitor) {
+            // Find the offset between the current and pre_max monitors
+            current_monitor_rect = screen_physical_area_monitor(current_monitor);
+            monitor_diff_x = current_monitor_rect->x;
+            monitor_diff_y = current_monitor_rect->y;
+
+            pre_max_monitor_rect = screen_physical_area_monitor(pre_max_monitor);
+            monitor_diff_x -= pre_max_monitor_rect->x;
+            monitor_diff_y -= pre_max_monitor_rect->y;
+
+            // Offset pre_max_area to be on the new monitor
+            self->pre_max_area.x += monitor_diff_x;
+            self->pre_max_area.y += monitor_diff_y;
+            if(!RECT_INTERSECTS_RECT(*current_monitor_rect, self->pre_max_area)) {
+                // Ensure that the client is within the new screen
+                self->pre_max_area.x = current_monitor_rect->x;
+                self->pre_max_area.y = current_monitor_rect->y;
+            }
+        }
         if ((dir == 0 || dir == 1) && self->max_horz) { /* horz */
             g_assert(self->pre_max_area.width > 0);
 

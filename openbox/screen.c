@@ -294,6 +294,11 @@ gboolean screen_annex(void)
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_FRAME_STRUT);
     supported[i++] = OBT_PROP_ATOM(KDE_NET_WM_WINDOW_TYPE_OVERRIDE);
 
+    // FIXME: openbox claims to support GTK_FRAME_EXTENTS, which is currently
+    // not the case.  This, however, enables full GTK client-side decorations,
+    // e.g. rounded window frames and shadows.
+    supported[i++] = OBT_PROP_ATOM(GTK_FRAME_EXTENTS);
+
     supported[i++] = OBT_PROP_ATOM(OB_WM_ACTION_UNDECORATE);
     supported[i++] = OBT_PROP_ATOM(OB_WM_STATE_UNDECORATED);
     supported[i++] = OBT_PROP_ATOM(OPENBOX_PID);

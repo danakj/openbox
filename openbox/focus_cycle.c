@@ -43,6 +43,10 @@ static gboolean focus_cycle_all_desktops;
 static gboolean focus_cycle_nonhilite_windows;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
+static gboolean focus_same_monitor;
+
+static GList *list_same_monitor = NULL;
+static gint old_monitor_to_focus = -1;
 
 static ObClient *focus_find_directional(ObClient *c,
                                         ObDirection dir,
@@ -86,15 +90,20 @@ void focus_cycle_addremove(ObClient *c, gboolean redraw)
 
 void focus_cycle_reorder()
 {
+    GList *window_list;
     if (focus_cycle_type == OB_CYCLE_NORMAL) {
+        if      (focus_same_monitor) window_list = list_same_monitor;
+        else if (focus_cycle_linear) window_list = client_list;
+        else                         window_list = focus_order;
+
         focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_target,
                                                        TRUE,
-                                                       focus_cycle_linear);
+                                                       window_list);
         focus_cycle_update_indicator(focus_cycle_target);
         if (!focus_cycle_target)
             focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
                         TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
-                        TRUE, TRUE);
+                        TRUE, TRUE, FALSE, -1);
     }
 }
 
@@ -103,12 +112,14 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                       gboolean dock_windows, gboolean desktop_windows,
                       gboolean linear, gboolean showbar,
                       ObFocusCyclePopupMode mode,
-                      gboolean done, gboolean cancel)
+                      gboolean done, gboolean cancel, gboolean same_monitor,
+                      gint monitor_to_focus)
 {
     static GList *order = NULL;
     GList *it, *start, *list;
     ObClient *ft = NULL;
     ObClient *ret = NULL;
+    guint start_monitor;
 
     if (cancel) {
         focus_cycle_target = NULL;
@@ -129,6 +140,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
         focus_cycle_nonhilite_windows = nonhilite_windows;
         focus_cycle_dock_windows = dock_windows;
         focus_cycle_desktop_windows = desktop_windows;
+        focus_same_monitor = same_monitor;
         start = it = g_list_find(list, focus_client);
     } else
         start = it = g_list_find(list, focus_cycle_target);
@@ -136,6 +148,39 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
     if (!start) /* switched desktops or something? */
         start = it = forward ? g_list_last(list) : g_list_first(list);
     if (!start) goto done_cycle;
+
+    ob_debug("same_monitor = %d", same_monitor);
+    ob_debug("monitor_to_focus = %d", monitor_to_focus);
+    ob_debug("old_monitor_to_focus = %d", old_monitor_to_focus);
+    if (same_monitor || monitor_to_focus != -1) {
+        // since the list will be modified almost surely, make a copy of it
+        // so to not break anything underlying
+        if (list_same_monitor)
+            g_list_free(list_same_monitor);
+        list_same_monitor = NULL;
+
+        start_monitor = same_monitor ? client_monitor(start->data) :
+            monitor_to_focus;
+        for (it = g_list_first(list); it; it = it->next)
+            if (client_monitor(it->data) == start_monitor)
+                list_same_monitor = g_list_append(list_same_monitor, it->data);
+
+        // here we need to reset the "start" and "it" pointers
+        list = list_same_monitor;
+
+        if (focus_cycle_target == NULL)
+            start = it = g_list_find(list, focus_client);
+        else start = it = g_list_find(list, focus_cycle_target);
+        if (!start)
+            start = it = forward ? g_list_last(list) : g_list_first(list);
+    }
+
+    if (old_monitor_to_focus != monitor_to_focus) {
+        // we need to redraw the popup
+        focus_cycle_draw_indicator(NULL);
+        focus_cycle_popup_hide();
+    }
+    old_monitor_to_focus = monitor_to_focus;
 
     do {
         if (forward) {
@@ -153,7 +198,9 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                 focus_cycle_draw_indicator(showbar ? ft : NULL);
             }
             /* same arguments as focus_target_valid */
-            focus_cycle_popup_show(ft, mode, focus_cycle_linear);
+
+            focus_cycle_popup_show(ft, mode, list);
+
             return focus_cycle_target;
         }
     } while (it != start);

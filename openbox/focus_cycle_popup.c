@@ -103,7 +103,7 @@ static gchar   *popup_get_name (ObClient *c);
 static gboolean popup_setup    (ObFocusCyclePopup *p,
                                 gboolean create_targets,
                                 gboolean refresh_targets,
-                                gboolean linear);
+                                GList *window_list);
 static void     popup_render   (ObFocusCyclePopup *p,
                                 const ObClient *c);
 
@@ -251,7 +251,7 @@ static void popup_target_free(ObFocusCyclePopupTarget *t)
 }
 
 static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
-                            gboolean refresh_targets, gboolean linear)
+                            gboolean refresh_targets, GList *window_list)
 {
     gint maxwidth, n;
     GList *it;
@@ -273,6 +273,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
 
     g_assert(p->targets == NULL);
     g_assert(p->n_targets == 0);
+    g_assert(window_list != NULL);
 
     /* make its width to be the width of all the possible titles */
 
@@ -280,7 +281,7 @@ static gboolean popup_setup(ObFocusCyclePopup *p, gboolean create_targets,
        and count them */
     maxwidth = 0;
     n = 0;
-    for (it = g_list_last(linear ? client_list : focus_order);
+    for (it = g_list_last(window_list);
          it;
          it = g_list_previous(it))
     {
@@ -705,7 +706,7 @@ static void popup_render(ObFocusCyclePopup *p, const ObClient *c)
 }
 
 void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
-                            gboolean linear)
+                            GList *window_list)
 {
     g_assert(c != NULL);
 
@@ -716,7 +717,7 @@ void focus_cycle_popup_show(ObClient *c, ObFocusCyclePopupMode mode,
 
     /* do this stuff only when the dialog is first showing */
     if (!popup.mapped) {
-        popup_setup(&popup, TRUE, FALSE, linear);
+        popup_setup(&popup, TRUE, FALSE, window_list);
         /* this is fixed once the dialog is shown */
         popup.mode = mode;
     }
@@ -824,14 +825,14 @@ static ObClient* popup_revert(ObClient *target)
 
 ObClient* focus_cycle_popup_refresh(ObClient *target,
                                     gboolean redraw,
-                                    gboolean linear)
+                                    GList *window_list)
 {
     if (!popup.mapped) return NULL;
 
     if (!focus_cycle_valid(target))
         target = popup_revert(target);
 
-    redraw = popup_setup(&popup, TRUE, TRUE, linear) && redraw;
+    redraw = popup_setup(&popup, TRUE, TRUE, window_list) && redraw;
 
     if (!target && popup.targets)
         target = ((ObFocusCyclePopupTarget*)popup.targets->data)->client;

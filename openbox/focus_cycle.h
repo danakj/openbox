@@ -40,7 +40,8 @@ struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                               gboolean dock_windows, gboolean desktop_windows,
                               gboolean linear, gboolean showbar,
                               ObFocusCyclePopupMode mode,
-                              gboolean done, gboolean cancel);
+                              gboolean done, gboolean cancel,
+                              gboolean same_monitor, gint monitor_to_focus);
 struct _ObClient* focus_directional_cycle(ObDirection dir,
                                           gboolean dock_windows,
                                           gboolean desktop_windows,

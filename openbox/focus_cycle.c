@@ -47,6 +47,7 @@ static gboolean focus_same_monitor;
 
 static GList *list_same_monitor = NULL;
 static gint old_monitor_to_focus = -1;
+static gboolean old_same_monitor = -1;
 
 static ObClient *focus_find_directional(ObClient *c,
                                         ObDirection dir,
@@ -175,12 +176,14 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             start = it = forward ? g_list_last(list) : g_list_first(list);
     }
 
-    if (old_monitor_to_focus != monitor_to_focus) {
+    if (old_monitor_to_focus != monitor_to_focus ||
+            old_same_monitor != -1 && old_same_monitor != same_monitor) {
         // we need to redraw the popup
         focus_cycle_draw_indicator(NULL);
         focus_cycle_popup_hide();
     }
     old_monitor_to_focus = monitor_to_focus;
+    old_same_monitor = same_monitor;
 
     do {
         if (forward) {

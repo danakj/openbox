@@ -2735,7 +2735,8 @@ gboolean client_should_show(ObClient *self)
     if (self->iconic)
         return FALSE;
     if (client_normal(self) && screen_showing_desktop())
-        return FALSE;
+        if (!(self->skip_taskbar && self->skip_pager && self->below))
+            return FALSE;
     if (self->desktop == screen_desktop || self->desktop == DESKTOP_ALL)
         return TRUE;
 

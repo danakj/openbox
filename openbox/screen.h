@@ -21,6 +21,7 @@
 
 #include "misc.h"
 #include "geom.h"
+#include <X11/X.h>
 
 struct _ObClient;
 

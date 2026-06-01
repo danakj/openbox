@@ -951,22 +951,9 @@ gboolean moveresize_event(XEvent *e)
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
-            XEvent ce;
-            ObtXQueueWindowType wt;
-
-            wt.window = e->xmotion.window;
-            wt.type = MotionNotify;
-            while (xqueue_remove_local(&ce, xqueue_match_window_type, &wt)) {
-                e->xmotion.x = ce.xmotion.x;
-                e->xmotion.y = ce.xmotion.y;
-                e->xmotion.x_root = ce.xmotion.x_root;
-                e->xmotion.y_root = ce.xmotion.y_root;
-            }
-
             cur_x = start_cx + e->xmotion.x_root - start_x;
             cur_y = start_cy + e->xmotion.y_root - start_y;
             do_move(FALSE, 0);
-            XSync(obt_display, FALSE);
             do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
         } else {
             gint dw, dh;

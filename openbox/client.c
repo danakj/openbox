@@ -2158,19 +2158,18 @@ void client_update_title(ObClient *self)
         /* try old x stuff */
         if (!OBT_PROP_GETS(self->window, WM_NAME, &data)) {
             if (self->transient) {
-   /*
-   GNOME alert windows are not given titles:
-   http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
-   */
+                /*
+                GNOME alert windows are not given titles:
+                http://developer.gnome.org/projects/gup/hig/draft_hig_new/windows-alert.html
+                */
                 data = g_strdup("");
-            } else {
-                if (self->class && *self->class)
-                    data = g_strdup(self->class);
-                else if (self->name && *self->name)
-                    data = g_strdup(self->name);
-                else
-                    data = g_strdup(_("Unnamed Window"));
             }
+            else if (self->class && *self->class)
+                data = g_strdup(self->class);
+            else if (self->name && *self->name)
+                data = g_strdup(self->name);
+            else
+                data = g_strdup(_("Unnamed Window"));
         }
     }
     self->original_title = g_strdup(data);

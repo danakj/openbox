@@ -1740,42 +1740,42 @@ void client_update_opacity(ObClient *self)
         OBT_PROP_ERASE(self->frame->window, NET_WM_WINDOW_OPACITY);
 }
 
-void client_update_normal_hints(ObClient *realself)
+void client_update_normal_hints(ObClient *self)
 {
     XSizeHints size = {0};
     glong ret;
-    ObClient *self = g_new(ObClient, 1);
+    ObClient staging;
 
     /* defaults */
-    realself->min_ratio = 0.0f;
-    realself->max_ratio = 0.0f;
-    SIZE_SET(realself->size_inc, 1, 1);
-    SIZE_SET(realself->base_size, -1, -1);
-    SIZE_SET(realself->min_size, 0, 0);
-    SIZE_SET(realself->max_size, G_MAXINT, G_MAXINT);
-
-    memcpy(self, realself, sizeof(ObClient));
+    self->min_ratio = 0.0f;
+    self->max_ratio = 0.0f;
+    SIZE_SET(self->size_inc, 1, 1);
+    SIZE_SET(self->base_size, -1, -1);
+    SIZE_SET(self->min_size, 0, 0);
+    SIZE_SET(self->max_size, G_MAXINT, G_MAXINT);
 
     /* get the hints from the window */
-    if (XGetWMNormalHints(obt_display, self->window, &size, &ret)) {
+    if (XGetWMNormalHints(obt_display, staging.window, &size, &ret)) {
+        memcpy(&staging, self, sizeof(ObClient));
+
         /* normal windows can't request placement! har har
         if (!client_normal(self))
         */
-        self->positioned = (size.flags & (PPosition|USPosition));
-        self->sized = (size.flags & (PSize|USSize));
+        staging.positioned = (size.flags & (PPosition|USPosition));
+        staging.sized = (size.flags & (PSize|USSize));
 
         if (size.flags & PWinGravity)
-            self->gravity = size.win_gravity;
+            staging.gravity = size.win_gravity;
 
         if (size.flags & PAspect) {
             if ((unsigned int)size.min_aspect.x > 4096 ||
                 (unsigned int)size.min_aspect.y > 4096)
                 goto invalid_hints;
             if (size.min_aspect.y)
-                self->min_ratio =
+                staging.min_ratio =
                     (gfloat) size.min_aspect.x / size.min_aspect.y;
             if (size.max_aspect.y)
-                self->max_ratio =
+                staging.max_ratio =
                     (gfloat) size.max_aspect.x / size.max_aspect.y;
         }
 
@@ -1783,44 +1783,43 @@ void client_update_normal_hints(ObClient *realself)
             if ((unsigned int)size.min_width > 4096 ||
                 (unsigned int)size.min_height > 4096)
                 goto invalid_hints;
-            SIZE_SET(self->min_size, size.min_width, size.min_height);
+            SIZE_SET(staging.min_size, size.min_width, size.min_height);
         }
 
         if (size.flags & PMaxSize) {
             if ((unsigned int)size.max_width > 4096 ||
                 (unsigned int)size.max_height > 4096)
                 goto invalid_hints;
-            SIZE_SET(self->max_size, size.max_width, size.max_height);
+            SIZE_SET(staging.max_size, size.max_width, size.max_height);
         }
 
         if (size.flags & PBaseSize) {
             if ((unsigned int)size.base_width > 4096 ||
                 (unsigned int)size.base_height > 4096)
                 goto invalid_hints;
-            SIZE_SET(self->base_size, size.base_width, size.base_height);
+            SIZE_SET(staging.base_size, size.base_width, size.base_height);
         }
 
         if (size.flags & PResizeInc && size.width_inc && size.height_inc) {
             if ((unsigned int)size.width_inc > 4096 ||
                 (unsigned int)size.height_inc > 4096)
                 goto invalid_hints;
-            SIZE_SET(self->size_inc, size.width_inc, size.height_inc);
+            SIZE_SET(staging.size_inc, size.width_inc, size.height_inc);
         }
 
         ob_debug("Normal hints: min size (%d %d) max size (%d %d)",
-                 self->min_size.width, self->min_size.height,
-                 self->max_size.width, self->max_size.height);
+                 staging.min_size.width, staging.min_size.height,
+                 staging.max_size.width, staging.max_size.height);
         ob_debug("size inc (%d %d) base size (%d %d)",
-                 self->size_inc.width, self->size_inc.height,
-                 self->base_size.width, self->base_size.height);
+                 staging.size_inc.width, staging.size_inc.height,
+                 staging.base_size.width, staging.base_size.height);
+
+        memcpy(self, &staging, sizeof(ObClient));
     }
     else
         ob_debug("Normal hints: not set");
-    memcpy(realself, self, sizeof(ObClient));
-    g_free(self);
     return;
 invalid_hints:
-    g_free(self);
     ob_debug("Normal hints: corruption detected, not setting anything");
 }
 

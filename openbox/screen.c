@@ -78,9 +78,11 @@ static GSList *struts_left = NULL;
 static GSList *struts_right = NULL;
 static GSList *struts_bottom = NULL;
 
-static ObPagerPopup **desktop_popup;
-static guint         desktop_popup_timer = 0;
-static gboolean      desktop_popup_perm;
+/*! There is an ObPagerPopup for each monitor, so this is an array of size
+  `screen_num_monitors`. */
+static ObPagerPopup **desktop_popups;
+static guint          desktop_popups_timer = 0;
+static gboolean       desktop_popups_permanent;
 
 /*! The number of microseconds that you need to be on a desktop before it will
   replace the remembered "last desktop" */
@@ -320,40 +322,37 @@ gboolean screen_annex(void)
     return TRUE;
 }
 
-static void desktop_popup_new()
+static void desktop_popups_new()
 {
-        guint i;
-        desktop_popup = g_new(ObPagerPopup*, screen_num_monitors);
-        for (i = 0; i < screen_num_monitors; i++) {
-            desktop_popup[i] = pager_popup_new();
-            desktop_popup[i]->popup->a_text->texture[0].data.text.font = ob_rr_theme->menu_title_font;
-            pager_popup_height(desktop_popup[i], POPUP_HEIGHT);
-
-            /* update the pager popup's width */
-            if (screen_desktop_names)
-                pager_popup_text_width_to_strings(desktop_popup[i],
-                                                  screen_desktop_names,
-                                                  screen_num_desktops);
-        }
-
+    guint i;
+    desktop_popups = g_new(ObPagerPopup*, screen_num_monitors);
+    for (i = 0; i < screen_num_monitors; i++) {
+        desktop_popups[i] = pager_popup_new();
+        desktop_popups[i]->popup->a_text->texture[0].data.text.font = ob_rr_theme->menu_title_font;
+        pager_popup_height(desktop_popups[i], POPUP_HEIGHT);
+    }
 }
 
 void screen_startup(gboolean reconfig)
 {
     gchar **names = NULL;
+    guint i;
     guint32 d;
     gboolean namesexist = FALSE;
 
-    desktop_popup_perm = FALSE;
+    desktop_popups_new();
 
     if (reconfig) {
-        desktop_popup_new();
         screen_update_layout();
+
+        /* On reconfig, the desktop popups were reallocated, and their
+          width needs to be restored. */
+        for (i = 0; i < screen_num_monitors; i++) {
+            pager_popup_text_width_to_strings(desktop_popups[i],
+                                              screen_desktop_names,
+                                              screen_num_desktops);
+        }
         return;
-    } else {
-        if (desktop_popup)
-            ob_debug("desktop_popup wasn't NULL when expected %x", desktop_popup);
-        desktop_popup = NULL;
     }
 
     /* get the initial size */
@@ -444,19 +443,20 @@ void screen_startup(gboolean reconfig)
         screen_update_layout();
 }
 
-static void desktop_popup_free(guint n)
+static void desktop_popups_free()
 {
     guint i;
-    for (i = 0; i < n; i++) {
-        pager_popup_free(desktop_popup[i]);
+    for (i = 0; i < screen_num_monitors; i++) {
+        pager_popup_free(desktop_popups[i]);
     }
-    g_free(desktop_popup);
-    desktop_popup = NULL;
+    g_free(desktop_popups);
+    desktop_popups = NULL;
 }
 
 void screen_shutdown(gboolean reconfig)
 {
-    desktop_popup_free(screen_num_monitors);
+    screen_hide_desktop_popup();
+    desktop_popups_free();
 
     if (reconfig)
         return;
@@ -933,14 +933,14 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-static gboolean hide_desktop_popup_func(gpointer data)
+static gboolean hide_desktop_popups_func(gpointer data)
 {
     guint i;
 
-    desktop_popup_timer = 0;
+    desktop_popups_timer = 0;
 
     for (i = 0; i < screen_num_monitors; i++) {
-        pager_popup_hide(desktop_popup[i]);
+        pager_popup_hide(desktop_popups[i]);
     }
     return FALSE; /* don't repeat */
 }
@@ -955,37 +955,39 @@ void screen_show_desktop_popup(guint d, gboolean perm)
 
     for (i = 0; i < screen_num_monitors; i++) {
         a = screen_physical_area_monitor(i);
-        pager_popup_position(desktop_popup[i], CenterGravity,
+        pager_popup_position(desktop_popups[i], CenterGravity,
                              a->x + a->width / 2, a->y + a->height / 2);
-        pager_popup_icon_size_multiplier(desktop_popup[i],
+        pager_popup_icon_size_multiplier(desktop_popups[i],
                                          (screen_desktop_layout.columns /
                                           screen_desktop_layout.rows) / 2,
                                          (screen_desktop_layout.rows/
                                           screen_desktop_layout.columns) / 2);
-        pager_popup_max_width(desktop_popup[i],
+        pager_popup_max_width(desktop_popups[i],
                               MAX(a->width/3, POPUP_WIDTH));
-        pager_popup_show(desktop_popup[i], screen_desktop_names[d], d);
+        pager_popup_show(desktop_popups[i], screen_desktop_names[d], d);
     }
-    if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
-    desktop_popup_timer = 0;
-    if (!perm && !desktop_popup_perm)
+    if (desktop_popups_timer) g_source_remove(desktop_popups_timer);
+    desktop_popups_timer = 0;
+    if (!perm && !desktop_popups_permanent) {
         /* only hide if its not already being show permanently */
-        desktop_popup_timer = g_timeout_add(config_desktop_popup_time,
-                                            hide_desktop_popup_func,
-                                            desktop_popup);
+        desktop_popups_timer = g_timeout_add(config_desktop_popup_time,
+                                             hide_desktop_popups_func,
+                                             desktop_popups);
+    }
     if (perm)
-        desktop_popup_perm = TRUE;
+        desktop_popups_permanent = TRUE;
 }
 
 void screen_hide_desktop_popup(void)
 {
-    if (desktop_popup_timer) g_source_remove(desktop_popup_timer);
-    desktop_popup_timer = 0;
-    desktop_popup_perm = FALSE;
     guint i;
 
+    if (desktop_popups_timer) g_source_remove(desktop_popups_timer);
+    desktop_popups_timer = 0;
+    desktop_popups_permanent = FALSE;
+
     for (i = 0; i < screen_num_monitors; i++) {
-        pager_popup_hide(desktop_popup[i]);
+        pager_popup_hide(desktop_popups[i]);
     }
 }
 
@@ -1222,7 +1224,7 @@ void screen_update_desktop_names(void)
 
     /* resize the pager for these names */
     for (i = 0; i < screen_num_monitors; i++) {
-        pager_popup_text_width_to_strings(desktop_popup[i],
+        pager_popup_text_width_to_strings(desktop_popups[i],
                                           screen_desktop_names,
                                           screen_num_desktops);
     }
@@ -1427,7 +1429,7 @@ static void get_xinerama_screens(Rect **xin_areas, guint *nxin)
 
 void screen_update_areas(void)
 {
-    guint i, old_num_monitors = screen_num_monitors;
+    guint i, new_num_monitors;
     gulong *dims;
     GList *it, *onscreen;
 
@@ -1439,11 +1441,15 @@ void screen_update_areas(void)
     }
 
     g_free(monitor_area);
-    get_xinerama_screens(&monitor_area, &screen_num_monitors);
-    if (screen_num_monitors != old_num_monitors) {
-        if (desktop_popup)
-            desktop_popup_free(old_num_monitors);
-        desktop_popup_new();
+    get_xinerama_screens(&monitor_area, &new_num_monitors);
+    if (new_num_monitors != screen_num_monitors) {
+        /* Desktop popups need to be reallocated if `screen_num_monitors`
+          changes. */
+        screen_hide_desktop_popup();
+        desktop_popups_free();
+
+        screen_num_monitors = new_num_monitors;
+        desktop_popups_new();
     }
 
     /* set up the user-specified margins */

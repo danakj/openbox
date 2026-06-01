@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # openbox-xdg-autostart runs things based on the XDG autostart specification
 # Copyright (C) 2008       Dana Jansens
@@ -18,8 +18,6 @@
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-
-from __future__ import print_function
 
 ME="openbox-xdg-autostart"
 VERSION="1.1"

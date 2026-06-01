@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pygtk
 import gtk
@@ -8,7 +8,7 @@ pygtk.require('2.0')
 class FolderSelector(gtk.Window):
     def __init__(self, jules):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        print "init folder selector", self, jules
+        print("init folder selector", self, jules)
         self.set_title("Select Folder")
         self.jules = jules
 
@@ -30,7 +30,7 @@ class FolderSelector(gtk.Window):
         self.add(self.tree)
         self.show_all()
         self.tree.columns_autosize()
-        print "done init"
+        print("done init")
 
 class Jules(gtk.Window):
     def __init__(self):

@@ -12,6 +12,7 @@
     but with a more logical name. The Unfocus action may change to unfocus the
     window in a future release (and not focus any other window in its place).
   * Various small bugfixes.
+  * Added focus.cycle.bg.color and focus.cycle.border.color theme options.
 
 3.6.1:
   * Bump ABI version of libobrender that should have been done in 3.6

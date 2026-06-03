@@ -299,21 +299,24 @@ static void event_hack_mods(XEvent *e)
         break;
     case MotionNotify:
         e->xmotion.state = obt_keyboard_only_modmasks(e->xmotion.state);
-        /* compress events */
-        {
-            XEvent ce;
-            ObtXQueueWindowType wt;
-
-            wt.window = e->xmotion.window;
-            wt.type = MotionNotify;
-            while (xqueue_remove_local(&ce, xqueue_match_window_type, &wt)) {
-                e->xmotion.x = ce.xmotion.x;
-                e->xmotion.y = ce.xmotion.y;
-                e->xmotion.x_root = ce.xmotion.x_root;
-                e->xmotion.y_root = ce.xmotion.y_root;
-            }
-        }
         break;
+    }
+}
+
+static void event_compress_motion(XEvent *e)
+{
+    if (e->type != MotionNotify) return;
+
+    XEvent ce;
+    ObtXQueueWindowType wt;
+
+    wt.window = e->xmotion.window;
+    wt.type = MotionNotify;
+    while (xqueue_remove_local(&ce, xqueue_match_window_type, &wt)) {
+        e->xmotion.x = ce.xmotion.x;
+        e->xmotion.y = ce.xmotion.y;
+        e->xmotion.x_root = ce.xmotion.x_root;
+        e->xmotion.y_root = ce.xmotion.y_root;
     }
 }
 
@@ -500,6 +503,7 @@ static void event_process(const XEvent *ec, gpointer data)
     event_set_curtime(e);
     event_curserial = e->xany.serial;
     event_hack_mods(e);
+    event_compress_motion(e);
 
     /* deal with it in the kernel */
 

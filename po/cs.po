@@ -4,25 +4,26 @@
 #
 # tezlo <tezlo@gmx.net>, 2007.
 # David Kolibac <david@kolibac.cz>, 2011.
+# zenobit <zen@osowoso.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: Openbox 3.4.7\n"
 "Report-Msgid-Bugs-To: http://bugzilla.icculus.org\n"
 "POT-Creation-Date: 2014-11-05 16:51+0100\n"
-"PO-Revision-Date: 2011-06-03 17:49+0200\n"
-"Last-Translator: David Kolibac <david@kolibac.cz>\n"
+"PO-Revision-Date: 2026-06-03 17:13+0200\n"
+"Last-Translator: zenobit <zen@osowoso.org>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 1.2\n"
+"X-Generator: Geany / PoHelper 2.1\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: openbox/actions.c:234
 #, c-format
 msgid "Invalid action \"%s\" requested. No such action exists."
-msgstr "Požadována neplatná činnost \"%s\". Žádná taková činnost neexistuje."
+msgstr "Požadována neplatná činnost \"%s\". Taková činnost neexistuje."
 
 #: openbox/actions/execute.c:245
 msgid "No"
@@ -39,7 +40,7 @@ msgstr "Spustit"
 #: openbox/actions/execute.c:259
 #, c-format
 msgid "Failed to convert the path \"%s\" from utf8"
-msgstr "Nepodařilo se převést cestu \"%s\" z UTF-8"
+msgstr "Nemohu převést cestu \"%s\" z UTF-8"
 
 #: openbox/actions/exit.c:69 openbox/client.c:3665
 msgid "Cancel"
@@ -71,7 +72,7 @@ msgstr "Nepojmenované okno"
 
 #: openbox/client.c:2129 openbox/client.c:2160
 msgid "Killing..."
-msgstr "Ukončuje se..."
+msgstr "Ukončuji..."
 
 #: openbox/client.c:2131 openbox/client.c:2162
 msgid "Not Responding"
@@ -198,11 +199,13 @@ msgid ""
 "Openbox was compiled without image loading support. Icons in menus will not "
 "be loaded."
 msgstr ""
+"Openbox byl zkompilován bez podpory načítání obrázků. Ikony v nabídkách "
+"nebudou načteny."
 
 #: openbox/debug.c:57
 #, c-format
 msgid "Unable to make directory '%s': %s"
-msgstr ""
+msgstr "Nemohu vytvořit adresář '%s': %s"
 
 #: openbox/debug.c:195 openbox/openbox.c:377
 msgid "Close"
@@ -215,12 +218,12 @@ msgstr "Konflikt klávesových zkratek v konfiguračním souboru"
 #: openbox/menu.c:103 openbox/menu.c:115
 #, c-format
 msgid "Unable to find a valid menu file \"%s\""
-msgstr "Nepodařilo se najít platný soubor nabídky \"%s\""
+msgstr "Nemohu najít platný soubor nabídky \"%s\""
 
 #: openbox/menu.c:168
 #, c-format
 msgid "Failed to execute command for pipe-menu \"%s\": %s"
-msgstr "Nepodařilo se spustit příkaz pro pipe-menu \"%s\": %s"
+msgstr "Nemohu spustit příkaz pro pipe-menu \"%s\": %s"
 
 #: openbox/menu.c:182
 #, c-format
@@ -244,15 +247,15 @@ msgstr "Neplatné tlačítko \"%s\" v nastavení myši"
 #: openbox/openbox.c:137
 #, c-format
 msgid "Unable to change to home directory \"%s\": %s"
-msgstr "Nepodařilo se přejít do domovského adresáře \"%s\": %s"
+msgstr "Nemohu přejít do domovského adresáře \"%s\": %s"
 
 #: openbox/openbox.c:152
 msgid "Failed to open the display from the DISPLAY environment variable."
-msgstr "Nepodařilo se otevřít displej z proměnné prostředí DISPLAY."
+msgstr "Nemohu otevřít displej z proměnné prostředí DISPLAY."
 
 #: openbox/openbox.c:182
 msgid "Failed to initialize the obrender library."
-msgstr "Nepodařilo se inicializovat knihovnu obrender."
+msgstr "Nemohu inicializovat knihovnu obrender."
 
 #: openbox/openbox.c:193
 msgid "X server does not support locale."
@@ -264,9 +267,7 @@ msgstr "Nelze nastavit modifikátory lokalizace pro X server."
 
 #: openbox/openbox.c:254
 msgid "Unable to find a valid config file, using some simple defaults"
-msgstr ""
-"Nepodařilo se najít platný konfigurační soubor, pokračuje se s výchozím "
-"nastavením"
+msgstr "Nemohu najít platný konfigurační soubor, použiji výchozí nastavení"
 
 #: openbox/openbox.c:270
 #, c-format
@@ -281,7 +282,7 @@ msgstr ""
 
 #: openbox/openbox.c:295
 msgid "Unable to load a theme."
-msgstr "Nepodařilo se načíst motiv."
+msgstr "Nemohu načíst motiv."
 
 #: openbox/openbox.c:376
 msgid "Openbox Syntax Error"
@@ -365,7 +366,7 @@ msgstr "  --sync              Spustit v synchronním módu\n"
 
 #: openbox/openbox.c:548
 msgid "  --startup CMD       Run CMD after starting\n"
-msgstr ""
+msgstr "  --startup CMD       Spustit CMD po startu\n"
 
 #: openbox/openbox.c:549
 msgid "  --debug             Display debugging output\n"
@@ -377,7 +378,7 @@ msgstr "  --debug-focus       Zobrazit ladící výstup pro aktivaci oken\n"
 
 #: openbox/openbox.c:551
 msgid "  --debug-session     Display debugging output for session management\n"
-msgstr ""
+msgstr "  --debug-session     Zobrazit ladící výstup pro správu sezení\n"
 
 #: openbox/openbox.c:552
 msgid "  --debug-xinerama    Split the display into fake xinerama screens\n"
@@ -410,7 +411,7 @@ msgstr "Na obrazovce %d již nějaký správce oken běží"
 #: openbox/screen.c:127
 #, c-format
 msgid "Could not acquire window manager selection on screen %d"
-msgstr "Nepodařilo se převzít správu oken na obrazovce %d"
+msgstr "Nemohu převzít správu oken na obrazovce %d"
 
 #: openbox/screen.c:150
 #, c-format

@@ -490,9 +490,14 @@ ImlibLoader* LoadWithImlib(gchar *path,
                            gint *width,
                            gint *height)
 {
-    ImlibLoader *loader = g_slice_new0(ImlibLoader);
-    if (!(loader->img = imlib_load_image(path))) {
-        DestroyImlibLoader(loader);
+    Imlib_Image img;
+    ImlibLoader *loader = NULL;
+    
+    
+    if ((img = imlib_load_image(path))) {
+        loader = g_slice_new0(ImlibLoader);
+        loader->img = img;
+    } else {
         return NULL;
     }
 

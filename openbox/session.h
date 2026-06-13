@@ -34,7 +34,7 @@ struct _ObSessionState {
     gboolean shaded, iconic, skip_pager, skip_taskbar, fullscreen;
     gboolean above, below, max_horz, max_vert, undecorated;
     gboolean focused;
-
+    ObClientStopMode stop_hidden;
     gboolean matched;
 };
 

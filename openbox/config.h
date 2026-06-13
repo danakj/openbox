@@ -42,6 +42,7 @@ struct _ObAppSettings
     GPatternSpec *group_name;
     GPatternSpec *title;
     ObClientType  type;
+    ObClientStopMode stop_hidden;
 
     GravityPoint position;
     gboolean pos_given;

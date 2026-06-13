@@ -603,6 +603,8 @@ static gboolean session_save_to_file(const ObSMSaveData *savedata)
                 fprintf(f, "\t<max_vert />\n");
             if (c->undecorated)
                 fprintf(f, "\t<undecorated />\n");
+            if (c->stop_hidden)
+                fprintf(f, "\t<stop_hidden />\n");
             if (savedata->focus_client == c)
                 fprintf(f, "\t<focused />\n");
             fprintf(f, "</window>\n\n");
@@ -784,6 +786,8 @@ static void session_load_file(const gchar *path)
             obt_xml_find_node(node->children, "max_vert") != NULL;
         state->undecorated =
             obt_xml_find_node(node->children, "undecorated") != NULL;
+        state->stop_hidden =
+            obt_xml_find_node(node->children, "stop_hidden") != NULL;
         state->focused =
             obt_xml_find_node(node->children, "focused") != NULL;
 

@@ -69,6 +69,14 @@ typedef enum
     OB_CLIENT_FUNC_UNDECORATE = 1 << 9  /*!< Allow to be undecorated */
 } ObFunctions;
 
+/*! The way to stop client when it hides */
+typedef enum
+{
+    OB_CLIENT_STOP_MODE_NONE,    /*!< Do not stop client */
+    OB_CLIENT_STOP_MODE_PROCESS, /*!< Stop the client process only */
+    OB_CLIENT_STOP_MODE_GROUP,   /*!< Stop process group the client belongs to */
+} ObClientStopMode;
+
 struct _ObClient
 {
     ObWindow obwin;
@@ -272,6 +280,8 @@ struct _ObClient
     gboolean skip_pager;
     /*! The window should not be displayed by taskbars */
     gboolean skip_taskbar;
+    /*! How to stop the process when it hides or iconifies */
+    ObClientStopMode stop_hidden;
     /*! The window is a 'fullscreen' window, and should be on top of all
       others */
     gboolean fullscreen;
@@ -547,6 +557,12 @@ void client_close(ObClient *self);
 
 /*! Kill the client off violently */
 void client_kill(ObClient *self);
+
+/*! Stop the client process when all its windows are hidded */
+void client_stop_hidden(ObClient *self);
+
+/*! Continue executing the client process when one of its windows appears */
+void client_continue_hidden(ObClient *self);
 
 /*! Sends the window to the specified desktop
   @param donthide If TRUE, the window will not be shown/hidden after its

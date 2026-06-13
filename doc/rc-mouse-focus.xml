@@ -625,6 +625,13 @@
     <fullscreen>yes</fullscreen>
     # make the window in fullscreen mode when it appears
 
+    <stop_hidden>process</stop_hidden>
+    # stop the application when it hides in order to minimize CPU usage
+    # and power consumption
+    #   'no'      - do not stop application when it hides (default value)
+    #   'process' - stop just the process the window belongs to
+    #   'group'   - stop whole process group the application belongs to
+
     <maximized>true</maximized>
     # 'Horizontal', 'Vertical' or boolean (yes/no)
   </application>

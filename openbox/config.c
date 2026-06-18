@@ -46,6 +46,7 @@ guint          config_primary_monitor_index;
 ObPlaceMonitor config_primary_monitor;
 
 StrutPartial config_margins;
+gboolean     config_margins_per_monitor;
 
 gchar   *config_theme;
 gboolean config_theme_keepborder;
@@ -688,6 +689,8 @@ static void parse_margins(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
 
+    obt_xml_attr_bool(node, "perMonitor", &config_margins_per_monitor);
+
     node = node->children;
 
     if ((n = obt_xml_find_node(node, "top")))
@@ -1119,6 +1122,7 @@ void config_startup(ObtXmlInst *i)
     obt_xml_register(i, "placement", parse_placement, NULL);
 
     STRUT_PARTIAL_SET(config_margins, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    config_margins_per_monitor = FALSE;
 
     obt_xml_register(i, "margins", parse_margins, NULL);
 

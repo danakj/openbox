@@ -4491,21 +4491,21 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
 
     switch (dir) {
     case OB_DIRECTION_NORTH:
-        edge = RECT_TOP(*a) - 1;
+        edge = RECT_TOP(*a) - 1 + (config_margins_per_monitor ? config_margins.top : 0);
         break;
     case OB_DIRECTION_SOUTH:
-        edge = RECT_BOTTOM(*a) + 1;
+        edge = RECT_BOTTOM(*a) + 1 - (config_margins_per_monitor ? config_margins.bottom : 0);
         break;
     case OB_DIRECTION_EAST:
-        edge = RECT_RIGHT(*a) + 1;
+        edge = RECT_RIGHT(*a) + 1 - (config_margins_per_monitor ? config_margins.right : 0);
         break;
     case OB_DIRECTION_WEST:
-        edge = RECT_LEFT(*a) - 1;
+        edge = RECT_LEFT(*a) - 1 + (config_margins_per_monitor ? config_margins.left : 0);
         break;
     default:
         g_assert_not_reached();
     }
-    /* default to the far edge, then narrow it down */
+    /* default to the far edge (per-monitor margin adjusted), then narrow it down */
     *dest = edge;
     *near_edge = TRUE;
 

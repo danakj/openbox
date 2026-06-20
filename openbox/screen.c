@@ -1678,13 +1678,6 @@ Rect* screen_area(guint desktop, guint head, Rect *search)
                 t = MAX(t, RECT_TOP(monitor_area[i]));
                 r = MIN(r, RECT_RIGHT(monitor_area[i]));
                 b = MIN(b, RECT_BOTTOM(monitor_area[i]));
-
-                if (config_margins_per_monitor) {
-                    l += config_margins.left;
-                    t += config_margins.top;
-                    r -= config_margins.right;
-                    b -= config_margins.bottom;
-                }
             }
         }
     }

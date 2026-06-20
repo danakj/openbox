@@ -3096,6 +3096,13 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
         a = screen_area(self->desktop, i,
                         (self->max_horz && self->max_vert ? NULL : &desired));
 
+        if (config_margins_per_monitor) {
+            a->x     += config_margins.left;
+            a->y     += config_margins.top;
+            a->width  -= config_margins.left + config_margins.right;
+            a->height -= config_margins.top  + config_margins.bottom;
+        }
+
         /* set the size and position if maximized */
         if (self->max_horz) {
             *x = a->x;
@@ -4512,6 +4519,12 @@ void client_find_edge_directional(ObClient *self, ObDirection dir,
     /* search for edges of monitors */
     for (i = 0; i < screen_num_monitors; ++i) {
         Rect *area = screen_area(self->desktop, i, NULL);
+        if (config_margins_per_monitor) {
+            area->x     += config_margins.left;
+            area->y     += config_margins.top;
+            area->width  -= config_margins.left + config_margins.right;
+            area->height -= config_margins.top  + config_margins.bottom;
+        }
         detect_edge(*area, dir, my_head, my_size, my_edge_start,
                     my_edge_size, dest, near_edge);
         g_slice_free(Rect, area);

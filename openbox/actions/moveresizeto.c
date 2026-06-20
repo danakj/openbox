@@ -122,7 +122,19 @@ static gboolean run_func(ObActionsData *data, gpointer options)
         }
 
         area = screen_area(c->desktop, mon, NULL);
+        if (config_margins_per_monitor && mon < screen_num_monitors) {
+            area->x     += config_margins.left;
+            area->y     += config_margins.top;
+            area->width  -= config_margins.left + config_margins.right;
+            area->height -= config_margins.top  + config_margins.bottom;
+        }
         carea = screen_area(c->desktop, cmon, NULL);
+        if (config_margins_per_monitor) {
+            carea->x     += config_margins.left;
+            carea->y     += config_margins.top;
+            carea->width  -= config_margins.left + config_margins.right;
+            carea->height -= config_margins.top  + config_margins.bottom;
+        }
 
         /* find a target size for the client/frame. */
         w = o->w;

@@ -162,8 +162,11 @@
 <!-- You can reserve a portion of your screen where windows will not cover when
      they are maximized, or when they are initially placed.
      Many programs reserve space automatically, but you can use this in other
-     cases. -->
-<margins>
+     cases.
+     Set perMonitor="yes" to apply margins per monitor instead of as global
+     struts. In this mode, margins act as gaps inset from each monitor edge
+     and affect maximized windows and MoveToEdge snapping. -->
+<margins perMonitor="no">
   <top>0</top>
   <bottom>0</bottom>
   <left>0</left>

@@ -106,6 +106,8 @@ extern ObPlaceMonitor config_primary_monitor;
 
 /*! User-specified margins around the edge of the screen(s) */
 extern StrutPartial config_margins;
+/*! When TRUE, margins are applied per-monitor instead of as global struts */
+extern gboolean config_margins_per_monitor;
 
 /*! When true windows' contents are refreshed while they are resized; otherwise
   they are not updated until the resize is complete */

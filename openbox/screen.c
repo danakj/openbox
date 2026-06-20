@@ -1482,14 +1482,16 @@ void screen_update_areas(void)
     if (dock_strut.bottom)
         ADD_STRUT_TO_LIST(struts_bottom, DESKTOP_ALL, &dock_strut);
 
-    if (config_margins.left)
-        ADD_STRUT_TO_LIST(struts_left, DESKTOP_ALL, &config_margins);
-    if (config_margins.top)
-        ADD_STRUT_TO_LIST(struts_top, DESKTOP_ALL, &config_margins);
-    if (config_margins.right)
-        ADD_STRUT_TO_LIST(struts_right, DESKTOP_ALL, &config_margins);
-    if (config_margins.bottom)
-        ADD_STRUT_TO_LIST(struts_bottom, DESKTOP_ALL, &config_margins);
+    if (!config_margins_per_monitor) {
+        if (config_margins.left)
+            ADD_STRUT_TO_LIST(struts_left, DESKTOP_ALL, &config_margins);
+        if (config_margins.top)
+            ADD_STRUT_TO_LIST(struts_top, DESKTOP_ALL, &config_margins);
+        if (config_margins.right)
+            ADD_STRUT_TO_LIST(struts_right, DESKTOP_ALL, &config_margins);
+        if (config_margins.bottom)
+            ADD_STRUT_TO_LIST(struts_bottom, DESKTOP_ALL, &config_margins);
+    }
 
     VALIDATE_STRUTS(struts_left, left,
                     monitor_area[screen_num_monitors].width / 2);

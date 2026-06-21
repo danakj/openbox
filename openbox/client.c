@@ -412,8 +412,7 @@ void client_manage(Window window, ObPrompt *prompt)
                              ob_state() == OB_STATE_RUNNING &&
                              (self->type == OB_CLIENT_TYPE_DIALOG ||
                               self->type == OB_CLIENT_TYPE_SPLASH ||
-                              (!((self->positioned & USPosition) ||
-                                 settings->pos_given) &&
+                              (!settings->pos_given &&
                                client_normal(self) &&
                                !self->session &&
                                /* don't move oldschool fullscreen windows to

@@ -226,10 +226,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     /* keep the pointer bounded to the screen for move/resize */
     if (!grab_pointer(FALSE, TRUE, cur))
         return;
-    if (!grab_keyboard()) {
-        ungrab_pointer();
-        return;
-    }
 
     frame_end_iconify_animation(c->frame);
 
@@ -311,7 +307,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
 
 void moveresize_end(gboolean cancel)
 {
-    ungrab_keyboard();
     ungrab_pointer();
 
     popup_hide(popup);

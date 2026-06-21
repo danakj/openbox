@@ -408,5 +408,5 @@ static void framerender_close(ObFrame *self, RrAppearance *a)
 {
     if (!self->close_on) return;
     RrPaint(a, self->close,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+            ob_rr_theme->close_button_size, ob_rr_theme->button_size);
 }

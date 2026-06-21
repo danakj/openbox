@@ -59,6 +59,8 @@ struct _RrTheme {
     gint label_height;
     gint title_height;
     gint button_size;
+    gint close_button_size;
+    gint close_button_percent;
     gint grip_width;
     gint menu_title_label_height;
     gint menu_title_height;

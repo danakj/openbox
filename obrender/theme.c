@@ -262,6 +262,7 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
     READ_INT("window.handle.width", theme->handle_height, 0, 100, 6);
     READ_INT("padding.width", theme->paddingx, 0, 100, 3);
     READ_INT("padding.height", theme->paddingy, 0, 100, theme->paddingx);
+    READ_INT("close.button.percent", theme->close_button_percent, 0, 300, 100);
     READ_INT("border.width", theme->fbwidth, 0, 100, 1);
     READ_INT("menu.border.width", theme->mbwidth, 0, 100, theme->fbwidth);
     READ_INT("osd.border.width", theme->obwidth, 0, 100, theme->fbwidth);
@@ -983,6 +984,11 @@ RrTheme* RrThemeNew(const RrInstance *inst, const gchar *name,
             theme->paddingy * 2;
     }
     theme->button_size = theme->label_height - 2;
+    if (theme->close_button_percent>0) {
+        theme->close_button_size = (gint)(theme->button_size * theme->close_button_percent / 100);
+    } else {
+        theme->close_button_size = theme->button_size;
+    }
     theme->grip_width = 25;
 
     RrAppearanceFree(fbs.focused_disabled);

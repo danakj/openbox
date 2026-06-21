@@ -10,6 +10,7 @@ padding.width:				1
 window.handle.width:			0
 window.client.padding.width:		0
 window.client.padding.height:		0
+close.button.percent:			150
 
 menu.overlap:				0
 

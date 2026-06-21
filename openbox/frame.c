@@ -207,7 +207,7 @@ static void set_theme_statics(ObFrame *self)
     XResizeWindow(obt_display, self->icon,
                   ob_rr_theme->button_size + 2, ob_rr_theme->button_size + 2);
     XResizeWindow(obt_display, self->close,
-                  ob_rr_theme->button_size, ob_rr_theme->button_size);
+                  ob_rr_theme->close_button_size, ob_rr_theme->button_size);
     XResizeWindow(obt_display, self->desk,
                   ob_rr_theme->button_size, ob_rr_theme->button_size);
     XResizeWindow(obt_display, self->shade,
@@ -1183,6 +1183,7 @@ static void layout_title(ObFrame *self)
     gint i;
 
     const gint bwidth = ob_rr_theme->button_size + ob_rr_theme->paddingx + 1;
+    const gint close_bwidth = ob_rr_theme->close_button_size + ob_rr_theme->paddingx + 1;
     /* position of the leftmost button */
     const gint left = ob_rr_theme->paddingx + 1;
     /* position of the rightmost button */
@@ -1240,7 +1241,7 @@ static void layout_title(ObFrame *self)
                 place_button(self, lc, bwidth, left, i, &x, &self->max_on, &self->max_x);
             } else if (*lc == 'C') {
                 if (firstcon) *firstcon = OB_FRAME_CONTEXT_CLOSE;
-                place_button(self, lc, bwidth, left, i, &x, &self->close_on, &self->close_x);
+                place_button(self, lc, close_bwidth, left, i, &x, &self->close_on, &self->close_x);
             } else
                 continue; /* don't set firstcon */
             firstcon = NULL;

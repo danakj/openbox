@@ -30,6 +30,7 @@
 #include "grab.h"
 #include "menu.h"
 #include "prompt.h"
+#include "snap.h"
 #include "menuframe.h"
 #include "keyboard.h"
 #include "mouse.h"
@@ -464,6 +465,7 @@ static void event_process(const XEvent *ec, gpointer data)
     ObWindow *obwin = NULL;
     ObMenuFrame *menu = NULL;
     ObPrompt *prompt = NULL;
+    gboolean snapwin;
     gboolean used;
 
     /* make a copy we can mangle */
@@ -471,6 +473,7 @@ static void event_process(const XEvent *ec, gpointer data)
     e = &ee;
 
     window = event_get_window(e);
+    snapwin = snap_is_popup_window(window);
     if (window == obt_root(ob_screen))
         /* don't do any lookups, waste of cpu */;
     else if ((obwin = window_find(window))) {
@@ -636,6 +639,8 @@ static void event_process(const XEvent *ec, gpointer data)
         event_handle_dock(dock, e);
     else if (menu)
         event_handle_menu(menu, e);
+    else if (snapwin)
+        snap_event(e);
     else if (window == obt_root(ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
@@ -704,11 +709,19 @@ static void event_process(const XEvent *ec, gpointer data)
     }
 #endif
 
-    if (e->type == ButtonPress || e->type == ButtonRelease) {
+    if (snapwin) {
+        /* the snap layouts popup has already dealt with its own events, and
+           they are not to be used for bindings */
+    }
+    else if (e->type == ButtonPress || e->type == ButtonRelease) {
         ObWindow *w;
         static guint pressed = 0;
 
         event_sourcetime = event_curtime;
+
+        /* clicking anywhere else takes the snap layouts popup down */
+        if (e->type == ButtonPress)
+            snap_hide();
 
         /* If the button press was on some non-root window, or was physically
            on the root window... */
@@ -739,6 +752,9 @@ static void event_process(const XEvent *ec, gpointer data)
              e->type == MotionNotify)
     {
         event_sourcetime = event_curtime;
+
+        if (e->type == KeyPress)
+            snap_hide();
 
         used = event_handle_user_input(client, e);
 
@@ -1049,6 +1065,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     client->frame->close_hover = FALSE;
                 frame_adjust_state(client->frame);
             }
+            snap_hover_end();
             break;
         default:
             but = context_to_button(client->frame, con, FALSE);
@@ -1056,6 +1073,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 *but = TRUE;
                 frame_adjust_state(client->frame);
             }
+            if (con == OB_FRAME_CONTEXT_MAXIMIZE && !pb)
+                snap_hover_begin(client);
+            else if (con != OB_FRAME_CONTEXT_MAXIMIZE)
+                snap_hover_end();
             break;
         }
         break;
@@ -1079,6 +1100,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
                     client->frame->iconify_press =
                     client->frame->close_press = FALSE;
             }
+            snap_hover_end();
             break;
         case OB_FRAME_CONTEXT_FRAME:
             /* When the mouse leaves an animating window, don't use the
@@ -1116,6 +1138,8 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 }
                 frame_adjust_state(client->frame);
             }
+            if (con == OB_FRAME_CONTEXT_MAXIMIZE)
+                snap_hover_end();
             break;
         }
         break;
@@ -1169,6 +1193,10 @@ static void event_handle_client(ObClient *client, XEvent *e)
                 }
                 frame_adjust_state(client->frame);
             }
+            if (con == OB_FRAME_CONTEXT_MAXIMIZE)
+                snap_hover_begin(client);
+            else
+                snap_hover_end();
             break;
         }
         break;

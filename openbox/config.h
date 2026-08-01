@@ -222,6 +222,28 @@ extern GSList *config_menu_files;
 /*! Per app settings */
 extern GSList *config_per_app_settings;
 
+/*! One zone of a snap layout. The values are percentages of the monitor's
+  usable area. */
+typedef struct _ObSnapZone {
+    gint x;
+    gint y;
+    gint width;
+    gint height;
+} ObSnapZone;
+
+/*! One template shown in the snap layouts popup */
+typedef struct _ObSnapLayout {
+    /*! A list of ObSnapZone */
+    GSList *zones;
+} ObSnapLayout;
+
+/*! Show the snap layouts popup when hovering a window's maximize button */
+extern gboolean config_snap_layouts;
+/*! Milliseconds to hover the maximize button before the popup appears */
+extern guint config_snap_layouts_delay;
+/*! The layouts offered by the popup, a list of ObSnapLayout */
+extern GSList *config_snap_layouts_list;
+
 void config_startup(ObtXmlInst *i);
 void config_shutdown(void);
 

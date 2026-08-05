@@ -104,6 +104,10 @@ gboolean config_menu_separate_iconic;
 
 GSList *config_menu_files;
 
+gboolean config_snap_layouts;
+guint    config_snap_layouts_delay;
+GSList  *config_snap_layouts_list;
+
 gint     config_resist_win;
 gint     config_resist_edge;
 
@@ -997,6 +1001,121 @@ static void parse_menu(xmlNodePtr node, gpointer d)
     }
 }
 
+static void snap_layout_add_zone(ObSnapLayout *l,
+                                 gint x, gint y, gint w, gint h)
+{
+    ObSnapZone *z = g_slice_new(ObSnapZone);
+    z->x = x;
+    z->y = y;
+    z->width = w;
+    z->height = h;
+    l->zones = g_slist_append(l->zones, z);
+}
+
+static void snap_layout_free(ObSnapLayout *l)
+{
+    GSList *it;
+
+    for (it = l->zones; it; it = g_slist_next(it))
+        g_slice_free(ObSnapZone, it->data);
+    g_slist_free(l->zones);
+    g_slice_free(ObSnapLayout, l);
+}
+
+static void config_snap_layouts_clear(void)
+{
+    GSList *it;
+
+    for (it = config_snap_layouts_list; it; it = g_slist_next(it))
+        snap_layout_free(it->data);
+    g_slist_free(config_snap_layouts_list);
+    config_snap_layouts_list = NULL;
+}
+
+/*! The layouts offered when the user hasn't specified any of their own */
+static void config_snap_layouts_defaults(void)
+{
+    /*! Each row is a layout, each group of 4 numbers a zone within it, given
+      as x, y, width, height in percent of the monitor */
+    static const gint defaults[][4 * 4 + 1] = {
+        /* left and right halves */
+        { 2,  0,0,50,100,   50,0,50,100 },
+        /* three columns */
+        { 3,  0,0,33,100,   33,0,34,100,   67,0,33,100 },
+        /* a wide column and a narrow one */
+        { 2,  0,0,67,100,   67,0,33,100 },
+        /* one half, and two quarters stacked beside it */
+        { 3,  0,0,50,100,   50,0,50,50,    50,50,50,50 },
+        /* four quarters */
+        { 4,  0,0,50,50,    50,0,50,50,    0,50,50,50,   50,50,50,50 },
+        /* top and bottom halves */
+        { 2,  0,0,100,50,   0,50,100,50 },
+    };
+    guint i;
+    gint j;
+
+    for (i = 0; i < sizeof(defaults) / sizeof(defaults[0]); ++i) {
+        ObSnapLayout *l = g_slice_new0(ObSnapLayout);
+        for (j = 0; j < defaults[i][0]; ++j) {
+            const gint *z = &defaults[i][1 + j * 4];
+            snap_layout_add_zone(l, z[0], z[1], z[2], z[3]);
+        }
+        config_snap_layouts_list = g_slist_append(config_snap_layouts_list, l);
+    }
+}
+
+static void parse_snap_layouts(xmlNodePtr node, gpointer d)
+{
+    xmlNodePtr n, l;
+    gboolean any = FALSE;
+
+    node = node->children;
+
+    if ((n = obt_xml_find_node(node, "enabled")))
+        config_snap_layouts = obt_xml_node_bool(n);
+    if ((n = obt_xml_find_node(node, "delay")))
+        config_snap_layouts_delay = MAX(0, obt_xml_node_int(n));
+
+    for (l = obt_xml_find_node(node, "layout"); l;
+         l = obt_xml_find_node(l->next, "layout"))
+    {
+        ObSnapLayout *layout;
+
+        /* the first layout in the config file replaces the built-in ones */
+        if (!any) {
+            config_snap_layouts_clear();
+            any = TRUE;
+        }
+
+        layout = g_slice_new0(ObSnapLayout);
+        for (n = obt_xml_find_node(l->children, "zone"); n;
+             n = obt_xml_find_node(n->next, "zone"))
+        {
+            gint x = 0, y = 0, w = 0, h = 0;
+
+            obt_xml_attr_int(n, "x", &x);
+            obt_xml_attr_int(n, "y", &y);
+            obt_xml_attr_int(n, "width", &w);
+            obt_xml_attr_int(n, "height", &h);
+
+            x = CLAMP(x, 0, 100);
+            y = CLAMP(y, 0, 100);
+            w = CLAMP(w, 1, 100 - x);
+            h = CLAMP(h, 1, 100 - y);
+
+            snap_layout_add_zone(layout, x, y, w, h);
+        }
+
+        if (layout->zones)
+            config_snap_layouts_list =
+                g_slist_append(config_snap_layouts_list, layout);
+        else {
+            g_message(_("Ignoring snap layout with no zones in it"));
+            snap_layout_free(layout);
+        }
+    }
+}
+
 static void parse_resistance(xmlNodePtr node, gpointer d)
 {
     xmlNodePtr n;
@@ -1201,6 +1320,13 @@ void config_startup(ObtXmlInst *i)
 
     obt_xml_register(i, "menu", parse_menu, NULL);
 
+    config_snap_layouts = TRUE;
+    config_snap_layouts_delay = 400;
+    config_snap_layouts_list = NULL;
+    config_snap_layouts_defaults();
+
+    obt_xml_register(i, "snapLayouts", parse_snap_layouts, NULL);
+
     config_per_app_settings = NULL;
 
     obt_xml_register(i, "applications", parse_per_app_settings, NULL);
@@ -1228,6 +1354,8 @@ void config_shutdown(void)
     for (it = config_menu_files; it; it = g_slist_next(it))
         g_free(it->data);
     g_slist_free(config_menu_files);
+
+    config_snap_layouts_clear();
 
     for (it = config_per_app_settings; it; it = g_slist_next(it)) {
         ObAppSettings *itd = (ObAppSettings *)it->data;

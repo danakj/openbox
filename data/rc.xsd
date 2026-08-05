@@ -34,6 +34,7 @@
                 <xsd:element name="keyboard" type="ob:keyboard"/>
                 <xsd:element name="mouse" type="ob:mouse"/>
                 <xsd:element name="menu" type="ob:menu"/>
+                <xsd:element minOccurs="0" name="snapLayouts" type="ob:snapLayouts"/>
                 <xsd:element name="applications" type="ob:applications"/>
             </xsd:all>
         </xsd:complexType>
@@ -227,6 +228,30 @@
             <xsd:element minOccurs="0" name="showIcons" type="ob:bool"/>
             <xsd:element minOccurs="0" name="manageDesktops" type="ob:bool"/>
         </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="snapLayouts">
+        <xsd:annotation>
+            <xsd:documentation>the zone picker shown when hovering a window's maximize button</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element minOccurs="0" name="enabled" type="ob:bool"/>
+            <xsd:element minOccurs="0" name="delay" type="xsd:integer"/>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="layout" type="ob:snapLayout"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="snapLayout">
+        <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" name="zone" type="ob:snapZone"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="snapZone">
+        <xsd:annotation>
+            <xsd:documentation>a region of the monitor, in percent of its usable area</xsd:documentation>
+        </xsd:annotation>
+        <xsd:attribute name="x" type="xsd:integer" use="required"/>
+        <xsd:attribute name="y" type="xsd:integer" use="required"/>
+        <xsd:attribute name="width" type="xsd:integer" use="required"/>
+        <xsd:attribute name="height" type="xsd:integer" use="required"/>
     </xsd:complexType>
     <xsd:complexType name="window_position">
         <xsd:all>

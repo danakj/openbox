@@ -643,6 +643,50 @@
   <!-- show the manage desktops section in the client-list-(combined-)menu -->
 </menu>
 
+<snapLayouts>
+  <!-- Hovering the maximize button of a window pops up a set of layout
+       templates. Each template is drawn as a miniature of the monitor, split
+       into zones; clicking a zone moves and resizes the window to fill that
+       part of the monitor's usable area. -->
+  <enabled>yes</enabled>
+  <!-- how long the pointer must rest on the maximize button, in
+       milliseconds, before the popup appears -->
+  <delay>400</delay>
+  <!-- If you list any <layout> here, they replace the built-in set entirely.
+       Zone positions and sizes are percentages of the monitor's usable area.
+       The built-in set is equivalent to this:
+
+  <layout>
+    <zone x="0" y="0" width="50" height="100"/>
+    <zone x="50" y="0" width="50" height="100"/>
+  </layout>
+  <layout>
+    <zone x="0" y="0" width="33" height="100"/>
+    <zone x="33" y="0" width="34" height="100"/>
+    <zone x="67" y="0" width="33" height="100"/>
+  </layout>
+  <layout>
+    <zone x="0" y="0" width="67" height="100"/>
+    <zone x="67" y="0" width="33" height="100"/>
+  </layout>
+  <layout>
+    <zone x="0" y="0" width="50" height="100"/>
+    <zone x="50" y="0" width="50" height="50"/>
+    <zone x="50" y="50" width="50" height="50"/>
+  </layout>
+  <layout>
+    <zone x="0" y="0" width="50" height="50"/>
+    <zone x="50" y="0" width="50" height="50"/>
+    <zone x="0" y="50" width="50" height="50"/>
+    <zone x="50" y="50" width="50" height="50"/>
+  </layout>
+  <layout>
+    <zone x="0" y="0" width="100" height="50"/>
+    <zone x="0" y="50" width="100" height="50"/>
+  </layout>
+  -->
+</snapLayouts>
+
 <applications>
 <!--
   # this is an example with comments through out. use these to make your

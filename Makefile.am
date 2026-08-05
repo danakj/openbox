@@ -303,6 +303,8 @@ openbox_openbox_SOURCES = \
 	openbox/screen.h \
 	openbox/session.c \
 	openbox/session.h \
+	openbox/snap.c \
+	openbox/snap.h \
 	openbox/stacking.c \
 	openbox/stacking.h \
 	openbox/startupnotify.c \

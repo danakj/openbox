@@ -58,6 +58,49 @@ struct _RrTheme {
     gint menu_font_height;
     gint label_height;
     gint title_height;
+    /*! ABI COMPATIBILITY FIELD -- do not move, rename, or remove.
+        =========================================================
+        This field must stay at exactly this position in the struct.
+        RrTheme is a *public* struct (declared in this installed header,
+        obrender/theme.h) that external programs compile against
+        directly -- they don't just call our functions, they read
+        theme->some_field at whatever byte offset their own compiled
+        copy of this header says that field lives at. The shared
+        library (libobrender.so.32) and any such external program
+        (obconf is the known case, but there may be others: panels,
+        theme switchers, previewers, anything linking obrender) do NOT
+        get recompiled together -- they are separate packages, updated
+        independently by the package manager.
+
+        So: inserting a field *before* this point, or deleting this
+        field outright, silently shifts the compiled-in offsets that
+        every field *after* it is read at in every external binary
+        that hasn't been rebuilt against the new header. Those programs
+        don't get a compile error -- they just start reading the wrong
+        bytes as soon as the new library is installed, misinterpreting
+        e.g. an RrColor* pointer as some unrelated gint, and typically
+        segfault almost immediately (this is exactly what happened to
+        obconf during development of the button/titlebar geometry
+        rework: replacing this field in place with two new ones,
+        button_height and button_width, shifted every RrColor pointer
+        and RrAppearance pointer field declared below it, and obconf
+        crashed the instant it dereferenced one of those now-misaligned
+        pointers).
+
+        The fix, and the rule going forward: never insert or resize a
+        field in the middle of this struct. New fields belonging to
+        this stage of the work (kgrip, button_height, button_width)
+        are instead appended after the last original field (see the
+        end of this struct, past `name`) -- appending only grows the
+        struct and cannot change any earlier field's offset, so old
+        binaries keep reading everything before the append point
+        correctly. button_size itself is kept alive (rather than
+        deleted) and populated in theme.c as a mirror of button_height,
+        so that legacy code which still reads a single square
+        button_size -- like obconf's theme-preview button -- gets a
+        sane value instead of whatever garbage now sits at that offset.
+        It is not used anywhere in this codebase's own layout logic
+        any more; use button_height/button_width for that. */
     gint button_size;
     gint grip_width;
     gint menu_title_label_height;
@@ -174,6 +217,38 @@ struct _RrTheme {
     RrAppearance *osd_focused_button;
 
     gchar *name;
+
+    /* =====================================================================
+       APPEND-ONLY ZONE -- new fields from here on, nothing above this line.
+       =====================================================================
+       `name` above is the last field of the original, upstream RrTheme
+       struct (see the ABI comment on button_size, further up, for the
+       full explanation of why this matters). Every field added below
+       was deliberately placed *after* the original struct's end rather
+       than inserted among the existing fields, specifically so that
+       external programs already compiled against the stock layout --
+       obconf being the concrete example that broke -- go on reading
+       every pre-existing field (all the RrColor and RrAppearance pointers
+       etc. above) at the exact offsets they were compiled for, even
+       though this library's struct is now physically larger than
+       theirs. Those programs simply don't know these new fields exist,
+       which is fine: they never try to read past `name`.
+
+       Any future geometry work should keep following this same rule:
+       append new fields here, don't insert them earlier in the struct,
+       and don't repurpose/resize an existing field's type. If a field
+       genuinely needs to be removed, keep it in place (like
+       button_size) and just stop relying on it internally, rather than
+       deleting it outright. */
+
+    /*! Room at the top of the titlebar, above the buttons, that acts as
+      a hover zone for the top-resize cursor. Read directly from the
+      theme file (clamped), like paddingx/paddingy. */
+    gint kgrip;
+    /*! Real (non-square) button dimensions. button_width is derived
+        from button_height via the WISTOH constant in theme.c. */
+    gint button_height;
+    gint button_width;
 };
 
 /*! The font values are all optional. If a NULL is used for any of them, then

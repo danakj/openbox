@@ -21,6 +21,7 @@
 #include "openbox.h"
 #include "screen.h"
 #include "client.h"
+#include "config.h"
 #include "framerender.h"
 #include "obrender/theme.h"
 
@@ -43,6 +44,37 @@ void framerender_frame(ObFrame *self)
     self->need_render = FALSE;
 
     {
+        if ((self->decorations & OB_FRAME_DECOR_TITLEBAR) && !self->max_horz && !self->max_vert && config_theme_roundcorners)
+        {
+            XGCValues xgcv;
+            XWindowAttributes wd_att;
+            XGetWindowAttributes (obt_display, self->window, &wd_att);
+            Pixmap mask = XCreatePixmap (obt_display, self->window, wd_att.width, wd_att.height, 1);
+            GC shape_gc = XCreateGC (obt_display, mask, 0, &xgcv);
+            XSetForeground (obt_display, shape_gc, 1);
+            XFillRectangle (obt_display, mask, shape_gc, 0, 0, wd_att.width, wd_att.height);
+            XSetForeground (obt_display, shape_gc, 0);
+
+            XFillRectangle (obt_display, mask, shape_gc, 0, 0, 2, 2);
+            XFillRectangle (obt_display, mask, shape_gc, 2, 0, 2, 1);
+            XFillRectangle (obt_display, mask, shape_gc, 0, 2, 1, 2);
+
+            XFillRectangle (obt_display, mask, shape_gc, 0, wd_att.height - 2, 2, 2);
+            XFillRectangle (obt_display, mask, shape_gc, 2, wd_att.height - 1, 2, 1);
+            XFillRectangle (obt_display, mask, shape_gc, 0, wd_att.height - 4, 1, 2);
+
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 2, 0, 2, 2);
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 4, 0, 2, 1);
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 1, 2, 1, 2);
+
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 2, wd_att.height - 2, 2, 2);
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 4, wd_att.height - 1, 2, 1);
+            XFillRectangle (obt_display, mask, shape_gc, wd_att.width - 1, wd_att.height - 4, 1, 2);
+
+            XShapeCombineMask (obt_display, self->window, ShapeBounding, 0, 0, mask, ShapeSet);
+            XFreePixmap (obt_display, mask);
+        }
+
         gulong px;
 
         px = (self->focused ?
@@ -123,6 +155,88 @@ void framerender_frame(ObFrame *self)
 
         XSetWindowBackground(obt_display, self->titlebottom, px);
         XClearWindow(obt_display, self->titlebottom);
+
+        px = (self->focused ?
+            RrColorPixel (ob_rr_theme->a_focused_title->surface.primary) :
+            RrColorPixel (ob_rr_theme->a_unfocused_title->surface.primary));
+
+        XSetWindowBackground(obt_display, self->outertop, px);
+        XClearWindow(obt_display, self->outertop);
+        XSetWindowBackground(obt_display, self->outerlefttop, px);
+        XClearWindow(obt_display, self->outerlefttop);
+        XSetWindowBackground(obt_display, self->outerrighttop, px);
+        XClearWindow(obt_display, self->outerrighttop);
+        XSetWindowBackground(obt_display, self->outertopleft, px);
+        XClearWindow(obt_display, self->outertopleft);
+        XSetWindowBackground(obt_display, self->outertopright, px);
+        XClearWindow(obt_display, self->outertopright);
+
+        px = (self->focused ?
+              RrColorPixel(ob_rr_theme->cb_focused_color) :
+              RrColorPixel(ob_rr_theme->cb_unfocused_color));
+
+        XSetWindowBackground(obt_display, self->outerleft, px);
+        XClearWindow(obt_display, self->outerleft);
+        XSetWindowBackground(obt_display, self->outerright, px);
+        XClearWindow(obt_display, self->outerright);
+        XSetWindowBackground(obt_display, self->outerbottom, px);
+        XClearWindow(obt_display, self->outerbottom);
+        XSetWindowBackground(obt_display, self->outerleftbottom, px);
+        XClearWindow(obt_display, self->outerleftbottom);
+        XSetWindowBackground(obt_display, self->outerrightbottom, px);
+        XClearWindow(obt_display, self->outerrightbottom);
+        XSetWindowBackground(obt_display, self->outerbottomleft, px);
+        XClearWindow(obt_display, self->outerbottomleft);
+        XSetWindowBackground(obt_display, self->outerbottomright, px);
+        XClearWindow(obt_display, self->outerbottomright);
+
+        px = RrColorPixel (ob_rr_theme->frame_focused_border_color);
+
+        XSetWindowBackground(obt_display, self->edgeleft, px);
+        XClearWindow(obt_display, self->edgeleft);
+        XSetWindowBackground(obt_display, self->edgeright, px);
+        XClearWindow(obt_display, self->edgeright);
+        XSetWindowBackground(obt_display, self->edgebottom, px);
+        XClearWindow(obt_display, self->edgebottom);
+        XSetWindowBackground(obt_display, self->edgebottomleft, px);
+        XClearWindow(obt_display, self->edgebottomleft);
+        XSetWindowBackground(obt_display, self->edgebottomright, px);
+        XClearWindow(obt_display, self->edgebottomright);
+        XSetWindowBackground(obt_display, self->edgeleftbottom, px);
+        XClearWindow(obt_display, self->edgeleftbottom);
+        XSetWindowBackground(obt_display, self->edgerightbottom, px);
+        XClearWindow(obt_display, self->edgerightbottom);
+        XSetWindowBackground(obt_display, self->ce_bl_b, px);
+        XClearWindow(obt_display, self->ce_bl_b);
+        XSetWindowBackground(obt_display, self->ce_bl_l, px);
+        XClearWindow(obt_display, self->ce_bl_l);
+        XSetWindowBackground(obt_display, self->ce_br_b, px);
+        XClearWindow(obt_display, self->ce_br_b);
+        XSetWindowBackground(obt_display, self->ce_br_r, px);
+        XClearWindow(obt_display, self->ce_br_r);
+
+        px = (self->focused ?
+              RrColorPixel (ob_rr_theme->a_focused_title->surface.primary) :
+              RrColorPixel(ob_rr_theme->frame_focused_border_color));
+
+        XSetWindowBackground(obt_display, self->edgetop, px);
+        XClearWindow(obt_display, self->edgetop);
+        XSetWindowBackground(obt_display, self->edgelefttop, px);
+        XClearWindow(obt_display, self->edgelefttop);
+        XSetWindowBackground(obt_display, self->edgerighttop, px);
+        XClearWindow(obt_display, self->edgerighttop);
+        XSetWindowBackground(obt_display, self->edgetopleft, px);
+        XClearWindow(obt_display, self->edgetopleft);
+        XSetWindowBackground(obt_display, self->edgetopright, px);
+        XClearWindow(obt_display, self->edgetopright);
+        XSetWindowBackground(obt_display, self->ce_tl_t, px);
+        XClearWindow(obt_display, self->ce_tl_t);
+        XSetWindowBackground(obt_display, self->ce_tl_l, px);
+        XClearWindow(obt_display, self->ce_tl_l);
+        XSetWindowBackground(obt_display, self->ce_tr_t, px);
+        XClearWindow(obt_display, self->ce_tr_t);
+        XSetWindowBackground(obt_display, self->ce_tr_r, px);
+        XClearWindow(obt_display, self->ce_tr_r);
     }
 
     if (self->decorations & OB_FRAME_DECOR_TITLEBAR) {
@@ -244,6 +358,24 @@ void framerender_frame(ObFrame *self)
         }
         clear = ob_rr_theme->a_clear;
 
+        /* mirrors the vertical-centering math in frame.c's layout_title();
+           these values must stay in sync with the actual XMoveWindow
+           calls there, since this block only feeds parent-relative
+           (RR_SURFACE_PARENTREL) appearances the coordinates they need
+           to sample the correct region of the parent's background --
+           it doesn't move any real window itself. A mismatch here
+           doesn't crash anything, but produces exactly the kind of
+           misplaced/blank rectangle artifact seen with parent-relative
+           (transparent-background) button themes: the real button
+           window sits at the new centered position, while the parent-
+           relative fill is sampled from the old, stale offset. */
+        {
+        const gint label_y =
+            (ob_rr_theme->title_height - ob_rr_theme->label_height) / 2;
+        const gint button_y =
+            (ob_rr_theme->title_height - ob_rr_theme->button_height) / 2;
+        const gint icon_y = button_y; /* icon is sized to button_height */
+
         RrPaint(t, self->title, self->width, ob_rr_theme->title_height);
 
         clear->surface.parent = t;
@@ -251,15 +383,20 @@ void framerender_frame(ObFrame *self)
 
         clear->surface.parentx = ob_rr_theme->grip_width;
 
+        /* topresize's height is kgrip now (see frame.c's
+           frame_adjust_area), not paddingy + 1 -- keep this RrPaint
+           size argument in sync with that window's real XResizeWindow
+           size, or the clear/parent-relative fill will be built for
+           the wrong dimensions */
         RrPaint(clear, self->topresize,
                 self->width - ob_rr_theme->grip_width * 2,
-                ob_rr_theme->paddingy + 1);
+                ob_rr_theme->kgrip);
 
         clear->surface.parentx = 0;
 
         if (ob_rr_theme->grip_width > 0)
             RrPaint(clear, self->tltresize,
-                    ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
+                    ob_rr_theme->grip_width, ob_rr_theme->kgrip);
         if (ob_rr_theme->title_height > 0)
             RrPaint(clear, self->tllresize,
                     ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
@@ -268,7 +405,7 @@ void framerender_frame(ObFrame *self)
 
         if (ob_rr_theme->grip_width > 0)
             RrPaint(clear, self->trtresize,
-                    ob_rr_theme->grip_width, ob_rr_theme->paddingy + 1);
+                    ob_rr_theme->grip_width, ob_rr_theme->kgrip);
 
         clear->surface.parentx = self->width - (ob_rr_theme->paddingx + 1);
 
@@ -279,31 +416,32 @@ void framerender_frame(ObFrame *self)
         /* set parents for any parent relative guys */
         l->surface.parent = t;
         l->surface.parentx = self->label_x;
-        l->surface.parenty = ob_rr_theme->paddingy;
+        l->surface.parenty = label_y;
 
         m->surface.parent = t;
         m->surface.parentx = self->max_x;
-        m->surface.parenty = ob_rr_theme->paddingy + 1;
+        m->surface.parenty = button_y;
 
         n->surface.parent = t;
         n->surface.parentx = self->icon_x;
-        n->surface.parenty = ob_rr_theme->paddingy;
+        n->surface.parenty = icon_y;
 
         i->surface.parent = t;
         i->surface.parentx = self->iconify_x;
-        i->surface.parenty = ob_rr_theme->paddingy + 1;
+        i->surface.parenty = button_y;
 
         d->surface.parent = t;
         d->surface.parentx = self->desk_x;
-        d->surface.parenty = ob_rr_theme->paddingy + 1;
+        d->surface.parenty = button_y;
 
         s->surface.parent = t;
         s->surface.parentx = self->shade_x;
-        s->surface.parenty = ob_rr_theme->paddingy + 1;
+        s->surface.parenty = button_y;
 
         c->surface.parent = t;
         c->surface.parentx = self->close_x;
-        c->surface.parenty = ob_rr_theme->paddingy + 1;
+        c->surface.parenty = button_y;
+        }
 
         framerender_label(self, l);
         framerender_max(self, m);
@@ -374,39 +512,42 @@ static void framerender_icon(ObFrame *self, RrAppearance *a)
         a->texture[0].type = RR_TEXTURE_NONE;
     }
 
+    /* the icon is square, sized to match the button height */
     RrPaint(a, self->icon,
-            ob_rr_theme->button_size + 2, ob_rr_theme->button_size + 2);
+            ob_rr_theme->button_height, ob_rr_theme->button_height);
 }
 
 static void framerender_max(ObFrame *self, RrAppearance *a)
 {
     if (!self->max_on) return;
-    RrPaint(a, self->max, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    RrPaint(a, self->max,
+            ob_rr_theme->button_width, ob_rr_theme->button_height);
 }
 
 static void framerender_iconify(ObFrame *self, RrAppearance *a)
 {
     if (!self->iconify_on) return;
     RrPaint(a, self->iconify,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+            ob_rr_theme->button_width, ob_rr_theme->button_height);
 }
 
 static void framerender_desk(ObFrame *self, RrAppearance *a)
 {
     if (!self->desk_on) return;
-    RrPaint(a, self->desk, ob_rr_theme->button_size, ob_rr_theme->button_size);
+    RrPaint(a, self->desk,
+            ob_rr_theme->button_width, ob_rr_theme->button_height);
 }
 
 static void framerender_shade(ObFrame *self, RrAppearance *a)
 {
     if (!self->shade_on) return;
     RrPaint(a, self->shade,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+            ob_rr_theme->button_width, ob_rr_theme->button_height);
 }
 
 static void framerender_close(ObFrame *self, RrAppearance *a)
 {
     if (!self->close_on) return;
     RrPaint(a, self->close,
-            ob_rr_theme->button_size, ob_rr_theme->button_size);
+            ob_rr_theme->button_width, ob_rr_theme->button_height);
 }

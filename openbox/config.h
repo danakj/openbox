@@ -185,6 +185,7 @@ extern guint config_keyboard_reset_keycode;
 extern guint config_keyboard_reset_state;
 /*! Reload the keyboard bindings when the mapping changes */
 extern gboolean config_keyboard_rebind_on_mapping_notify;
+extern GHashTable *config_keyboard_display_aliases;
 
 /*! Number of pixels a drag must go before being considered a drag */
 extern gint config_mouse_threshold;

@@ -76,6 +76,39 @@ static void chain_done(gpointer data)
     chain_timer = 0;
 }
 
+/* Substitute the final key name only for popup presentation. */
+static gchar *display_key_name(const gchar *binding)
+{
+    const gchar *name = g_strrstr(binding, "-");
+    const gchar *alias;
+
+    name = name ? name + 1 : binding;
+    alias = config_keyboard_display_aliases ?
+        g_hash_table_lookup(config_keyboard_display_aliases, name) : NULL;
+    if (!alias)
+        return g_strdup(binding);
+    if (name == binding)
+        return g_strdup(alias);
+
+    {
+        gchar *mods = g_strndup(binding, name - binding - 1);
+        gchar *p;
+        gchar *result;
+
+        for (p = mods; *p; p++) {
+            if ((p == mods || p[-1] == '-') &&
+                (p[1] == '-' || p[1] == '\0') &&
+                (*p == 'c' || *p == 'w' ||
+                 *p == 'a' || *p == 's'))
+                *p = g_ascii_toupper(*p);
+        }
+
+        result = g_strdup_printf("%s-%s", alias, mods);
+        g_free(mods);
+        return result;
+    }
+}
+
 static void set_curpos(KeyBindingTree *newpos)
 {
     if (curpos == newpos) return;
@@ -91,10 +124,12 @@ static void set_curpos(KeyBindingTree *newpos)
 
         for (it = curpos->keylist; it; it = g_list_next(it)) {
             gchar *oldtext = text;
+            gchar *display = display_key_name(it->data);
             if (text == NULL)
-                text = g_strdup(it->data);
+                text = g_strdup(display);
             else
-                text = g_strconcat(text, " - ", it->data, NULL);
+                text = g_strconcat(text, " - ", display, NULL);
+            g_free(display);
             g_free(oldtext);
         }
 

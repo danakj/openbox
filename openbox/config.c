@@ -88,6 +88,7 @@ guint           config_dock_app_move_modifiers;
 guint    config_keyboard_reset_keycode;
 guint    config_keyboard_reset_state;
 gboolean config_keyboard_rebind_on_mapping_notify;
+GHashTable *config_keyboard_display_aliases;
 
 gint     config_mouse_threshold;
 gint     config_mouse_dclicktime;
@@ -498,6 +499,25 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
     gchar *key;
 
     keyboard_unbind_all();
+
+    /* Rebuild display aliases when configuration is parsed. */
+    g_hash_table_remove_all(config_keyboard_display_aliases);
+    if ((n = obt_xml_find_node(node->children, "keyDisplayAliases"))) {
+        xmlNodePtr alias;
+        for (alias = obt_xml_find_node(n->children, "alias"); alias;
+             alias = obt_xml_find_node(alias->next, "alias")) {
+            gchar *key = NULL, *label = NULL;
+            gboolean have_key = obt_xml_attr_string(alias, "key", &key);
+            gboolean have_label = obt_xml_attr_string(alias, "label", &label);
+            if (have_key && have_label && *key && *label)
+                g_hash_table_replace(config_keyboard_display_aliases,
+                                     key, label);
+            else {
+                g_free(key);
+                g_free(label);
+            }
+        }
+    }
 
     if ((n = obt_xml_find_node(node->children, "chainQuitKey"))) {
         key = obt_xml_node_string(n);
@@ -1171,6 +1191,8 @@ void config_startup(ObtXmlInst *i)
     translate_key("C-g", &config_keyboard_reset_state,
                   &config_keyboard_reset_keycode);
     config_keyboard_rebind_on_mapping_notify = TRUE;
+    config_keyboard_display_aliases = g_hash_table_new_full(
+        g_str_hash, g_str_equal, g_free, g_free);
 
     bind_default_keyboard();
 
@@ -1209,6 +1231,9 @@ void config_startup(ObtXmlInst *i)
 void config_shutdown(void)
 {
     GSList *it;
+
+    g_hash_table_destroy(config_keyboard_display_aliases);
+    config_keyboard_display_aliases = NULL;
 
     g_free(config_theme);
 
